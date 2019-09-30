@@ -68,7 +68,7 @@ then
     
     echo -e "### Grinder Installation...\n"
     
-    conda activate Stalker_environment
+    conda activate ISeeker_environment
 else
     code=$?
     echo "FAIL : Conda environment configuration FAILED."
