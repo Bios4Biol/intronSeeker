@@ -25,7 +25,7 @@ Installation procedure
 
 To install intronSeeker, download all files and directories found at  
 [URL](https://forgemia.inra.fr/faustine.oudin/Script_unigene/tree/modification_emilien),
-then, run the setup.sh script :
+then, open a bash session if you are not already in bash (bash command) and run the setup.sh script :
 
  ```diff
  + ./setup.sh
