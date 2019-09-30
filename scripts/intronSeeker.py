@@ -13,11 +13,11 @@ import checkInstall as ci ;
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(
-		description="Functions to find and analyse split in alignment file.")
+		description="Functions to find and analyse split reads in alignment file.")
 	subparser = parser.add_subparsers(help="sub-command help")
 	
 	# subparser for the split read research
-	parser_split = subparser.add_parser("split", help="In the alignment file, look for split read")
+	parser_split = subparser.add_parser("splitReadSearch", help="In the alignment file, look for split read")
 	parser_split.add_argument("-i", "--input", help="input bam file from alignment", dest="bamfilename", type=str,
 							   metavar='', required=True)
 	parser_split.add_argument("-r", "--reference", help="name of the reference file used for the alignment", type=str,
@@ -27,7 +27,7 @@ if __name__ == '__main__':
 	parser_split.set_defaults(func=ir.split_research)
 
 	# subparser for writing fasta of spliced sequence
-	parser_trunc = subparser.add_parser("truncate", help="Write fasta file where each sequence is spliced if it bears a feature (present in the gff file provided). "
+	parser_trunc = subparser.add_parser("trimFastaFromGFF", help="Write fasta file where each sequence is spliced if it bears a feature (present in the gff file provided). "
 														  "If a sequence bears several features, a different spliced sequence is written for each feature")
 	parser_trunc.add_argument("-i", "--fasta", help="Fasta with sequences to splice", dest="fasta_file", type=str,
 							   metavar='', required=True)
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 	parser_trunc.set_defaults(func=ir.truncate)
 
 	# subparser for searching ORF on sequences
-	parser_orf = subparser.add_parser("orf", help="Run TransDecoder to search Open Reading Frame on sequences provided in fasta format."
+	parser_orf = subparser.add_parser("analyzeORF", help="Run TransDecoder to search Open Reading Frame on sequences provided in fasta format."
 													 "Returns the predicted ORFs in BED, nucleic FASTA, proteic FASTA and TSV format."
 													 "Needs software TransDecoder-v5.5.0")
 	parser_orf.add_argument("-i", "--fasta", help="Sequences on which the prediction will be performed", dest="fasta_file", type=str,
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 	parser_orf.set_defaults(func=ir.predictORF)
 
 	# subparser for aligning contigs and proteins to search long gaps (i.e. potential introns)
-	parser_protein = subparser.add_parser("protein", help="Run Diamond to search long gaps (i.e. potential introns) in contigs-protein alignement."
+	parser_protein = subparser.add_parser("analyzeProtein", help="Run Diamond to search long gaps (i.e. potential introns) in contigs-protein alignement."
 													 "Returns a GFF file with all the found gaps"
 													 "Needs Diamond-v0.9.9")
 	parser_protein.add_argument("-i", "--fasta", help="Contigs sequences", dest="fasta", type=str,
@@ -104,7 +104,7 @@ if __name__ == '__main__':
 	parser_intron.set_defaults(func=ds.write_intron)
 
 	# subparser for grinder
-	parser_grinder = subparser.add_parser("grinder", help="Grinder help. Needs software Grinder-v0.5.4 or more recent version")
+	parser_grinder = subparser.add_parser("simulateReads", help="Grinder help. Needs software Grinder-v0.5.4 or more recent version")
 	parser_grinder.add_argument("-i","--rf", help="reference file", type=str, required=True, metavar='',dest="rf")
 	parser_grinder.add_argument("-p","--pf",
 							 help="Profile file : all arguments for grinder", type=str, required=False, 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
 	parser_grinder.set_defaults(func=ds.grinder)
 
 	# subparser for STAR
-	parser_star = subparser.add_parser("star", help="STAR help. Needs aligner STAR-2.6.0c or more recent version")
+	parser_star = subparser.add_parser("starAlignement", help="STAR help. Needs aligner STAR-2.6.0c or more recent version")
 	parser_star.add_argument("-i","--reference",
 							 help="reference file", type=str, required=True, metavar='',dest="reference")
 	parser_star.add_argument("-1","--r1",
@@ -130,7 +130,7 @@ if __name__ == '__main__':
 	parser_star.set_defaults(func=rmg.star)
 
 	# subparser for HiSat2
-	parser_hisat2 = subparser.add_parser("hisat2", help="HiSat2 help. Needs aligner HiSat2-2.1.0 or more recent version")
+	parser_hisat2 = subparser.add_parser("hisat2Alignement", help="HiSat2 help. Needs aligner HiSat2-2.1.0 or more recent version")
 	parser_hisat2.add_argument("-i","--reference",
 							 help="reference file", type=str, required=True, metavar='',dest="reference")
 	parser_hisat2.add_argument("-1","--r1",
@@ -148,7 +148,7 @@ if __name__ == '__main__':
 	parser_install.set_defaults(func=ci.checkInstall) ;
 
 	# subparser for Annotation-based data simulation (annoToData) 
-	parser_annotodata = subparser.add_parser("annoToData", help="Data simulation (genome assembly and reads library) from a genome annotation (GFF or GTF file)")
+	parser_annotodata = subparser.add_parser("GTFbasedSimulation", help="Data simulation (genome assembly and reads library) from a genome annotation (GFF or GTF file)")
 	parser_annotodata.add_argument("-i","--annotation", help="Filename of GFF file which contains the genome annotation",type=str,metavar='',required=True,dest="annotation") ;
 	parser_annotodata.add_argument("-f","--fasta",type=str,metavar='',required=True,dest="fasta")
 	group_nb = parser_annotodata.add_mutually_exclusive_group(required=True) 
