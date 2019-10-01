@@ -132,19 +132,17 @@ if __name__ == '__main__':
     parser_install = subparser.add_parser("checkInstall", help="Check module to verify if the running environment and the dependencies are correctly installed")
     parser_install.set_defaults(func=ci.checkInstall) ;
 
-    # subparser for Annotation-based data simulation (annoToData) 
-    parser_annotodata = subparser.add_parser("GTFbasedSimulation", help="Data simulation (genome assembly and reads library) from a genome annotation (GFF or GTF file)")
-    parser_annotodata.add_argument("-i","--annotation", help="Filename of GFF file which contains the genome annotation",type=str,metavar='',required=True,dest="annotation") ;
-    parser_annotodata.add_argument("-f","--fasta",type=str,metavar='',required=True,dest="fasta")
-    group_nb = parser_annotodata.add_mutually_exclusive_group(required=True) 
-    group_nb.add_argument("-n","--nb_genes", help="Total number of genes to transcript ",type=float, required=False, default = 0,dest="nb",metavar='') ;
-    group_nb.add_argument("-a", "--all", help="Flag which says if all genes from GFF have to be transcripted", action="store_const",const=0,default = False, dest="nb") ;
-    parser_annotodata.add_argument("-o","--output", help="prefix of ouput files", type=str, required=True,dest="output",metavar='') ; 
-    parser_annotodata.add_argument("--no-grinder",help="Boolean which rules if let the library at temporary state (i.e. before the reads library generation)",
-                                 action="store_false",default = True, dest="grinder") ;
-    parser_annotodata.add_argument("--mix-library",help="Boolean which rules if the generated library is mixed i.e. if the library contains the transcript in two state when a intron is retained or an exon is spliced",
-                                 action="store_true",default = False, dest="mix") ;
-    parser_annotodata.set_defaults(func=ds.annoToData)
+    # subparser for annotated genome-based data simulation (annoToData) 
+    parser_gbs = subparser.add_parser("GTFbasedSimulation", help="Data simulation (genome assembly and reads library) from a genome annotation (GFF or GTF file)")
+    parser_gbs.add_argument("-i","--annotation",help="Filename of GFF file which contains the genome annotation",type=str,metavar='',required=True,dest="annotation")
+    parser_gbs.add_argument("-f","--fasta",type=str,metavar='',required=True,dest="fasta")
+    group_nb = parser_gbs.add_mutually_exclusive_group(required=True) 
+    group_nb.add_argument("-n","--nb_genes",help="Total number of genes to transcript ",type=float,required=False,default=0,dest="nb",metavar='')
+    group_nb.add_argument("-a","--all",help="Flag which says if all genes from GFF have to be transcripted",action="store_const",const=0,default=False,dest="nb")
+    parser_gbs.add_argument("-o","--output",help="prefix of ouput files",type=str,required=True,dest="output",metavar='')
+    parser_gbs.add_argument("--mix-library", help="Boolean which rules if the generated library is mixed i.e. if the library contains the transcript in two state when a intron is retained or an exon is spliced",
+                                   action="store_true", default=False, dest="mix")
+    parser_gbs.set_defaults(func=ds.gtf_based_simulation)
 
     args = vars(parser.parse_args())
 

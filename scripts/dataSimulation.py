@@ -12,6 +12,8 @@ try :
     import configparser ;
     import re ;
     import pandas as pd ;
+    import tempfile as tmp
+    import subprocess as sp
     from Bio.Seq import Seq ;
     from Bio import SeqIO ;
     from Bio.SeqRecord import SeqRecord ;
@@ -254,309 +256,483 @@ def split_read(output_path : str):
 ### Genome-Based Simulation ###
 ###############################
 
-def countGenes(gff : str) :
+def read_gtf(path_to_file):
     """
-    Count the protein-coding genes in the GFF file in order to randomly
-     pick among them for simulate the transcripts.
-    
-    :param gff: Name of the genome reference GFF file.
-    :return: Number of genes. 
-    """
-    
-    grep = subprocess.Popen(["grep", "gene.*=protein_coding;",gff], stdout=subprocess.PIPE) ;
-    wcline = subprocess.Popen(["wc", "-l"], stdin=grep.stdout, stdout=subprocess.PIPE) ;
-    # Allow grep to receive a SIGPIPE if wcline exits before grep
-    grep.stdout.close() ; 
-    # Run the commands 
-    sdo = wcline.communicate()[0] ;
-    # Extract the result from standard output
-    nb_genes = int(re.search(r'(\d+)',str(sdo)).group(1)) ;
-    
-    return nb_genes ;
-
-
-def chooseGenes(gff : str, nb_genes = int) :
-    """
-    Randomly pick 
-    """
-    try :
-        total_genes = countGenes(gff) ;
-        if nb_genes < 0 :
-            raise ValueError ;
-        elif nb_genes >= total_genes or nb_genes == 0 :
-            choosen = range(total_genes);
-        else :
-            choosen = rd.choice(range(total_genes),int(nb_genes),replace=False) ;
-    except ValueError :
-        print("*Value Error* : Number of genes to select can't be negative.") ;
-        exit(1);
-
-    return choosen ;
-
-
-def generateTranscripts(gff_file : str, choosen_genes : list, output_path : str, mix : bool) :
-    classes_transcripts = makeDensityLaw() ;
-    reference = "" ;
-    library = "" ;
-    all_features = "" ;
-    with open(gff_file,"r") as gff :
-        ligne = gff.readline().rstrip() ;
+    Reads an entire GTF file.
+    Returns the list of all feature and a set of transcripts ID.
         
-        i = 0 ;
-        num_transcript = 0 ;
-        while ligne :
-            if ligne.find("\tgene\t") != -1 and ligne.find("=protein_coding;") != -1 :
-                if i in choosen_genes :
-                    introns = None ; exon = None ;
-                    gene = [] ;
-                    nb_mRNA = 0 ;
-                    ligne = gff.readline().rstrip() ;
-                    while ligne and (ligne.find("\tgene\t") == -1 and ligne.find("\tpseudogene\t") == -1 ) :
-                        if ligne.find("\ttranscript\t") != -1 or ligne.find("\ttRNA\t") != -1 or ligne.find("\trRNA\t") != -1:
-                            while ligne and (ligne.find("\tgene\t") == -1 and ligne.find("\tmRNA\t") == -1 ) :
-                                ligne = gff.readline().rstrip() ;
-                        if ligne.find("\tmRNA\t") != -1  :
-                            nb_mRNA += 1 ;
-                        gene.append(ligne) ;
-                        ligne = gff.readline().rstrip() ;
-                    transcript = "" ;
-                    num_transcript += 1 ;
-                    mRNA,nb_exons = parseGene(gene,nb_mRNA,num_transcript) ;
-                    classe = int(rd.choice(classes_transcripts, 1)) ;
-                    if classe == -1 :
-                        fragments,exon,real_class = constructTranscript(list(tuple(mRNA)),nb_exons, classe) ;
-                        library += "\n".join(fragments) + "\n" ;
-                        transcript += "\n".join(addClasse(mRNA,real_class)) ;
-                        if mix :
-                            mRNA_copy = [] ;
-                            for ele_fea in list(mRNA) :
-                                new = ele_fea.split("\t") ;
-                                attr = new[-1].split(";") ;
-                                attr[1] += ".1" ;
-                                new[-1] = ";".join(attr) ;
-                                mRNA_copy.append("\t".join(new)) ; 
-                            library += "\n".join(mRNA_copy) + "\n" ;
-                        transcript += "\n".join(addClasse(mRNA,real_class)) ;
-                    elif classe == 0 :
-                        library += "\n".join(addClasse(mRNA,classe)) + "\n"; 
-                        transcript = "\n".join(addClasse(mRNA,classe)) ;
-                    else :
-                        fragments,introns,real_class = constructTranscript(list(tuple(mRNA)), nb_exons, classe) ;
-                        transcript = "\n".join(fragments) ;
-                        library += "\n".join(addClasse(mRNA,real_class)) + "\n"; 
-                        if mix :
-                            mRNA_copy = [] ;
-                            for ele_fea in list(fragments) :
-                                new = ele_fea.split("\t") ;
-                                attr = new[-1].split(";") ;
-                                attr[1] += ".1" ;
-                                new[-1] = ";".join(attr) ;
-                                mRNA_copy.append("\t".join(new)) ; 
-                            library += "\n".join(mRNA_copy) + "\n" ;
-                    reference += transcript +"\n";
-                    if introns :
-                        all_features += "\n".join(introns) + "\n" ; 
-                    elif exon :
-                        all_features += "\n".join(exon) + "\n" ;
-                
-                else :
-                    ligne = gff.readline().rstrip() ;
-                i += 1 ;
-                
-            else :
-                ligne = gff.readline().rstrip() ;
-                
-    writeGFF(all_features,output_path + "_Features_of_interest") ;
-    writeGFF(reference,output_path + "_reference_transcripts.tmp") ;
-    writeGFF(library, output_path + "_library_transcripts.tmp") ;
+    :param path_to_file: GTF file name.
+    :return liste: List of list. Each sublist corresponds to a feature of the GTF file.
+    :rtype: list
+    :return transcript: Set of transcript IDs. Only transcript annotated as "protein_coding" are selected.
+    :rtype: set
+    
+    :Example:
+    >>> gtf,transcripts = read_gtf(os.path.abspath(os.path.dirname(__file__))+"/../data/test_GBS.gtf") # doctest: +SKIP
+    >>> gtf[0] # doctest: +SKIP
+    ['V', 'WormBase', 'gene', '180', '329', '.', '+', '.', {'gene_id': 'WBGene00197333', 'gene_version': '1', 'gene_name': 'cTel3X.2', 'gene_source': 'WormBase', 'gene_biotype': 'ncRNA'}]
+    >>> gtf[:3] # doctest: +SKIP
+    [['V', 'WormBase', 'gene', '180', '329', '.', '+', '.', {'gene_id': 'WBGene00197333', 'gene_version': '1', 'gene_name': 'cTel3X.2', 'gene_source': 'WormBase', 'gene_biotype': 'ncRNA'}],
+     ['V', 'WormBase', 'transcript', '180', '329', '.', '+', '.', {'gene_id': 'WBGene00197333', 'gene_version': '1', 'transcript_id': 'cTel3X.2', 'gene_name': 'cTel3X.2', 'gene_source': 'WormBase', 'gene_biotype': 'ncRNA', 'transcript_name': 'cTel3X.2', 'transcript_source': 'WormBase', 'transcript_biotype': 'ncRNA'}],
+     ['V', 'WormBase', 'exon', '180', '329', '.', '+', '.', {'gene_id': 'WBGene00197333', 'gene_version': '1', 'transcript_id': 'cTel3X.2', 'exon_number': '1', 'gene_name': 'cTel3X.2', 'gene_source': 'WormBase', 'gene_biotype': 'ncRNA', 'transcript_name': 'cTel3X.2', 'transcript_source': 'WormBase', 'transcript_biotype': 'ncRNA', 'exon_id': 'cTel3X.2.e1'}]]
+    >>> transcripts # doctest: +SKIP
+    {'B0348.4e.1', 'K08E3.5b.1', 'K08E3.7a.2', ... , 'B0348.4u.1', 'K08E3.5e.1', 'K08E3.5a.2'}
+        
+    .. seealso:: annoToData()
+    .. warning::
+        Developed to read Ensembl GTF files. A file from another source could 
+        induce errors particularly if the additional attributes are different of
+        these defined by Ensembl
+    """
+    
+    liste = []
+    transcripts = set()
+    with open(path_to_file) as gtf:
+        for ligne in gtf:
+            if ligne.startswith("#"):  # We ignore the file's header
+                continue
+            feature = ligne.rstrip().split("\t")
+            feature.append({
+                el.split()[0]: el.split()[1].strip('"') 
+                for el in feature.pop().rstrip(";").split("; ")
+                })
+            # We check if it's a transcript and if produce a protein
+            if feature[2] == "transcript" and feature[-1]["transcript_biotype"] == "protein_coding":
+                # we add the transcript id to the set of transcript ID in order
+                # to pickly random among them
+                transcripts.add(feature[-1]["transcript_id"])
+            liste.append(feature)
+        return liste, transcripts
 
 
-def makeDensityLaw() :
-    law = [] ;
-    config_path = os.path.abspath(os.path.dirname(sys.argv[0]) + "/../config/intronStalker.properties")
+def make_density_law():
+    """
+    Reads a distribution among several class from the property file 
+    and returns a tuple where each class is represented according to distribution.
+    If you want to modify this distribution, modify the property file.
+    The distibution have to be expressed in term of effectives or percentages (i.e. only int values)
+    
+    :Example:
+    ---Extract of intronStalker.properties file for this example---
+    [Density]
+    -1=5
+    0=60
+    1=20
+    2=10
+    3=5
+    ---------------------------------------------------------------
+    >>> law = make_density_law() # doctest: +SKIP
+    >>> set(law) # doctest: +SKIP
+    {0, 1, 2, 3, -1}
+    >>> law.count(0) # doctest: +SKIP
+    60
+    >>> law.count(-1) # doctest: +SKIP
+    5
+    >>> law.count(1) # doctest: +SKIP
+    20
+    >>> law.count(2) # doctest: +SKIP
+    10
+    >>> law.count(3) # doctest: +SKIP
+    5
+    
+    ..seealso: choose_transcript()
+    """
+    law = []
 
-    config = configparser.RawConfigParser() ;
-    config.read(config_path) ;
-    for classe in config["Density"] :
-        effectif = int(config["Density"][classe]) ;
-        law += [int(classe)]*effectif ;
-    return tuple(law) ;
-
-
-def parseGene(gene : list, nb_mRNA : int ,num_transcript : int) :
-    # We randomly pick one mRNA
-    choosen_mRNA = int(rd.choice(range(1,nb_mRNA+1),1)) ;
-    j = 0 ;
-    current_mRNA = [] ;
-    nb_exons = 0 ;
-    while j <= choosen_mRNA :
-        ligne = gene.pop(0) ;
-        if ligne.find("\tmRNA\t") != -1 or not gene:
-            j += 1 ;
-            old_mRNA = current_mRNA ;
-            old_nb = nb_exons ;
-            current_mRNA = [] ;
-            nb_exons = 0 ;
-        elif ligne.find("\texon\t") != -1  :
-            nb_exons += 1 ;
-            exon = changeAttributes(ligne, str(num_transcript), nb_exons) ;
-            current_mRNA.append(exon) ;
-    return old_mRNA, old_nb ;
-
-
-def changeAttributes(exon : str, num_transcript : str, num_exon : int) :
-    transcript_id = "T"+num_transcript ;
-    exon_id = "exon"+str(num_exon) ;
-    items = exon.split("\t") ;
-    old_attributes = items[-1].split(";") ;
-    new_attributes = "ID="+exon_id+";Parent="+transcript_id+";"+(";".join(old_attributes[2:])) ;
-    return "\t".join(items[:-1]) + "\t" + new_attributes ;
-
-
-def addClasse(mRNA : list, classe : int) :
-    for e in range(len(mRNA)) :
-        mRNA[e] += ";transcript_class="+str(classe) ;
-    return mRNA ;
+    config = configparser.RawConfigParser()
+    config.read(os.path.abspath(os.path.dirname(__file__))+"/../config/intronSeeker.properties")
+    for classe in config["Density"]:
+        effectif = int(config["Density"][classe])
+        law += [int(classe)] * effectif
+    return tuple(law)
 
 
-def constructTranscript(mRNA : list, nb_exons : int, classe : int) :
-    features_interest=[] ;
-    if classe == -1 and nb_exons > 2:
-        spliced_exon = int(rd.choice(range(1,nb_exons-1),1)) ;
-        mRNA,exon = spliceExon(mRNA,spliced_exon) ; 
-        features_interest.append(exon) ;
-    elif classe >= 1 :
-        nb_introns = nb_exons -1 ;
-        if nb_introns <= classe :
-            retained_introns = range(nb_introns) ;
-            classe = nb_introns ;
+def choose_transcripts(transcripts, nb_to_choose):
+    """
+    Randomly picks a given number of transcripts among a list of transcripts, and for each,
+    randomly assign a class according to the distribution given by the make_density_law() function.
+    Returns a dict object where the keys correspond to transcripts IDs and the values are their class.
+    If the precised number of transcripts is greater than the transcripts list's length,
+    all the transcripts IDs with their randombly assigned class are returned.
+    
+    :param transcripts: List of IDs transcript.
+    :type transcripts: list
+    :param nb_to_choose: Number of transcripts to pick.
+    :type nb_to_choose: int
+    :return choosen: Picked transcripts with the corresponding randomly choosen class 
+    :rtype: dict
+    
+    :Example:
+    >>> transcripts = ['3R5.1a.1', '3R5.1b.1', 'B0348.1.1', 'B0348.10.1', 'B0348.2a.1', 'B0348.2b.1', 'B0348.4a.1'] # doctest: +SKIP 
+    >>> choose_transcripts(transcripts,3) # doctest: +SKIP
+    {'B0348.1.1': 0, 'B0348.10.1': 2, '3R5.1b.1': 0}
+    >>> choose_transcripts(transcripts,100) # doctest: +SKIP
+    {'3R5.1a.1': -1, '3R5.1b.1': 1, 'B0348.1.1': 0, 'B0348.10.1': 1, 'B0348.2a.1': 0, 'B0348.2b.1': 0, 'B0348.4a.1': 0}
+    
+    .. seealso: make_density_law(), annoToData()
+    """
+    law = make_density_law()
+
+    if nb_to_choose == 0 or nb_to_choose >= len(transcripts):
+        choosen = {t: int(rd.choice(law, 1)) for t in list(transcripts)}
+    else:
+        choosen = {
+            t: int(rd.choice(law,1)) 
+            for t in rd.choice(
+                list(transcripts),
+                int(nb_to_choose),
+                replace=False
+                )
+            }
+
+    return choosen
+
+
+def parse_gtf_content(gtf_content, choosen, mix):
+    """
+    This function parse the ouput of the read_gtf() function (a list of each line of the gtf file).
+    According to a dict with choosen ones transcripts and their associated class (the ouput of the 
+    choose_transcripts() function), it gathers the exons of these transcripts, treats them according 
+    to their class (construct_new_transcript() function) and constructs three lists of feature which
+    will be the future thre output files : the reference file wich contains the pseudo-assembly (all the 
+    longer transcripts, with or without retained introns), the library file from which the reads library
+    will be generated (all the shorter transcripts, with or without spliced exons) and the control file 
+    which contains all the retained introns and spliced exons.
+    A bool parameter, mix, rules if the produced library list is mixed or not, that is, the library
+    contains the non-0-class transcripts in two states : normal transcripts (all the exons and no intron)
+    and modified transcript (with retained introns or with a spliced exon).
+    
+    :param gtf_content: All the line of a gtf file. Exactly the ouput of read_gtf().
+    :type gtf_content: list
+    :param choosen: All the choosen ones transcripts associated to their own class. Output of choose_transcripts()
+    :type choosen: dict
+    :param mix: Rules the production of a mixed library of reads.
+    :type bool:
+    :returns: reference, library, control
+    :rtype: list, list, list
+    
+    :Example:
+    
+    >>> gtf,transcripts = read_gtf("../data/test_GBS.gtf") # doctest: +SKIP
+    >>> choosen = choose_transcripts(transcripts,10) # doctest: +SKIP
+    >>> reference, library, control = parse_gtf_content(gtf,choosen,False) # doctest: +SKIP
+    
+    .. seealso: read_gtf(), choose_transcripts(), construct_new_transcript(), annoToData()
+    """
+    reference = []
+    library = []
+    control = []
+    exons = []
+    # We add a false transcript feature at the end in the case of the true
+    # last transcript of the file is choosen (in order to oblige the function to
+    # processes last exons)
+    gtf_content.append(["ref",".","transcript",".",".",".",".",".","."])
+    for feature in gtf_content:
+        if feature[2] == "exon" and feature[-1]["transcript_id"] in choosen:
+            exons.append(feature)
+        if feature[2] == "transcript" and exons:
+            reference_transcript,library_transcript,feat_interest = construct_new_transcript(list(exons),choosen[exons[0][-1]["transcript_id"]])
+            # We add corresponding transcript for each result file
+            reference.extend(list(reference_transcript))
+            library.extend(list(library_transcript))
+            if feat_interest :
+                control.extend(list(feat_interest))
+            # If --mix-library flag is precised (i.e. the library has to contain the modified transcript and original transcript),
+            # we add the modified reference_transcript to library only if it is really modified (if the class is not 0)
+            if mix and reference_transcript[0][-1]["classe"] != '0':
+                library.extend([e[:-1] + [{**e[-1],"transcript_id":e[-1]["transcript_id"]+".ref"}] for e in list(reference_transcript)])
+            del choosen[exons[0][-1]["transcript_id"]]
+            exons = []
+        if not choosen:
+            break
+
+    return reference, library, control
+
+def transcript_df(exons) :
+    """
+    From a transcrispt's exons list, returns a pandas.DataFrame corresponding to this transcript.
+    This DataFrame contains all the exons and introns of the transcript(lines) and their GTF attributes (columns).
+    It contains also an additional column "in_transcript" corresponding to a bool if a feature is an exon.
+    
+    :param exons: A list of exons with all Ensembl GTF format's fields which represents a transcript
+    :type exons: list
+    :return: whole_transcript
+    :rtype: pandas.DataFrame
+    
+    :Example:
+    
+    >>> transcript = [ # doctest: +SKIP
+    ... ['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1'}], # doctest: +SKIP
+    ... ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2'}]] # doctest: +SKIP 
+    >>> transcript_df(transcript) # doctest: +SKIP
+    ref        DB feature     start       end score strand frame                                          misc_attr  in_transcript
+    0  III  WormBase    exon  13782587  13782934     .      +     .  {'gene_id': 'WBGene00007066', 'transcript_id':...           True
+    1  III  WormBase  intron  13782935  13783360     .      +     .  {'gene_id': 'WBGene00007066', 'transcript_id':...          False
+    2  III  WormBase    exon  13783361  13783459     .      +     .  {'gene_id': 'WBGene00007066', 'transcript_id':...           True
+    
+    
+    .. seealso:: construct_new_transcript()
+    """
+    
+    introns = []
+    for i in range(len(exons) -1) :
+        if exons[i][6] == "+" :
+            intr_start = int(exons[i][4])+1 ; intr_end = int(exons[i+1][3])-1
         else :
-            retained_introns = rd.choice(range(nb_introns), classe,replace=False) ;
-        # We'll take each retained intron in decreasing order to prevent exon index error
-        for intron in sorted(retained_introns,reverse=True) :
-            coord_start = calcCoord(mRNA[0:intron+1])
-            mRNA[intron],feature_interest = keepIntron(mRNA[intron],mRNA[intron+1],coord_start) ;
-            del mRNA[intron+1] ;
-            features_interest.append(feature_interest) ;
-    else :
-        classe = 0 ;
-    return addClasse(mRNA,classe),features_interest,classe ;
+            intr_start = int(exons[i+1][4])+1 ; intr_end = int(exons[i][3])-1
+        introns.append([
+            exons[i][0],
+            exons[i][1],
+            "intron",
+            str(intr_start),
+            str(intr_end),
+            exons[i][5],
+            exons[i][6],
+            exons[i][7],
+            {**{key: exons[i][-1][key] for key in exons[i][-1] if not key.startswith("exon")},"intron_id" : "+".join([exons[i][-1]["exon_id"],exons[i+1][-1]["exon_id"]])}
+            ])
+    whole_transcript = pd.DataFrame(
+        [*[l for cpl in zip(exons,introns) for l in cpl],exons[-1]],
+        columns=["ref","DB","feature","start","end","score","strand","frame","misc_attr"]
+        )
+    whole_transcript["in_transcript"] = whole_transcript.apply(lambda df : df.feature == "exon",axis=1)
+    whole_transcript["misc_attr"] = whole_transcript.apply(lambda df : dict(df.misc_attr),axis=1) # Just to fix the mutability of misc_attr dict
+    return whole_transcript
 
-
-def keepIntron(exon1 : str, exon2 : str , coord_start : int) :
-    items1 = exon1.split("\t") ;
-    items2 = exon2.split("\t") ;
+def construct_new_transcript(exons, classe):
+    """
+    From a transcript (a list of exons) and its class, modify the transcript according to its class
+    by splicing one exon (class -1) or retaining some introns (class greater than 0). It returns two 
+    state for a transcript : one for the reference pseudo-assembly and the other one for the library
+    file from which the reads will be generated. It returns also the modified feature(s) (spliced exon or retained introns) 
+    for the control file.
+    If the class is 0, the function returns in lib_t and ref_t the unmodifed transcript.
+    In the same vein, if a modification cannot be performed because of transcript construction, the minimum suitable modification 
+    is performed and the class is changed. For example if, a transcript contains only one exon, whatever its class,
+    its returned without modification and its class is reset to 0. Another example is when the class is greater than the number of intron :
+    if a transcript has 2 exons (i.e. only 1 intron) but its class is 3, the intron is retained and its class becomes 1.
     
-    # We check the strand 
-    if items1[6] == "+" :
-        # New exon's start is the first exon's start
-        new_start = items1[3] ;
-        intron_start = items1[4] ;
-        # New exon's end is the second exon's end
-        intron_end = items2[3] ;
-        new_end = items2[4] ;
-    else :
-        # New exon's start is the second exon's start
-        new_start = items2[3] ;
-        intron_start = items2[4] ;
-        # New exon's end is the first exon's end
-        intron_end = items1[3] ;
-        new_end = items1[4] ;
+    :param exons: A collection of exons represents a transcript
+    :type exons: list
+    :param classe: A number indicates the modification to perform on transcript
+    :type classe: int
+    :return ref_t: Transcript for reference file
+    :rtype ref_t: list
+    :return lib_t: Transcript for library file
+    :rtype lib_t: list
+    :return ft_on_t: Feature of interest (spliced exon or retained intron) for control file
+    :rtype ft_on_t: list
     
-    intron_length = int(intron_end) - 1 - (int(intron_start) + 1) +1 ;
-    coord_end = coord_start + intron_length -1
-
-    # We update the new exon's attributes
-    attributes1 = items1[-1].split(";") ;
-    attributes2 = items2[-1].split(";") ;
-    new_ID = attributes1[0] + "+" + attributes2[0].lstrip("ID=") ;
-    new_attributes = ";".join([
-        new_ID,
-        attributes1[1],
-        ";".join(attributes1[2:])
-        ]) ;
-
-    new_exon = "\t".join([
-        items1[0],
-        items1[1],
-        "exon",
-        new_start,
-        new_end,
-        ".",
-        items1[6],
-        ".",
-        new_attributes
-        ]) ;
+    :Example:
+    >>> transcript = [ # doctest: +SKIP
+    ... ['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1'}], # doctest: +SKIP
+    ... ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2'}]] # doctest: +SKIP 
+    >>> reference,library,feature = construct_new_transcript(list(transcript),-1) # doctest: +SKIP 
+    >>> reference # doctest: +SKIP 
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '-1'}], 
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '-1'}]]
+    >>> library # doctest: +SKIP 
+    [['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '-1'}]]
+    >>> feature # doctest: +SKIP 
+    [['3R5.2', 'WormBase', 'spliced_exon', '1', '348', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '-1'}]]
+    >>> reference,library,feature = construct_new_transcript(list(transcript),0) # doctest: +SKIP 
+    >>> reference # doctest: +SKIP 
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '0'}],
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '0'}]]
+    >>> library # doctest: +SKIP 
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '0'}],
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '0'}]]
+    >>> feature # doctest: +SKIP 
+    >>> reference,library,feature = construct_new_transcript(list(transcript),3) # doctest: +SKIP 
+    >>> reference # doctest: +SKIP 
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '1'}],
+     ['III', 'WormBase', 'exon', '13782935', '13783360', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'intron_id': '3R5.2.e1+3R5.2.e2', 'classe': '1'}],
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '1'}]]
+    >>> library # doctest: +SKIP 
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '1'}],
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '1'}]]
+    >>> feature # doctest: +SKIP 
+    [['3R5.2', 'WormBase', 'retained_intron', '349', '774', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'intron_id': '3R5.2.e1+3R5.2.e2', 'classe': '1'}]]
     
-    intron = "\t".join([
-        attributes1[1].lstrip("Parent="),
-        ".",
-        "retained_intron",
-        str(coord_start),
-        str(coord_end),
-        ".",
-        items1[6],
-        ".",
-        ";".join([
-            "ID=intron" + attributes1[0].lstrip("ID=exon"),
-            "length="+str(intron_length)
-        ])
-        ]) ;
+    .. seealso:: transcript_df(), parse_gtf_content()
+    .. note:: When a intron is retained, is annotated like exon in the feature field to oblige gffread to consider it like an exon and add it in the FASTA transcript. 
+    """
+    lib_t = ref_t = ft_on_t = [] # a virer une fois fini
+    whole_transcript = transcript_df(list(exons))
+    if classe == 0 or len(exons) == 1:
+        whole_transcript.apply(lambda df : df.misc_attr.update({"classe":str(0)}),axis=1) # We update the class of the transcript for each feature
+        
+        # From the DataFrame, we take only the feature with True value in "in_transcript" column (here it's only exons because of the class 0)  
+        lib_t = ref_t = [ 
+            list(line)[1:] # We exclude the index value of DataFrame which is stored in the first position of the record
+            for line in whole_transcript.loc[lambda df : df.in_transcript == True,"ref":"misc_attr"].to_records() 
+            ]
+        ft_on_t = None
+    elif classe == -1:
+        whole_transcript.apply(lambda df : df.misc_attr.update({"classe":str(classe)}),axis=1) # We update the class of the transcript for each feature
+        
+        # We add to reference file the not spliced transcript
+        ref_t = [ 
+            list(line)[1:] # We exclude the index value of DataFrame which is stored in the first position of the record
+            for line in whole_transcript.loc[lambda df : df.in_transcript == True,"ref":"misc_attr"].to_records() 
+            ]
+        
+        # We randomly pick an index of the DataFrame wich corresponds to an exon for splicing 
+        spliced_exon = int(rd.choice(whole_transcript.loc[lambda df : df.feature == "exon"].index,1))
+        # Splice the choosen exon by puting False in "in_transcript" column
+        whole_transcript.at[spliced_exon,"in_transcript"] = False
+        
+        # Construction of the feature which corresponds to spliced exon for the control GFF file
+        e_start = sum(whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < spliced_exon),"end"].apply(int)-whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < spliced_exon),"start"].apply(int)+1)+1
+        e_end = e_start + (int(whole_transcript.at[spliced_exon,"end"])-int(whole_transcript.at[spliced_exon,"start"]))
+        ft_on_t = [[
+            whole_transcript.at[spliced_exon,"misc_attr"]["transcript_id"],
+            whole_transcript.at[spliced_exon,"DB"],
+            "spliced_exon",
+            str(e_start),
+            str(e_end),
+            whole_transcript.at[spliced_exon,"score"],
+            whole_transcript.at[spliced_exon,"strand"],
+            whole_transcript.at[spliced_exon,"frame"],
+            whole_transcript.at[spliced_exon,"misc_attr"]
+            ]]
+        
+        # We add to library file (from which the read will be generated) the spliced transcript
+        lib_t = [ 
+            list(line)[1:] # We exclude the index value of DataFrame which is stored in the first position of the record
+            for line in whole_transcript.loc[lambda df : df.in_transcript == True,"ref":"misc_attr"].to_records() 
+            ]
+    elif classe > 0:
+        # if the number of retained introns is greater than the number of introns (the class), we take all the available intron and change the class if it is necessary
+        if classe >= len(exons) - 1:
+            classe = len(exons) - 1
+            choosen_introns = list(whole_transcript.loc[lambda df : df.feature == "intron"].index)
+        # if not, we random pick the desired number of introns
+        else:
+            choosen_introns = sorted(list(rd.choice(whole_transcript.loc[lambda df : df.feature == "intron"].index,classe,replace=False)))
+        
+        whole_transcript.apply(lambda df : df.misc_attr.update({"classe":str(classe)}),axis=1) # We update the class of the transcript for each feature
+        
+        # We add to library file (from which the read will be generated) the transcript without retained introns
+        lib_t = [ 
+            list(line)[1:] # We exclude the index value of DataFrame which is stored in the first position of the record
+            for line in whole_transcript.loc[lambda df : df.in_transcript == True,"ref":"misc_attr"].to_records() 
+            ]
+        
+        # Intron retention by putting true in "in_transcript" column and 
+        # change feature field from exon to intron in order to oblige gffread to consider the retained intron
+        ft_on_t=[]
+        for retained_intron in choosen_introns :
+            whole_transcript.at[retained_intron,"in_transcript"] = True
+            whole_transcript.at[retained_intron,"feature"] = "exon"
+            
+            # Construction of the feature which corresponds to spliced exon for the control GFF file
+            i_start = sum(whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < retained_intron),"end"].apply(int)-whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < retained_intron),"start"].apply(int)+1)+1
+            i_end = i_start + (int(whole_transcript.at[retained_intron,"end"])-int(whole_transcript.at[retained_intron,"start"]))
+            ft_on_t.append([
+                whole_transcript.at[retained_intron,"misc_attr"]["transcript_id"],
+                whole_transcript.at[retained_intron,"DB"],
+                "retained_intron",
+                str(i_start),
+                str(i_end),
+                whole_transcript.at[retained_intron,"score"],
+                whole_transcript.at[retained_intron,"strand"],
+                whole_transcript.at[retained_intron,"frame"],
+                whole_transcript.at[retained_intron,"misc_attr"]
+                ])
+        
+        # We add to reference file the transcript with retained_introns
+        ref_t = [ 
+            list(line)[1:] # We exclude the index value of DataFrame which is stored in the first position of the record
+            for line in whole_transcript.loc[lambda df : df.in_transcript == True,"ref":"misc_attr"].to_records() 
+            ]
     
-    return new_exon, intron ; 
+    return ref_t, lib_t, ft_on_t
 
 
-def spliceExon(mRNA : list, spliced_exon : int) :
-    feature = mRNA.pop(spliced_exon) ;
-    items = feature.split("\t") ;
-    attributes = items[-1].split(";") ;
-
-    new_start = calcCoord(mRNA[0:spliced_exon]) ;
-    exon_length = int(items[4]) - int(items[3]) +1
-    new_end = int(new_start) + exon_length -1 ;
-
-    exon = "\t".join([
-        attributes[1].lstrip("Parent="),
-        ".",
-        "spliced_exon",
-        str(new_start),
-        str(new_end),
-        ".",
-        ".",
-        ".",
-        ";".join([attributes[0],"length="+str(exon_length)])
-        ]) ;
-    return mRNA,exon ;
-
-
-def calcCoord(features_list : list) :
-    total_length = 0 ;
-    for feature in features_list :
-        items = feature.split("\t") ;
-        start,end = items[3],items[4] ;
-        total_length += int(end) - int(start) +1 ;
-
-    return total_length + 1 ;
+def write_gtf_file(content: str, output: str):
+    """
+    Write a GTF file from a list of features.
     
+    :param content: List of features. Each feature is a list where each element corresponds to each field of GTF (the last element is a dict for the descrption GTF field)
+    :type content: list
+    :param output: Name of the output file
+    :type output: str
+    
+    :Example:
+    >>> content=[["chr1","RefSeq","exon","2","200",".","+",".",{"gene":"g1","exon":"g1.e1"}]] # doctest: +SKIP 
+    >>> write_gtf_file(content,"exon.gtf") # doctest: +SKIP 
+    -------------   exon.gtf   ---------------------------
+    chr1	RefSeq	exon	2	200	.	+	.	gene "g1"; exon "g1.e1"
+    ------------------------------------------------------
+    
+    .. seealso:: gtf_based_simulation(), parse_gtf_content()
+    """
+    gtf = "\n".join(["\t".join([str(item) if not isinstance(item, dict) else "; ".join(
+        ['{k} "{v}"'.format(k=key, v=item[key]) for key in item]) for item in ligne])for ligne in content])
+    with open(output, "w") as gtf_file:
+        gtf_file.write(gtf + "\n")
 
 
-def annoToData(annotation : str, fasta : str, nb : int, output : str, grinder : bool, mix : bool) :
+def extract_fasta(genome: str, ref_file: str, lib_file: str, path: str):
+    """
+    Call gffread program to generate a FASTA file from a genome (FASTA format) and a GTF file.
+    The output files contains the sequence of each transcript defined by the entry GTF file.
+    
+    :param genome: Filename of the genome FASTA file
+    :type genome: str
+    :param ref_file: GTF filename of the reference transcripts. Corresponds to the produced reference.fasta file.
+    :type ref_file: str
+    :param lib_file: GTF filename of the library transcripts. Corresponds to the produced library.fasta file.
+    :type lib_file: str
+    :param path: Path of the directory where the two FASTA files will be stored.
+    :type path: str
+    """
+    sp.call(["gffread", ref_file, "-g", genome,
+             "-w", path + "_reference.fa", "-F"])
+    sp.call(["gffread", lib_file, "-g", genome,
+             "-w", path + "_library.fa", "-F"])    
 
 
+def gtf_based_simulation(annotation: str, fasta: str, nb: int, output: str, mix: bool):
+    """
+    Simulate a RNA-seq pseudo-assembly from a GTF file with retained introns or spliced exons. This procedure produces 3 files :
+        - output_reference.fasta : pseudo-assembly where the contigs have potentially retained introns. 
+        - output_library.fasta : pseudo-assembly where the contigs have potentially spliced exons. This file have to be used to generate reads library with simulateReads module
+        - output_Features_of_interest.gtf : gtf which conatains all simulated retained introns and spliced exons.
+    To choose the number of pseudo-contigs, you have to use the nb argument. If nb=0, all the transcripts contained in the GTF will be pseudo-transcripted.
+    The mix arguments rules if a mixed library is genrated : by default, the library file contains the shorter contigs (without intron or with spliced exon) compared to reference file ; 
+    a mixed library file contains both of the peudo-contig states  :the shorter one (without intron and spliced exon) and the longer on (like in reference file : with retained intron or with all exons).
+    The goal is to produce some reads with the intron or the exon (which will not split in the reference/library alignement) and reads without the intron or the exon (which will split during the alignement).
+    
+    :param annotation: GTF filename which contains genome annotation
+    :type annotation: str
+    :param fasta: FASTA file which contains genome sequence
+    :type fasta: str
+    :param nb: Number of pseudo-contigs to generate. If 0, all the transcripts in GTF will give pseudo contig.
+    :type nb: str
+    :param output: Basename of the output files
+    :type output: str
+    :param mix: Boolean which rules if a mixed library is generated.
+    :type mix: bool
+    
+    """
+    
+    outdir = output.split(".")[0] + "_GTFbasedSimulation" ; # Output directory name (where this function will write 
+                                                # all the results and tmp files).
+    if not os.path.exists(outdir) :
+        os.mkdir(outdir) 
+    output_path = "/".join([outdir,output]) ; # Path to output file
+    
+    print("GTF reading...")
+    gtf_content, transcripts = read_gtf(annotation)
+    print("Generate transcripts...")
+    choosen = choose_transcripts(transcripts, nb)
+    reference, library, control = parse_gtf_content(gtf_content, choosen, mix)
 
-    outdir = output + "_annoToData" ; # Output directory name (where this function will write 
-                                 # all the results and tmp files).
-    os.system("mkdir " + outdir) ;
-    output_path = outdir + "/" + output ;
-
-    choosen_genes = chooseGenes(annotation, int(nb)) ;
-    generateTranscripts(annotation, choosen_genes, output_path, mix) ;
-    extractFasta(fasta,output_path) ;
-
-    if grinder :
-        profile_path = os.path.abspath(os.path.dirname(sys.argv[0]) + "/../config/profile_file.txt")
-        _grinder(output_path+"_library.fa", profile_path, output_path)
-        split_read(output_path)
-        os.system("rm {path}-reads.fa".format(path=output_path)) ;
-        os.system("rm {path}_library.fa".format(path=output_path)) ;
-
+    lib_tmpfile = tmp.NamedTemporaryFile(dir="./"+outdir,delete=True) ; ref_tmpfile = tmp.NamedTemporaryFile(dir="./"+outdir,delete=True)
+    write_gtf_file(reference,ref_tmpfile.name) ;  write_gtf_file(library,lib_tmpfile.name)
+    write_gtf_file(control,output_path+"_Features-of-interest.gtf")
+    print("FASTA files writing with gffread...")
+    extract_fasta(fasta,ref_tmpfile.name,lib_tmpfile.name,output_path)
+        
