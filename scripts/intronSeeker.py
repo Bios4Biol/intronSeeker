@@ -87,38 +87,6 @@ if __name__ == '__main__':
     parser_frs.add_argument("-o", "--output", help="Basename of the generated files. Default 'FullRandomSimulation' ", type=str,
                                default="FullRandomSimulation", metavar='',dest="output")
     parser_frs.set_defaults(func=ds.full_random_simulation)
-    
-    # ~ # subparser for the contig creation
-    # ~ parser_contig = subparser.add_parser("contig", help="contig help")
-    # ~ parser_contig.add_argument("-n", help="Number of contig/sequence randomly generated. Default 10", type=int,
-                               # ~ default=10, metavar='',dest="n")
-    # ~ parser_contig.add_argument("--min", help="lower limits of the sequence(s). Default 150", type=int, default=150,
-                               # ~ metavar='',dest="minimum")
-    # ~ parser_contig.add_argument("--max", help="upper limits of the sequence(s). Default 1000", type=int, default=1000,
-                               # ~ metavar='',dest="maximum")
-    # ~ parser_contig.add_argument("-o", "--output", help="output name/directory, default=OutputRandomContig.fa", type=str,
-                               # ~ default="OutputRandomContig.fa", metavar='',dest="output")
-    # ~ parser_contig.set_defaults(func=ds.contig)
-
-    # ~ # subparser for the input insertion
-    # ~ parser_intron = subparser.add_parser("intron", help="intron help")
-    # ~ parser_intron.add_argument("-i", "--input", help="input File", type=str, required=True, metavar='',dest="input_file")
-    # ~ parser_intron.add_argument("-l", "--lower", help="lower limits of intron length.", type=int, default=150,
-                               # ~ metavar='',dest="lower")
-    # ~ parser_intron.add_argument("-u", "--upper", help="upper limits of intron length.", type=int, default=1000,
-                               # ~ metavar='',dest="upper")
-    # ~ parser_intron.add_argument("--bi", help="5 intron limit. Default GT", type=str, default="GT", metavar='',dest="bi")
-    # ~ parser_intron.add_argument("--bs", help="3 intron limit. Default AG", type=str, default="AG", metavar='',dest="bs")
-    # ~ parser_intron.add_argument("-o", "--output", help="output name/directory, default=OutputIntron.fa", type=str,
-                               # ~ default="OutputIntron.fa", metavar='',dest="output")
-    # ~ parser_intron.add_argument("-c", "--coorf", help="output name/directory of the intron information file", type=str,
-                               # ~ default="IntronCoord.txt", metavar='',dest="coorf")
-    # ~ parser_intron.add_argument("-b", "--begin", help="file with the beginning of intron for all sequences and if they "
-                                                     # ~ "are reverse", type=str,
-                               # ~ default="", metavar='',dest="begin")
-    # ~ parser_intron.add_argument("-r", "--rand", help="insert intron in randomly half "
-                                                    # ~ "of the sequences if the option is specified", action="store_true",dest="rand")
-    # ~ parser_intron.set_defaults(func=ds.write_intron)
 
     # subparser for grinder
     parser_grinder = subparser.add_parser("simulateReads", help="Grinder help. Needs software Grinder-v0.5.4 or more recent version")
