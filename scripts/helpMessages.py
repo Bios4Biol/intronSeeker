@@ -15,6 +15,9 @@ __version__ = config['Metadata']['version']
 __email__ = config['Metadata']['email']
 __status__ = config['Metadata']['status']
 
+def program_version() :
+    print("intronSeeker v{version}".format(version=__version__),end="\n\n")
+
 def program_help() :
     text = '\
 \n\
@@ -41,60 +44,60 @@ The second simulation is based on an existing genome and corresponding genome\
  exon. This modules enables to verify the fraction of retained introns which\
  can be detected in real condition and and set the appropriate detection\
  thresholds.\n\
- \n\n'.format(version=__version__)
+ \n'.format(version=__version__)
 
     tw = textwrap.TextWrapper(
-        width=80,
-        initial_indent="        ",
-        subsequent_indent="    "
+        width=90,
+        initial_indent="    ",
     )
     
     cw = textwrap.TextWrapper(
-        width=45,
+        width=60,
         initial_indent="\t\t",
-        subsequent_indent="\t\t\t\t\t"
-    
+        subsequent_indent="\t\t\t\t",
+        break_long_words=False
     )
     # Program Description
     print("\n".join([tw.fill(line) for line in text.splitlines()]))
     
     # Usage
-    print('\tUsage : intronSeeker <command> [options]\n')
+    print('Usage : intronSeeker <command> [arguments] [--help] [--version]')
+    print('(To know the detailed usage of each sub-commands use \'intronSeeker <command> --help\')',end='\n\n')
     
     # Detail of the commands
-    print('\tCommands : ')
+    print('Commands : ')
     
-    print('\t --Align')
+    print(' --Align')
     # hisat2Alignement
-    print('\t   hisat2Alignement',end='')
+    print('   hisat2Alignement',end='')
     print(cw.fill(
-'Call Hisat2 to align the reads library and the reference assembly and produce\
+'Calls Hisat2 to align the reads library and the reference assembly and produce\
  a BAM file on which reads split detection can be performed.'
     ))
     # starAlignement
-    print('\t   star2Alignement',end='')
+    print('   starAlignement',end='')
     print(cw.fill(
-'Call STAR to align the reads library and the reference assembly and produce\
+'Calls STAR to align the reads library and the reference assembly and produce\
  a BAM file on which reads splicing detection can be performed.'
     ))
     print()
     
-    print('\t --Analyze')
+    print(' --Analyze')
     # splitReadSearch
-    print('\t   splitReadSearch',end='')
+    print('   splitReadSearch',end='')
     print(cw.fill(
-'Perform the extraction of read splicing detection on a BAM file in order to\
+'Performs the extraction of read splicing detection on a BAM file in order to\
  identify and caracterize introns candidates.'
     ))
     # trimFastaFromGFF
-    print('\t   trimFastaFromGFF',end='')
+    print('   trimFastaFromGFF',end='')
     print(cw.fill(
-'From a reference Fasta file and a associated GFF, produce a new Fasta file\
+'From a reference Fasta file and a associated GFF, produces a new Fasta file\
  containing each sequence of the original Fasta spliced of the segments\
  corresponding to the features of the GFF file.'
     ))
     # analyzeORF
-    print('\t   analyzeORF\t',end='')
+    print('   analyzeORF\t',end='')
     print(cw.fill(
 'From a reference Fasta file, predicts the Open Reading Frames for each\
  sequence of the Fasta and returns  the characteristics of the best predicted\
@@ -102,47 +105,83 @@ The second simulation is based on an existing genome and corresponding genome\
  with TransDecoder.'
     ))
     # analyzeProtein
-    print('\t   analyzeProtein',end='')
+    print('   analyzeProtein',end='')
     print(cw.fill(
-'From a reference Fasta file and a proteic bank, perform the proteic alignement\
+'From a reference Fasta file and a proteic bank, performs the proteic alignement\
  all-vs-all beetween the Fasta and the bank and returns the characteristics\
  of the best alignement for each sequence of the Fasta in a tabulated file.\
  The proteic alignement is performed with Diamond.'
     ))
     print()
     
-    print('\t --Simulation')
+    print(' --Simulation')
     # fullRandomSimulation
-    print('\t   fullRandomSimulation',end='')
+    print('   fullRandomSimulation',end='')
     print(cw.fill(
-'TO FILL'
+'Simulates a multi Fasta file which contains the pseudo-contigs and a TXT file\
+ which contains the pseudo retained introns charesteristics. All the sequences\
+ (contigs and introns) as well as the introns insertion are fully random.'
     ))
     # fullRandomSimulation
-    print('\t   GTFbasedSimulation',end='')
+    print('   GTFbasedSimulation',end='')
     print(cw.fill(
-'TO FILL'
+'From a genome and an associated GTF file, generates pseudo-contigs (corresponds\
+ to transcripts) with potentially retained introns or spliced exons. Three\
+ files are generated : one corresponds to reference pseudo-assembly, another\
+ one is used for dimulate the reads library and the third one gathers all\
+ the simulated features (retained intorns or spliced exons). gffread program\
+ is called during the simulation process.'
     ))
     # simulateReads
-    print('\t   simulateReads',end='')
+    print('   simulateReads',end='')
     print(cw.fill(
-'TO FILL'
+'From a Fasta file, calls Grinder program to simulates a corresponding reads library.'
     ))
     print()
     
-    print('\t --Test')
+    print(' --Test')
     # checkInstall
-    print('\t   checkInstall\t',end='')
+    print('   checkInstall\t',end='')
     print(cw.fill(
-'TO FILL'
+'Checks the correct installation of the dependencies as well as the dependencies\' versions.'
     ))
+    
+    
     print()
+    print('Program: intronSeeker version {version}'.format(version=__version__))
+    print('License : {license}'.format(license=__license__))
+    print('Copyright : {copyright}'.format(copyright=__copyright__))
+    print('Author(s): {author}'.format(author=__author__))
+    print('Support : {email}'.format(email=__email__))
+
+
+def command_help(command: str) :
+    if command == "starAlignement" :
+        star_help()
     
 
-def command_help(command: str ,verbosity: int) :
-    pass
-     # ~ if command == "starAlignement" :
-         # ~ if verbosity == 0 :
-            # ~ print(command)
-    # ~ elif command == "hisat2Alignement" :
-        # ~ if verbosity == 0 :
-            
+def star_help() :
+    text='\
+\n\
+intronSeeker starAlignement :\n\n\
+Calls STAR to align the reads library and the reference assembly and produce\
+ a BAM file on which reads splicing detection can be performed.\
+'
+    tw = textwrap.TextWrapper(
+        width=90,
+        initial_indent="    ",
+    )
+
+    # starAlignement Description
+    print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
+    
+    # Usage
+    print(' Usage:')
+    print(
+    textwrap.fill('\
+ intronSeeker starAlignement -r <reference.fa> -1 <read1.fq>\
+ -o <outfile_basename> [-2 <read2.fq>] [-t <num_threads>]',
+    width=90
+    ))
+    
+    
