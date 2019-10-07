@@ -146,32 +146,38 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
         distrib = [1]*nb
     
     #Generate the contigs
-    contigs_set = []
+    reference_contigs_set = []
+    library_contigs_set = []
     introns = ["Contig\tStart\tEnd\tReverse"]
     for c in range(0,nb) :
         length = random.randint(mini, maxi) ; # Random contig length 
         name = "SEQUENCE" + str(c+1) ; # Contig name creation
         contig_seq = random_seq(length, "ATCG") # Random sequence creation
+        library_seq = Seq(contig_seq)
         
         # Insert intron according to the distribution
         if distrib[c] : 
-            contig_seq, intron_start, intron_end = insert_intron(contig_seq, lower, upper)
+            modified_seq, intron_start, intron_end = insert_intron(contig_seq, lower, upper)
             description = " ".join(["intron_start="+str(intron_start),"intron_end="+str(intron_end)])
+            reference_seq = Seq(modified_seq)
         else :
             description = " ".join(["intron_start="+str(None),"intron_end="+str(None)])
-        contig_seq = Seq(contig_seq)
+            reference_seq = Seq(contig_seq)
         
         # Half of the contigs are reversed (i.e. like if they comes from - strand)
         reverse = random.choice([True,False])
         if reverse : 
-            contig_seq = Seq.reverse_complement(contig_seq)
+            reference_seq = Seq.reverse_complement(reference_seq)
+            library_seq = Seq.reverse_complement(library_seq)
         description = " ".join([description,"reverse="+str(reverse)])
         
-        contigs_set.append(SeqRecord(contig_seq,id=name.split()[0],description=description))
+        reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
+        library_contigs_set.append(SeqRecord(library_seq,id=name.split()[0]+".ori",description=description))
         if distrib[c] :
             introns.append("\t".join([name,str(intron_start),str(intron_end),str(reverse)]))
         
-    SeqIO.write(contigs_set,output_path+"_contigs.fa","fasta")
+    SeqIO.write(reference_contigs_set,output_path+"_reference-contigs.fa","fasta")
+    SeqIO.write(library_contigs_set,output_path+"_library-contigs.fa","fasta")
     
     with open(output_path+"_introns.txt","w") as out :
         out.write("\n".join(introns))

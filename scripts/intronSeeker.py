@@ -122,11 +122,11 @@ def parse_arguments() :
                             help='Insert intron in random half of the simulated contigs if the option is specified. Default False',default=False, action='store_true',dest='half')
     parser_frs.add_argument('-l', '--lower-intron-length',
                             help='Minimal length of random intron. Default 150', type=int, default=150, dest='lower')
-    parser_frs.add_argument('-h', '--higher-intron-length',
+    parser_frs.add_argument('-H', '--higher-intron-length',
                             help='Maximal length of random intron. Default 1000', type=int, default=1000, dest='upper')
     parser_frs.add_argument('-o', '--output',
                             help='Basename of the generated files. Default [FullRandomSimulation] ', type=str, default='FullRandomSimulation', dest='output')
-    # ~ parser_frs.add_argument('-h','--help',action='store_const', const = parser_star.prog.split()[-1],dest='c_help')
+    parser_frs.add_argument('-h','--help',action='store_const', const = parser_star.prog.split()[-1],dest='c_help')
     parser_frs.set_defaults(func=full_random_simulation)
 
     # subparser for annotated genome-based data simulation (annoToData) 
