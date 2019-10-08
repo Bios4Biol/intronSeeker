@@ -170,8 +170,8 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
             library_seq = Seq.reverse_complement(library_seq)
             if intron_start and intron_end :
                 old_start = intron_start
-                intron_start = len(reference_seq)-intron_end +1
-                intron_end = len(reference_seq)-old_start +1 
+                intron_start = len(reference_seq)-intron_end
+                intron_end = len(reference_seq)-old_start
                 
         description = " ".join(["intron_start="+str(intron_start),"intron_end="+str(intron_end),"reverse="+str(reverse)])
         
