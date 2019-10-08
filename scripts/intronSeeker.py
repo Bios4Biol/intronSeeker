@@ -38,7 +38,7 @@ def parse_arguments() :
 
     # subparser to call Hisat2 aligner
     parser_hisat2 = subparser.add_parser('hisat2Alignement',add_help=False, help='HiSat2 help. Needs aligner HiSat2-2.1.0 or more recent version')
-    parser_hisat2.add_argument('-i','--reference',
+    parser_hisat2.add_argument('-r','--reference',
                                help='reference file', type=str, dest='reference')
     parser_hisat2.add_argument('-1','--r1',
                                help='fasta file of reads', type=str, dest='r1')
