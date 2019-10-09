@@ -13,7 +13,7 @@ To run the all the tests use pytest in scripts directory or run this scripts :
   
   ~$  intronSeeker --checkExample
 
-.. seealso:: checkInstall.py, seekerToolbox.py, dataSimulation.py, readsMapping.py, intronResearch.py
+.. seealso:: checkInstall.py, seekerToolbox.py, dataSimulation.py, readsMapping.py, intronSearch.py
 """
 
 # Metadata
