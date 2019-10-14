@@ -63,7 +63,7 @@ input files or output files presented here are available in data directory.
 Before running any intronSeeker command, activate the conda environment with :
 
 ```diff
-+ source activate Seeker_environment
++ source activate ISeeker_environment
 ```
 
 ##### Reads alignement on reference contigs : Hisat or Star.
@@ -78,13 +78,13 @@ results but takes longer to run and works only with paired-end library.
 Running alignment, use the commands :
 
 ```diff
-+ intronSeeker star -i Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignement
++ intronSeeker starAlignement -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignement
 ```
 
 or 
 
 ```diff
-intronSeeker hisat2 -i Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignement
+intronSeeker hisat2Alignement -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignement
 ```
 
 
@@ -93,5 +93,5 @@ intronSeeker hisat2 -i Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_read
 When the alignment is ended, you can search for splicing events with :
 
 ```diff
-+ intronSeeker split -i Cele_library-contigs_alignement_hisat2/Cele_library-contigs_alignement.Aligned.sortedByCoord.out.bam -r Test_set_Cele_contig-assembly.fasta -o Test_Cele_splicing_event
++ intronSeeker splitReadSearch -a Cele_library-contigs_alignement_hisat2/Cele_library-contigs_alignement.Aligned.sortedByCoord.out.bam -r Test_set_Cele_contig-assembly.fasta -o Test_Cele_splicing_event
 ```
