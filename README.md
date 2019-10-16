@@ -9,7 +9,7 @@ These retained introns will be present in only some sequences nevertheless they
 can therefore be present in the assembled contigs built from those reads.  
 ![](doc/splice_event.png)
 
-The read splicing signal of these intron can be used to find and remove them. 
+The read splicing signal of these introns can be used to find and remove them. 
 The intron splice site boundaries (canonical or not), the Open Reading Frame size
 and the protein alignment can be used as different hints to measure the probabiliy
 of having a retained intron.
@@ -36,7 +36,7 @@ Simulator and simulation data descriptions can be found in the SIMULATION.md fil
 How it works ?
 --------------
 
-#### Searchin for introns
+#### Searching for introns
 
 1. Use [Star](https://github.com/alexdobin/STAR) or 
 [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml) to map reads on 
