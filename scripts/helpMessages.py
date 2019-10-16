@@ -28,40 +28,41 @@ def program_version() :
 def program_help() :
     text = '\
 \n\
-intronSeeker v{version}\n\
--------------------\n\n\
-This tool identify potentially retained introns in de novo RNA-seq assembly\
+Program: intronSeeker\n\
+Version: v{version}\n\n\
+\
+This tool identify  potentially retained introns  in de novo RNA-seq  assembly\
  in order to quantify and remove them. The intron detection is based on the\
- read splicing signal which appears when an alignement is performed beetween\
+ read splicing signal  which appears when an alignement is performed beetween\
  the reads library and the assembly.\n\
-This program makes available all the tools to produce (STAR and Hisat2 aligners),\
- detect (reads splicing identification) and analyze (ORF prediction, protein\
- alignement, data integration) the signal in order to give the most reliable\
+This program makes available  all the tools  to produce (STAR and Hisat2 aligners),\
+ detect (reads splicing  identification)  and analyze  (ORF prediction,  protein\
+ alignement,  data integration)  the signal  in  order to  give  the most  reliable\
  and consistent results as possible in term of retained intron detection.\n\
 \n\
-You can find also two types of RNA-seq data simulations to validate the\
+You can find also two types of RNA-seq data simulations to validate  the\
  detection process and measure the false positive detection rate.\n\
-The first simulation module uses random sequence simulation in order to check\
- if splice aligners are able to find inserted introns when only contigs with\
+The first  simulation module uses random sequence  simulation in order  to check\
+ if splice aligners are  able  to find  inserted  introns  when only  contigs  with\
  introns and reads without intron are used as well as when contigs with and\
  without introns and reads without introns are used.\n\
 The second simulation is based on an existing genome and corresponding genome\
- annotation. In this case the simulator produces reads with an without intron\
+ annotation. In this case the simulator produces reads with and without intron\
  or spliced exons as well as transcripts with and whithout introns or spliced\
- exon. This modules enables to verify the fraction of retained introns which\
- can be detected in real condition and and set the appropriate detection\
+ exon.  This modules enables to  verify the  fraction  of retained  introns  which\
+ can be detected in real condition  and  set the appropriate detection\
  thresholds.\n\
  \n'.format(version=__version__)
 
     tw = textwrap.TextWrapper(
         width=90,
-        initial_indent="    ",
+        initial_indent="",
     )
     
     cw = textwrap.TextWrapper(
         width=60,
-        initial_indent="\t\t",
-        subsequent_indent="\t\t\t\t",
+        initial_indent="\t",
+        subsequent_indent="\t\t\t",
         break_long_words=False
     )
     # Program Description
@@ -74,7 +75,7 @@ The second simulation is based on an existing genome and corresponding genome\
     # Detail of the commands
     print('Commands : ')
     
-    print(' --Align')
+    print(' -- Align')
     # hisat2Alignement
     print('   hisat2Alignement',end='')
     print(cw.fill(
@@ -89,7 +90,7 @@ The second simulation is based on an existing genome and corresponding genome\
     ))
     print()
     
-    print(' --Analyze')
+    print(' -- Analyze')
     # splitReadSearch
     print('   splitReadSearch',end='')
     print(cw.fill(
@@ -121,7 +122,7 @@ The second simulation is based on an existing genome and corresponding genome\
     ))
     print()
     
-    print(' --Simulation')
+    print(' -- Simulation')
     # fullRandomSimulation
     print('   fullRandomSimulation',end='')
     print(cw.fill(
@@ -146,7 +147,7 @@ The second simulation is based on an existing genome and corresponding genome\
     ))
     print()
     
-    print(' --Test')
+    print(' -- Test')
     # checkInstall
     print('   checkInstall\t',end='')
     print(cw.fill(
@@ -155,11 +156,12 @@ The second simulation is based on an existing genome and corresponding genome\
     
     
     print()
-    print('Program: intronSeeker version {version}'.format(version=__version__))
-    print('License : {license}'.format(license=__license__))
-    print('Copyright : {copyright}'.format(copyright=__copyright__))
-    print('Author(s): {author}'.format(author=__author__))
-    print('Support : {email}'.format(email=__email__))
+    print('Program:   intronSeeker version {version}')
+    print('Version:   {version}'.format(version=__version__))
+    print('License:   {license}'.format(license=__license__))
+    print('Copyright: {copyright}'.format(copyright=__copyright__))
+    print('Authors:   {author}'.format(author=__author__))
+    print('Support:   {email}\n'.format(email=__email__))
 
 
 ########################################

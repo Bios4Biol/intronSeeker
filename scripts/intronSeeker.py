@@ -152,7 +152,7 @@ def parse_arguments() :
         print("To know how to call intronSeeker program, use 'intronSeeker --help'.",file=sys.stderr)
         print("***",file=sys.stderr,end="\n\n")
         exit(2)
-    
+
     # Printing of help or version messages with the 'help' or 'version' option.
     if args.pop('help') :
         program_help()
@@ -162,6 +162,8 @@ def parse_arguments() :
         exit()
     else :
         h_command = args.pop('c_help')
+        if len(sys.argv) == 2 :
+           h_command = sys.argv[1]
         if h_command :
             command_help(h_command)
             exit()
