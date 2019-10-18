@@ -13,38 +13,36 @@ from helpMessages import program_help,command_help,program_version
 def parse_arguments() :
     
     ### Creation of the Argument Parser 
-    parser = argparse.ArgumentParser(
-        add_help=False
-        )
+    parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('-v','--version',action='store_true',required=False,dest='version')
     parser.add_argument('-h','--help',action='store_true',required=False,dest='help')
     
     subparser = parser.add_subparsers()
     
     # subparser to call STAR aligner
-    parser_star = subparser.add_parser('starAlignement',add_help=False)
-    parser_star.add_argument('-r','--reference', type=str, dest='reference')
-    parser_star.add_argument('-1','--r1', type=str, dest='r1')
-    parser_star.add_argument('-2','--r2', type=str, default='',dest='r2')
+    parser_star = subparser.add_parser('starAlignment',add_help=False)
+    parser_star.add_argument('-r','--reference', type=argparse.FileType('r'), dest='reference')
+    parser_star.add_argument('-1','--r1', type=argparse.FileType('r'), dest='r1')
+    parser_star.add_argument('-2','--r2', type=argparse.FileType('r'), required=False, dest='r2')
     parser_star.add_argument('-o','--output', type=str, dest='prefix')
-    parser_star.add_argument('-t','--threads', type=int, default=1,dest='threads')
-    parser_star.add_argument('-h','--help',action='store_const', const = parser_star.prog.split()[-1],dest='c_help')
+    parser_star.add_argument('-t','--threads', type=int, default=1, dest='threads')
+    parser_star.add_argument('-h','--help',action='store_const', const = parser_star.prog.split()[-1], dest='c_help')
     parser_star.set_defaults(func=star)
 
     # subparser to call Hisat2 aligner
-    parser_hisat2 = subparser.add_parser('hisat2Alignement',add_help=False)
-    parser_hisat2.add_argument('-r','--reference', type=str, dest='reference')
-    parser_hisat2.add_argument('-1','--r1', type=str, dest='r1')
-    parser_hisat2.add_argument('-2','--r2', type=str, default='', dest='r2')
+    parser_hisat2 = subparser.add_parser('hisat2Alignment',add_help=False)
+    parser_hisat2.add_argument('-r','--reference', type=argparse.FileType('r'), dest='reference')
+    parser_hisat2.add_argument('-1','--r1', type=argparse.FileType('r'), dest='r1')
+    parser_hisat2.add_argument('-2','--r2', type=argparse.FileType('r'), required=False, dest='r2')
     parser_hisat2.add_argument('-o','--output', type=str, default='HiSat2', dest='prefix')
     parser_hisat2.add_argument('-t','--threads', type=int, default=1, dest='threads')
-    parser_hisat2.add_argument('-h','--help',action='store_const', const = parser_hisat2.prog.split()[-1],dest='c_help')
+    parser_hisat2.add_argument('-h','--help',action='store_const', const = parser_hisat2.prog.split()[-1], dest='c_help')
     parser_hisat2.set_defaults(func=hisat2)
     
     # subparser for the split read research
     parser_split = subparser.add_parser('splitReadSearch',add_help=False)
-    parser_split.add_argument('-a', '--alignement', dest='bamfilename', type=str, )
-    parser_split.add_argument('-r', '--reference', type=str, dest='fastafilename')
+    parser_split.add_argument('-a', '--alignment', type=argparse.FileType('r'), dest='bamfilename')
+    parser_split.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fastafilename')
     parser_split.add_argument('-o','--output', type=str, dest='basename')
     parser_split.add_argument('-h','--help',action='store_const', const = parser_split.prog.split()[-1],dest='c_help')
     parser_split.set_defaults(func=split_research)
@@ -67,7 +65,7 @@ def parse_arguments() :
     parser_orf.set_defaults(func=predictORF)
 
     # subparser for aligning contigs and proteins
-    parser_protein = subparser.add_parser('analyzeProtein',add_help=False, help='Run Diamond to search long gaps (i.e. potential introns) in contigs-protein alignement.'
+    parser_protein = subparser.add_parser('analyzeProtein',add_help=False, help='Run Diamond to search long gaps (i.e. potential introns) in contigs-protein alignment.'
                                                      'Returns a GFF file with all the found gaps'
                                                      'Needs Diamond-v0.9.9')
     parser_protein.add_argument('-i', '--fasta',
@@ -79,7 +77,7 @@ def parse_arguments() :
     parser_protein.add_argument('-k','--keep_intermediate',
                                 help='Boolean which rules intermediate files erasure (default False)', dest='rm', action='store_true',required=False)
     parser_protein.add_argument('-t','--threads',
-                                help='Integer which indicates the numberof CPU to use for alignement (default 1)', dest='threads', type=int, required=False,default = 1)
+                                help='Integer which indicates the numberof CPU to use for alignment (default 1)', dest='threads', type=int, required=False,default = 1)
     parser_protein.add_argument('-h','--help',action='store_const', const = parser_protein.prog.split()[-1],dest='c_help')
     parser_protein.set_defaults(func=searchProtein)
 
@@ -148,9 +146,8 @@ def parse_arguments() :
     try :
         args = vars(parser.parse_args())
     except :
-        print("\n***",file=sys.stderr)
-        print("To know how to call intronSeeker program, use 'intronSeeker --help'.",file=sys.stderr)
-        print("***",file=sys.stderr,end="\n\n")
+        print("\nTo know how to call intronSeeker program, use 'intronSeeker --help'",file=sys.stderr)
+        print("or 'intronSeeker <command> --help'.",file=sys.stderr,end="\n\n")
         exit(2)
 
     # Printing of help or version messages with the 'help' or 'version' option.
@@ -170,9 +167,8 @@ def parse_arguments() :
         else :
             return args
 
-    
+
 if __name__ == '__main__':
-    
     args = parse_arguments()
     
     # Run the program

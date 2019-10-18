@@ -33,11 +33,11 @@ Version: v{version}\n\n\
 \
 This tool identify  potentially retained introns  in de novo RNA-seq  assembly\
  in order to quantify and remove them. The intron detection is based on the\
- read splicing signal  which appears when an alignement is performed beetween\
+ read splicing signal  which appears when  an alignment is performed beetween\
  the reads library and the assembly.\n\
 This program makes available  all the tools  to produce (STAR and Hisat2 aligners),\
  detect (reads splicing  identification)  and analyze  (ORF prediction,  protein\
- alignement,  data integration)  the signal  in  order to  give  the most  reliable\
+ alignment,  data  integration)  the signal  in  order to  give  the most  reliable\
  and consistent results as possible in term of retained intron detection.\n\
 \n\
 You can find also two types of RNA-seq data simulations to validate  the\
@@ -76,14 +76,14 @@ The second simulation is based on an existing genome and corresponding genome\
     print('Commands : ')
     
     print(' -- Align')
-    # hisat2Alignement
-    print('   hisat2Alignement',end='')
+    # hisat2Alignment
+    print('   hisat2Alignment',end='')
     print(cw.fill(
 'Calls Hisat2 to align the reads library and the reference assembly and produce\
  a BAM file on which reads split detection can be performed.'
     ))
-    # starAlignement
-    print('   starAlignement',end='')
+    # starAlignment
+    print('   starAlignment',end='')
     print(cw.fill(
 'Calls STAR to align the reads library and the reference assembly and produce\
  a BAM file on which reads splicing detection can be performed.'
@@ -115,10 +115,10 @@ The second simulation is based on an existing genome and corresponding genome\
     # analyzeProtein
     print('   analyzeProtein',end='')
     print(cw.fill(
-'From a reference Fasta file and a proteic bank, performs the proteic alignement\
+'From a reference Fasta file and a proteic bank, performs the proteic alignment\
  all-vs-all beetween the Fasta and the bank and returns the characteristics\
- of the best alignement for each sequence of the Fasta in a tabulated file.\
- The proteic alignement is performed with Diamond.'
+ of the best alignment for each sequence of the Fasta in a tabulated file.\
+ The proteic alignment is performed with Diamond.'
     ))
     print()
     
@@ -156,7 +156,7 @@ The second simulation is based on an existing genome and corresponding genome\
     
     
     print()
-    print('Program:   intronSeeker version {version}')
+    print('Program:   intronSeeker')
     print('Version:   {version}'.format(version=__version__))
     print('License:   {license}'.format(license=__license__))
     print('Copyright: {copyright}'.format(copyright=__copyright__))
@@ -169,9 +169,9 @@ The second simulation is based on an existing genome and corresponding genome\
 ########################################
 
 def command_help(command: str) :
-    if command == "starAlignement" :
+    if command == "starAlignment" :
         star_help()
-    elif command == "hisat2Alignement" :
+    elif command == "hisat2Alignment" :
         hisat2_help()
     elif command == "splitReadSearch" :
         split_help()
@@ -188,15 +188,14 @@ def command_help(command: str) :
 
 def star_help() :
     text='\
-    \n\
-starAlignement :\n\n\
+\nDescription:\n\
 Calls STAR to align the reads library and the reference assembly and produce\
- a BAM file on which reads splicing detection can be performed.\
- A directory <output>_star is created where the STAR indexing, STAR log and output BAM and BAI file will be stored\
+ a BAM file on which  reads  splicing  detection  can be performed.\
+ A directory  <output>_star is created where the STAR indexing, STAR log and output BAM and BAI file will be stored.\
 '
     tw = textwrap.TextWrapper(
         width=90,
-        initial_indent="    ",
+        initial_indent="",
         drop_whitespace=True
     )
 
@@ -204,42 +203,41 @@ Calls STAR to align the reads library and the reference assembly and produce\
     print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
     
     # Usage
-    print(' Usage:')
+    print('Usage:')
     print(
     textwrap.fill('\
- intronSeeker starAlignement -r <reference.fa> -1 <read1.fq>\
- -o <outfile_basename> [-2 <read2.fq>] [-t <num_threads>]',
+intronSeeker starAlignement -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t INT]',
     width=90
     ))
     print()
     
     cw = textwrap.TextWrapper(
-        width=55,
-        initial_indent="\t\t",
-        subsequent_indent="\t\t\t\t",
+        width=67,
+        initial_indent="\t",
+        subsequent_indent="\t\t\t",
         break_long_words=False
     )
     print('Arguments :')
-    print('   -r/--reference',end='')
+    print('   -r/--reference FILE',end='')
     print(cw.fill(
 'Name of the reference FASTA file on wich the reads will be mapped.'
     ))
-    print('   -1/--r1\t',end='')
+    print('   -1/--r1 FILE\t',end='')
     print(cw.fill(
-'Name of the FASTQ file which contains the single-end reads library. If paired-end,\
+'Name of the  FASTQ  file  which  contains  the  single-end   reads library. If paired-end,\
  filename of #1 reads mates.'
     ))
-    print('   -2/--r2\t',end='')
+    print('   -2/--r2 FILE\t',end='')
     print(cw.fill(
-'Only for a paired-end library, filename of #2 reads mates '
+'Only for a paired-end library, filename of #2 reads mates.'
     ))
-    print('   -o/--output\t',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
-'Basename of the output directory where the STAR index and ouput BAM fil will be stored.'
+'Basename of the output directory  where  the STAR index  and ouput BAM file will be stored.'
     ))
-    print('   -t/--threads\t',end='')
+    print('   -t/--threads INT',end='')
     print(cw.fill(
-'Number of alignment threads to lauch.'
+'Number of alignment threads to launch [1].'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
@@ -253,15 +251,14 @@ Calls STAR to align the reads library and the reference assembly and produce\
 
 def hisat2_help() :
     text='\
-    \n\
-hisat2Alignement :\n\n\
-Calls HiSat2 to align the reads library and the reference assembly and produce\
+\nDescription:\n\
+Calls HiSat2  to align the reads library and the reference assembly and produce\
  a BAM file on which reads splicing detection can be performed.\
- A directory <output>_hisat2 is created where the HiSat2 indexing, HiSat2 log and output BAM and BAI file will be stored\
+ A directory <output>_hisat2 is created where the HiSat2 indexing, HiSat2 log and output BAM and BAI file will be stored.\
 '
     tw = textwrap.TextWrapper(
         width=90,
-        initial_indent="    ",
+        initial_indent="",
         drop_whitespace=True
     )
 
@@ -269,42 +266,41 @@ Calls HiSat2 to align the reads library and the reference assembly and produce\
     print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
     
     # Usage
-    print(' Usage:')
+    print('Usage:')
     print(
     textwrap.fill('\
- intronSeeker hisat2Alignement -r <reference.fa> -1 <read1.fq>\
- -o <outfile_basename> [-2 <read2.fq>] [-t <num_threads>]',
+intronSeeker hisat2Alignement -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t INT]',
     width=90
     ))
     print()
     
     cw = textwrap.TextWrapper(
-        width=55,
-        initial_indent="\t\t",
-        subsequent_indent="\t\t\t\t",
+        width=67,
+        initial_indent="\t",
+        subsequent_indent="\t\t\t",
         break_long_words=False
     )
-    print('Arguments :')
-    print('   -r/--reference',end='')
+    print('Options:')
+    print('   -r/--reference FILE',end='')
     print(cw.fill(
 'Name of the reference FASTA file on wich the reads will be mapped.'
     ))
-    print('   -1/--r1\t',end='')
+    print('   -1/--r1 FILE\t',end='')
     print(cw.fill(
-'Name of the FASTQ file which contains the single-end reads library. If paired-end,\
+'Name of the  FASTQ  file  which  contains  the  single-end   reads library. If paired-end,\
  filename of #1 reads mates.'
     ))
-    print('   -2/--r2\t',end='')
+    print('   -2/--r2 FILE\t',end='')
     print(cw.fill(
-'Only for a paired-end library, filename of #2 reads mates '
+'Only for a paired-end library, filename of #2 reads mates.'
     ))
-    print('   -o/--output\t',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
-'Basename of the output directory where the HiSat2 index and ouput BAM fil will be stored.'
+'Basename of the output directory where the HiSat2 index and  ouput BAM file will be stored.'
     ))
-    print('   -t/--threads\t',end='')
+    print('   -t/--threads INT',end='')
     print(cw.fill(
-'Number of alignment threads to lauch.'
+'Number of alignment threads to launch [1].'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
@@ -318,16 +314,15 @@ Calls HiSat2 to align the reads library and the reference assembly and produce\
 
 def split_help() :
     text='\
-    \n\
-splitReadSearch :\n\n\
-Performs the split read signal extraction from an alignement (BAM File) beetween an assembly (FASTA file) and its reads library.\
- A split read is interpreted like a potential splicing event and, so, a candidate for the intron identification.\
- Several splicing events could be merged in one entity if their splicing limits are the same (+/-2b).\
- A directory named <output>_splitReadSearch is created where the TXT output file is stored. Each line of this file characterize an intron candidate.\
+\nDescription:\n\
+Performs  the split read  signal  extraction  from  an   alignment (BAM File)  beetween an assembly (FASTA file) and its reads library.\
+ A split read is interpreted  like a potential splicing event and, so, a candidate for the intron identification.\
+ Several splicing events could be merged in one entity if their splicing limits are  the same (+/-2b).\
+  A directory named <output>_splitReadSearch is created where  the TXT output file is stored.  Each line of this file characterize an intron candidate.\
 '
     tw = textwrap.TextWrapper(
         width=90,
-        initial_indent="    ",
+        initial_indent="",
         drop_whitespace=True
     )
 
@@ -335,33 +330,33 @@ Performs the split read signal extraction from an alignement (BAM File) beetween
     print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
     
     # Usage
-    print(' Usage:')
+    print('Usage:')
     print(
     textwrap.fill('\
- intronSeeker splitReadSearch -a <alignement.bam> -r <reference.fa> \
+intronSeeker splitReadSearch -a <alignemnt.bam> -r <ref.fa> \
  -o <outfile_basename> ',
     width=90
     ))
     print()
     
     cw = textwrap.TextWrapper(
-        width=55,
-        initial_indent="\t\t",
-        subsequent_indent="\t\t\t\t",
+        width=67,
+        initial_indent="\t",
+        subsequent_indent="\t\t\t",
         break_long_words=False
     )
     print('Arguments :')
-    print('   -a/--alignement',end='')
+    print('   -a/--alignment FILE',end='')
     print(cw.fill(
-'Name of the alifnement BAM file from which the split read signal has to be extracted.'
+'Name of the  alignment BAM file  from which the split  read signal has to be extracted.'
     ))
-    print('   -r/--reference',end='')
+    print('   -r/--reference FILE',end='')
     print(cw.fill(
-'Name of the reference FASTA file of the alignement and in which the introns have to be identified.'
+'Name of the reference FASTA file  of the  alignment  and  in which the introns have to be identified.'
     ))
-    print('   -o/--output\t',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
-'Basename of the output directory where the TXT ouput file will be stored.'
+'Basename of the output directory  where the TXT ouput file will be stored.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
@@ -501,8 +496,8 @@ def protein_help() :
     text='\
     \n\
 analyzeProtein :\n\n\
-Performs a proteic alignement on a reference FASTA file with Diamond. Produces a file where each line characterize the best alignement for each sequence of the FASTA.\
- This module take part of the same approach of the analyzeORF module : the proteic alignements before and after candidate trimming are compared to support the intron identification.\
+Performs a proteic alignment on a reference FASTA file with Diamond. Produces a file where each line characterize the best alignment for each sequence of the FASTA.\
+ This module take part of the same approach of the analyzeORF module : the proteic alignments before and after candidate trimming are compared to support the intron identification.\
 '
     tw = textwrap.TextWrapper(
         width=90,
@@ -532,7 +527,7 @@ Performs a proteic alignement on a reference FASTA file with Diamond. Produces a
     print('Arguments :')
     print('   -r/--reference',end='')
     print(cw.fill(
-'\tName of the reference FASTA file on which theproteic alignement must be performed.'
+'\tName of the reference FASTA file on which theproteic alignment must be performed.'
     ))
     print('   -p/--db-proteins',end='')
     print(cw.fill(

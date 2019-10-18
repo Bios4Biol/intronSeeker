@@ -132,7 +132,7 @@ def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
                     index = ["start_split","end_split","split_length","split_flanks"])
 
-def process_bam(alignements, contigs, introns, library):
+def process_bam(alignments, contigs, introns, library):
     """
     For an alignment file, list all split reads.
 
@@ -141,12 +141,12 @@ def process_bam(alignements, contigs, introns, library):
     :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
     """
     rows = []
-    for record in alignements :
+    for record in alignments :
         begin = pd.Series([
             record['query_name'],                        # ID of the read
             record['reference_name'],                    # ID of the contig where the read is mapped
-            record['reference_start'],                   # Start of the alignement on the contig
-            record['reference_end'],                     # End of the alignement on the contig
+            record['reference_start'],                   # Start of the alignment on the contig
+            record['reference_end'],                     # End of the alignment on the contig
             library.at[record['query_name'],"covering"], # Bool if the read normally covers an intron (i.e. should be split)
             record['cigartuples'] is not None,           # Bool if the read is mapped
             not record['reference_name'] == library.at[record['query_name'],"contig"].rstrip(".ori"), # Bool if the read is mapped on right contig
@@ -196,7 +196,7 @@ def class_read(align_group) :
     elif (not align_group["covering"].any() and align_group["split"].any()) or (align_group["covering"].all() and align_group["missplit"].any()):
         return "FP"
 
-def alignement_analysis(args_dict) :
+def alignment_analysis(args_dict) :
 
     
     print("Analysis")
@@ -274,9 +274,9 @@ def alignement_analysis(args_dict) :
         
         print("alignment computation")
         if not os.path.exists(path_rmpg_pick) :
-            print("alignement parsing")
+            print("alignment parsing")
             bamfile = pysam.AlignmentFile(args_dict["bamfile"], "rb")
-            alignements = [{
+            alignments = [{
                         'query_name' : record.query_name,
                         'reference_name' : record.reference_name,
                         'reference_start' : record.reference_start,
@@ -284,10 +284,10 @@ def alignement_analysis(args_dict) :
                         'cigartuples' : record.cigartuples
                         } for record in bamfile.fetch(until_eof=True)]
             
-            print("alignement plrz")
+            print("alignment plrz")
             
             with prl.ThreadPoolExecutor(max_workers=8) as ex :
-                align_split = np.array_split(alignements,8)
+                align_split = np.array_split(alignments,8)
                 reads_mapping = pd.concat(ex.map(process_bam,
                     align_split,
                     [contigs]*8,
@@ -318,7 +318,7 @@ if __name__ == '__main__' :
     
     start_tot_time = time.time()
     with prl.ProcessPoolExecutor(max_workers=4) as ex :
-        ex.map(alignement_analysis,args_dicts)
+        ex.map(alignment_analysis,args_dicts)
     print('la totale')
     print(time.time() - start_tot_time)
     
