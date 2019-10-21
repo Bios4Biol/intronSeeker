@@ -24,7 +24,7 @@ __version__ = '1.0'
 __email__ = 'support.bioinfo.genotoul@inra.fr'
 __status__ = 'dev'
 
-from GBS_fonction_base import * # TODO : A remplacer par dataSimulation quand intégré
+from dataSimulation import * # TODO : A remplacer par dataSimulation quand intégré
 import os
 import tempfile as tmp
 import configparser
