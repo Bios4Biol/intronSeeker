@@ -49,54 +49,40 @@ def parse_arguments() :
 
     # subparser for writing fasta of spliced sequence
     parser_trim = subparser.add_parser('trimFastaFromTXT',add_help=False)
-    parser_trim.add_argument('-r', '--reference', dest='fasta_file', type=str, )
-    parser_trim.add_argument('-f', '--features', dest='gff_feature', type=str, )
-    parser_trim.add_argument('-o','--output', dest='output', type=str, default='sequences')
+    parser_trim.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta_file')
+    parser_trim.add_argument('-f', '--features', type=argparse.FileType('r'), dest='gff_feature')
+    parser_trim.add_argument('-o','--output', type=str, default='sequences', dest='output')
     parser_trim.add_argument('-h','--help',action='store_const', const = parser_trim.prog.split()[-1],dest='c_help')
     parser_trim.set_defaults(func=truncate)
 
     # subparser for searching ORF on sequences
     parser_orf = subparser.add_parser('analyzeORF',add_help=False)
-    parser_orf.add_argument('-r', '--reference', dest='fasta_file', type=str, )
-    parser_orf.add_argument('-k','--keep-intermediate', dest='rm', action='store_false',required=False, default=True)
-    parser_orf.add_argument('-o','--output', dest='output', type=str, default='predicted_orfs')
-    parser_orf.add_argument('--no-refine-starts', dest='refine',action='store_false', required=False, default=True)
+    parser_orf.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta_file')
+    parser_orf.add_argument('-k','--keep-intermediate', action='store_false',required=False, default=False, dest='rm')
+    parser_orf.add_argument('-o','--output', type=str, dest='output', default='predicted_orfs')
+    parser_orf.add_argument('--no-refine-starts', action='store_false', required=False, default=True, dest='refine')
     parser_orf.add_argument('-h','--help',action='store_const', const = parser_orf.prog.split()[-1],dest='c_help')
     parser_orf.set_defaults(func=predictORF)
 
     # subparser for aligning contigs and proteins
-    parser_protein = subparser.add_parser('analyzeProtein',add_help=False, help='Run Diamond to search long gaps (i.e. potential introns) in contigs-protein alignment.'
-                                                     'Returns a GFF file with all the found gaps'
-                                                     'Needs Diamond-v0.9.9')
-    parser_protein.add_argument('-i', '--fasta',
-                                help='Contigs sequences', dest='fasta', type=str, )
-    parser_protein.add_argument('-p','--dbprotein',
-                                help='Name of the Diamond database containing the indexed proteic sequences.',type=str, dest='dbprotein')
-    parser_protein.add_argument('-o', '--output',
-                                help='Output filename',required=False,default='LongGaps.gff', dest='output', type=str)
-    parser_protein.add_argument('-k','--keep_intermediate',
-                                help='Boolean which rules intermediate files erasure (default False)', dest='rm', action='store_true',required=False)
-    parser_protein.add_argument('-t','--threads',
-                                help='Integer which indicates the numberof CPU to use for alignment (default 1)', dest='threads', type=int, required=False,default = 1)
-    parser_protein.add_argument('-h','--help',action='store_const', const = parser_protein.prog.split()[-1],dest='c_help')
+    parser_protein = subparser.add_parser('analyzeProtein',add_help=False)
+    parser_protein.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta')
+    parser_protein.add_argument('-p','--dbprotein', type=str, dest='dbprotein')
+    parser_protein.add_argument('-o', '--output', type=str, required=False, default='LongGaps.gff', dest='output')
+    parser_protein.add_argument('-k','--keep_intermediate', action='store_true',required=False, default=False, dest='rm')
+    parser_protein.add_argument('-t','--threads', type=int, default=1, dest='threads')
+    parser_protein.add_argument('-h','--help', action='store_const', const = parser_protein.prog.split()[-1],dest='c_help')
     parser_protein.set_defaults(func=searchProtein)
 
     # subparser for Full Random Simulation
     parser_frs = subparser.add_parser('fullRandomSimulation',add_help=False, help='contig help')
-    parser_frs.add_argument('-n','--nb_contigs',
-                            help='Number of contig/sequence randomly generated. Default 10', type=int, default=10, dest='nb')
-    parser_frs.add_argument('-m','--min-contig-length',
-                            help='Minimal length of random contigs. Default 150', type=int, default=150, dest='mini')
-    parser_frs.add_argument('-M','--max-contig-length', 
-                            help='Maximal length of random contigs. Default 1000', type=int, default=1000, dest='maxi')
-    parser_frs.add_argument('--random-half',
-                            help='Insert intron in random half of the simulated contigs if the option is specified. Default False',default=False, action='store_true',dest='half')
-    parser_frs.add_argument('-l', '--lower-intron-length',
-                            help='Minimal length of random intron. Default 150', type=int, default=150, dest='lower')
-    parser_frs.add_argument('-H', '--higher-intron-length',
-                            help='Maximal length of random intron. Default 1000', type=int, default=1000, dest='upper')
-    parser_frs.add_argument('-o', '--output',
-                            help='Basename of the generated files. Default [FullRandomSimulation] ', type=str, default='FullRandomSimulation', dest='output')
+    parser_frs.add_argument('-n','--nb_contigs', type=int, default=10, dest='nb')
+    parser_frs.add_argument('-m','--min-contig-length', type=int, default=150, dest='mini')
+    parser_frs.add_argument('-M','--max-contig-length', type=int, default=1000, dest='maxi')
+    parser_frs.add_argument('-r','--random-half', default=False, action='store_true',dest='half')
+    parser_frs.add_argument('-l', '--lower-intron-length',  type=int, default=150, dest='lower')
+    parser_frs.add_argument('-H', '--higher-intron-length', type=int, default=1000, dest='upper')
+    parser_frs.add_argument('-o', '--output', type=str, default='FullRandomSimulation', dest='output')
     parser_frs.add_argument('-h','--help',action='store_const', const = parser_frs.prog.split()[-1],dest='c_help')
     parser_frs.set_defaults(func=full_random_simulation)
 

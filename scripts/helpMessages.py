@@ -98,11 +98,11 @@ The second simulation is based on an existing genome and corresponding genome\
  identify and caracterize introns candidates.'
     ))
     # trimFastaFromGFF
-    print('   trimFastaFromGFF',end='')
+    print('   trimFastaFromTXT',end='')
     print(cw.fill(
-'From a reference Fasta file and a associated GFF, produces a new Fasta file\
+'From a reference Fasta file and a associated TXT, produces a new Fasta file\
  containing each sequence of the original Fasta spliced of the segments\
- corresponding to the features of the GFF file.'
+ corresponding to the features of the TXT file.'
     ))
     # analyzeORF
     print('   analyzeORF\t',end='')
@@ -181,7 +181,15 @@ def command_help(command: str) :
         orf_help()
     elif command == "analyzeProtein" :
         protein_help()
-    
+    elif command == "fullRandomSimulation" :
+        frs_help()
+    elif command == "GTFbasedSimulation" :
+        gbs_help()
+    elif command == "simulateReads" :
+        sr_help()
+    elif command == "checkInstall" :
+        checki_help()
+
 ########################################
 ##### starAlignement help printing #####
 ########################################
@@ -217,7 +225,7 @@ intronSeeker starAlignement -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t 
         subsequent_indent="\t\t\t",
         break_long_words=False
     )
-    print('Arguments :')
+    print('Options:')
     print('   -r/--reference FILE',end='')
     print(cw.fill(
 'Name of the reference FASTA file on wich the reads will be mapped.'
@@ -345,7 +353,7 @@ intronSeeker splitReadSearch -a <alignemnt.bam> -r <ref.fa> \
         subsequent_indent="\t\t\t",
         break_long_words=False
     )
-    print('Arguments :')
+    print('Options:')
     print('   -a/--alignment FILE',end='')
     print(cw.fill(
 'Name of the  alignment BAM file  from which the split  read signal has to be extracted.'
@@ -370,19 +378,17 @@ intronSeeker splitReadSearch -a <alignemnt.bam> -r <ref.fa> \
 
 def trim_help() :
     text='\
-    \n\
-trimFastaFromTXT :\n\n\
+\nDescription:\n\
 From a tabulated TXT which contains all the features to trim and the reference FASTA where the features have to be trimmed,\
- produces a new FASTA reference file where the features were trimmed. The TXT file must hold at least 4 necessary fields :\n\
--reference : ID of the sequence to splice\n\
--start : feature\'s starting coordinate on the reference\n\
--end : ending\'s coordinate on the reference\n\
--to_trim : 0 or 1 value, 1 if the feature must be trimmed, 0 otherwise\n\n\
-The TXT file can hold other fields but they will not influence trimming process.\
-'
+ produces  a new FASTA  reference file where  the features were trimmed.  The TXT file  must hold at least  4  mandatory fields\
+ (supplementary fields will not take into account by the trimming process):\n\
+  - reference:\tID of the sequence to splice\n\
+  - start:\tFeature\'s starting coordinate on the reference\n\
+  - end:\tEnding\'s coordinate on the reference\n\
+  - to_trim:\t0 or 1 value, 1 if the feature must be trimmed, 0 otherwise\n'
     tw = textwrap.TextWrapper(
         width=90,
-        initial_indent="    ",
+        initial_indent="",
         drop_whitespace=True
     )
 
@@ -390,31 +396,30 @@ The TXT file can hold other fields but they will not influence trimming process.
     print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
     
     # Usage
-    print(' Usage:')
+    print('Usage:')
     print(
     textwrap.fill('\
- intronSeeker trimFastaFromTXT -r <reference.fa> -f <features.txt>\
- -o <outfile_basename> ',
+intronSeeker trimFastaFromTXT -r <ref.fa> -f <features.txt> -o <outfile_basename> ',
     width=90
     ))
     print()
     
     cw = textwrap.TextWrapper(
-        width=55,
-        initial_indent="\t\t",
-        subsequent_indent="\t\t\t\t",
+        width=67,
+        initial_indent="\t",
+        subsequent_indent="\t\t\t",
         break_long_words=False
     )
-    print('Arguments :')
-    print('   -r/--reference',end='')
+    print('Options:')
+    print('   -r/--reference FILE',end='')
     print(cw.fill(
-'Name of the reference FASTA file where the features must be spliced.'
+'Name of the reference FASTA file where features must be spliced.'
     ))
-    print('   -f/--features',end='')
+    print('   -f/--features FILE',end='')
     print(cw.fill(
-'Name of the features TXT file which has to hold at least the \'reference\', \'start\', \'end\' and \'to_trim\' fields (above-detailed).'
+'Name of the features TXT file  which has  to  hold at  least the \'reference\', \'start\', \'end\', \'to_trim\' fields (detailed above).'
     ))
-    print('   -o/--output\t',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
 'Basename of the output directory where the FASTA ouput file will be stored.'
     ))
@@ -431,17 +436,16 @@ The TXT file can hold other fields but they will not influence trimming process.
 
 def orf_help() :
     text='\
-    \n\
-analyzeORF :\n\n\
-Performs the ORF analysis on a reference FASTA file : predicts, with TransDecoder software, the ORF of each sequence of the FASTA\
- and produces a file where each line characterizes the best predicted ORF of each sequence. This module is involved two times in intorn identification :\
- first, directly on the original reference file to predict ORFs and a second time after the intron candidates identification :\
- the candidates are trimmed from the original reference FASTA and the ORFs prediction is performed on the resulting file. The goal of this approach\
- is to analyze the potential ORFs modifications in order to help us in intorn identification.\
+\nDescription:\n\
+Performs the ORF analysis on a reference FASTA file: predicts, with TransDecoder software, the ORF  of each sequence  of the FASTA\
+ and  produces a file where each line characterizes the best predicted ORF of each  sequence.  This module  is involved  two times  in  intron identification:\
+ first, directly  on the  original  reference  file  to predict ORFs  and a second time after the intron candidates identification.\
+  The candidates  are trimmed  from the original reference FASTA and the ORFs prediction is performed on the resulting file. The goal of this approach\
+ is to analyze the potential ORFs modifications in order  to help us in intron identification.\
 '
     tw = textwrap.TextWrapper(
         width=90,
-        initial_indent="    ",
+        initial_indent="",
         drop_whitespace=True
     )
 
@@ -449,37 +453,36 @@ Performs the ORF analysis on a reference FASTA file : predicts, with TransDecode
     print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
     
     # Usage
-    print(' Usage:')
+    print('Usage:')
     print(
     textwrap.fill('\
- intronSeeker analyzeORF -r <reference.fa> -o <outfile_basename>\
- [-k] [--no-refine-starts]',
+intronSeeker analyzeORF -r <ref.fa> -o <outfile_basename> [-k] [--no-refine-starts]',
     width=90
     ))
     print()
     
     cw = textwrap.TextWrapper(
-        width=55,
+        width=59,
         initial_indent="\t",
         subsequent_indent="\t\t\t\t",
         break_long_words=False
     )
-    print('Arguments :')
-    print('   -r/--reference',end='')
+    print('Options:')
+    print('   -r/--reference FILE',end='')
     print(cw.fill(
-'\tName of the reference FASTA file on which the ORF prediction must be performed.'
+'\tName  of the reference FASTA file  on which  the ORF prediction must be performed.'
     ))
-    print('   -o/--output\t',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
-'\tBasename of the output directory where the ouput file and potential TransDEcoder\'s files will be stored.'
+'\tBasename of the output directory where the ouput file and potential TransDEcoder\'s files  will be stored.'
     ))
     print('   -k/--keep-intermediate',end='')
     print(cw.fill(
-'Set up this option, if you want to keep the TransDecoder\'s intermediate files.'
+'Set up  this  option, if  you  want  to keep the TransDecoder\'s intermediate files.'
     ))
     print('   --no-refine-starts',end='')
     print(cw.fill(
-'\tAllow TransDecoder to not perform ORF\'s starts refining. Use this option only if TransDecoder fails at this step of ORF prediction.'
+'\tAllow TransDecoder  to not perform  ORF\'s starts refining. Use this option  only  if TransDecoder      fails at this step of ORF prediction.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
@@ -494,14 +497,13 @@ Performs the ORF analysis on a reference FASTA file : predicts, with TransDecode
 
 def protein_help() :
     text='\
-    \n\
-analyzeProtein :\n\n\
+\nDescription:\n\
 Performs a proteic alignment on a reference FASTA file with Diamond. Produces a file where each line characterize the best alignment for each sequence of the FASTA.\
- This module take part of the same approach of the analyzeORF module : the proteic alignments before and after candidate trimming are compared to support the intron identification.\
+ This module take part of the same approach of the  analyzeORF module:  the  proteic  alignments  before and after candidate trimming are compared to support the intron identification.\
 '
     tw = textwrap.TextWrapper(
         width=90,
-        initial_indent="    ",
+        initial_indent="",
         drop_whitespace=True
     )
 
@@ -509,40 +511,136 @@ Performs a proteic alignment on a reference FASTA file with Diamond. Produces a 
     print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
     
     # Usage
-    print(' Usage:')
+    print('Usage:')
     print(
     textwrap.fill('\
- intronSeeker analyzeProtein -r <reference.fa> -o <outfile_basename>\
- [-k] [--no-refine-starts]',
+intronSeeker analyzeProtein -r <ref.fa> -o <outfile_basename> [-k] [-t INT]',
     width=90
     ))
     print()
     
     cw = textwrap.TextWrapper(
-        width=55,
+        width=63,
         initial_indent="\t",
         subsequent_indent="\t\t\t\t",
         break_long_words=False
     )
-    print('Arguments :')
-    print('   -r/--reference',end='')
+    print('Options:')
+    print('   -r/--reference FILE',end='')
     print(cw.fill(
-'\tName of the reference FASTA file on which theproteic alignment must be performed.'
+'\tName of the reference FASTA file on which the proteic alignment must be performed.'
     ))
-    print('   -p/--db-proteins',end='')
+    print('   -p/--db-proteins STR',end='')
     print(cw.fill(
-'\t.'
+'\tName of the Diamond database containing the indexed proteic sequences.'
     ))
-    print('   -o/--output\t',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
-'\tBasename of the output directory where the ouput file and potential TransDEcoder\'s files will be stored.'
+'\tBasename of  the output directory where the ouput file will be stored.'
     ))
     print('   -k/--keep-intermediate',end='')
     print(cw.fill(
-'Set up this option, if you want to keep the TransDecoder\'s intermediate files.'
+'Set up this option, if you want to keep the intermediate files.'
+    ))
+    print('   -t/--threads INT\t',end='')
+    print(cw.fill(
+'Number of alignment threads to launch [1].'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
 '\tPrint this help message.'
     ))
     print()
+
+
+################################################
+##### Full Random Simulation help printing #####
+################################################
+
+def frs_help() :
+    text='\
+\nDescription:\n\
+Simulates a multi Fasta file which contains the pseudo-contigs and a TXT file which contains the pseudo retained\
+introns charesteristics. All the sequences (contigs and introns) as well as the introns insertion are fully random.\
+'
+    tw = textwrap.TextWrapper(
+        width=90,
+        initial_indent="",
+        drop_whitespace=True
+    )
+
+    # analyzeProtein Description
+    print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
+    
+    # Usage
+    print('Usage:')
+    print(
+    textwrap.fill('\
+intronSeeker fullRandomSimulation -r <ref.fa> -o <outfile_basename> [-k] [-t INT]',
+    width=90
+    ))
+    print()
+    
+    cw = textwrap.TextWrapper(
+        width=63,
+        initial_indent="\t",
+        subsequent_indent="\t\t\t\t",
+        break_long_words=False
+    )
+    print('Options:')
+    print('   -n/--nb_contigs INT',end='')
+    print(cw.fill(
+'\tNumber of contig/sequence randomly generated. [10].'
+    ))
+    print('   -m/--min-contig-length INT',end='')
+    print(cw.fill(
+'Minimal length of random contigs [150].'
+    ))
+    print('   -M/--max-contig-length INT',end='')
+    print(cw.fill(
+'Maximal length of random contigs [1000].'
+    ))
+    print('   -r/--random-half',end='')
+    print(cw.fill(
+'\tInsert intron in random half of the simulated contigs.'
+    ))
+    print('   -l/--lower-intron-length',end='')
+    print(cw.fill(
+'Minimal length of random intron [150].'
+    ))
+    print('   -H/--higher-intron-length',end='')
+    print(cw.fill(
+'Maximal length of random intron [1000].'
+    ))
+    print('   -o/--output STR',end='')
+    print(cw.fill(
+'\tBasename for generated files [FullRandomSimulation].'
+    ))
+    print('   -h/--help\t',end='')
+    print(cw.fill(
+'\tPrint this help message.'
+    ))
+
+
+############################################
+##### GTFbasedSimulation help printing #####
+############################################
+
+def gbs_help() :
+    pass
+
+
+#######################################
+##### simulateReads help printing #####
+#######################################
+
+def sr_help() :
+    pass
+
+
+########################
+##### checkInstall #####
+########################
+
+def checki_help() :
+    pass
