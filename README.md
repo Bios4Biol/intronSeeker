@@ -9,7 +9,7 @@ These retained introns will be present in only some sequences nevertheless they
 can therefore be present in the assembled contigs built from those reads.  
 ![](doc/splice_event.png)
 
-The read splicing signal of these intron can be used to find and remove them. 
+The read splicing signal of these introns can be used to find and remove them. 
 The intron splice site boundaries (canonical or not), the Open Reading Frame size
 and the protein alignment can be used as different hints to measure the probabiliy
 of having a retained intron.
@@ -36,7 +36,7 @@ Simulator and simulation data descriptions can be found in the SIMULATION.md fil
 How it works ?
 --------------
 
-#### Searchin for introns
+#### Searching for introns
 
 1. Use [Star](https://github.com/alexdobin/STAR) or 
 [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml) to map reads on 
@@ -63,10 +63,10 @@ input files or output files presented here are available in data directory.
 Before running any intronSeeker command, activate the conda environment with :
 
 ```diff
-+ source activate Seeker_environment
++ source activate ISeeker_environment
 ```
 
-##### Reads alignement on reference contigs : Hisat or Star.
+##### Reads alignment on reference contigs : Hisat or Star.
 
 From here, we will use files corresponding to reduced real dataset available 
 in the data directory (this data comes from *Ceanhorhabditis elegans*). 
@@ -78,13 +78,13 @@ results but takes longer to run and works only with paired-end library.
 Running alignment, use the commands :
 
 ```diff
-+ intronSeeker star -i Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignement
++ intronSeeker starAlignment -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignment
 ```
 
 or 
 
 ```diff
-intronSeeker hisat2 -i Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignement
+intronSeeker hisat2Alignment -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignment
 ```
 
 
@@ -93,5 +93,5 @@ intronSeeker hisat2 -i Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_read
 When the alignment is ended, you can search for splicing events with :
 
 ```diff
-+ intronSeeker split -i Cele_library-contigs_alignement_hisat2/Cele_library-contigs_alignement.Aligned.sortedByCoord.out.bam -r Test_set_Cele_contig-assembly.fasta -o Test_Cele_splicing_event
++ intronSeeker splitReadSearch -a Cele_library-contigs_alignment_hisat2/Cele_library-contigs_alignment.Aligned.sortedByCoord.out.bam -r Test_set_Cele_contig-assembly.fasta -o Test_Cele_splicing_event
 ```

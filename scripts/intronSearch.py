@@ -64,7 +64,7 @@ def limit_from_cigar(cigar_list: list, start: int, ref_name: str, read_name: str
 def split_research(bamfilename, fastafilename, basename) :
 	"""
 	Search the split reads and write two output files : the first with all the spliced events and the second where all the identical spliced events are merged
-	:param bamfilename: name of the input alignement file
+	:param bamfilename: name of the input alignment file
 	:param fastafilename: name of the reference fasta file (contains the contigs) 
 	:param basename: prefix for the name of output files 
 	:return: nothing
@@ -552,9 +552,9 @@ def predictORF(fasta_file, trunc, gff, rm, output : str,refine) :
 		os.system("rm pipeliner* ; rm -r {outdir}_intermediate* ".format(outdir=output_path))
 
 
-##################################################
-# Search long gap on contigs-proteins alignement #
-##################################################
+#################################################
+# Search long gap on contigs-proteins alignment #
+#################################################
 
 def runDiamond(fasta_file : str, protein_db : str, output : str,threads : int) :
 	"""
@@ -562,7 +562,7 @@ def runDiamond(fasta_file : str, protein_db : str, output : str,threads : int) :
 	:param fasta_file: Filename of the fasta which contains the nucleic sequences.
 	:param protein_db: Name of the Diamond proteic database.
 	:param output: Name of the output file.
-	:param threads: Number of threads used for the alignement.
+	:param threads: Number of threads used for the alignment.
 	"""
 	os.system("diamond blastx -q {fasta} -d {proteindb} -o {output} -f 5 -p {threads} -e 0.05 --max-target-seqs 0".format(
 		fasta=fasta_file,proteindb=protein_db, output=output+".tmp.xml",threads=threads)) ;
@@ -572,7 +572,7 @@ def searchGapsOfInterest(alignseq_subject : str , alignseq_query : str) :
 	From query eand susject aligned sequences (extracted from Diamond XML output), find long gaps and return a list of them.
 	:param alignseq_subject: String which contains the subject sequence.
 	:param alignseq_query: String which contains the query sequence.
-	:return list_gaps: List of long Gaps found in the alignement.
+	:return list_gaps: List of long Gaps found in the alignment.
 	"""
 	gap_pattern = re.compile("-+") ;
 	begin_idx = 0 ;
@@ -643,7 +643,7 @@ def searchProtein(fasta : str, dbprotein : str, output : str, threads : int, rm 
 	:param fasta: Name of the fasta file which contains contigs.
 	:param dbprotein: Name of the Diamond proteic database.
 	:param output: Name of the ouput file.
-	:param threads: Number of threads used for the alignement.
+	:param threads: Number of threads used for the alignment.
 	:param rm : Boolean which rules the temporary files erasure.
 	"""
 	outdir = output + "_protein" ;

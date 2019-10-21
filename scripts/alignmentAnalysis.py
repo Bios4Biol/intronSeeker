@@ -8,18 +8,28 @@ import pysam
 import gzip
 import time
 import numpy as np
+<<<<<<< HEAD
 from pprint import pprint
+=======
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
 from Bio import SeqIO
 from collections import OrderedDict
 import configparser
 import concurrent.futures as prl
+<<<<<<< HEAD
 from itertools import repeat
+=======
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
 
 def parse_config() :
     config = configparser.RawConfigParser()
     config.read('jupyter.properties')
     return config
     
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
 def parse_positions(fastq_pos) :
     pos = fastq_pos.lstrip("position=").split("..")
     complement = ('complement(' in pos[0])
@@ -133,7 +143,11 @@ def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
                     index = ["start_split","end_split","split_length","split_flanks"])
 
+<<<<<<< HEAD
 def process_bam(alignements, contigs, introns, library):
+=======
+def process_bam(alignments, contigs, introns, library):
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
     """
     For an alignment file, list all split reads.
 
@@ -142,12 +156,21 @@ def process_bam(alignements, contigs, introns, library):
     :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
     """
     rows = []
+<<<<<<< HEAD
     for record in alignements :
         begin = pd.Series([
             record['query_name'],                        # ID of the read
             record['reference_name'],                    # ID of the contig where the read is mapped
             record['reference_start'],                   # Start of the alignement on the contig
             record['reference_end'],                     # End of the alignement on the contig
+=======
+    for record in alignments :
+        begin = pd.Series([
+            record['query_name'],                        # ID of the read
+            record['reference_name'],                    # ID of the contig where the read is mapped
+            record['reference_start'],                   # Start of the alignment on the contig
+            record['reference_end'],                     # End of the alignment on the contig
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
             library.at[record['query_name'],"covering"], # Bool if the read normally covers an intron (i.e. should be split)
             record['cigartuples'] is not None,           # Bool if the read is mapped
             not record['reference_name'] == library.at[record['query_name'],"contig"].rstrip(".ori"), # Bool if the read is mapped on right contig
@@ -179,6 +202,7 @@ def process_bam(alignements, contigs, introns, library):
     
     return pd.DataFrame(rows)
 
+<<<<<<< HEAD
 def class_read(mapping) :
     if (mapping.covering and mapping.correct) or (mapping.split and not mapping.missplit) :
         return "TP"
@@ -227,6 +251,38 @@ def alignement_analysis(args_dict) :
     path_resreads_pick = "/".join([
         results_dir,
         "_".join(["res_lectures",*args_dict["name"].split()])
+=======
+def check_multi_align(align_group) :
+    if len(align_group)>1 :
+        align_group["duplicated"] = True
+    else :
+        align_group["duplicated"] = False
+    return align_group
+
+def class_read(align_group) :
+    
+    if (align_group["covering"].all() and align_group["correct"].any()) or (align_group["split"].any() and not align_group["missplit"].any()) :
+        return "TP"
+    elif not align_group["covering"].all() and not align_group["split"].any() :
+        return "TN"
+    elif align_group["covering"].all() and not align_group["correct"].any() :
+        return "FN"
+    elif (not align_group["covering"].any() and align_group["split"].any()) or (align_group["covering"].all() and align_group["missplit"].any()):
+        return "FP"
+
+def alignment_analysis(args_dict) :
+
+    
+    print("Analysis")
+    
+    path_rmpg_pick = "/".join([
+        results_dir,
+        "_".join(["reads_mapping",*args_dict["name"].split()])+".gz"
+        ])
+    path_resreads_pick = "/".join([
+        results_dir,
+        "_".join(["res_lectures",*args_dict["name"].split()])+".gz"
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
         ])
     if not os.path.exists(path_rmpg_pick) or not os.path.exists(path_resreads_pick) :
         # Reads library parsing and pickling 
@@ -285,19 +341,31 @@ def alignement_analysis(args_dict) :
         # For each intron, we determine all the reads which cover the insertion locus and the position in the read of this insertion locus
         # (precision : the function is called on intronns DataFrame but it returns a library-like DataFrame)
         print("library computation")
+<<<<<<< HEAD
         with prl.ProcessPoolExecutor(max_workers=8) as ex :
             s_t = time.time()
             introns_split = np.array_split(introns,ex._max_workers)
             lectures = pd.concat(ex.map(prlz_process_intron,introns_split,repeat(library,ex._max_workers)))
             print(time.time()-s_t)
+=======
+        with prl.ThreadPoolExecutor(max_workers=8) as ex :
+            introns_split = np.array_split(introns,8)
+            lectures = pd.concat(ex.map(prlz_process_intron,introns_split,[library]*8))
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
         lectures = library.join(lectures,lsuffix='',rsuffix='_cov').loc[:,lectures.columns]
         lectures.loc[lambda df : df.covering != True, "covering"] = False
         
         print("alignment computation")
         if not os.path.exists(path_rmpg_pick) :
+<<<<<<< HEAD
             print("alignement parsing")
             bamfile = pysam.AlignmentFile(args_dict["bamfile"], "rb")
             alignements = [{
+=======
+            print("alignment parsing")
+            bamfile = pysam.AlignmentFile(args_dict["bamfile"], "rb")
+            alignments = [{
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
                         'query_name' : record.query_name,
                         'reference_name' : record.reference_name,
                         'reference_start' : record.reference_start,
@@ -305,6 +373,7 @@ def alignement_analysis(args_dict) :
                         'cigartuples' : record.cigartuples
                         } for record in bamfile.fetch(until_eof=True)]
             
+<<<<<<< HEAD
             print("alignement plrz")
             
             with prl.ProcessPoolExecutor(max_workers=8) as ex :
@@ -328,10 +397,27 @@ def alignement_analysis(args_dict) :
         multi_aligned_classe = pd.DataFrame(reads_mapping.loc[lambda df : df.multi_aligned == True,:].groupby('read').apply(class_multi),columns=['classe'])
         lectures = lectures.join(pd.concat([simple_aligned_classe,multi_aligned_classe]))
         
+=======
+            print("alignment plrz")
+            
+            with prl.ThreadPoolExecutor(max_workers=8) as ex :
+                align_split = np.array_split(alignments,8)
+                reads_mapping = pd.concat(ex.map(process_bam,
+                    align_split,
+                    [contigs]*8,
+                    [introns]*8,
+                    [lectures]*8)).groupby('read').apply(check_multi_align)
+            reads_mapping.to_pickle(path_rmpg_pick)
+        else :
+            reads_mapping.read_pickle(path_rmpg_pick)
+        
+        lectures['classe'] = reads_mapping.groupby("read").apply(class_read)
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
         lectures.to_pickle(path_resreads_pick)
     else :
         reads_mapping = pd.read_pickle(path_rmpg_pick)
         lectures = pd.read_pickle(path_resreads_pick)
+<<<<<<< HEAD
     # ~ print()
     # ~ print("####### Results  ######")
     # ~ print(args_dict["name"])
@@ -345,6 +431,8 @@ def alignement_analysis(args_dict) :
     # ~ print(len(np.array_split(reads_mapping.groupby('contig'),8)))
     
     return 
+=======
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
     
             
 if __name__ == '__main__' :
@@ -359,11 +447,19 @@ if __name__ == '__main__' :
         
     args_dicts = [config[analysis] for analysis in config['Global']['analysis'].split(',')]
     
+<<<<<<< HEAD
     alignement_analysis(args_dicts[0])
 
     #~ start_time = time.time()
     #~ with prl.ProcessPoolExecutor(max_workers=4) as ex :
         #~ ex.map(alignement_analysis,args_dicts)
     #~ print('la totale : '+str(time.time() - start_time))
+=======
+    start_tot_time = time.time()
+    with prl.ProcessPoolExecutor(max_workers=4) as ex :
+        ex.map(alignment_analysis,args_dicts)
+    print('la totale')
+    print(time.time() - start_tot_time)
+>>>>>>> 38c5c4295eee013016c20a6eb305cc6154b8b3c1
     
     

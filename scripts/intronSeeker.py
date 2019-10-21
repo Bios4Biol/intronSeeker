@@ -13,92 +13,76 @@ from helpMessages import program_help,command_help,program_version
 def parse_arguments() :
     
     ### Creation of the Argument Parser 
-    parser = argparse.ArgumentParser(
-        add_help=False
-        )
+    parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('-v','--version',action='store_true',required=False,dest='version')
     parser.add_argument('-h','--help',action='store_true',required=False,dest='help')
     
     subparser = parser.add_subparsers()
     
     # subparser to call STAR aligner
-    parser_star = subparser.add_parser('starAlignement',add_help=False)
-    parser_star.add_argument('-r','--reference', type=str, dest='reference')
-    parser_star.add_argument('-1','--r1', type=str, dest='r1')
-    parser_star.add_argument('-2','--r2', type=str, default='',dest='r2')
+    parser_star = subparser.add_parser('starAlignment',add_help=False)
+    parser_star.add_argument('-r','--reference', type=argparse.FileType('r'), dest='reference')
+    parser_star.add_argument('-1','--r1', type=argparse.FileType('r'), dest='r1')
+    parser_star.add_argument('-2','--r2', type=argparse.FileType('r'), required=False, dest='r2')
     parser_star.add_argument('-o','--output', type=str, dest='prefix')
-    parser_star.add_argument('-t','--threads', type=int, default=1,dest='threads')
-    parser_star.add_argument('-h','--help',action='store_const', const = parser_star.prog.split()[-1],dest='c_help')
+    parser_star.add_argument('-t','--threads', type=int, default=1, dest='threads')
+    parser_star.add_argument('-h','--help',action='store_const', const = parser_star.prog.split()[-1], dest='c_help')
     parser_star.set_defaults(func=star)
 
     # subparser to call Hisat2 aligner
-    parser_hisat2 = subparser.add_parser('hisat2Alignement',add_help=False)
-    parser_hisat2.add_argument('-r','--reference', type=str, dest='reference')
-    parser_hisat2.add_argument('-1','--r1', type=str, dest='r1')
-    parser_hisat2.add_argument('-2','--r2', type=str, default='', dest='r2')
+    parser_hisat2 = subparser.add_parser('hisat2Alignment',add_help=False)
+    parser_hisat2.add_argument('-r','--reference', type=argparse.FileType('r'), dest='reference')
+    parser_hisat2.add_argument('-1','--r1', type=argparse.FileType('r'), dest='r1')
+    parser_hisat2.add_argument('-2','--r2', type=argparse.FileType('r'), required=False, dest='r2')
     parser_hisat2.add_argument('-o','--output', type=str, default='HiSat2', dest='prefix')
     parser_hisat2.add_argument('-t','--threads', type=int, default=1, dest='threads')
-    parser_hisat2.add_argument('-h','--help',action='store_const', const = parser_hisat2.prog.split()[-1],dest='c_help')
+    parser_hisat2.add_argument('-h','--help',action='store_const', const = parser_hisat2.prog.split()[-1], dest='c_help')
     parser_hisat2.set_defaults(func=hisat2)
     
     # subparser for the split read research
     parser_split = subparser.add_parser('splitReadSearch',add_help=False)
-    parser_split.add_argument('-a', '--alignement', dest='bamfilename', type=str, )
-    parser_split.add_argument('-r', '--reference', type=str, dest='fastafilename')
+    parser_split.add_argument('-a', '--alignment', type=argparse.FileType('r'), dest='bamfilename')
+    parser_split.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fastafilename')
     parser_split.add_argument('-o','--output', type=str, dest='basename')
     parser_split.add_argument('-h','--help',action='store_const', const = parser_split.prog.split()[-1],dest='c_help')
     parser_split.set_defaults(func=split_research)
 
     # subparser for writing fasta of spliced sequence
     parser_trim = subparser.add_parser('trimFastaFromTXT',add_help=False)
-    parser_trim.add_argument('-r', '--reference', dest='fasta_file', type=str, )
-    parser_trim.add_argument('-f', '--features', dest='gff_feature', type=str, )
-    parser_trim.add_argument('-o','--output', dest='output', type=str, default='sequences')
+    parser_trim.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta_file')
+    parser_trim.add_argument('-f', '--features', type=argparse.FileType('r'), dest='gff_feature')
+    parser_trim.add_argument('-o','--output', type=str, default='sequences', dest='output')
     parser_trim.add_argument('-h','--help',action='store_const', const = parser_trim.prog.split()[-1],dest='c_help')
     parser_trim.set_defaults(func=truncate)
 
     # subparser for searching ORF on sequences
     parser_orf = subparser.add_parser('analyzeORF',add_help=False)
-    parser_orf.add_argument('-r', '--reference', dest='fasta_file', type=str, )
-    parser_orf.add_argument('-k','--keep-intermediate', dest='rm', action='store_false',required=False, default=True)
-    parser_orf.add_argument('-o','--output', dest='output', type=str, default='predicted_orfs')
-    parser_orf.add_argument('--no-refine-starts', dest='refine',action='store_false', required=False, default=True)
+    parser_orf.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta_file')
+    parser_orf.add_argument('-k','--keep-intermediate', action='store_false',required=False, default=False, dest='rm')
+    parser_orf.add_argument('-o','--output', type=str, dest='output', default='predicted_orfs')
+    parser_orf.add_argument('--no-refine-starts', action='store_false', required=False, default=True, dest='refine')
     parser_orf.add_argument('-h','--help',action='store_const', const = parser_orf.prog.split()[-1],dest='c_help')
     parser_orf.set_defaults(func=predictORF)
 
     # subparser for aligning contigs and proteins
-    parser_protein = subparser.add_parser('analyzeProtein',add_help=False, help='Run Diamond to search long gaps (i.e. potential introns) in contigs-protein alignement.'
-                                                     'Returns a GFF file with all the found gaps'
-                                                     'Needs Diamond-v0.9.9')
-    parser_protein.add_argument('-i', '--fasta',
-                                help='Contigs sequences', dest='fasta', type=str, )
-    parser_protein.add_argument('-p','--dbprotein',
-                                help='Name of the Diamond database containing the indexed proteic sequences.',type=str, dest='dbprotein')
-    parser_protein.add_argument('-o', '--output',
-                                help='Output filename',required=False,default='LongGaps.gff', dest='output', type=str)
-    parser_protein.add_argument('-k','--keep_intermediate',
-                                help='Boolean which rules intermediate files erasure (default False)', dest='rm', action='store_true',required=False)
-    parser_protein.add_argument('-t','--threads',
-                                help='Integer which indicates the numberof CPU to use for alignement (default 1)', dest='threads', type=int, required=False,default = 1)
-    parser_protein.add_argument('-h','--help',action='store_const', const = parser_protein.prog.split()[-1],dest='c_help')
+    parser_protein = subparser.add_parser('analyzeProtein',add_help=False)
+    parser_protein.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta')
+    parser_protein.add_argument('-p','--dbprotein', type=str, dest='dbprotein')
+    parser_protein.add_argument('-o', '--output', type=str, required=False, default='LongGaps.gff', dest='output')
+    parser_protein.add_argument('-k','--keep_intermediate', action='store_true',required=False, default=False, dest='rm')
+    parser_protein.add_argument('-t','--threads', type=int, default=1, dest='threads')
+    parser_protein.add_argument('-h','--help', action='store_const', const = parser_protein.prog.split()[-1],dest='c_help')
     parser_protein.set_defaults(func=searchProtein)
 
     # subparser for Full Random Simulation
     parser_frs = subparser.add_parser('fullRandomSimulation',add_help=False, help='contig help')
-    parser_frs.add_argument('-n','--nb_contigs',
-                            help='Number of contig/sequence randomly generated. Default 10', type=int, default=10, dest='nb')
-    parser_frs.add_argument('-m','--min-contig-length',
-                            help='Minimal length of random contigs. Default 150', type=int, default=150, dest='mini')
-    parser_frs.add_argument('-M','--max-contig-length', 
-                            help='Maximal length of random contigs. Default 1000', type=int, default=1000, dest='maxi')
-    parser_frs.add_argument('--random-half',
-                            help='Insert intron in random half of the simulated contigs if the option is specified. Default False',default=False, action='store_true',dest='half')
-    parser_frs.add_argument('-l', '--lower-intron-length',
-                            help='Minimal length of random intron. Default 150', type=int, default=150, dest='lower')
-    parser_frs.add_argument('-H', '--higher-intron-length',
-                            help='Maximal length of random intron. Default 1000', type=int, default=1000, dest='upper')
-    parser_frs.add_argument('-o', '--output',
-                            help='Basename of the generated files. Default [FullRandomSimulation] ', type=str, default='FullRandomSimulation', dest='output')
+    parser_frs.add_argument('-n','--nb_contigs', type=int, default=10, dest='nb')
+    parser_frs.add_argument('-m','--min-contig-length', type=int, default=150, dest='mini')
+    parser_frs.add_argument('-M','--max-contig-length', type=int, default=1000, dest='maxi')
+    parser_frs.add_argument('-r','--random-half', default=False, action='store_true',dest='half')
+    parser_frs.add_argument('-l', '--lower-intron-length',  type=int, default=150, dest='lower')
+    parser_frs.add_argument('-H', '--higher-intron-length', type=int, default=1000, dest='upper')
+    parser_frs.add_argument('-o', '--output', type=str, default='FullRandomSimulation', dest='output')
     parser_frs.add_argument('-h','--help',action='store_const', const = parser_frs.prog.split()[-1],dest='c_help')
     parser_frs.set_defaults(func=full_random_simulation)
 
@@ -148,11 +132,10 @@ def parse_arguments() :
     try :
         args = vars(parser.parse_args())
     except :
-        print("\n***",file=sys.stderr)
-        print("To know how to call intronSeeker program, use 'intronSeeker --help'.",file=sys.stderr)
-        print("***",file=sys.stderr,end="\n\n")
+        print("\nTo know how to call intronSeeker program, use 'intronSeeker --help'",file=sys.stderr)
+        print("or 'intronSeeker <command> --help'.",file=sys.stderr,end="\n\n")
         exit(2)
-    
+
     # Printing of help or version messages with the 'help' or 'version' option.
     if args.pop('help') :
         program_help()
@@ -162,15 +145,16 @@ def parse_arguments() :
         exit()
     else :
         h_command = args.pop('c_help')
+        if len(sys.argv) == 2 :
+           h_command = sys.argv[1]
         if h_command :
             command_help(h_command)
             exit()
         else :
             return args
 
-    
+
 if __name__ == '__main__':
-    
     args = parse_arguments()
     
     # Run the program
