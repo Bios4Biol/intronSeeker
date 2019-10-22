@@ -75,43 +75,34 @@ def parse_arguments() :
     parser_protein.set_defaults(func=searchProtein)
 
     # subparser for Full Random Simulation
-    parser_frs = subparser.add_parser('fullRandomSimulation',add_help=False, help='contig help')
+    parser_frs = subparser.add_parser('fullRandomSimulation',add_help=False)
     parser_frs.add_argument('-n','--nb_contigs', type=int, default=10, dest='nb')
-    parser_frs.add_argument('-m','--min-contig-length', type=int, default=150, dest='mini')
-    parser_frs.add_argument('-M','--max-contig-length', type=int, default=1000, dest='maxi')
+    parser_frs.add_argument('-m','--min-contig-len', type=int, default=150, dest='mini')
+    parser_frs.add_argument('-M','--max-contig-len', type=int, default=1000, dest='maxi')
     parser_frs.add_argument('-r','--random-half', default=False, action='store_true',dest='half')
-    parser_frs.add_argument('-l', '--lower-intron-length',  type=int, default=150, dest='lower')
-    parser_frs.add_argument('-H', '--higher-intron-length', type=int, default=1000, dest='upper')
+    parser_frs.add_argument('-l', '--lower-intron-len',  type=int, default=150, dest='lower')
+    parser_frs.add_argument('-H', '--higher-intron-len', type=int, default=1000, dest='upper')
     parser_frs.add_argument('-o', '--output', type=str, default='FullRandomSimulation', dest='output')
     parser_frs.add_argument('-h','--help',action='store_const', const = parser_frs.prog.split()[-1],dest='c_help')
     parser_frs.set_defaults(func=full_random_simulation)
 
     # subparser for annotated genome-based data simulation (annoToData) 
-    parser_gbs = subparser.add_parser('GTFbasedSimulation',add_help=False, help='Data simulation (genome assembly and reads library) from a genome annotation (GFF or GTF file)')
-    parser_gbs.add_argument('-i','--annotation',
-                            help='Filename of GFF file which contains the genome annotation', type=str, dest='annotation')
-    parser_gbs.add_argument('-f','--fasta',
-                            type=str, dest='fasta')
+    parser_gbs = subparser.add_parser('GTFbasedSimulation',add_help=False)
+    parser_gbs.add_argument('-i','--annotation', type=argparse.FileType('r'), dest='annotation')
+    parser_gbs.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta')
     group_nb = parser_gbs.add_mutually_exclusive_group() 
-    group_nb.add_argument('-n','--nb_genes',
-                          help='Total number of genes to transcript ', type=float, required=False, default=0, dest='nb')
-    group_nb.add_argument('-a','--all',
-                          help='Flag which says if all genes from GFF have to be transcripted', action='store_const', const=0, default=False, dest='nb')
-    parser_gbs.add_argument('-o','--output',
-                            help='prefix of ouput files', type=str, dest='output')
-    parser_gbs.add_argument('--mix-library',
-                            help='Boolean which rules if the generated library is mixed i.e. if the library contains the transcript in two state when a intron is retained or an exon is spliced', action='store_true', default=False, dest='mix')
+    group_nb.add_argument('-n','--nb_genes', type=int, required=False, default=0, dest='nb')
+    group_nb.add_argument('-a','--all', action='store_const', const=0, default=False, dest='nb')
+    parser_gbs.add_argument('-o','--output', type=str, dest='output')
+    parser_gbs.add_argument('--mix-library', action='store_true', default=False, dest='mix')
     parser_gbs.add_argument('-h','--help',action='store_const', const = parser_gbs.prog.split()[-1],dest='c_help')
     parser_gbs.set_defaults(func=gtf_based_simulation)
 
     # subparser for grinder
     parser_grinder = subparser.add_parser('simulateReads',add_help=False, help='Grinder help. Needs software Grinder-v0.5.4 or more recent version')
-    parser_grinder.add_argument('-i','--rf',
-                                help='reference file', type=str, dest='rf')
-    parser_grinder.add_argument('-p','--pf',
-                             help='Profile file : all arguments for grinder', type=str, required=False, default=os.path.abspath(os.path.dirname(sys.argv[0]) + '/../config/profile_file.txt'),dest='pf')
-    parser_grinder.add_argument('-o','--pref',
-                             help='Prefix of the output files', type=str, default='Grinder', dest='pref')
+    parser_grinder.add_argument('-r','--reference', type=argparse.FileType('r'), dest='rf')
+    parser_grinder.add_argument('-p','--pf', type=argparse.FileType('r'), required=False, default=os.path.abspath(os.path.dirname(sys.argv[0]) + '/../config/profile_file.txt'), dest='pf')
+    parser_grinder.add_argument('-o','--output', type=str, default='Grinder', dest='pref')
     parser_grinder.add_argument('-h','--help',action='store_const', const = parser_grinder.prog.split()[-1],dest='c_help')
     parser_grinder.set_defaults(func=grinder)
 

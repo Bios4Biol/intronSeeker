@@ -569,14 +569,14 @@ introns charesteristics. All the sequences (contigs and introns) as well as the 
         drop_whitespace=True
     )
 
-    # analyzeProtein Description
+    # Description
     print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
     
     # Usage
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker fullRandomSimulation -r <ref.fa> -o <outfile_basename> [-k] [-t INT]',
+intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] [-o STR]',
     width=90
     ))
     print()
@@ -592,11 +592,11 @@ intronSeeker fullRandomSimulation -r <ref.fa> -o <outfile_basename> [-k] [-t INT
     print(cw.fill(
 '\tNumber of contig/sequence randomly generated. [10].'
     ))
-    print('   -m/--min-contig-length INT',end='')
+    print('   -m/--min-contig-len INT',end='')
     print(cw.fill(
 'Minimal length of random contigs [150].'
     ))
-    print('   -M/--max-contig-length INT',end='')
+    print('   -M/--max-contig-len INT',end='')
     print(cw.fill(
 'Maximal length of random contigs [1000].'
     ))
@@ -604,11 +604,11 @@ intronSeeker fullRandomSimulation -r <ref.fa> -o <outfile_basename> [-k] [-t INT
     print(cw.fill(
 '\tInsert intron in random half of the simulated contigs.'
     ))
-    print('   -l/--lower-intron-length',end='')
+    print('   -l/--lower-intron-len INT',end='')
     print(cw.fill(
 'Minimal length of random intron [150].'
     ))
-    print('   -H/--higher-intron-length',end='')
+    print('   -H/--higher-intron-len INT',end='')
     print(cw.fill(
 'Maximal length of random intron [1000].'
     ))
@@ -620,6 +620,7 @@ intronSeeker fullRandomSimulation -r <ref.fa> -o <outfile_basename> [-k] [-t INT
     print(cw.fill(
 '\tPrint this help message.'
     ))
+    print()
 
 
 ############################################
@@ -627,7 +628,67 @@ intronSeeker fullRandomSimulation -r <ref.fa> -o <outfile_basename> [-k] [-t INT
 ############################################
 
 def gbs_help() :
-    pass
+    text='\
+\nDescription:\n\
+From a genome  and an associated  GTF  file, generates  pseudo-contigs  (corresponds to transcripts) with potentially\
+retained introns or spliced exons.\nThree files are generated : one corresponds to reference pseudo-assembly,\
+another one is used  for  dimulate  the reads library  and  the third  one gathers  all the  simulated features \
+(retained intorns or  spliced  exons). gffread  program  is called during  the simulation process.\
+'
+    tw = textwrap.TextWrapper(
+        width=90,
+        initial_indent="",
+        drop_whitespace=True
+    )
+
+    # Description
+    print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
+    
+    # Usage
+    print('Usage:')
+    print(
+    textwrap.fill('\
+intronSeeker GTFbasedSimulation -i <annot.gff> -r <ref.fa> [-a | -n INT] -o STR',
+    width=90
+    ))
+    print()
+    
+    cw = textwrap.TextWrapper(
+        width=59,
+        initial_indent="\t",
+        subsequent_indent="\t\t\t\t",
+        break_long_words=False
+    )
+    print('Options:')
+    print('   -i/--annotation FILE',end='')
+    print(cw.fill(
+'\tGFF filename which contains the genome annotation.'
+    ))
+    print('   -r/--reference FILE',end='')
+    print(cw.fill(
+'\tName of the reference FASTA file.'
+    )) 
+    print('   -n/--nb_genes INT',end='')
+    print(cw.fill(
+'\tTotal number of genes to transcript [0].'
+    ))
+    print('   -a/--all\t\t',end='')
+    print(cw.fill(
+'All genes from GFF have to be transcripted.'
+    ))
+    print('   --mix-library\t',end='')
+    print(cw.fill(
+'Boolean which rules if the generated library  is mixed i.e. if  the library  contains the  transcript  in two state when a intron is retained or an exon is spliced.'
+    ))
+    print('   -o/--output STR',end='')
+    print(cw.fill(
+'\tBasename for generated files.'
+    ))
+    print('   -h/--help\t',end='')
+    print(cw.fill(
+'\tPrint this help message.'
+    ))
+    print()
 
 
 #######################################
@@ -635,7 +696,52 @@ def gbs_help() :
 #######################################
 
 def sr_help() :
-    pass
+    text='\
+\nDescription:\n\
+From a Fasta file, calls Grinder program to simulates a corresponding reads library.\
+'
+    tw = textwrap.TextWrapper(
+        width=90,
+        initial_indent="",
+        drop_whitespace=True
+    )
+
+    # Description
+    print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
+    
+    # Usage
+    print('Usage:')
+    print(
+    textwrap.fill('\
+intronSeeker simulateReads -r <ref.fa> -p <grinder.conf> -o STR',
+    width=90
+    ))
+    print()
+    
+    cw = textwrap.TextWrapper(
+        width=59,
+        initial_indent="\t",
+        subsequent_indent="\t\t\t",
+        break_long_words=False
+    )
+    print('Options:')
+    print('   -r/--reference FILE',end='')
+    print(cw.fill(
+'Name of the reference FASTA file.'
+    ))
+    print('   -p/--pf FILE',end='')
+    print(cw.fill(
+'\tProfile file: all arguments for Grinder.'
+    ))
+    print('   -o/--output STR',end='')
+    print(cw.fill(
+'Basename for generated files [Grinder].'
+    ))
+    print('   -h/--help\t',end='')
+    print(cw.fill(
+'Print this help message.'
+    ))
+    print()
 
 
 ########################
@@ -643,4 +749,37 @@ def sr_help() :
 ########################
 
 def checki_help() :
-    pass
+    text='\
+\nDescription:\n\
+Checks the correct installation of the dependencies as well as the dependencies\' versions.\
+'
+    tw = textwrap.TextWrapper(
+        width=90,
+        initial_indent="",
+        drop_whitespace=True
+    )
+
+    # Description
+    print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
+    
+    # Usage
+    print('Usage:')
+    print(
+    textwrap.fill('\
+intronSeeker checkInstall',
+    width=90
+    ))
+    print()
+    
+    cw = textwrap.TextWrapper(
+        width=59,
+        initial_indent="\t",
+        subsequent_indent="\t\t\t",
+        break_long_words=False
+    )
+    print('Options:')
+    print('   -h/--help\t',end='')
+    print(cw.fill(
+'Print this help message.'
+    ))
+    print()
