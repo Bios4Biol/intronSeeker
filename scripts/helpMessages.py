@@ -214,7 +214,7 @@ Calls STAR to align the reads library and the reference assembly and produce\
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker starAlignement -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t INT]',
+intronSeeker starAlignment -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t INT]',
     width=90
     ))
     print()
@@ -277,7 +277,7 @@ Calls HiSat2  to align the reads library and the reference assembly and produce\
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker hisat2Alignement -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t INT]',
+intronSeeker hisat2Alignment -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t INT]',
     width=90
     ))
     print()
