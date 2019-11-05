@@ -16,11 +16,11 @@ def star_bam_fix(input_file: str, output_file):
 	"""
 	bamfile = pysam.AlignmentFile(input_file, "rb",check_sq=False)
 	outfile = pysam.AlignmentFile(output_file, "wb", template=bamfile)
-	for read in bamfile:
+	for alignment in bamfile:
 		if read.is_read1:
-			read.query_name = read.query_name + "/1"
+			alignment.query_name += "/1"
 		if read.is_read2:
-			read.query_name = read.query_name + "/2"
+			alignment.query_name += "/2"
 		outfile.write(read)
 
 
@@ -53,11 +53,11 @@ def star(reference: str, r1: str, r2: str, prefix: str, threads: int):
 	# Reads Mapping and ouput files writing 
 	if r1.endswith(".gz") : # check if reads files are zipped
 		os.system("STAR --genomeDir {genomedir} --runThreadN {threads} --readFilesIn {reads1} {reads2} "
-				"--outSAMstrandField intronMotif --outSAMtype BAM SortedByCoordinate --readFilesCommand zcat "
+				"--outSAMstrandField intronMotif --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --readFilesCommand zcat "
 				"--outFileNamePrefix {outfile}".format(genomedir=genomedir, threads=threads, reads1=r1, reads2=r2, outfile = outdir + "temp")) ;
 	else :
 		os.system("STAR --genomeDir {genomedir} --runThreadN {threads} --readFilesIn {reads1} {reads2} "
-				"--outSAMstrandField intronMotif --outSAMtype BAM SortedByCoordinate "
+				"--outSAMstrandField intronMotif --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within "
 				"--outFileNamePrefix {outfile}".format(genomedir=genomedir, threads=threads, reads1=r1, reads2=r2, outfile = outdir + "temp")) ;
 	star_bam_fix(outdir + "tempAligned.sortedByCoord.out.bam", outfile + ".Aligned.sortedByCoord.out.bam") ;
 	os.system("rm " + outdir + "temp*") ; # Temporary files erasure
