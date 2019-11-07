@@ -247,21 +247,6 @@ def split_read(output_path : str):
     os.remove(input_file) ;
 
 
-
-# ~ def intron_unique(pref: str):
-    # ~ """
-    # ~ Create the gff file of the intron from star alignment
-    # ~ :param pref: output prefix
-    # ~ :return:
-    # ~ """
-    # ~ data = pd.read_table(pref + ".txt", names=['ref', 'start', 'end', 'query', 'qstart', 'qend'])
-    # ~ data = data.drop_duplicates(subset=('ref', 'start', 'end', 'qstart', 'qend'))
-    # ~ data = pd.DataFrame(
-        # ~ {'col0_ref': data.ref, 'col1': ".", "col2_class": "Intron", "col3_start": data.qstart, "col4_end": data.qend,
-         # ~ 'col5_quality': "5000", 'col6': ".", 'col7': ".", 'col8': "."})
-    # ~ data.to_csv(pref+".gff", header=False, sep="\t", index=False)
-
-
 ###############################
 ### Genome-Based Simulation ###
 ###############################
