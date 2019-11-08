@@ -4,6 +4,7 @@ try :
     import os
     import pysam
     import subprocess as sp
+    import sys
 except ImportError as error :
     print(error)
     exit(1)
@@ -143,7 +144,7 @@ def hisat2(reference, r1, r2, prefix, threads):
     # Reads Mapping and ouput files writing 
     hisat_command = ['hisat2',
                     '-x', ref_path,
-                    '-p',threads
+                    '-p', str(threads)
                     ]
     
     if r2 :
@@ -155,8 +156,28 @@ def hisat2(reference, r1, r2, prefix, threads):
         hisat_command.extend([
                     '-U', r1.name
                     ])
-    if '.fq' or '.fastq' in r1.name :
-        hisat_command.append('q')
+    try :
+        if '.fq' in r1.name or '.fastq' in r1.name :
+            hisat_command.append('-q')
+        elif '.fa' in r1.name or '.fasta' in r1.name :
+            hisat_command.append('-f')
+        else :
+            raise OSError
+    except OSError :
+        print(r1.name+' : File format not supported to call Hisat2. Only regular, gzipped or bzipped fastq and fasta files are supported.')
+        exit(1)
+    samtools_view_cmd = ['samtools', 'view', '-bS']
+    samtools_sort_cmd = ['samtools','sort', '-o',outfile+'.Aligned.sortedByCoord.out.bam'] 
+    print('\nHiSat2 Alignement : ')
+    print(' | '.join([' '.join(hisat_command),' '.join(samtools_view_cmd), ' '.join(samtools_sort_cmd)]))
+    align = sp.Popen(hisat_command,stdout=sp.PIPE,stderr=sp.PIPE)
+
+    view = sp.Popen(samtools_view_cmd, stdin = align.stdout, stdout=sp.PIPE)
+    sort = sp.Popen(samtools_sort_cmd, stdin = view.stdout)
+    
+    bam_indexing(outfile+'.Aligned.sortedByCoord.out.bam')
+    
+    flagstat(outfile+'.Aligned.sortedByCoord.out.bam')
     # ~ if ".fq" in r1 or ".fastq" in r1 :
         # ~ os.system("hisat2 -x {ref_path} -1 {reads1} -2 {reads2} -q -p {threads} | samtools view -bS | samtools sort -o {outfilename}".format(
             # ~ ref_path=ref_path, reads1=r1, reads2=r2, threads=threads, outfilename=outfile + ".Aligned.sortedByCoord.out.bam")) ;
