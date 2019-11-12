@@ -170,22 +170,17 @@ def hisat2(reference, r1, r2, prefix, threads):
     samtools_sort_cmd = ['samtools','sort', '-o',outfile+'.Aligned.sortedByCoord.out.bam'] 
     print('\nHiSat2 Alignement : ')
     print(' | '.join([' '.join(hisat_command),' '.join(samtools_view_cmd), ' '.join(samtools_sort_cmd)]))
-    align = sp.Popen(hisat_command,stdout=sp.PIPE,stderr=sp.PIPE)
-
-    view = sp.Popen(samtools_view_cmd, stdin = align.stdout, stdout=sp.PIPE)
-    sort = sp.Popen(samtools_sort_cmd, stdin = view.stdout)
-    
+    with open(outdir+'Hisat2_alignement.log','w') as log : 
+        align = sp.Popen(hisat_command,stdout=sp.PIPE,stderr=log)
+        view = sp.Popen(samtools_view_cmd, stdin = align.stdout, stdout=sp.PIPE)
+        sort = sp.Popen(samtools_sort_cmd, stdin = view.stdout)
+        align.stdout.close()
+        view.stdout.close()
+        sort.wait()
+   
     bam_indexing(outfile+'.Aligned.sortedByCoord.out.bam')
     
     flagstat(outfile+'.Aligned.sortedByCoord.out.bam')
-    # ~ if ".fq" in r1 or ".fastq" in r1 :
-        # ~ os.system("hisat2 -x {ref_path} -1 {reads1} -2 {reads2} -q -p {threads} | samtools view -bS | samtools sort -o {outfilename}".format(
-            # ~ ref_path=ref_path, reads1=r1, reads2=r2, threads=threads, outfilename=outfile + ".Aligned.sortedByCoord.out.bam")) ;
-    # ~ else :
-        # ~ os.system("hisat2 -x {ref_path} -1 {reads1} -2 {reads2} -f -p {threads} | samtools view -bS | samtools sort -o {outfilename}".format(
-            # ~ ref_path=ref_path, reads1=r1, reads2=r2, threads=threads, outfilename=outfile + ".Aligned.sortedByCoord.out.bam")) ;
-    
-    # ~ os.system("samtools index {bamfile} {indexfile}".format(bamfile=outfile+".Aligned.sortedByCoord.out.bam",
-                                                            # ~ indexfile=outfile+".Aligned.sortedByCoord.out.bai")) ;
+
 
 
