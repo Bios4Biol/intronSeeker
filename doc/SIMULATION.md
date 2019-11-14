@@ -81,11 +81,11 @@ all the information about introns (contig name, begin/end coordinates, strand).
 Now, we get the contigs and the introns, we have to generate the reads library. 
 The library is generated from reference contigs (i.e. without introns). Grinder 
 needs a lot of parameter (detailed in Grinder documentation and in Grinder section
-in HOW TO USE file in doc repertory). An example of basic profile_file (i.e. the file 
-which conatains all grinder parameters) is available in data directory. The command is : 
+in HOW TO USE file in doc repertory). An example of basic grinder.cfg file (i.e. the file 
+which conatains all grinder parameters) is available in config directory. The command is : 
 
 ```diff
-+ intronStalker grinder -i OutputRandomContig_contig/OutputRandomContig.fa -p profile_file.txt
++ intronStalker simulatedReads -r ref.fa -p grinder.cfg -o outputDirName
 ```
 
 This command generates two or three files : the first one is the `ranks.txt` file
