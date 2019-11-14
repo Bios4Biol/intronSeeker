@@ -117,11 +117,17 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
     
     .. seealso:: random_seq(), insert_intron(), annoToData()
     """
-    outdir = output.split(".")[0] + "_FullRandomSimulation" ; # Output directory name (where this function will write 
-                                                # all the results and tmp files).
-    if not os.path.exists(outdir) :
-        os.mkdir(outdir) 
-    output_path = "/".join([outdir,output]) ; # Path to output file
+    # Create output dir if not exist
+    if not os.path.exists(output) :
+        os.mkdir(output)
+    try :
+        if os.path.exists(output + "/frs_contigs.fa") or os.path.exists(output + "/frs_contigs-no-introns.fa") or os.path.exists(output + "/frs_introns.txt") :
+               raise FileExistsError
+    except FileExistsError as e :
+        print('\nError: output file(s) already exists.\n')
+        exit(1)
+    
+    output_path = output + "/frs";
     
     # Check if the length intervals are correct
     if mini > maxi :
@@ -180,8 +186,8 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
         if distrib[c] :
             introns.append("\t".join([name,str(intron_start),str(intron_end),str(reverse)]))
         
-    SeqIO.write(reference_contigs_set,output_path+"_reference-contigs.fa","fasta")
-    SeqIO.write(library_contigs_set,output_path+"_library-contigs.fa","fasta")
+    SeqIO.write(reference_contigs_set,output_path+"_contigs.fa","fasta")
+    SeqIO.write(library_contigs_set,output_path+"_contigs-no-intron.fa","fasta")
     
     with open(output_path+"_introns.txt","w") as out :
         out.write("\n".join(introns))
@@ -192,13 +198,13 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
 ### Reads library Simulation ###
 ################################
 
-def _grinder(input_file : str, profile_file : str, output_file : str) :
+#~ def _grinder(input_file : str, profile_file : str, output_file : str) :
 
-    os.system("grinder -rf {input_file} -pf {profile_file} -bn {output_file}".format(
-        input_file=input_file, profile_file=profile_file, output_file=output_file
-        )) ;
+    #~ os.system("grinder -rf {input_file} -pf {profile_file} -bn {output_file}".format(
+        #~ input_file=input_file, profile_file=profile_file, output_file=output_file
+        #~ )) ;
 
-def grinder(rf: str, pf: str, pref: str):
+def grinder(rf: str, pf: str, output: str):
     """
     Generate reads for a reference file depending on grinder parameters from the profile file.
     Call the software Grinder.
@@ -207,11 +213,21 @@ def grinder(rf: str, pf: str, pref: str):
     :param pref: prefix of the output files
     :return:
     """
-    outdir = pref + "_grinder" ;
-    os.system("mkdir " + outdir ) ;
-    output_path = outdir + "/" + pref ;
+    # Create output dir if not exist
+    if not os.path.exists(output) :
+        os.mkdir(output)
+    try :
+        if os.path.exists(output + "/sr-ranks.txt") or os.path.exists(output + "/sr_read_1.fastq.gz") or os.path.exists(output + "/sr_read_2.fastq.gz") :
+               raise FileExistsError
+    except FileExistsError as e :
+        print('\nError: output file(s) already exists.\n')
+        exit(1)
+    
+    output_path = output + "/sr";
 
-    _grinder(rf, pf, output_path) ;
+    os.system("grinder -rf {input_file} -pf {profile_file} -bn {output_file} > {log}".format(
+        input_file=rf.name, profile_file=pf.name, output_file=output_path, log=output+"/sr.log"
+        ))
     split_read(output_path)
 
 
@@ -669,7 +685,7 @@ def write_gtf_file(content: str, output: str):
         gtf_file.write(gtf + "\n")
 
 
-def extract_fasta(genome: str, ref_file: str, lib_file: str, path: str):
+def extract_fasta(genome: str, mix: bool, ref_file: str, lib_file: str, path: str):
     """
     Call gffread program to generate a FASTA file from a genome (FASTA format) and a GTF file.
     The output files contains the sequence of each transcript defined by the entry GTF file.
@@ -684,9 +700,13 @@ def extract_fasta(genome: str, ref_file: str, lib_file: str, path: str):
     :type path: str
     """
     sp.call(["gffread", ref_file, "-g", genome,
-             "-w", path + "_reference.fa", "-F"])
-    sp.call(["gffread", lib_file, "-g", genome,
-             "-w", path + "_library.fa", "-F"])    
+             "-w", path + "_contigs.fa", "-F"])
+    if mix:
+        sp.call(["gffread", lib_file, "-g", genome,
+             "-w", path + "_contigs-mix-state.fa", "-F"])
+    else:
+        sp.call(["gffread", lib_file, "-g", genome,
+             "-w", path + "_contigs-no-intron.fa", "-F"])
 
 
 def gtf_based_simulation(annotation: str, fasta: str, nb: int, output: str, mix: bool):
@@ -712,22 +732,29 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, output: str, mix:
     :type mix: bool
     
     """
+    # Create output dir if not exist
+    if not os.path.exists(output) :
+        os.mkdir(output)
+    try :
+        if os.path.exists(output + "/gbs_contigs.fa") or os.path.exists(output + "/gbs_contigs-no-introns.fa") or os.path.exists(output + "/gbs_features-of-interest.gtf") or  os.path.exists(output + "/gbs_contigs-mix-state.fa"):
+               raise FileExistsError
+    except FileExistsError as e :
+        print('\nError: output file(s) already exists.\n')
+        exit(1)
     
-    outdir = output.split(".")[0] + "_GTFbasedSimulation" ; # Output directory name (where this function will write 
-                                                # all the results and tmp files).
-    if not os.path.exists(outdir) :
-        os.mkdir(outdir) 
-    output_path = "/".join([outdir,output]) ; # Path to output file
+    output_path = output + "/gbs";
     
-    print("GTF reading...")
-    gtf_content, transcripts = read_gtf(annotation)
-    print("Generate transcripts...")
+    #print("GTF reading...")
+    gtf_content, transcripts = read_gtf(annotation.name)
+    #print("Generate transcripts...")
     choosen = choose_transcripts(transcripts, nb)
     reference, library, control = parse_gtf_content(gtf_content, choosen, mix)
 
-    lib_tmpfile = tmp.NamedTemporaryFile(dir="./"+outdir,delete=True) ; ref_tmpfile = tmp.NamedTemporaryFile(dir="./"+outdir,delete=True)
-    write_gtf_file(reference,ref_tmpfile.name) ;  write_gtf_file(library,lib_tmpfile.name)
-    write_gtf_file(control,output_path+"_Features-of-interest.gtf")
-    print("FASTA files writing with gffread...")
-    extract_fasta(fasta,ref_tmpfile.name,lib_tmpfile.name,output_path)
-        
+    lib_tmpfile = tmp.NamedTemporaryFile(dir=output,delete=True)
+    ref_tmpfile = tmp.NamedTemporaryFile(dir=output,delete=True)
+    write_gtf_file(reference,ref_tmpfile.name)
+    write_gtf_file(library,lib_tmpfile.name)
+    write_gtf_file(control,output_path + "_features-of-interest.gtf")
+    #print("FASTA files writing with gffread...")
+    extract_fasta(fasta.name, mix, ref_tmpfile.name, lib_tmpfile.name, output_path)
+    

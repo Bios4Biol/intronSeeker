@@ -576,7 +576,7 @@ introns charesteristics. All the sequences (contigs and introns) as well as the 
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] [-o STR]',
+intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] -o STR',
     width=90
     ))
     print()
@@ -612,9 +612,9 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] [-o STR]
     print(cw.fill(
 'Maximal length of random intron [1000].'
     ))
-    print('   -o/--output STR',end='')
+    print('   -o/--outputDir STR',end='')
     print(cw.fill(
-'\tBasename for generated files [FullRandomSimulation].'
+'\tOutput dir name.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
@@ -630,10 +630,10 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] [-o STR]
 def gbs_help() :
     text='\
 \nDescription:\n\
-From a genome  and an associated  GTF  file, generates  pseudo-contigs  (corresponds to transcripts) with potentially\
-retained introns or spliced exons.\nThree files are generated : one corresponds to reference pseudo-assembly,\
-another one is used  for  dimulate  the reads library  and  the third  one gathers  all the  simulated features \
-(retained intorns or  spliced  exons). gffread  program  is called during  the simulation process.\
+From a genome and associated ensembl GTF file, generates pseudo-contigs (corresponds to transcripts) with potentially\
+ retained introns or spliced exons.\nThree files are generated: one corresponds to reference pseudo-assembly,\
+ another one is used  for  simulate  the reads library  and  the third  one gathers  all the  simulated features \
+(retained introns or  spliced  exons). gffread  program  is called during  the simulation process.\
 '
     tw = textwrap.TextWrapper(
         width=90,
@@ -648,7 +648,7 @@ another one is used  for  dimulate  the reads library  and  the third  one gathe
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker GTFbasedSimulation -i <annot.gff> -r <ref.fa> [-a | -n INT] -o STR',
+intronSeeker GTFbasedSimulation -i <annot.gff> -r <ref.fa> [-m,-a|-n INT] -o STR',
     width=90
     ))
     print()
@@ -668,7 +668,7 @@ intronSeeker GTFbasedSimulation -i <annot.gff> -r <ref.fa> [-a | -n INT] -o STR'
     print(cw.fill(
 '\tName of the reference FASTA file.'
     )) 
-    print('   -n/--nb_genes INT',end='')
+    print('   -n/--nb-genes INT',end='')
     print(cw.fill(
 '\tTotal number of genes to transcript [0].'
     ))
@@ -676,9 +676,9 @@ intronSeeker GTFbasedSimulation -i <annot.gff> -r <ref.fa> [-a | -n INT] -o STR'
     print(cw.fill(
 'All genes from GFF have to be transcripted.'
     ))
-    print('   --mix-library\t',end='')
+    print('   -m/--mix-state\t',end='')
     print(cw.fill(
-'Boolean which rules if the generated library  is mixed i.e. if  the library  contains the  transcript  in two state when a intron is retained or an exon is spliced.'
+'Boolean which rules if the generated contigs (input  of simulateReads)  is mixed i.e. if  the library  contains the  transcript  in two state when a intron is retained or an exon is spliced.'
     ))
     print('   -o/--output STR',end='')
     print(cw.fill(
@@ -713,7 +713,7 @@ From a Fasta file, calls Grinder program to simulates a corresponding reads libr
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker simulateReads -r <ref.fa> -p <grinder.conf> -o STR',
+intronSeeker simulateReads -r <ref.fa> -p <grinder.cfg> -o STR',
     width=90
     ))
     print()
@@ -733,9 +733,9 @@ intronSeeker simulateReads -r <ref.fa> -p <grinder.conf> -o STR',
     print(cw.fill(
 '\tProfile file: all arguments for Grinder.'
     ))
-    print('   -o/--output STR',end='')
+    print('   -o/--outputDir STR',end='')
     print(cw.fill(
-'Basename for generated files [Grinder].'
+'Output dir name.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(

@@ -82,27 +82,27 @@ def parse_arguments() :
     parser_frs.add_argument('-r','--random-half', default=False, action='store_true',dest='half')
     parser_frs.add_argument('-l', '--lower-intron-len',  type=int, default=150, dest='lower')
     parser_frs.add_argument('-H', '--higher-intron-len', type=int, default=1000, dest='upper')
-    parser_frs.add_argument('-o', '--output', type=str, default='FullRandomSimulation', dest='output')
+    parser_frs.add_argument('-o', '--outputDir', type=str, required=True, dest='output')
     parser_frs.add_argument('-h','--help',action='store_const', const = parser_frs.prog.split()[-1],dest='c_help')
     parser_frs.set_defaults(func=full_random_simulation)
 
     # subparser for annotated genome-based data simulation (annoToData) 
     parser_gbs = subparser.add_parser('GTFbasedSimulation',add_help=False)
-    parser_gbs.add_argument('-i','--annotation', type=argparse.FileType('r'), dest='annotation')
-    parser_gbs.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta')
+    parser_gbs.add_argument('-i','--annotation', type=argparse.FileType('r'), required=True, dest='annotation')
+    parser_gbs.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='fasta')
     group_nb = parser_gbs.add_mutually_exclusive_group() 
-    group_nb.add_argument('-n','--nb_genes', type=int, required=False, default=0, dest='nb')
+    group_nb.add_argument('-n','--nb-genes', type=int, required=False, default=0, dest='nb')
     group_nb.add_argument('-a','--all', action='store_const', const=0, default=False, dest='nb')
-    parser_gbs.add_argument('-o','--output', type=str, dest='output')
-    parser_gbs.add_argument('--mix-library', action='store_true', default=False, dest='mix')
+    parser_gbs.add_argument('-o','--output', type=str, required=True, dest='output')
+    parser_gbs.add_argument('-m', '--mix-state', action='store_true', default=False, dest='mix')
     parser_gbs.add_argument('-h','--help',action='store_const', const = parser_gbs.prog.split()[-1],dest='c_help')
     parser_gbs.set_defaults(func=gtf_based_simulation)
 
     # subparser for grinder
     parser_grinder = subparser.add_parser('simulateReads',add_help=False, help='Grinder help. Needs software Grinder-v0.5.4 or more recent version')
-    parser_grinder.add_argument('-r','--reference', type=argparse.FileType('r'), dest='rf')
-    parser_grinder.add_argument('-p','--pf', type=argparse.FileType('r'), required=False, default=os.path.abspath(os.path.dirname(sys.argv[0]) + '/../config/profile_file.txt'), dest='pf')
-    parser_grinder.add_argument('-o','--output', type=str, default='Grinder', dest='pref')
+    parser_grinder.add_argument('-r','--reference', type=argparse.FileType('r'), required=True, dest='rf')
+    parser_grinder.add_argument('-p','--pf', type=argparse.FileType('r'), required=True, dest='pf')
+    parser_grinder.add_argument('-o','--outputDir', type=str, required=True, dest='output')
     parser_grinder.add_argument('-h','--help',action='store_const', const = parser_grinder.prog.split()[-1],dest='c_help')
     parser_grinder.set_defaults(func=grinder)
 
@@ -117,14 +117,15 @@ def parse_arguments() :
     if len(sys.argv) == 1 : 
         program_help()
         exit()
+    elif len(sys.argv) > 1 :
+        h_command = sys.argv[1]
     
     # Trying to parse the arguments.
     # If errors are raised, printing of error message
     try :
         args = vars(parser.parse_args())
     except :
-        print("\nTo know how to call intronSeeker program, use 'intronSeeker --help'",file=sys.stderr)
-        print("or 'intronSeeker <command> --help'.",file=sys.stderr,end="\n\n")
+        command_help(h_command)
         exit(2)
 
     # Printing of help or version messages with the 'help' or 'version' option.
@@ -136,8 +137,6 @@ def parse_arguments() :
         exit()
     else :
         h_command = args.pop('c_help')
-        if len(sys.argv) == 2 :
-           h_command = sys.argv[1]
         if h_command :
             command_help(h_command)
             exit()
