@@ -561,7 +561,7 @@ def frs_help() :
     text='\
 \nDescription:\n\
 Simulates a multi Fasta file which contains the pseudo-contigs and a TXT file which contains the pseudo retained\
-introns charesteristics. All the sequences (contigs and introns) as well as the introns insertion are fully random.\
+ intron charesteristics. All the sequences (contigs and introns) as well as the introns insertion are fully random.\
 '
     tw = textwrap.TextWrapper(
         width=90,
@@ -576,7 +576,7 @@ introns charesteristics. All the sequences (contigs and introns) as well as the 
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] -o STR',
+intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] [-p STR] -o STR',
     width=90
     ))
     print()
@@ -611,6 +611,10 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] -o STR',
     print('   -H/--higher-intron-len INT',end='')
     print(cw.fill(
 'Maximal length of random intron [1000].'
+    ))
+    print('   -p/--prefix STR',end='')
+    print(cw.fill(
+'\tPrefix for output files name.'
     ))
     print('   -o/--outputDir STR',end='')
     print(cw.fill(
@@ -648,7 +652,7 @@ From a genome and associated ensembl GTF file, generates pseudo-contigs (corresp
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker GTFbasedSimulation -i <annot.gff> -r <ref.fa> [-m,-a|-n INT] -o STR',
+intronSeeker GTFbasedSimulation -a <annot.gtf> -r <ref.fa> [-m,-N|-n INT] [-p STR] -o STR',
     width=90
     ))
     print()
@@ -660,7 +664,7 @@ intronSeeker GTFbasedSimulation -i <annot.gff> -r <ref.fa> [-m,-a|-n INT] -o STR
         break_long_words=False
     )
     print('Options:')
-    print('   -i/--annotation FILE',end='')
+    print('   -a/--annotation FILE',end='')
     print(cw.fill(
 '\tGFF filename which contains the genome annotation.'
     ))
@@ -668,17 +672,21 @@ intronSeeker GTFbasedSimulation -i <annot.gff> -r <ref.fa> [-m,-a|-n INT] -o STR
     print(cw.fill(
 '\tName of the reference FASTA file.'
     )) 
-    print('   -n/--nb-genes INT',end='')
+    print('   -n/--nb-transcripts INT',end='')
     print(cw.fill(
-'\tTotal number of genes to transcript [0].'
+'Total number of transcript to simulate.'
     ))
-    print('   -a/--all\t\t',end='')
+    print('   -N/--all-transcripts\t',end='')
     print(cw.fill(
-'All genes from GFF have to be transcripted.'
+'All genes from GFF have to be transcripted [DEFAULT].'
     ))
     print('   -m/--mix-state\t',end='')
     print(cw.fill(
 'Boolean which rules if the generated contigs (input  of simulateReads)  is mixed i.e. if  the library  contains the  transcript  in two state when a intron is retained or an exon is spliced.'
+    ))
+    print('   -p/--prefix STR',end='')
+    print(cw.fill(
+'\tPrefix for output files name.'
     ))
     print('   -o/--output STR',end='')
     print(cw.fill(
@@ -713,7 +721,7 @@ From a Fasta file, calls Grinder program to simulates a corresponding reads libr
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker simulateReads -r <ref.fa> -p <grinder.cfg> -o STR',
+intronSeeker simulateReads -f <file.fa> -c <grinder.cfg> [-p STR] -o STR',
     width=90
     ))
     print()
@@ -725,13 +733,17 @@ intronSeeker simulateReads -r <ref.fa> -p <grinder.cfg> -o STR',
         break_long_words=False
     )
     print('Options:')
-    print('   -r/--reference FILE',end='')
+    print('   -f/--fasta FILE',end='')
     print(cw.fill(
-'Name of the reference FASTA file.'
+'Name of the FASTA file.'
     ))
-    print('   -p/--pf FILE',end='')
+    print('   -c/--cfg FILE',end='')
     print(cw.fill(
-'\tProfile file: all arguments for Grinder.'
+'Grinder config file (see config/grinder.cfg for example).'
+    ))
+    print('   -p/--prefix STR',end='')
+    print(cw.fill(
+'Prefix for output files name.'
     ))
     print('   -o/--outputDir STR',end='')
     print(cw.fill(

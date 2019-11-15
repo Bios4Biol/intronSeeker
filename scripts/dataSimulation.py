@@ -88,7 +88,7 @@ def insert_intron(contig_seq : str, lower : int, upper: int,):
     intron_end = insert_pos+rand_length+4
     return new_seq, insert_pos, intron_end
 
-def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower : int, upper : int, output : str) :
+def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower : int, upper : int, prefix: str, output : str) :
     """
     Simulate a set of nb contigs (with entirely random sequence) with random length beetween [mini,maxi].
     In each contig, an intron with a random length beetween [lower,upper] is randomly inserted. 
@@ -117,18 +117,20 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
     
     .. seealso:: random_seq(), insert_intron(), annoToData()
     """
+    output_path = output + "/frs";
+    if prefix:
+        output_path += "_" + prefix;
+    
     # Create output dir if not exist
     if not os.path.exists(output) :
         os.mkdir(output)
     try :
-        if os.path.exists(output + "/frs_contigs.fa") or os.path.exists(output + "/frs_contigs-no-introns.fa") or os.path.exists(output + "/frs_introns.txt") :
+        if os.path.exists(output_path + "_contigs.fa") or os.path.exists(output_path + "_contigs-modified.fa") or os.path.exists(output_path + "_modifications.txt") :
                raise FileExistsError
     except FileExistsError as e :
         print('\nError: output file(s) already exists.\n')
         exit(1)
-    
-    output_path = output + "/frs";
-    
+        
     # Check if the length intervals are correct
     if mini > maxi :
         print('*WARNING* : Contigs maximal length is inferior to minimal length. Max and Min values are swapped.')
@@ -178,18 +180,19 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
                 old_start = intron_start
                 intron_start = len(reference_seq)-intron_end
                 intron_end = len(reference_seq)-old_start
-                
+
+        library_contigs_set.append(SeqRecord(library_seq,id=name.split()[0],description="reverse="+str(reverse)))
+        
         description = " ".join(["intron_start="+str(intron_start),"intron_end="+str(intron_end),"reverse="+str(reverse)])
+        reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0]+".modif",description=description))
         
-        reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
-        library_contigs_set.append(SeqRecord(library_seq,id=name.split()[0]+".ori",description=description))
         if distrib[c] :
-            introns.append("\t".join([name,str(intron_start),str(intron_end),str(reverse)]))
+            introns.append("\t".join([name+".modif",str(intron_start),str(intron_end),str(reverse)]))
         
-    SeqIO.write(reference_contigs_set,output_path+"_contigs.fa","fasta")
-    SeqIO.write(library_contigs_set,output_path+"_contigs-no-intron.fa","fasta")
+    SeqIO.write(reference_contigs_set,output_path+"_contigs-modified.fa","fasta")
+    SeqIO.write(library_contigs_set,output_path+"_contigs.fa","fasta")
     
-    with open(output_path+"_introns.txt","w") as out :
+    with open(output_path+"_modifications.txt","w") as out :
         out.write("\n".join(introns))
     
 
@@ -204,7 +207,7 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
         #~ input_file=input_file, profile_file=profile_file, output_file=output_file
         #~ )) ;
 
-def grinder(rf: str, pf: str, output: str):
+def grinder(rf: str, pf: str, prefix: str, output: str):
     """
     Generate reads for a reference file depending on grinder parameters from the profile file.
     Call the software Grinder.
@@ -212,22 +215,25 @@ def grinder(rf: str, pf: str, output: str):
     :param pf:profile file containing all grinder parameters
     :param pref: prefix of the output files
     :return:
-    """
+    """    
+    output_path = output + "/sr"
+    if prefix:
+        output_path += "_" + prefix;
+
     # Create output dir if not exist
     if not os.path.exists(output) :
         os.mkdir(output)
     try :
-        if os.path.exists(output + "/sr-ranks.txt") or os.path.exists(output + "/sr_read_1.fastq.gz") or os.path.exists(output + "/sr_read_2.fastq.gz") :
+        if os.path.exists(output_path + "_ranks.txt") or os.path.exists(output_path + "_R1.fastq.gz") or os.path.exists(output_path + "_R2.fastq.gz") :
                raise FileExistsError
     except FileExistsError as e :
         print('\nError: output file(s) already exists.\n')
         exit(1)
     
-    output_path = output + "/sr";
-
     os.system("grinder -rf {input_file} -pf {profile_file} -bn {output_file} > {log}".format(
-        input_file=rf.name, profile_file=pf.name, output_file=output_path, log=output+"/sr.log"
+        input_file=rf.name, profile_file=pf.name, output_file=output_path, log=output_path + ".log"
         ))
+    os.rename(output_path + "-ranks.txt", output_path + "_ranks.txt")
     split_read(output_path)
 
 
@@ -243,8 +249,8 @@ def split_read(output_path : str):
     input_file = outdir + "/" + [n for n in os.listdir(outdir) if n.startswith(pref+"-reads.")].pop() ;
     pile = 0 ;
     if input_file.endswith(".fa") :
-        with open(input_file, 'rU') as filer, gzip.open(output_path + "_read_1.fa.gz", 'wt') as read1, \
-                gzip.open(output_path + "_read_2.fa.gz", 'wt') as read2:
+        with open(input_file, 'rU') as filer, gzip.open(output_path + "_R1.fa.gz", 'wt') as read1, \
+                gzip.open(output_path + "_R2.fa.gz", 'wt') as read2:
             for record in SeqIO.parse(filer, "fasta"):
                 if pile % 2 == 0:
                     SeqIO.write(record, read1, "fasta") ;
@@ -252,8 +258,8 @@ def split_read(output_path : str):
                     SeqIO.write(record, read2, "fasta") ;
                 pile += 1
     elif input_file.endswith(".fastq") :
-        with open(input_file, 'rU') as filer, gzip.open(output_path + "_read_1.fastq.gz", 'wt') as read1, \
-                gzip.open(output_path + "_read_2.fastq.gz", 'wt') as read2:
+        with open(input_file, 'rU') as filer, gzip.open(output_path + "_R1.fastq.gz", 'wt') as read1, \
+                gzip.open(output_path + "_R2.fastq.gz", 'wt') as read2:
             for record in SeqIO.parse(filer, "fastq"):
                 if pile % 2 == 0:
                     SeqIO.write(record, read1, "fastq") ;
@@ -444,14 +450,17 @@ def parse_gtf_content(gtf_content, choosen, mix):
         if feature[2] == "transcript" and exons:
             reference_transcript,library_transcript,feat_interest = construct_new_transcript(list(exons),choosen[exons[0][-1]["transcript_id"]])
             # We add corresponding transcript for each result file
-            reference.extend(list(reference_transcript))
             library.extend(list(library_transcript))
+            if reference_transcript[0][-1]["class"] != '0':
+                reference.extend([e[:-1] + [{**e[-1],"transcript_id":e[-1]["transcript_id"]+".modif"}] for e in list(reference_transcript)])
+            else:
+                reference.extend(list(reference_transcript))
             if feat_interest :
-                control.extend(list(feat_interest))
+                control.extend([e[:-1] + [{**e[-1],"transcript_id":e[-1]["transcript_id"]+".modif"}] for e in list(feat_interest)])
             # If --mix-library flag is precised (i.e. the library has to contain the modified transcript and original transcript),
             # we add the modified reference_transcript to library only if it is really modified (if the class is not 0)
-            if mix and reference_transcript[0][-1]["classe"] != '0':
-                library.extend([e[:-1] + [{**e[-1],"transcript_id":e[-1]["transcript_id"]+".ref"}] for e in list(reference_transcript)])
+            if mix and reference_transcript[0][-1]["class"] != '0':
+                library.extend([e[:-1] + [{**e[-1],"transcript_id":e[-1]["transcript_id"]+".modif"}] for e in list(reference_transcript)])
             del choosen[exons[0][-1]["transcript_id"]]
             exons = []
         if not choosen:
@@ -540,30 +549,30 @@ def construct_new_transcript(exons, classe):
     ... ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2'}]] # doctest: +SKIP 
     >>> reference,library,feature = construct_new_transcript(list(transcript),-1) # doctest: +SKIP 
     >>> reference # doctest: +SKIP 
-    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '-1'}], 
-     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '-1'}]]
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'class': '-1'}], 
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'class': '-1'}]]
     >>> library # doctest: +SKIP 
-    [['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '-1'}]]
+    [['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'class': '-1'}]]
     >>> feature # doctest: +SKIP 
-    [['3R5.2', 'WormBase', 'spliced_exon', '1', '348', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '-1'}]]
+    [['3R5.2', 'WormBase', 'spliced_exon', '1', '348', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'class': '-1'}]]
     >>> reference,library,feature = construct_new_transcript(list(transcript),0) # doctest: +SKIP 
     >>> reference # doctest: +SKIP 
-    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '0'}],
-     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '0'}]]
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'class': '0'}],
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'class': '0'}]]
     >>> library # doctest: +SKIP 
-    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '0'}],
-     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '0'}]]
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'class': '0'}],
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'class': '0'}]]
     >>> feature # doctest: +SKIP 
     >>> reference,library,feature = construct_new_transcript(list(transcript),3) # doctest: +SKIP 
     >>> reference # doctest: +SKIP 
-    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '1'}],
-     ['III', 'WormBase', 'exon', '13782935', '13783360', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'intron_id': '3R5.2.e1+3R5.2.e2', 'classe': '1'}],
-     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '1'}]]
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'class': '1'}],
+     ['III', 'WormBase', 'exon', '13782935', '13783360', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'intron_id': '3R5.2.e1+3R5.2.e2', 'class': '1'}],
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'class': '1'}]]
     >>> library # doctest: +SKIP 
-    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'classe': '1'}],
-     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'classe': '1'}]]
+    [['III', 'WormBase', 'exon', '13782587', '13782934', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '1', 'exon_id': '3R5.2.e1', 'class': '1'}],
+     ['III', 'WormBase', 'exon', '13783361', '13783459', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'exon_number': '2', 'exon_id': '3R5.2.e2', 'class': '1'}]]
     >>> feature # doctest: +SKIP 
-    [['3R5.2', 'WormBase', 'retained_intron', '349', '774', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'intron_id': '3R5.2.e1+3R5.2.e2', 'classe': '1'}]]
+    [['3R5.2', 'WormBase', 'retained_intron', '349', '774', '.', '+', '.', {'gene_id': 'WBGene00007066', 'transcript_id': '3R5.2', 'intron_id': '3R5.2.e1+3R5.2.e2', 'class': '1'}]]
     
     .. seealso:: transcript_df(), parse_gtf_content()
     .. note:: When a intron is retained, is annotated like exon in the feature field to oblige gffread to consider it like an exon and add it in the FASTA transcript. 
@@ -571,7 +580,7 @@ def construct_new_transcript(exons, classe):
     lib_t = ref_t = ft_on_t = [] # a virer une fois fini
     whole_transcript = transcript_df(list(exons))
     if classe == 0 or len(exons) == 1:
-        whole_transcript.apply(lambda df : df.misc_attr.update({"classe":str(0)}),axis=1) # We update the class of the transcript for each feature
+        whole_transcript.apply(lambda df : df.misc_attr.update({"class":str(0)}),axis=1) # We update the class of the transcript for each feature
         
         # From the DataFrame, we take only the feature with True value in "in_transcript" column (here it's only exons because of the class 0)  
         lib_t = ref_t = [ 
@@ -580,7 +589,7 @@ def construct_new_transcript(exons, classe):
             ]
         ft_on_t = None
     elif classe == -1:
-        whole_transcript.apply(lambda df : df.misc_attr.update({"classe":str(classe)}),axis=1) # We update the class of the transcript for each feature
+        whole_transcript.apply(lambda df : df.misc_attr.update({"class":str(classe)}),axis=1) # We update the class of the transcript for each feature
         
         # We add to reference file the not spliced transcript
         ref_t = [ 
@@ -622,7 +631,7 @@ def construct_new_transcript(exons, classe):
         else:
             choosen_introns = sorted(list(rd.choice(whole_transcript.loc[lambda df : df.feature == "intron"].index,classe,replace=False)))
         
-        whole_transcript.apply(lambda df : df.misc_attr.update({"classe":str(classe)}),axis=1) # We update the class of the transcript for each feature
+        whole_transcript.apply(lambda df : df.misc_attr.update({"class":str(classe)}),axis=1) # We update the class of the transcript for each feature
         
         # We add to library file (from which the read will be generated) the transcript without retained introns
         lib_t = [ 
@@ -641,7 +650,7 @@ def construct_new_transcript(exons, classe):
             i_start = sum(whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < retained_intron),"end"].apply(int)-whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < retained_intron),"start"].apply(int)+1)+1
             i_end = i_start + (int(whole_transcript.at[retained_intron,"end"])-int(whole_transcript.at[retained_intron,"start"]))
             ft_on_t.append([
-                whole_transcript.at[retained_intron,"misc_attr"]["transcript_id"],
+                whole_transcript.at[retained_intron,"misc_attr"]["transcript_id"]+".modif",
                 whole_transcript.at[retained_intron,"DB"],
                 "retained_intron",
                 str(i_start),
@@ -700,16 +709,16 @@ def extract_fasta(genome: str, mix: bool, ref_file: str, lib_file: str, path: st
     :type path: str
     """
     sp.call(["gffread", ref_file, "-g", genome,
-             "-w", path + "_contigs.fa", "-F"])
+             "-w", path + "_transcripts-modified.fa", "-F"])
     if mix:
         sp.call(["gffread", lib_file, "-g", genome,
-             "-w", path + "_contigs-mix-state.fa", "-F"])
+             "-w", path + "_transcripts-mix-state.fa", "-F"])
     else:
         sp.call(["gffread", lib_file, "-g", genome,
-             "-w", path + "_contigs-no-intron.fa", "-F"])
+             "-w", path + "_transcripts.fa", "-F"])
 
 
-def gtf_based_simulation(annotation: str, fasta: str, nb: int, output: str, mix: bool):
+def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, output: str, mix: bool):
     """
     Simulate a RNA-seq pseudo-assembly from a GTF file with retained introns or spliced exons. This procedure produces 3 files :
         - output_reference.fasta : pseudo-assembly where the contigs have potentially retained introns. 
@@ -732,17 +741,19 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, output: str, mix:
     :type mix: bool
     
     """
+    output_path = output + "/gbs";
+    if prefix:
+        output_path += "_" + prefix;
+    
     # Create output dir if not exist
     if not os.path.exists(output) :
         os.mkdir(output)
     try :
-        if os.path.exists(output + "/gbs_contigs.fa") or os.path.exists(output + "/gbs_contigs-no-introns.fa") or os.path.exists(output + "/gbs_features-of-interest.gtf") or  os.path.exists(output + "/gbs_contigs-mix-state.fa"):
+        if os.path.exists(output_path + "_transcripts-modified.fa") or os.path.exists(output_path + "_transcripts.fa") or os.path.exists(output_path + "_transcripts-modified.gtf") or  os.path.exists(output_path + "_transcripts-mix-state.fa"):
                raise FileExistsError
     except FileExistsError as e :
         print('\nError: output file(s) already exists.\n')
         exit(1)
-    
-    output_path = output + "/gbs";
     
     #print("GTF reading...")
     gtf_content, transcripts = read_gtf(annotation.name)
@@ -754,7 +765,7 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, output: str, mix:
     ref_tmpfile = tmp.NamedTemporaryFile(dir=output,delete=True)
     write_gtf_file(reference,ref_tmpfile.name)
     write_gtf_file(library,lib_tmpfile.name)
-    write_gtf_file(control,output_path + "_features-of-interest.gtf")
+    write_gtf_file(control,output_path + "_transcripts-modified.gtf")
     #print("FASTA files writing with gffread...")
     extract_fasta(fasta.name, mix, ref_tmpfile.name, lib_tmpfile.name, output_path)
     
