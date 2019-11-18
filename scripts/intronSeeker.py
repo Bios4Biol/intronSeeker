@@ -83,6 +83,7 @@ def parse_arguments() :
     parser_frs.add_argument('-l', '--lower-intron-len',  type=int, default=150, dest='lower')
     parser_frs.add_argument('-H', '--higher-intron-len', type=int, default=1000, dest='upper')
     parser_frs.add_argument('-o', '--outputDir', type=str, required=True, dest='output')
+    parser_frs.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_frs.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser_frs.add_argument('-h','--help',action='store_const', const = parser_frs.prog.split()[-1],dest='c_help')
     parser_frs.set_defaults(func=full_random_simulation)
@@ -96,6 +97,7 @@ def parse_arguments() :
     group_nb.add_argument('-N','--all-transcripts', action='store_const', const=0, default=False, dest='nb')
     parser_gbs.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser_gbs.add_argument('-o','--output', type=str, required=True, dest='output')
+    parser_gbs.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_gbs.add_argument('-m', '--mix-state', action='store_true', default=False, dest='mix')
     parser_gbs.add_argument('-h','--help',action='store_const', const = parser_gbs.prog.split()[-1],dest='c_help')
     parser_gbs.set_defaults(func=gtf_based_simulation)
@@ -106,6 +108,7 @@ def parse_arguments() :
     parser_grinder.add_argument('-c','--cfg', type=argparse.FileType('r'), required=True, dest='pf')
     parser_grinder.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser_grinder.add_argument('-o','--outputDir', type=str, required=True, dest='output')
+    parser_grinder.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_grinder.add_argument('-h','--help',action='store_const', const = parser_grinder.prog.split()[-1],dest='c_help')
     parser_grinder.set_defaults(func=grinder)
 

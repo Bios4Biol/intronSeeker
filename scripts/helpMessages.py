@@ -576,7 +576,7 @@ Simulates a multi Fasta file which contains the pseudo-contigs and a TXT file wh
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] [-p STR] -o STR',
+intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-rF] [-l,-H INT] [-p STR] -o STR',
     width=90
     ))
     print()
@@ -620,6 +620,10 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-r] [-l,-H INT] [-p STR]
     print(cw.fill(
 '\tOutput dir name.'
     ))
+    print('   -F/--force',end='')
+    print(cw.fill(
+'\t\tForce to overwrite output files.'
+    ))
     print('   -h/--help\t',end='')
     print(cw.fill(
 '\tPrint this help message.'
@@ -652,7 +656,7 @@ From a genome and associated ensembl GTF file, generates pseudo-contigs (corresp
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker GTFbasedSimulation -a <annot.gtf> -r <ref.fa> [-m,-N|-n INT] [-p STR] -o STR',
+intronSeeker GTFbasedSimulation -a <annot.gtf> -r <ref.fa> [-mF,-N|-n INT] [-p STR] -o STR',
     width=90
     ))
     print()
@@ -692,6 +696,10 @@ intronSeeker GTFbasedSimulation -a <annot.gtf> -r <ref.fa> [-m,-N|-n INT] [-p ST
     print(cw.fill(
 '\tBasename for generated files.'
     ))
+    print('   -F/--force',end='')
+    print(cw.fill(
+'\t\tForce to overwrite output files.'
+    ))
     print('   -h/--help\t',end='')
     print(cw.fill(
 '\tPrint this help message.'
@@ -721,7 +729,7 @@ From a Fasta file, calls Grinder program to simulates a corresponding reads libr
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker simulateReads -f <file.fa> -c <grinder.cfg> [-p STR] -o STR',
+intronSeeker simulateReads -f <file.fa> -c <grinder.cfg> [-p STR] [-F] -o STR',
     width=90
     ))
     print()
@@ -748,6 +756,10 @@ intronSeeker simulateReads -f <file.fa> -c <grinder.cfg> [-p STR] -o STR',
     print('   -o/--outputDir STR',end='')
     print(cw.fill(
 'Output dir name.'
+    ))
+    print('   -F/--force',end='')
+    print(cw.fill(
+'\tForce to overwrite output files.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(

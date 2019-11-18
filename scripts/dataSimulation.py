@@ -88,7 +88,7 @@ def insert_intron(contig_seq : str, lower : int, upper: int,):
     intron_end = insert_pos+rand_length+4
     return new_seq, insert_pos, intron_end
 
-def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower : int, upper : int, prefix: str, output : str) :
+def full_random_simulation(nb:int, maxi:int, mini:int, half:bool, lower:int, upper:int, prefix:str, output:str, force:bool) :
     """
     Simulate a set of nb contigs (with entirely random sequence) with random length beetween [mini,maxi].
     In each contig, an intron with a random length beetween [lower,upper] is randomly inserted. 
@@ -124,12 +124,13 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
     # Create output dir if not exist
     if not os.path.exists(output) :
         os.mkdir(output)
-    try :
-        if os.path.exists(output_path + "_contigs.fa") or os.path.exists(output_path + "_contigs-modified.fa") or os.path.exists(output_path + "_modifications.txt") :
-               raise FileExistsError
-    except FileExistsError as e :
-        print('\nError: output file(s) already exists.\n')
-        exit(1)
+    if not force:
+        try :
+            if os.path.exists(output_path + "_contigs.fa") or os.path.exists(output_path + "_contigs-modified.fa") or os.path.exists(output_path + "_modifications.txt") :
+                   raise FileExistsError
+        except FileExistsError as e :
+            print('\nError: output file(s) already exists.\n')
+            exit(1)
         
     # Check if the length intervals are correct
     if mini > maxi :
@@ -207,7 +208,7 @@ def full_random_simulation(nb : int, maxi : int, mini : int, half : bool, lower 
         #~ input_file=input_file, profile_file=profile_file, output_file=output_file
         #~ )) ;
 
-def grinder(rf: str, pf: str, prefix: str, output: str):
+def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
     """
     Generate reads for a reference file depending on grinder parameters from the profile file.
     Call the software Grinder.
@@ -223,12 +224,13 @@ def grinder(rf: str, pf: str, prefix: str, output: str):
     # Create output dir if not exist
     if not os.path.exists(output) :
         os.mkdir(output)
-    try :
-        if os.path.exists(output_path + "_ranks.txt") or os.path.exists(output_path + "_R1.fastq.gz") or os.path.exists(output_path + "_R2.fastq.gz") :
-               raise FileExistsError
-    except FileExistsError as e :
-        print('\nError: output file(s) already exists.\n')
-        exit(1)
+    if not force:
+        try :
+            if os.path.exists(output_path + "_ranks.txt") or os.path.exists(output_path + "_R1.fastq.gz") or os.path.exists(output_path + "_R2.fastq.gz") :
+                   raise FileExistsError
+        except FileExistsError as e :
+            print('\nError: output file(s) already exists.\n')
+            exit(1)
     
     os.system("grinder -rf {input_file} -pf {profile_file} -bn {output_file} > {log}".format(
         input_file=rf.name, profile_file=pf.name, output_file=output_path, log=output_path + ".log"
@@ -718,7 +720,7 @@ def extract_fasta(genome: str, mix: bool, ref_file: str, lib_file: str, path: st
              "-w", path + "_transcripts.fa", "-F"])
 
 
-def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, output: str, mix: bool):
+def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, output: str, force: bool, mix: bool):
     """
     Simulate a RNA-seq pseudo-assembly from a GTF file with retained introns or spliced exons. This procedure produces 3 files :
         - output_reference.fasta : pseudo-assembly where the contigs have potentially retained introns. 
@@ -748,12 +750,13 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, outp
     # Create output dir if not exist
     if not os.path.exists(output) :
         os.mkdir(output)
-    try :
-        if os.path.exists(output_path + "_transcripts-modified.fa") or os.path.exists(output_path + "_transcripts.fa") or os.path.exists(output_path + "_transcripts-modified.gtf") or  os.path.exists(output_path + "_transcripts-mix-state.fa"):
-               raise FileExistsError
-    except FileExistsError as e :
-        print('\nError: output file(s) already exists.\n')
-        exit(1)
+    if not force:
+        try :
+            if os.path.exists(output_path + "_transcripts-modified.fa") or os.path.exists(output_path + "_transcripts.fa") or os.path.exists(output_path + "_transcripts-modified.gtf") or  os.path.exists(output_path + "_transcripts-mix-state.fa"):
+                   raise FileExistsError
+        except FileExistsError as e :
+            print('\nError: output file(s) already exists.\n')
+            exit(1)
     
     #print("GTF reading...")
     gtf_content, transcripts = read_gtf(annotation.name)
