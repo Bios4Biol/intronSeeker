@@ -25,24 +25,22 @@ def star_bam_fix(input_file: str, output_file):
             record.query_name += "/2"
         outfile.write(record)
 
-def bam_indexing(bamfile) :
-    
+def bam_indexing(bamfile, cmdlog) :
     bam_index_cmd = ['samtools','index',
                     bamfile,
                     bamfile.rstrip('.bam') + '.bai'
                     ]
-    print("\nBAM indexing :") 
-    print(' '.join(bam_index_cmd))
+    cmdlog.write("\n# BAM indexing:\n") 
+    cmdlog.write(' '.join(bam_index_cmd) + "\n")
     sp.run(bam_index_cmd)
 
-def flagstat(bamfile,threads = 1) :
-
+def flagstat(bamfile, cmdlog, threads = 1) :
     bam_flagstat_cmd = ['samtools','flagstat',
                         '--threads',str(threads),
                         bamfile
                         ]
-    print("\nBAM flagstat computation :") 
-    print(' '.join(bam_flagstat_cmd))
+    cmdlog.write("\n# BAM flagstat computation:\n") 
+    cmdlog.write(' '.join(bam_flagstat_cmd) + "\n")
     stdout = sp.run(bam_flagstat_cmd,stdout=sp.PIPE).stdout
     with open(bamfile.rstrip('.bam')+'.flagstat.txt','w') as out_flag :
         out_flag.write(stdout.decode('utf-8'))
@@ -109,7 +107,7 @@ def star(reference, r1, r2, prefix, threads):
     flagstat(outfile + '.Aligned.sortedByCoord.out.bam',threads)
 
 
-def hisat2(reference, r1, r2, prefix, threads):
+def hisat2(reference, r1, r2, output, prefix, force, threads):
     """
     Run HiSat2.
     Call the aligner HiSat2
@@ -120,26 +118,35 @@ def hisat2(reference, r1, r2, prefix, threads):
     :param threads: number of threads used to perform the alignment
     :return:
     """
-    outdir = prefix + "_hisat2Alignement/" # Output directory name (where this function will write)
-                                  # all the results and tmp files).
-    outfile = outdir + prefix # Final output file path
-    genomedir = outdir + "GenomeRef" # Path to the directory will contain reference fasta file and index files 
-
-    # Directories creation 
-    try :
+    output_path = output + "/hisat2";
+    if prefix:
+        output_path += "_" + prefix;
+    
+    genomedir = output + "/hisat2_genomeRef" # Path to the directory will contain reference fasta file and index files 
+    
+    # Create output dir if not exist
+    if not os.path.exists(genomedir) :
         os.makedirs(genomedir)
-    except FileExistsError :
-        print('WARNING: Output directories already exist. The potential existing output files will be overwritten.')
-    sp.run(['cp', reference.name, genomedir])
+    if not force:
+        try :
+            if os.path.exists(output_path + ".sort.bam") or os.path.exists(output_path + ".sort.flagstat.txt"):
+               raise FileExistsError
+        except FileExistsError as e :
+            print('\nError: output file(s) already exists.\n')
+            exit(1)
+    
     ref_path = "/".join([genomedir, os.path.basename(reference.name)]) ; # Path to reference fasta file and index files
 
+    cmdlog = open(output_path+".log", "w")
+    
     # Reference File indexing
-    index_command = ['hisat2-build',reference.name ,ref_path]
-    print('\nFasta indexing :')
-    print(" ".join(index_command))
-    log = sp.check_output(index_command) 
-    with open(outdir+'hisat2-build.log','w') as log_file :
-        log_file.write(log.decode('utf-8'))
+    if not os.path.exists(ref_path + ".1.ht2") or force:
+        index_command = ['hisat2-build', reference.name, ref_path]
+        cmdlog.write('\n# Fasta indexing:\n')
+        cmdlog.write(" ".join(index_command) + "\n")
+        log = sp.check_output(index_command, stderr=sp.STDOUT)
+        with open(output_path + '_build.log','w') as log_file :
+            log_file.write(log.decode('utf-8'))
 
     # Reads Mapping and ouput files writing 
     hisat_command = ['hisat2',
@@ -164,13 +171,13 @@ def hisat2(reference, r1, r2, prefix, threads):
         else :
             raise OSError
     except OSError :
-        print(r1.name+' : File format not supported to call Hisat2. Only regular, gzipped or bzipped fastq and fasta files are supported.')
+        print(r1.name+': File format not supported to call Hisat2. Only regular, gzipped or bzipped fastq and fasta files are supported.')
         exit(1)
     samtools_view_cmd = ['samtools', 'view', '-bS']
-    samtools_sort_cmd = ['samtools','sort', '-o',outfile+'.Aligned.sortedByCoord.out.bam'] 
-    print('\nHiSat2 Alignement : ')
-    print(' | '.join([' '.join(hisat_command),' '.join(samtools_view_cmd), ' '.join(samtools_sort_cmd)]))
-    with open(outdir+'Hisat2_alignement.log','w') as log : 
+    samtools_sort_cmd = ['samtools','sort', '-o',output_path+'.sort.bam'] 
+    cmdlog.write('\n# HiSat2 Alignement:\n')
+    cmdlog.write(' | '.join([' '.join(hisat_command),' '.join(samtools_view_cmd), ' '.join(samtools_sort_cmd)]) + "\n")
+    with open(output_path+'_aln.log','w') as log : 
         align = sp.Popen(hisat_command,stdout=sp.PIPE,stderr=log)
         view = sp.Popen(samtools_view_cmd, stdin = align.stdout, stdout=sp.PIPE)
         sort = sp.Popen(samtools_sort_cmd, stdin = view.stdout)
@@ -178,9 +185,7 @@ def hisat2(reference, r1, r2, prefix, threads):
         view.stdout.close()
         sort.wait()
    
-    bam_indexing(outfile+'.Aligned.sortedByCoord.out.bam')
-    
-    flagstat(outfile+'.Aligned.sortedByCoord.out.bam')
-
-
-
+    bam_indexing(output_path+'.sort.bam', cmdlog)
+    flagstat(output_path+'.sort.bam', cmdlog)
+    cmdlog.write("\n")
+    cmdlog.close()

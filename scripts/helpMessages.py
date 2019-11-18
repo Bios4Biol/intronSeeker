@@ -198,9 +198,7 @@ def star_help() :
     text='\
 \nDescription:\n\
 Calls STAR to align the reads library and the reference assembly and produce\
- a BAM file on which  reads  splicing  detection  can be performed.\
- A directory  <output>_star is created where the STAR indexing, STAR log and output BAM and BAI file will be stored.\
-'
+ a BAM file on which  reads  splicing  detection  can be performed.'
     tw = textwrap.TextWrapper(
         width=90,
         initial_indent="",
@@ -212,12 +210,8 @@ Calls STAR to align the reads library and the reference assembly and produce\
     
     # Usage
     print('Usage:')
-    print(
-    textwrap.fill('\
-intronSeeker starAlignment -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t INT]',
-    width=90
-    ))
-    print()
+    print('intronSeeker starAlignment -r <reference.fa> -1 <reads1.fq> -o STR')
+    print('\t\t\t   [-2 <reads2.fq>] [-t INT] [-F ] [-p STR]\n')
     
     cw = textwrap.TextWrapper(
         width=67,
@@ -239,9 +233,17 @@ intronSeeker starAlignment -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t I
     print(cw.fill(
 'Only for a paired-end library, filename of #2 reads mates.'
     ))
-    print('   -o/--output STR',end='')
+    print('   -p/--prefix STR',end='')
     print(cw.fill(
-'Basename of the output directory  where  the STAR index  and ouput BAM file will be stored.'
+'Prefix for output files name.'
+    ))
+    print('   -o/--outputDir STR',end='')
+    print(cw.fill(
+'Output dir name.'
+    ))
+    print('   -F/--force',end='')
+    print(cw.fill(
+'\tForce to overwrite output files.'
     ))
     print('   -t/--threads INT',end='')
     print(cw.fill(
@@ -261,9 +263,7 @@ def hisat2_help() :
     text='\
 \nDescription:\n\
 Calls HiSat2  to align the reads library and the reference assembly and produce\
- a BAM file on which reads splicing detection can be performed.\
- A directory <output>_hisat2 is created where the HiSat2 indexing, HiSat2 log and output BAM and BAI file will be stored.\
-'
+ a BAM file on which reads splicing detection can be performed.'
     tw = textwrap.TextWrapper(
         width=90,
         initial_indent="",
@@ -275,12 +275,8 @@ Calls HiSat2  to align the reads library and the reference assembly and produce\
     
     # Usage
     print('Usage:')
-    print(
-    textwrap.fill('\
-intronSeeker hisat2Alignment -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t INT]',
-    width=90
-    ))
-    print()
+    print('intronSeeker hisat2Alignment -r <reference.fa> -1 <reads1.fq> -o STR')
+    print('\t\t\t     [-2 <reads2.fq>] [-t INT] [-F, -p STR]')
     
     cw = textwrap.TextWrapper(
         width=67,
@@ -302,9 +298,17 @@ intronSeeker hisat2Alignment -r <ref.fa> -1 <r1.fq> -o <output> [-2 <r2.fq>] [-t
     print(cw.fill(
 'Only for a paired-end library, filename of #2 reads mates.'
     ))
-    print('   -o/--output STR',end='')
+    print('   -p/--prefix STR',end='')
     print(cw.fill(
-'Basename of the output directory where the HiSat2 index and  ouput BAM file will be stored.'
+'Prefix for output files name.'
+    ))
+    print('   -o/--outputDir STR',end='')
+    print(cw.fill(
+'Output dir name.'
+    ))
+    print('   -F/--force',end='')
+    print(cw.fill(
+'\tForce to overwrite output files.'
     ))
     print('   -t/--threads INT',end='')
     print(cw.fill(
@@ -654,12 +658,8 @@ From a genome and associated ensembl GTF file, generates pseudo-contigs (corresp
     
     # Usage
     print('Usage:')
-    print(
-    textwrap.fill('\
-intronSeeker GTFbasedSimulation -a <annot.gtf> -r <ref.fa> [-mF,-N|-n INT] [-p STR] -o STR',
-    width=90
-    ))
-    print()
+    print('intronSeeker GTFbasedSimulation -a <annotation.gtf> -r <reference.fa> -o STR')
+    print('\t\t\t\t[-N|-n INT] [-m] [-F] [-p STR]\n')
     
     cw = textwrap.TextWrapper(
         width=59,
