@@ -80,12 +80,12 @@ def parse_arguments() :
 
     # subparser for Full Random Simulation
     parser_frs = subparser.add_parser('fullRandomSimulation',add_help=False)
-    parser_frs.add_argument('-n','--nb_contigs', type=int, default=10, dest='nb')
-    parser_frs.add_argument('-m','--min-contig-len', type=int, default=150, dest='mini')
-    parser_frs.add_argument('-M','--max-contig-len', type=int, default=1000, dest='maxi')
+    parser_frs.add_argument('-n','--nb_contigs', type=int, default=2000, dest='nb')
+    parser_frs.add_argument('-m','--min-contig-len', type=int, default=250, dest='mini')
+    parser_frs.add_argument('-M','--max-contig-len', type=int, default=1500, dest='maxi')
     parser_frs.add_argument('-r','--random-half', default=False, action='store_true',dest='half')
-    parser_frs.add_argument('-l', '--lower-intron-len',  type=int, default=150, dest='lower')
-    parser_frs.add_argument('-H', '--higher-intron-len', type=int, default=1000, dest='upper')
+    parser_frs.add_argument('-l', '--lower-intron-len',  type=int, default=250, dest='lower')
+    parser_frs.add_argument('-H', '--higher-intron-len', type=int, default=750, dest='upper')
     parser_frs.add_argument('-o', '--outputDir', type=str, required=True, dest='output')
     parser_frs.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_frs.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')

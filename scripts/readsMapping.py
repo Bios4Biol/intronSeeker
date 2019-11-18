@@ -45,7 +45,7 @@ def flagstat(bamfile, cmdlog, threads = 1) :
     with open(bamfile.rstrip('.bam')+'.flagstat.txt','w') as out_flag :
         out_flag.write(stdout.decode('utf-8'))
 
-def star(reference, r1, r2, prefix, threads):
+def star(reference, r1, r2, output, prefix, force, threads):
     """
     Run STAR.
     Call the aligner STAR. 
@@ -55,18 +55,27 @@ def star(reference, r1, r2, prefix, threads):
     :param pref: output prefix
     :return:
     """
-    outdir = prefix + "_starAlignement/" ; # Output directory name (where this function will write 
-                                 # all the results and tmp files).
-    outfile = outdir + prefix ; # Final output file path
-    genomedir = outdir + "GenomeRef" ; # Path to the directory will contain reference fasta file and index files 
-
-    # Directories creation 
-    try :
+    output_path = output + "/star";
+    if prefix:
+        output_path += "_" + prefix;
+    
+    genomedir = output + "/star_genomeRef" # Path to the directory will contain reference fasta file and index files 
+    
+    # Create output dir if not exist
+    if not os.path.exists(genomedir) :
         os.makedirs(genomedir)
-    except FileExistsError :
-        print('WARNING: Output directories already exist. The potential existing output files will be overwritten.')
+    if not force:
+        try :
+            if os.path.exists(output_path + ".sort.bam") or os.path.exists(output_path + ".sort.flagstat.txt"):
+               raise FileExistsError
+        except FileExistsError as e :
+            print('\nError: output file(s) already exists.\n')
+            exit(1)
+    
     sp.run(['cp', reference.name, genomedir])
     ref_path = "/".join([genomedir, os.path.basename(reference.name)]) ; # Path to reference fasta file and index files
+    
+    cmdlog = open(output_path+".log", "w")
     
     # Reference File indexing
     index_command = ['STAR',
@@ -76,10 +85,10 @@ def star(reference, r1, r2, prefix, threads):
                     '--genomeDir', genomedir, 
                     '--genomeFastaFiles', ref_path
                     ]
-    print('\nFasta indexing :')
-    print(" ".join(index_command))
+    cmdlog.write('\n# Fasta indexing:\n')
+    cmdlog.write(" ".join(index_command) + "\n")
     sp.run(index_command) 
-    sp.run(['mv', 'Log.out', outdir]) ; # Move the index log file in output directory
+    sp.run(['mv', 'Log.out', output_path + "star.log"]) ; # Move the index log file in output directory
 
     # ~ # Reads Mapping and ouput files writing 
     star_command = ['STAR',
@@ -88,7 +97,7 @@ def star(reference, r1, r2, prefix, threads):
                     '--outSAMstrandField', 'intronMotif',
                     '--outSAMtype', 'BAM', 'SortedByCoordinate',
                     '--outSAMunmapped', 'Within',
-                    '--outFileNamePrefix', outfile+'.star.'
+                    '--outFileNamePrefix', output_path+'.star.'
                     ]
     if r2 :
         star_command.extend(['--readFilesIn', r1.name, r2.name])
@@ -96,15 +105,16 @@ def star(reference, r1, r2, prefix, threads):
         star_command.extend(['--readFilesIn', r1.name])
     if r1.name.endswith('.gz') :
         star_command.extend(['--readFilesCommand', 'zcat'])
-    print('\nSTAR alignement : ')
-    print(' '.join(star_command))
+    cmdlog.write('\n# STAR alignement:\n')
+    cmdlog.write(' '.join(star_command) + "\n")
     sp.run(star_command)
-    star_bam_fix(outfile+'.star.Aligned.sortedByCoord.out.bam', outfile+'.Aligned.sortedByCoord.out.bam')
-    sp.run(['rm',outfile+'.star.Aligned.sortedByCoord.out.bam']) # Temporary files erasure
+    star_bam_fix(output_path+'.star.Aligned.sortedByCoord.out.bam', output_path+'.sort.bam')
+    sp.run(['rm',output_path+'.star.Aligned.sortedByCoord.out.bam']) # Temporary files erasure
     
-    bam_indexing(outfile + '.Aligned.sortedByCoord.out.bam')
-    
-    flagstat(outfile + '.Aligned.sortedByCoord.out.bam',threads)
+    bam_indexing(output_path + '.sort.bam', cmdlog)
+    flagstat(output_path + '.sort.bam', cmdlog, threads)
+    cmdlog.write("\n")
+    cmdlog.close()
 
 
 def hisat2(reference, r1, r2, output, prefix, force, threads):
@@ -186,6 +196,6 @@ def hisat2(reference, r1, r2, output, prefix, force, threads):
         sort.wait()
    
     bam_indexing(output_path+'.sort.bam', cmdlog)
-    flagstat(output_path+'.sort.bam', cmdlog)
+    flagstat(output_path+'.sort.bam', cmdlog, threads)
     cmdlog.write("\n")
     cmdlog.close()

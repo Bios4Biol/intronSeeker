@@ -594,15 +594,15 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-rF] [-l,-H INT] [-p STR
     print('Options:')
     print('   -n/--nb_contigs INT',end='')
     print(cw.fill(
-'\tNumber of contig/sequence randomly generated. [10].'
+'\tNumber of contig/sequence randomly generated. [2000].'
     ))
     print('   -m/--min-contig-len INT',end='')
     print(cw.fill(
-'Minimal length of random contigs [150].'
+'Minimal length of random contigs [250].'
     ))
     print('   -M/--max-contig-len INT',end='')
     print(cw.fill(
-'Maximal length of random contigs [1000].'
+'Maximal length of random contigs [1500].'
     ))
     print('   -r/--random-half',end='')
     print(cw.fill(
@@ -610,11 +610,11 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-rF] [-l,-H INT] [-p STR
     ))
     print('   -l/--lower-intron-len INT',end='')
     print(cw.fill(
-'Minimal length of random intron [150].'
+'Minimal length of random intron [250].'
     ))
     print('   -H/--higher-intron-len INT',end='')
     print(cw.fill(
-'Maximal length of random intron [1000].'
+'Maximal length of random intron [750].'
     ))
     print('   -p/--prefix STR',end='')
     print(cw.fill(
