@@ -116,8 +116,6 @@ def star(reference, r1, r2, output, prefix, force, rm, threads):
     if not rm:
         os.system("rm {path}*progress.out {path}*final.out {path}*SJ.out.tab".format(path=output_path))
 
-
-
 def hisat2(reference, r1, r2, output, prefix, force, threads):
     """
     Run HiSat2.

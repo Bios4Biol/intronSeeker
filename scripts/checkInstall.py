@@ -26,7 +26,7 @@ def checkInstall() :
             miss_dpdc.append(program) ;
 
     if not miss_dpdc :
-        print("\nAll the dependencies are correctly installed") ;
+        print("\nAll the dependencies are correctly installed.") ;
         print() ;
     elif len(miss_dpdc) == 1 :
         print("Finally, the following program is missing or is not up to date:") ;

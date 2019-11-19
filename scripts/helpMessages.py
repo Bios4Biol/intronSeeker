@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
 
 import textwrap
-import configparser
 import os
 
-config = configparser.RawConfigParser()
-config.read(os.path.abspath(os.path.dirname(__file__))+"/../config/intronSeeker.properties")
-
 # Metadata readable in intronSeeker/config/intronSeeker.properties
-__author__ = config['Metadata']['author']
-__copyright__ = config['Metadata']['copyright']
-__license__ = config['Metadata']['license']
-__version__ = config['Metadata']['version']
-__email__ = config['Metadata']['email']
-__status__ = config['Metadata']['status']
+__author__    = "Lasguignes E., Oudin F., Cabanettes F., Klopp C."
+__copyright__ = "Copyright (C) 2019 INRA"
+__license__   = "GNU General Public License"
+__version__   = "1.0"
+__email__     = "support.bioinfo.genotoul(at)inra.fr"
+__status__    = "dev"
+
 
 ########################################
 ########### Version Printing ###########
 ########################################
 def program_version() :
-    print("intronSeeker v{version}".format(version=__version__),end="\n\n")
+    print("intronSeeker {version}".format(version=__version__),end="\n")
+    print(__copyright__) 
 
 ########################################
 ##### Global program help printing #####
@@ -29,7 +27,7 @@ def program_help() :
     text = '\
 \n\
 Program: intronSeeker\n\
-Version: v{version}\n\n\
+Version: {version}\n\n\
 \
 This tool identify  potentially retained introns  in de novo RNA-seq  assembly\
  in order to quantify and remove them. The intron detection is based on the\
