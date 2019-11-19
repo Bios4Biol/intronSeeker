@@ -45,7 +45,7 @@ def flagstat(bamfile, cmdlog, threads = 1) :
     with open(bamfile.rstrip('.bam')+'.flagstat.txt','w') as out_flag :
         out_flag.write(stdout.decode('utf-8'))
 
-def star(reference, r1, r2, output, prefix, force, threads):
+def star(reference, r1, r2, output, prefix, force, rm, threads):
     """
     Run STAR.
     Call the aligner STAR. 
@@ -72,9 +72,6 @@ def star(reference, r1, r2, output, prefix, force, threads):
             print('\nError: output file(s) already exists.\n')
             exit(1)
     
-    sp.run(['cp', reference.name, genomedir])
-    ref_path = "/".join([genomedir, os.path.basename(reference.name)]) ; # Path to reference fasta file and index files
-    
     cmdlog = open(output_path+".log", "w")
     
     # Reference File indexing
@@ -83,13 +80,13 @@ def star(reference, r1, r2, output, prefix, force, threads):
                     '--runThreadN', str(threads),
                     '--genomeSAindexNbases', str(6),
                     '--genomeDir', genomedir, 
-                    '--genomeFastaFiles', ref_path
+                    '--genomeFastaFiles', reference.name,
+                    '--outFileNamePrefix', output_path+'.star.'
                     ]
     cmdlog.write('\n# Fasta indexing:\n')
     cmdlog.write(" ".join(index_command) + "\n")
     sp.run(index_command) 
-    sp.run(['mv', 'Log.out', output_path + "star.log"]) ; # Move the index log file in output directory
-
+    
     # ~ # Reads Mapping and ouput files writing 
     star_command = ['STAR',
                     '--genomeDir', genomedir,
@@ -115,6 +112,10 @@ def star(reference, r1, r2, output, prefix, force, threads):
     flagstat(output_path + '.sort.bam', cmdlog, threads)
     cmdlog.write("\n")
     cmdlog.close()
+    
+    if not rm:
+        os.system("rm {path}*progress.out {path}*final.out {path}*SJ.out.tab".format(path=output_path))
+
 
 
 def hisat2(reference, r1, r2, output, prefix, force, threads):
