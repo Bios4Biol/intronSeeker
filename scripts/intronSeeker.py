@@ -4,7 +4,7 @@
 import argparse 
 import sys 
 import os 
-from intronSearch import searchProtein,predictORF,truncate,split_research
+from intronSearch import searchProtein,predictORF,truncate,splitReadSearch
 from readsMapping import star,hisat2
 from dataSimulation import full_random_simulation,gtf_based_simulation,grinder
 from checkInstall import checkInstall
@@ -52,7 +52,7 @@ def parse_arguments() :
     parser_split.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_split.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser_split.add_argument('-h','--help',action='store_const', const = parser_split.prog.split()[-1],dest='c_help')
-    parser_split.set_defaults(func=split_research)
+    parser_split.set_defaults(func=splitReadSearch)
 
     # subparser for writing fasta of spliced sequence
     parser_trim = subparser.add_parser('trimFastaFromTXT',add_help=False)
