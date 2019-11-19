@@ -347,8 +347,7 @@ Performs  the split read  signal  extraction  from  an   alignment (BAM File)  b
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker splitReadSearch -a <alignemnt.bam> -r <ref.fa> \
- -o <outfile_basename> ',
+intronSeeker splitReadSearch -a <alignment.bam> -r <ref.fa> -o STR [-F, -p STR]',
     width=90
     ))
     print()
@@ -368,9 +367,17 @@ intronSeeker splitReadSearch -a <alignemnt.bam> -r <ref.fa> \
     print(cw.fill(
 'Name of the reference FASTA file  of the  alignment  and  in which the introns have to be identified.'
     ))
-    print('   -o/--output STR',end='')
+    print('   -p/--prefix STR',end='')
     print(cw.fill(
-'Basename of the output directory  where the TXT ouput file will be stored.'
+'Prefix for output files name.'
+    ))
+    print('   -o/--outputDir STR',end='')
+    print(cw.fill(
+'Output dir name.'
+    ))
+    print('   -F/--force',end='')
+    print(cw.fill(
+'\tForce to overwrite output files.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(

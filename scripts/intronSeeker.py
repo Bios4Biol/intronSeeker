@@ -37,18 +37,20 @@ def parse_arguments() :
     parser_hisat2.add_argument('-r','--reference', type=argparse.FileType('r'), required=True, dest='reference')
     parser_hisat2.add_argument('-1','--r1', type=argparse.FileType('r'), required=True,  dest='r1')
     parser_hisat2.add_argument('-2','--r2', type=argparse.FileType('r'), required=False, dest='r2')
-    parser_hisat2.add_argument('-o','--output', type=str, required=True, default='HiSat2', dest='output')
+    parser_hisat2.add_argument('-o','--output', type=str, required=True, dest='output')
     parser_hisat2.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_hisat2.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser_hisat2.add_argument('-t','--threads', type=int, default=1, dest='threads')
     parser_hisat2.add_argument('-h','--help',action='store_const', const = parser_hisat2.prog.split()[-1], dest='c_help')
     parser_hisat2.set_defaults(func=hisat2)
     
-    # subparser for the split read research
+    # subparser for the split read search
     parser_split = subparser.add_parser('splitReadSearch',add_help=False)
-    parser_split.add_argument('-a', '--alignment', type=argparse.FileType('r'), dest='bamfilename')
-    parser_split.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fastafilename')
-    parser_split.add_argument('-o','--output', type=str, dest='basename')
+    parser_split.add_argument('-a', '--alignment', type=argparse.FileType('r'), required=True, dest='bamfilename')
+    parser_split.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='fastafilename')
+    parser_split.add_argument('-o','--output', type=str, required=True, dest='output')
+    parser_split.add_argument('-F', '--force', action='store_true', default=False, dest='force')
+    parser_split.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser_split.add_argument('-h','--help',action='store_const', const = parser_split.prog.split()[-1],dest='c_help')
     parser_split.set_defaults(func=split_research)
 
