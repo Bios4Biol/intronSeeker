@@ -67,24 +67,24 @@ The second simulation is based on an existing genome and corresponding genome\
     print("\n".join([tw.fill(line) for line in text.splitlines()]))
     
     # Usage
-    print('Usage : intronSeeker <command> [arguments] [--help] [--version]')
+    print('Usage: intronSeeker <command> [arguments] [--help] [--version]')
     print('(To know the detailed usage of each sub-commands use \'intronSeeker <command> --help\')',end='\n\n')
     
     # Detail of the commands
-    print('Commands : ')
+    print('Commands: ')
     
     print(' -- Align')
     # hisat2Alignment
     print('   hisat2Alignment',end='')
     print(cw.fill(
-'Calls Hisat2 to align the reads library and the reference assembly and produce\
- a BAM file on which reads split detection can be performed.'
+'Calls Hisat2 to align the reads library and the reference assembly  and  produce\
+ a BAM file on  which  reads  split detection can be performed.'
     ))
     # starAlignment
     print('   starAlignment',end='')
     print(cw.fill(
-'Calls STAR to align the reads library and the reference assembly and produce\
- a BAM file on which reads splicing detection can be performed.'
+'Calls STAR to align  the reads library and  the reference assembly and produce\
+ a BAM file  on which  reads splicing detection can be performed.'
     ))
     print()
     
@@ -92,31 +92,31 @@ The second simulation is based on an existing genome and corresponding genome\
     # splitReadSearch
     print('   splitReadSearch',end='')
     print(cw.fill(
-'Performs the extraction of read splicing detection on a BAM file in order to\
- identify and caracterize introns candidates.'
+'Performs the extraction of read splicing detection on BAM file in order to\
+ identify intron candidates.'
     ))
     # trimFastaFromGFF
     print('   trimFastaFromTXT',end='')
     print(cw.fill(
-'From a reference Fasta file and a associated TXT, produces a new Fasta file\
- containing each sequence of the original Fasta spliced of the segments\
- corresponding to the features of the TXT file.'
+'From a reference Fasta file and a associated TXT produces  a new Fasta file\
+ containing each sequence of the original Fasta  spliced  of  the  segments \
+ corresponding  to  the features of the TXT file.'
     ))
     # analyzeORF
     print('   analyzeORF\t',end='')
     print(cw.fill(
-'From a reference Fasta file, predicts the Open Reading Frames for each\
- sequence of the Fasta and returns  the characteristics of the best predicted\
- ORF for each sequence in a tabulated file. The ORF prediction is performed\
+'From a reference Fasta file, predicts  the  Open  Reading Frames  for  each\
+ sequence  of the Fasta and returns  the characteristics  of  the  best  predicted \
+ ORF  for  each sequence  in  a tabulated  file.  The ORF  prediction  is performed\
  with TransDecoder.'
     ))
     # analyzeProtein
     print('   analyzeProtein',end='')
     print(cw.fill(
-'From a reference Fasta file and a proteic bank, performs the proteic alignment\
- all-vs-all beetween the Fasta and the bank and returns the characteristics\
- of the best alignment for each sequence of the Fasta in a tabulated file.\
- The proteic alignment is performed with Diamond.'
+'From a reference Fasta file and a proteic bank,  performs  the  proteic  alignment\
+  all-vs-all  beetween  the  Fasta  and  the  bank  and  returns  the  characteristics\
+ of the  best  alignment  for each  sequence  of  the  Fasta  in a tabulated file. \
+ The proteic alignment is performed  with Diamond.'
     ))
     print()
     
@@ -124,24 +124,24 @@ The second simulation is based on an existing genome and corresponding genome\
     # fullRandomSimulation
     print('   fullRandomSimulation',end='')
     print(cw.fill(
-'Simulates a multi Fasta file which contains the pseudo-contigs and a TXT file\
- which contains the pseudo retained introns charesteristics. All the sequences\
- (contigs and introns) as well as the introns insertion are fully random.'
+'Simulates  a multi Fasta file  which contains the pseudo-contigs and a TXT file\
+ which contains the pseudo retained  introns  charesteristics.  All the sequences\
+ (contigs and introns)  as  well  as  the  introns  insertion are fully random.'
     ))
     # fullRandomSimulation
     print('   GTFbasedSimulation',end='')
     print(cw.fill(
-'From a genome and an associated GTF file, generates pseudo-contigs (corresponds\
- to transcripts) with potentially retained introns or spliced exons. Three\
- files are generated : one corresponds to reference pseudo-assembly, another\
- one is used for dimulate the reads library and the third one gathers all\
- the simulated features (retained intorns or spliced exons). gffread program\
+'From  a genome  and an  associated  GTF  file,  generates   pseudo-contigs   (corresponds \
+  to   transcripts)    with potentially  retained  introns  or  spliced exons.  Three\
+ files  are  generated:   one  corresponds  to   reference pseudo-assembly, another\
+ one  is used  for  simulate  the reads library and the third one gathers all\
+ the simulated features  (retained  intorns  or  spliced exons). gffread program\
  is called during the simulation process.'
     ))
     # simulateReads
     print('   simulateReads',end='')
     print(cw.fill(
-'From a Fasta file, calls Grinder program to simulates a corresponding reads library.'
+'From a Fasta file,  calls Grinder program  to simulates a corresponding reads library.'
     ))
     print()
     
@@ -149,7 +149,7 @@ The second simulation is based on an existing genome and corresponding genome\
     # checkInstall
     print('   checkInstall\t',end='')
     print(cw.fill(
-'Checks the correct installation of the dependencies as well as the dependencies\' versions.'
+'Checks the correct  installation  of the dependencies and versions.'
     ))
     
     
