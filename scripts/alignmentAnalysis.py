@@ -7,6 +7,7 @@ import pandas as pd
 import pysam
 import gzip
 import time
+import sys
 import numpy as np
 from pprint import pprint
 from Bio import SeqIO
@@ -152,9 +153,12 @@ def process_bam(alignments, contigs, introns, library):
             library.at[record['query_name'],"covering"], # Bool if the read normally covers an intron (i.e. should be split)
             record['cigartuples'] is not None,           # Bool if the read is mapped
             not record['reference_name'] == library.at[record['query_name'],"contig"].rstrip(".ori"), # Bool if the read is mapped on right contig
-            (record['cigartuples'] is not None) and ('(3,' in str(record['cigartuples'])) # Bool if the read is split by aligner
-            ],
-            index = ["read","contig","align_start","align_end",'covering','mapped',"mismapped",'split']
+            (record['cigartuples'] is not None) and ('(3,' in str(record['cigartuples'])), # Bool if the read is split by aligner
+            record['is_secondary'],
+            record['is_supplementary'],
+            record['mapping_quality']]
+            ,
+            index = ["read","contig","align_start","align_end",'covering','mapped',"mismapped",'split','second','suppl','score']
         )
         
         
@@ -171,51 +175,55 @@ def process_bam(alignments, contigs, introns, library):
         else :
             row = begin.append(pd.Series([None,None,None,None,None],
                                          index=["start_split","end_split","split_length","split_flanks","missplit"]))
-        if row.covering and row.mapped and not row.mismapped and row.split and not row.missplit :
-            row["correct"] = True
-        else :
-            row["correct"] = None
-        
         rows.append(row)
     
     return pd.DataFrame(rows)
 
 def class_read(mapping) :
-    if (mapping.covering and mapping.correct) or (mapping.split and not mapping.missplit) :
+    if mapping.covering and mapping.split and not mapping.missplit :
         return "TP"
-    elif not mapping.covering and not mapping.split :
+    if not mapping.covering and (not mapping.split or mapping.missplit) :
         return "TN"
-    elif mapping.covering and not mapping.correct :
+    if mapping.covering and (not mapping.split or mapping.missplit) :
         return "FN"
-    elif (not mapping.covering and mapping.split) or (mapping.covering and mapping.missplit):
+    if not mapping.covering and mapping.split and not mapping.missplit :
         return "FP"
 
-def class_multi(group) :
-    items = set(group['classe'].values)
-    if 'TP' in items :
-        return 'TP'
-    elif 'FP' in items :
-        return 'FP'
-    elif 'FN' in items :
-        return 'FN'
-    elif 'TN' in items :
-        return 'TN'
-
 def merge_split(contig_reads) :
-    split_signal = contig_reads.sort_values(by=['start_split','end_split']).to_dict('index',OrderedDict)
-    
-    candidates=[]
-    
-    first = split_signal.popitem(last=False)
-    current_candidate =[first[1]]
-    curr_cand_starts = [first[1]['start_split']]
-    curr_cand_ends = [first[1]['end_split']]
-    to_check=OrderedDict()
-    while split_signal or to_check :
-        idx, split_read = split_signal.popitem(last=False)
-        if split_read['start_split']-np.mean(curr_cand_starts) in range(-5,5) and split_read['end_split']-np.mean(curr_cand_ends) in range(-5,5) :
-             print(split_read)
-        
+    candidates = []
+    split_alignments = contig_reads.sort_values(by=['start_split','end_split']).reset_index(drop=True)
+    while not split_alignments.empty :
+        current = split_alignments.loc[0,['start_split','end_split']] 
+        split_alignments['start_split']=pd.to_numeric(split_alignments['start_split'])
+        split_alignments['end_split']=pd.to_numeric(split_alignments['end_split'])
+        selected_reads = split_alignments.query(
+            '(-5 <= start_split-{current_start} <= 5) and (-5 <= end_split-{current_end} <= 5)'.format(
+                current_start=float(current.start_split),
+                current_end=float(current.end_split)
+                )
+            )
+        old_size = 1
+        while len(selected_reads) != old_size :
+            current.start_split = round(selected_reads['start_split'].mean())
+            current.end_split = round(selected_reads['end_split'].mean())
+            old_size = len(selected_reads)
+            selected_reads = split_alignments.query(
+                '(-5 <= start_split-{current_start} <= 5) and (-5 <= end_split-{current_end} <= 5)'.format(
+                    current_start=current.start_split,
+                    current_end=current.end_split
+                    )
+                )
+        candidates.append(pd.Series(
+                name= '|'.join([
+                    contig_reads.name,
+                    str(int(current.start_split)),
+                    str(int(current.end_split))
+                    ]),
+                data= [contig_reads.name,current.start_split,current.end_split,len(selected_reads)],
+                index=['contig','start','end','depth']
+                ))
+        split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
+    return pd.DataFrame(candidates)
 
 def alignment_analysis(args_dict) :
 
@@ -227,7 +235,7 @@ def alignment_analysis(args_dict) :
         ])
     path_resreads_pick = "/".join([
         results_dir,
-        "_".join(["res_lectures",*args_dict["name"].split()])
+        os.path.basename(args_dict['library'])+"res"
         ])
     if not os.path.exists(path_rmpg_pick) or not os.path.exists(path_resreads_pick) :
         # Reads library parsing and pickling 
@@ -242,60 +250,61 @@ def alignment_analysis(args_dict) :
         else :
             library = pd.read_pickle(path_lib_pick)
         
-        # Reference Fasta parsing and pickling 
-        print("contig parsing")
+        
         path_ref_pick = '/'.join([
                 results_dir,
                 os.path.basename(args_dict['reference'])
                 ])+'.gz'
-        if not os.path.exists(path_ref_pick) :
-            contigs = parse_fasta(args_dict['reference'])
-            contigs.to_pickle(path_ref_pick)
-        else :
-            contigs = pd.read_pickle(path_ref_pick)
-        
-        # Introns control file parsing and pickling
-        print("Control parsing")
         path_ctrl_pick = '/'.join([
                 results_dir,
                 os.path.basename(args_dict['control'])
                 ])+'.gz'
-        if not os.path.exists(path_ctrl_pick) :
+        if not os.path.exists(path_ref_pick) or not os.path.exists(path_ctrl_pick):
+            print("contig parsing")
+            contigs = parse_fasta(args_dict['reference'])
+            print("Control parsing")
             control = parse_control_introns(args_dict['control'])
-            control.to_pickle(path_ctrl_pick)
-        else :
-            control = pd.read_pickle(path_ctrl_pick)
-        
-        # For each contig, we calculate the transcript length (i.e. only the exons total length)
-        print("contig computation")
-        contigs["transcript_length"] = contigs.apply(
+            
+            # For each contig, we calculate the transcript length (i.e. only the exons total length)
+            print("contig computation")
+            contigs["transcript_length"] = contigs.apply(
                 compute_tr_length,
                 axis = 1,
                 features=control
                 )
-        # For each intron, we calculate the insertion position in contig (in term of percentage of transcript length)
-        # and also the "real" start of intron (i.e. insertion position in term of transcript coordinates - without introns
-        print("introns computation")
-        introns = control.join(
+            # For each intron, we calculate the insertion position in contig (in term of percentage of transcript length)
+            # and also the "real" start of intron (i.e. insertion position in term of transcript coordinates - without introns
+            print("introns computation")
+            introns = control.join(
                     other = control.apply(
                         compute_pos_on_contig,
                         axis=1,
                         contigs=contigs
                     )
                 )
+            contigs.to_pickle(path_ref_pick)
+            introns.to_pickle(path_ctrl_pick)
+        else :
+            contigs = pd.read_pickle(path_ref_pick)
+            introns = pd.read_pickle(path_ctrl_pick)
+
         # For each intron, we determine all the reads which cover the insertion locus and the position in the read of this insertion locus
         # (precision : the function is called on intronns DataFrame but it returns a library-like DataFrame)
-        print("library computation")
-        with prl.ProcessPoolExecutor(max_workers=8) as ex :
-            s_t = time.time()
-            introns_split = np.array_split(introns,ex._max_workers)
-            lectures = pd.concat(ex.map(prlz_process_intron,introns_split,repeat(library,ex._max_workers)))
-            print(time.time()-s_t)
-        lectures = library.join(lectures,lsuffix='',rsuffix='_cov').loc[:,lectures.columns]
-        lectures.loc[lambda df : df.covering != True, "covering"] = False
-        
-        print("alignment computation")
         if not os.path.exists(path_rmpg_pick) :
+            print("library computation")
+            with prl.ProcessPoolExecutor(max_workers=8) as ex :
+                s_t = time.time()
+                introns_split = np.array_split(introns,ex._max_workers)
+                lectures = pd.concat(ex.map(prlz_process_intron,introns_split,repeat(library,ex._max_workers)))
+                print(time.time()-s_t)
+            lectures = library.join(lectures,lsuffix='',rsuffix='_cov').loc[:,lectures.columns]
+            lectures.loc[lambda df : df.covering != True, "covering"] = False
+            lectures.to_pickle(path_resreads_pick)
+        else :
+            lectures = pd.read_pickle(path_resreads_pick)
+        
+        if not os.path.exists(path_rmpg_pick) :
+            
             print("alignment parsing")
             bamfile = pysam.AlignmentFile(args_dict["bamfile"], "rb")
             alignments = [{
@@ -303,10 +312,13 @@ def alignment_analysis(args_dict) :
                         'reference_name' : record.reference_name,
                         'reference_start' : record.reference_start,
                         'reference_end' : record.reference_end,
-                        'cigartuples' : record.cigartuples
+                        'cigartuples' : record.cigartuples,
+                        'is_secondary' : record.is_secondary,
+                        'is_supplementary' : record.is_supplementary,
+                        'mapping_quality' : record.mapping_quality
                         } for record in bamfile.fetch(until_eof=True)]
             
-            print("alignment plrz")
+            print("alignment computation")
             
             with prl.ProcessPoolExecutor(max_workers=8) as ex :
                 s_t = time.time()
@@ -319,31 +331,47 @@ def alignment_analysis(args_dict) :
                 print(time.time()-s_t)
             print("duplicates computation")
             reads_mapping['multi_aligned'] = reads_mapping['read'].duplicated(keep=False)
+            print("alignements classification")
+            reads_mapping['classe'] = reads_mapping.apply(class_read,axis=1)
             reads_mapping.to_pickle(path_rmpg_pick)
         else :
             reads_mapping = pd.read_pickle(path_rmpg_pick)
         
-        print("lectures classification")
-        reads_mapping['classe'] = reads_mapping.apply(class_read,axis=1)
-        simple_aligned_classe = reads_mapping.loc[lambda df : df.multi_aligned != True,['read','classe']].set_index('read')
-        multi_aligned_classe = pd.DataFrame(reads_mapping.loc[lambda df : df.multi_aligned == True,:].groupby('read').apply(class_multi),columns=['classe'])
-        lectures = lectures.join(pd.concat([simple_aligned_classe,multi_aligned_classe]))
-        
-        lectures.to_pickle(path_resreads_pick)
     else :
         reads_mapping = pd.read_pickle(path_rmpg_pick)
         lectures = pd.read_pickle(path_resreads_pick)
-    # ~ print()
-    # ~ print("####### Results  ######")
-    # ~ print(args_dict["name"])
-    # ~ print(len(reads_mapping))
-    # ~ print(len(lectures))
-    # ~ print(lectures['classe'].value_counts())
-    # ~ print("###################")
-    # ~ print()
+    print()
+    print("####### Results  ######")
+    print(args_dict["name"])
+    print(len(reads_mapping))
+    print(reads_mapping['classe'].value_counts())
+    print("###################")
+    print()
     
-    reads_mapping.loc[lambda df : df.split == True,:].groupby('contig').apply(merge_split)
-    # ~ print(len(np.array_split(reads_mapping.groupby('contig'),8)))
+    path_candidates_pick = "/".join([
+        results_dir,
+        os.path.basename("_".join(["candidates",*args_dict["name"].split()]))
+        ])
+    
+    if not os.path.exists(path_candidates_pick) :
+        candidates = reads_mapping.loc[lambda df : df.split == True,:].groupby('contig').apply(merge_split).droplevel(0)
+        candidates.to_pickle(path_candidates_pick)
+    else :
+        candidates = pd.read_pickle(path_candidates_pick)
+        path_ctrl_pick = '/'.join([
+                results_dir,
+                os.path.basename(args_dict['control'])
+                ])+'.gz'
+        control = pd.read_pickle(path_ctrl_pick)
+    
+    print('Number of candidates')
+    print(len(candidates))
+    
+    print('Number of contigs with/without split reads')
+    print(reads_mapping.groupby('contig').apply(lambda df : not df['split'].any()).value_counts())
+    
+    print(candidates)
+    print(control)
     
     return 
     
@@ -359,12 +387,5 @@ if __name__ == '__main__' :
         os.mkdir(results_dir)
         
     args_dicts = [config[analysis] for analysis in config['Global']['analysis'].split(',')]
-    
-    alignment_analysis(args_dicts[0])
-
-    #~ start_time = time.time()
-    #~ with prl.ProcessPoolExecutor(max_workers=4) as ex :
-        #~ ex.map(alignment_analysis,args_dicts)
-    #~ print('la totale : '+str(time.time() - start_time))
-    
+    alignment_analysis(args_dicts[int(sys.argv[-1])])
     
