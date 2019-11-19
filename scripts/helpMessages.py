@@ -245,6 +245,10 @@ Calls STAR to align the reads library and the reference assembly and produce\
     print(cw.fill(
 '\tForce to overwrite output files.'
     ))
+    print('   -k/--keep',end='')
+    print(cw.fill(
+'\tKeep all intermediate files.'
+    ))
     print('   -t/--threads INT',end='')
     print(cw.fill(
 'Number of alignment threads to launch [1].'
@@ -468,29 +472,29 @@ intronSeeker analyzeORF -r <ref.fa> -o <outfile_basename> [-k] [--no-refine-star
     cw = textwrap.TextWrapper(
         width=59,
         initial_indent="\t",
-        subsequent_indent="\t\t\t\t",
+        subsequent_indent="\t\t\t",
         break_long_words=False
     )
     print('Options:')
     print('   -r/--reference FILE',end='')
     print(cw.fill(
-'\tName  of the reference FASTA file  on which  the ORF prediction must be performed.'
+'Name  of the reference FASTA file  on which  the ORF prediction must be performed.'
     ))
     print('   -o/--output STR',end='')
     print(cw.fill(
-'\tBasename of the output directory where the ouput file and potential TransDEcoder\'s files  will be stored.'
+'Basename of the output directory where the ouput file and potential TransDEcoder\'s files  will be stored.'
     ))
-    print('   -k/--keep-intermediate',end='')
+    print('   -k/--keep',end='')
     print(cw.fill(
-'Set up  this  option, if  you  want  to keep the TransDecoder\'s intermediate files.'
+'\tKeep all intermediate files.'
     ))
     print('   --no-refine-starts',end='')
     print(cw.fill(
-'\tAllow TransDecoder  to not perform  ORF\'s starts refining. Use this option  only  if TransDecoder      fails at this step of ORF prediction.'
+'Allow TransDecoder  to not perform  ORF\'s starts refining. Use this option  only  if TransDecoder      fails at this step of ORF prediction.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
-'\tPrint this help message.'
+'Print this help message.'
     ))
     print()
 
@@ -526,33 +530,33 @@ intronSeeker analyzeProtein -r <ref.fa> -o <outfile_basename> [-k] [-t INT]',
     cw = textwrap.TextWrapper(
         width=63,
         initial_indent="\t",
-        subsequent_indent="\t\t\t\t",
+        subsequent_indent="\t\t\t",
         break_long_words=False
     )
     print('Options:')
     print('   -r/--reference FILE',end='')
     print(cw.fill(
-'\tName of the reference FASTA file on which the proteic alignment must be performed.'
+'Name of the reference FASTA file on which the proteic alignment must be performed.'
     ))
     print('   -p/--db-proteins STR',end='')
     print(cw.fill(
-'\tName of the Diamond database containing the indexed proteic sequences.'
+'Name of the Diamond database containing the indexed proteic sequences.'
     ))
     print('   -o/--output STR',end='')
     print(cw.fill(
-'\tBasename of  the output directory where the ouput file will be stored.'
+'Basename of  the output directory where the ouput file will be stored.'
     ))
-    print('   -k/--keep-intermediate',end='')
+    print('   -k/--keep',end='')
     print(cw.fill(
-'Set up this option, if you want to keep the intermediate files.'
+'\tKeep all intermediate files.'
     ))
-    print('   -t/--threads INT\t',end='')
+    print('   -t/--threads INT',end='')
     print(cw.fill(
 'Number of alignment threads to launch [1].'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
-'\tPrint this help message.'
+'Print this help message.'
     ))
     print()
 
