@@ -35,7 +35,7 @@ def change_key(dictionary: dict, key_to_clean: dict):
 
 #######################
 # Extract split reads #
-#######################print(time.time()-s_t)
+#######################
 
 def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     """
@@ -139,7 +139,7 @@ def merge_split(contig_reads,contig_name) :
                     str(int(current.start_split)),
                     str(int(current.end_split))
                     ]),
-                data= [contig_name,current.start_split,current.end_split,len(selected_reads)],
+                data= [contig_name,int(current.start_split),int(current.end_split),len(selected_reads)],
                 index=['contig','start','end','depth']
                 ))
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
@@ -179,14 +179,14 @@ def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
             repeat(bamfile.name,ex._max_workers),
             repeat(fastafile.name,ex._max_workers)
             ))
-        candidates['to_trim'] = 1
+        candidates['selected'] = 1
         # ~ print(time.time()-s_t)
     
-    # ~ candidates = find_split(ref_id_list,bamfile.name,ref_dict)
-    # ~ candidates['to_trim'] = 1
+    # ~ candidates = find_split(ref_id_list,bamfile.name,fastafile.name)
+    # ~ candidates['selected'] = 1
     # ~ print(candidates)
-    
-    candidates.to_csv(output_path+'.txt',sep='\t')
+    header = ["#ID"] + list(candidates.columns.values)
+    candidates.reset_index().to_csv(output_path+'.txt', header=header, sep='\t', index=False)
 
 #########################
 # write truncated fasta #
