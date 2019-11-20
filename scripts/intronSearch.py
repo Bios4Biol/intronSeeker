@@ -87,6 +87,7 @@ def find_split(ref_id_list, bamfile, fastafile):
             print(e)
         exit(1)
     
+    split_alignments = []
     candidates=[]
     for id in ref_id_list:
         aligned = bamfile.fetch(id, multiple_iterators=True)
@@ -97,7 +98,8 @@ def find_split(ref_id_list, bamfile, fastafile):
             
                 if '(3,' in str(read.cigartuples):
                     split = limit_from_cigar(read.cigartuples, read.reference_start, reference)
-                    
+                    split['read'] = read.query_name
+                    split['contig'] = read.reference_name
                     if read.is_reverse :
                         split['strand'] = '-'
                     else :
@@ -106,8 +108,9 @@ def find_split(ref_id_list, bamfile, fastafile):
         df_split_reads = pd.DataFrame(split_reads)
         if not df_split_reads.empty :
             candidates.append(merge_split(df_split_reads,id))
+            split_alignments.append(df_split_reads)
         
-    return pd.concat(candidates)
+    return pd.concat(candidates), pd.concat(split_alignments)
 
 def merge_split(contig_reads,contig_name) :
     candidates = []
@@ -162,7 +165,7 @@ def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
         os.mkdir(output)
     if not force:
         try :
-            if os.path.exists(output_path + ".txt")  :
+            if os.path.exists(output_path + "_candidates.txt") or os.path.exists(output_path + "_split_alignments.txt") :
                    raise FileExistsError
         except FileExistsError as e :
             print('\nError: output file(s) already exists.\n')
@@ -173,20 +176,27 @@ def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
     with prl.ProcessPoolExecutor(max_workers=threads) as ex :
         # ~ s_t = time.time()
         ref_id_array = np.array_split(ref_id_list,ex._max_workers)
-        candidates = pd.concat(ex.map(
+        out = list(zip(*list(ex.map(
             find_split,
             ref_id_array,
             repeat(bamfile.name,ex._max_workers),
             repeat(fastafile.name,ex._max_workers)
-            ))
+            ))))
+        candidates= pd.concat(out[0])
+        split_alignments = pd.concat(out[1])
         candidates['selected'] = 1
         # ~ print(time.time()-s_t)
     
     # ~ candidates = find_split(ref_id_list,bamfile.name,fastafile.name)
     # ~ candidates['selected'] = 1
     # ~ print(candidates)
-    header = ["#ID"] + list(candidates.columns.values)
-    candidates.reset_index().to_csv(output_path+'.txt', header=header, sep='\t', index=False)
+    
+    header_sa= list(split_alignments.columns.values)
+    header_sa[0] = '#'+header_sa[0]
+    split_alignments.to_csv(output_path+'_split_alignments.txt',header=header_sa,sep='\t',index=False)
+    
+    header_cand = ["#ID"] + list(candidates.columns.values)
+    candidates.reset_index().to_csv(output_path+'_candidates.txt', header=header_cand, sep='\t', index=False)
 
 #########################
 # write truncated fasta #

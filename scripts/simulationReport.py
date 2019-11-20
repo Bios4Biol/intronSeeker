@@ -16,6 +16,19 @@ import configparser
 import concurrent.futures as prl
 from itertools import repeat
 
-def simulationReport() :
-    print()
+def simulationReport(r1,r2) :
+    print(r1.name)
+    print(r2.name)
 
+
+if __name__ == '__main__' :
+    
+    import argparse 
+    
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1')
+    parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
+    
+    args = vars(parser.parse_args())
+    
+    simulationReport(**args)
