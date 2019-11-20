@@ -46,11 +46,12 @@ def parse_arguments() :
     
     # subparser for the split read search
     parser_split = subparser.add_parser('splitReadSearch',add_help=False)
-    parser_split.add_argument('-a', '--alignment', type=argparse.FileType('r'), required=True, dest='bamfilename')
-    parser_split.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='fastafilename')
+    parser_split.add_argument('-a', '--alignment', type=argparse.FileType('r'), required=True, dest='bamfile')
+    parser_split.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='fastafile')
     parser_split.add_argument('-o','--output', type=str, required=True, dest='output')
     parser_split.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_split.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
+    parser_split.add_argument('-t','--threads', type=int, default=1, dest='threads')
     parser_split.add_argument('-h','--help',action='store_const', const = parser_split.prog.split()[-1],dest='c_help')
     parser_split.set_defaults(func=splitReadSearch)
 

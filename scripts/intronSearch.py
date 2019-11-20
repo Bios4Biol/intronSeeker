@@ -6,11 +6,15 @@ try :
     from Bio.SeqRecord import SeqRecord
     from Bio.Blast import NCBIXML as bx ;
     from collections import defaultdict
+    from itertools import repeat
+    import concurrent.futures as prl
     import pandas as pd
+    import numpy as np
     import pysam
     import os
     import re
     import subprocess as sp
+    import time
 except ImportError as error :
     print(error) ;
     exit(1) ;
@@ -31,35 +35,7 @@ def change_key(dictionary: dict, key_to_clean: dict):
 
 #######################
 # Extract split reads #
-#######################
-
-# ~ def limit_from_cigar(cigar_list: list, start: int, ref_name: str, read_name: str, reference: str):
-    # ~ """
-    # ~ Write the intron extract from cigar line in file_r
-
-    # ~ :param reference: reference sequence to extract flanking sequence of split read
-    # ~ :param cigar_list: list of tuple (equal to the cigar line)
-    # ~ :param start: beginning of the read alignment
-    # ~ :param ref_name: reference name on which the read is aligned
-    # ~ :param read_name: read name
-    # ~ :return:
-    # ~ """
-    # ~ values = [1, 0, 1, 1, 0]  # [M, I, D, N, S]
-    # ~ limit_from_start = [0, 0]
-    # ~ i = 0
-    # ~ cigar_tuple = cigar_list[i]
-    # ~ # if there is a split, calculate its position based on cigar line tuple
-    # ~ while cigar_tuple[0] != 3:
-        # ~ limit_from_start[0] += values[cigar_tuple[0]] * cigar_tuple[1]
-        # ~ i += 1
-        # ~ cigar_tuple = cigar_list[i]
-    # ~ # enf of the split, equal to the number of 'N'
-    # ~ limit_from_start[1] = cigar_tuple[1]
-    # ~ split_limit = [start + limit_from_start[0], start + limit_from_start[0] + limit_from_start[1]]
-    # ~ length = limit_from_start[1]
-    # ~ flank_left = reference[split_limit[0]: split_limit[0] + 2]
-    # ~ flank_right = reference[split_limit[1] - 2: split_limit[1]]
-    # ~ return list(map(str, [ref_name, "read"+read_name, split_limit[0], split_limit[1], "length="+str(length), "flank_left="+flank_left, "flank_right="+flank_right]))
+#######################print(time.time()-s_t)
 
 def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     """
@@ -92,41 +68,7 @@ def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
                     index = ["start_split","end_split","split_length","split_flanks"])
 
-def splitReadSearch(bamfilename, fastafilename, output, prefix, force) :
-    """
-    Search the split reads and write two output files : the first with all the spliced events and the second where all the identical spliced events are merged
-    :param bamfilename: name of the input alignment file
-    :param fastafilename: name of the reference fasta file (contains the contigs) 
-    :param basename: prefix for the name of output files 
-    :return: nothing
-    """
-    output_path = output + "/srs";
-    if prefix:
-        output_path += "_" + prefix;
-    
-    # Create output dir if not exist
-    if not os.path.exists(output) :
-        os.mkdir(output)
-    # ~ if not force:
-        # ~ try :
-            # ~ if os.path.exists(output_path + "_contigs.fa") or os.path.exists(output_path + "_contigs-modified.fa") or os.path.exists(output_path + "_modifications.txt") :
-                   # ~ raise FileExistsError
-        # ~ except FileExistsError as e :
-            # ~ print('\nError: output file(s) already exists.\n')
-            # ~ exit(1)
-
-    print(find_split(fastafilename.name,bamfilename.name))
-
-    # ~ with open(output_path + "_all-hits.gff", "w") as file_r:
-        # ~ file_r.write("\n".join(res_gff)+"\n")
-
-    # ~ events_gff=group_event(res_tmp)
-
-    # ~ with open(output_path + "_introns.gff","w") as file_r :
-        # ~ file_r.write("\n".join(events_gff)+"\n")
-
-
-def find_split(fastafilename: str, bamfilename):
+def find_split(ref_id_list, bamfile, fastafile):
     """
     For an alignment file, list all split reads.
 
@@ -134,12 +76,9 @@ def find_split(fastafilename: str, bamfilename):
     :param bamfilename: AlignmentFile object with all reads alignment information
     :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
     """
-    reads_list = [x.split("\t")[0] for x in pysam.idxstats(bamfilename).split("\n")[:-2]]
-    length_bam = len(reads_list)
-    liste_id = reads_list
-    bamfile = pysam.AlignmentFile(bamfilename, "rb")
+    bamfile = pysam.AlignmentFile(bamfile, "rb")
     try :
-        ref_dict = pysam.FastaFile(fastafilename)
+        ref_dict = pysam.FastaFile(fastafile)
     except OSError as e :
         if str(e).startswith("error when opening file") :
             print("\nIndexingError : it's impossible to write in Reference fasta directory to indexing file.")
@@ -147,8 +86,9 @@ def find_split(fastafilename: str, bamfilename):
         else :
             print(e)
         exit(1)
+    
     candidates=[]
-    for id in liste_id:
+    for id in ref_id_list:
         aligned = bamfile.fetch(id, multiple_iterators=True)
         split_reads=[]
         for read in aligned:
@@ -205,327 +145,48 @@ def merge_split(contig_reads,contig_name) :
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
 
-# ~ def GFFformating(feature : list, feature_type : str) :
-    # ~ attributes = feature[5:]
-    # ~ gff_feature = [
-        # ~ feature[0],
-        # ~ feature[1],
-        # ~ feature_type,
-        # ~ feature[2],
-        # ~ feature[3],
-        # ~ ".",
-        # ~ feature[4],
-        # ~ ".",
-        # ~ ";".join(attributes)
-        # ~ ]
-    # ~ return "\t".join(gff_feature)
-
-# ~ def group_event(all_hits) :
-    # ~ """
-    # ~ From a list of spliced events, merged all the events considered identical events
-    # ~ :param all_hits: a list of all found events
-    # ~ :return: return a list of feature (GFF formated)
-    # ~ """
-    # ~ deja_vu={}
-    # ~ a_creer=True
-    # ~ for hit in all_hits :
-        # ~ for event in deja_vu.keys() :
-            # ~ if hit[0] == event[0] and (int(hit[2])-int(event[1]) in range(-2,3)) and (int(hit[3])-int(event[2]) in range(-2,3)) :
-                # ~ deja_vu[event][-1] += 1
-                # ~ a_creer=False
-                # ~ break
-        # ~ if a_creer :
-            # ~ temp = hit
-            # ~ temp.append(1)
-            # ~ deja_vu[(hit[0],hit[2],hit[3])] = temp
-        # ~ a_creer=True
-    # ~ gff = []
+def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
+    """
+    Search the split reads and write two output files : the first with all the spliced events and the second where all the identical spliced events are merged
+    :param bamfilename: name of the input alignment file
+    :param fastafilename: name of the reference fasta file (contains the contigs) 
+    :param basename: prefix for the name of output files 
+    :return: nothing
+    """
+    output_path = output + "/srs";
+    if prefix:
+        output_path += "_" + prefix;
     
-    # ~ count = 1 ;
-    # ~ for ligne in deja_vu.values() :
-        # ~ ligne[1]="." ; ligne[-1] = "depth="+str(ligne[-1])
-        # ~ ligne.insert(4,".")
-        # ~ ID="event"+str(count)+"."+ligne[0]+"."+ligne[2]+"-"+ligne[3]
-        # ~ ligne.insert(5,"ID="+ID)
-        # ~ gff.append(GFFformating(ligne,"splicing_event"))
-        # ~ count += 1 ;
-    # ~ return gff
+    # Create output dir if not exist
+    if not os.path.exists(output) :
+        os.mkdir(output)
+    if not force:
+        try :
+            if os.path.exists(output_path + ".txt")  :
+                   raise FileExistsError
+        except FileExistsError as e :
+            print('\nError: output file(s) already exists.\n')
+            exit(1)
+    
+    ref_id_list = [x.split("\t")[0] for x in pysam.idxstats(bamfile.name).split("\n")[:-2]]
 
-
-#~ def find_split(liste_id, fasta_file: str, bamfile):
-    #~ """
-    #~ For each subpart of a bigger alignment file, list all split reads.
-
-    #~ :param liste_id: list of aligned reads from the alignment file
-    #~ :param fasta_file: reference fasta file
-    #~ :param bamfile: AlignmentFile object with all reads alignment information
-    #~ :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
-    #~ """
-
-    #~ ref_dict = pysam.FastaFile(fasta_file)
-    #~ list_result = []
-    #~ for id in liste_id:
-        #~ aligned = bamfile.fetch(id, multiple_iterators=True)
-        #~ for read in aligned:
-            #~ reference = ref_dict.fetch(id)
-            #~ if read.cigartuples is not None:
-                #~ if '(3,' in str(read.cigartuples):
-                        #~ list_result.append(limit_from_cigar(
-                            #~ read.cigartuples, read.reference_start, read.reference_name,
-                            #~ read.query_name, reference))
-    #~ return "\n".join(list_result)
-
-
-#~ def parallel(cpu, bam_file, fasta_file, split):
-    #~ """
-    #~ parallelisation of the split research
-
-    #~ :param cpu: number of thread for the parallel processing
-    #~ :param bam_file: alignment file
-    #~ :param fasta_file: reference fasta file use for the alignment
-    #~ :param split: output name
-    #~ :return: write the split file
-    #~ """
-    #~ reads_list = [x.split("\t")[0] for x in pysam.idxstats(bam_file).split("\n")[:-2]]
-    #~ length_bam = int(len(reads_list) / cpu)
-
-    #~ liste_id = []
-    #~ bamfile = pysam.AlignmentFile(bam_file, "rb")
-    #~ for i in range(0, len(reads_list), length_bam):
-        #~ liste_id.append(reads_list[i: i + length_bam])
-    #~ find_splitx = partial(find_split, fasta_file=fasta_file, bamfile=bamfile)
-    #~ p = Pool(cpu)
-    #~ results = p.map(find_splitx, liste_id)
-
-    #~ with open(split, "w") as file_r:
-        #~ file_r.write("\n".join(results))
-
-    #~ # create a html page with split read analyse
-
-    #~ with open("temp", "w") as file_r:
-        #~ file_r.write("\n".join([fasta_file, split]))
-
-    #~ fct_path = os.path.dirname(os.path.realpath(__file__))
-    #~ ipynb = os.path.join(fct_path, "filter_parameters.ipynb")
-    #~ template = os.path.join(fct_path, "full.tpl")
-
-    #~ os.system("jupyter nbconvert --to html --template %s --execute %s --output-dir=%s" % (template, ipynb, "./temp"))
-    #~ os.remove("./temp")
-
-    #~ data = pd.read_csv(split, sep="\t", names=['ref', 'query', 'qstart', 'qend', 'length',
-                                               #~ 'flank_left', 'flank_right'])
-    #~ introns_grouped = data.groupby(['ref', 'qstart', 'qend', 'length', 'flank_left',
-                                    #~ 'flank_right']).size().reset_index().rename(columns={0: 'depth'})
-    #~ introns_grouped.to_csv(split, header=None, sep="\t", index=False)
-
-
-######################################
-# aggregate closed spliced intervals #
-######################################
-
-#~ def categorie(data, bornes):
-    #~ """
-    #~ Class spliced interval depending on its splicing sites
-
-    #~ :param bornes: list of selected splicing sites
-    #~ :param data: a line about a spliced intervals
-    #~ :return:
-    #~ """
-    #~ bornes_data = (data['flank_left'], data['flank_right'])
-    #~ if bornes_data in bornes:
-        #~ return 'can'
-    #~ else:
-        #~ return 'ncan'
-
-
-#~ def read_parameters(parameters: str):
-    #~ """
-    #~ Extract the parameters from a parameters yaml file
-
-    #~ :param parameters: parameter yaml file
-    #~ :return: minimal depth and splicing site list
-    #~ """
-    #~ with open(parameters, "r") as data:
-        #~ param = data.read()
-    #~ param = yaml.load(param)
-    #~ bornes = []
-    #~ for i in param['splicing_sites']:
-        #~ pair = i.split("_")
-        #~ pair = tuple(pair)
-        #~ bornes.append(pair)
-    #~ return param['depth'], bornes
-
-
-#~ def aggregate(intron_file: str, distance: int, parameters: str):
-    #~ """
-    #~ Merged spliced intervals (5bp)
-
-    #~ :param parameters:
-    #~ :param distance:
-    #~ :param intron_file:
-    #~ :return: concatenate contigs file
-    #~ """
-
-    #~ depth, bornes = read_parameters(parameters)
-
-    #~ # load and prepare data
-    #~ split = pd.read_csv(intron_file, sep="\t", names=['ref', 'qstart', 'qend', 'length',
-                                                      #~ 'flank_left', 'flank_right', 'count'])
-    #~ split['borne'] = split.apply(categorie, axis=1, bornes=bornes)
-    #~ split['used'] = True
-
-    #~ # create the contig dictionary
-    #~ contig_list = list(set(split[split['borne'] == 'can'].ref.values))
-    #~ contig_dict = defaultdict(list)
-
-    #~ for i in range(0, len(split)):
-        #~ contig = split.iloc[i]
-        #~ if contig['ref'] in contig_list:
-            #~ contig_dict[contig['ref']].append(list(contig))
-
-    #~ # merged closed intervals (less than 5bp distance)
-    #~ resume = pd.DataFrame()
-    #~ for i in contig_list:
-        #~ sub_split = pd.DataFrame(contig_dict[i], columns=['ref', 'qstart', 'qend', 'length', 'flank_left',
-                                                          #~ 'flank_right', 'count', 'borne', 'used'])
-        #~ sub_split = sub_split.sort_values(by=['borne', 'count'], ascending=[True, False]).reset_index()
-        #~ if len(sub_split) > 1:
-            #~ for z in range(0, len(sub_split) - 1):
-                #~ reference = sub_split.iloc[z].copy()
-                #~ if reference['used'] and reference['borne'] == 'can':
-                    #~ subData = sub_split[sub_split['used']]
-                    #~ left = subData.qstart - reference.qstart
-                    #~ right = subData.qend - reference.qend
-                    #~ expression = (abs(left) <= distance) & (abs(right) <= distance)
-                    #~ to_concat = subData[expression]
-                    #~ list_index = list(to_concat.index)
-                    #~ reference['count'] = sum(to_concat['count'])
-                    #~ resume = resume.append(reference, ignore_index=True)
-                    #~ already_use = list(sub_split['used'])
-                    #~ for y in list_index:
-                        #~ already_use[y] = False
-                    #~ sub_split['used'] = already_use
-            #~ subData = sub_split[(sub_split['borne'] == 'can') & (sub_split['used'])]
-            #~ resume = resume.append(subData, ignore_index=True)
-        #~ else:
-            #~ resume = resume.append(sub_split, ignore_index=True)
-
-    #~ # write the merged spliced intervals into a file
-    #~ resume[['count', 'length', 'qstart', 'qend']] = resume[['count', 'length', 'qstart', 'qend']].astype(int)
-    #~ resume = resume[['ref',  'qstart', 'qend', 'length', 'flank_left', 'flank_right', 'count']]
-    #~ resume.to_csv("merged_" + intron_file, header=False, index=False, sep="\t")
-
-
-#########################
-# Overlapping intervals #
-#########################
-
-#~ def recouvrement(data: list):
-    #~ """
-    #~ Merge overlapping intervals into longer intervals
-
-    #~ :param data: list of all intervals starts and ends on a contig
-    #~ :return: list of extend intervals
-    #~ """
-    #~ list_debut = [interv[0] for interv in data]
-    #~ list_fin = [interv[1] for interv in data]
-
-    #~ list_debut.sort()
-    #~ list_fin.sort()
-
-    #~ list_intervalle_final = []
-    #~ nb_superposition = 0
-    #~ debut_intervalle_courant = 0
-
-    #~ while list_debut:
-        #~ ordre_debut_fin = (list_debut[0] > list_fin[0]) - (list_debut[0] < list_fin[0])
-        #~ if ordre_debut_fin == -1:
-            #~ pos_debut = list_debut.pop(0)
-            #~ if nb_superposition == 0:
-                #~ debut_intervalle_courant = pos_debut
-            #~ nb_superposition += 1
-        #~ elif ordre_debut_fin == +1:
-            #~ pos_fin = list_fin.pop(0)
-            #~ nb_superposition -= 1
-            #~ if nb_superposition == 0:
-                #~ nouvel_intervalle = (debut_intervalle_courant, pos_fin)
-                #~ list_intervalle_final.append(nouvel_intervalle)
-        #~ else:
-            #~ list_debut.pop(0)
-            #~ list_fin.pop(0)
-
-    #~ if list_fin:
-        #~ pos_fin = list_fin[-1]
-        #~ nouvel_intervalle = (debut_intervalle_courant, pos_fin)
-        #~ list_intervalle_final.append(nouvel_intervalle)
-
-    #~ return list_intervalle_final
-
-
-#~ def recoupement(intron_file: str, reference_file: str, parameters: str, intervals_name: str):
-    #~ """
-    #~ Estimate the complexity of spliced events by looking at the overlapping events
-
-    #~ :param intervals_name: output file name
-    #~ :param parameters: file of parameters for spliced events selection
-    #~ :param intron_file: file of spliced events (query, limits, depth ...)
-    #~ :param reference_file: reference file used for alignment
-    #~ :return: dataframe of all spliced intervals, depth and how many different
-    #~ spliced events are include in each intervals
-    #~ """
-
-    #~ depth, bornes = read_parameters(parameters)
-
-    #~ data = pd.read_csv(intron_file, sep="\t", names=['ref', 'qstart', 'qend', 'length',
-                                                     #~ 'flank_left', 'flank_right', 'count'])
-    #~ data['borne'] = data.apply(categorie, axis=1, bornes=bornes)
-
-    #~ data_can = data[(data['borne'] == 'can') & (data['count'] > depth)]
-    #~ contig_list = list(set(data_can[data_can['borne'] == 'can'].ref.values))
-
-    #~ contig_dict = defaultdict(list)
-    #~ for i in range(0, len(data_can)):
-        #~ contig = data_can.iloc[i]
-        #~ if contig['ref'] in contig_list:
-            #~ contig_dict[contig['ref']].append(list(contig))
-
-    #~ intervals = pd.DataFrame()
-    #~ for i in contig_list:
-        #~ contig_split = pd.DataFrame(contig_dict[i], columns=['ref', 'qstart', 'qend', 'length', 'flank_left',
-                                                             #~ 'flank_right', 'count', 'borne'])
-        #~ split_list = contig_split[['qstart', 'qend']].values.tolist()
-        #~ labels = ['contig', 'start', 'stop', 'number', 'overlap', 'depth']
-        #~ if len(split_list) > 1:
-            #~ list_intervals = recouvrement(split_list)
-            #~ for interval in list_intervals:
-                #~ sub_split = contig_split[
-                    #~ (interval[0] <= contig_split['qstart']) & (contig_split['qstart'] <= interval[1])]
-                #~ number = len(sub_split)
-                #~ overlap = int(sum(sub_split['length']) * 100 / (interval[1] - interval[0]))
-                #~ depth = sum(sub_split['count'])
-                #~ to_add = pd.DataFrame([[i, interval[0], interval[1], number, overlap, depth]], columns=labels)
-                #~ intervals = intervals.append(to_add, ignore_index=True)
-        #~ else:
-            #~ to_add = pd.DataFrame([[i, contig_split['qstart'][0], contig_split['qend'][0], 1, 100,
-                                    #~ contig_split['count'][0]]], columns=labels)
-            #~ intervals = intervals.append(to_add, ignore_index=True)
-
-    #~ intervals.to_csv(intervals_name, header=False, index=False, sep="\t")
-
-    #~ fct_path = os.path.dirname(os.path.realpath(__file__))
-    #~ ipynb = os.path.join(fct_path, "recoupement_graph.ipynb")
-    #~ template = os.path.join(fct_path, "full.tpl")
-    #~ temp = os.path.join(fct_path, "temp")
-
-    #~ temp_path = os.path.dirname(os.path.realpath(intervals_name))
-    #~ reference_path = os.path.realpath(reference_file)
-    #~ with open(temp, 'w') as tmp:
-        #~ to_write = [os.path.join(temp_path, os.path.basename(intervals_name)), reference_path]
-        #~ tmp.write("\n".join(map(str, to_write)))
-
-    #~ os.system("jupyter nbconvert --to html --template %s --execute %s --output-dir=%s" % (template, ipynb, temp_path))
-    #~ os.remove(temp)
-
+    with prl.ProcessPoolExecutor(max_workers=threads) as ex :
+        # ~ s_t = time.time()
+        ref_id_array = np.array_split(ref_id_list,ex._max_workers)
+        candidates = pd.concat(ex.map(
+            find_split,
+            ref_id_array,
+            repeat(bamfile.name,ex._max_workers),
+            repeat(fastafile.name,ex._max_workers)
+            ))
+        candidates['to_trim'] = 1
+        # ~ print(time.time()-s_t)
+    
+    # ~ candidates = find_split(ref_id_list,bamfile.name,ref_dict)
+    # ~ candidates['to_trim'] = 1
+    # ~ print(candidates)
+    
+    candidates.to_csv(output_path+'.txt',sep='\t')
 
 #########################
 # write truncated fasta #
@@ -735,6 +396,3 @@ def searchProtein(fasta : str, dbprotein : str, output : str, threads : int, rm 
     if not rm :
         os.system("rm {outdir}/*.tmp.*".format(outdir=outdir)) ;
 
-#~ if __name__ == "__main__" :
-    
-    #~ parseDiamondXML("test_xml.tmp.xml", "test")

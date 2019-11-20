@@ -347,7 +347,7 @@ Performs  the split read  signal  extraction  from  an   alignment (BAM File)  b
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker splitReadSearch -a <alignment.bam> -r <ref.fa> -o STR [-F, -p STR]',
+intronSeeker splitReadSearch -a <alignment.bam> -r <ref.fa> -o STR [-F, -p STR, -t INT]',
     width=90
     ))
     print()
@@ -378,6 +378,10 @@ intronSeeker splitReadSearch -a <alignment.bam> -r <ref.fa> -o STR [-F, -p STR]'
     print('   -F/--force',end='')
     print(cw.fill(
 '\tForce to overwrite output files.'
+    ))
+    print('   -t/--threads INT',end='')
+    print(cw.fill(
+'Number of alignment threads to launch [1].'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
