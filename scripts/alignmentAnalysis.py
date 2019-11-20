@@ -16,55 +16,6 @@ import configparser
 import concurrent.futures as prl
 from itertools import repeat
 
-def parse_config() :
-    config = configparser.RawConfigParser()
-    config.read('jupyter.properties')
-    return config
-    
-def parse_positions(fastq_pos) :
-    pos = fastq_pos.lstrip("position=").split("..")
-    complement = ('complement(' in pos[0])
-    start = int(pos[0].lstrip("complement("))-1
-    end = int(pos[1].rstrip(")"))
-    return start,end,complement
-
-def parse_library(library_prefix) :
-    lectures=[]
-    with gzip.open(library_prefix+"read_1.fastq.gz","rt") as file1 :
-        for record in SeqIO.parse(file1, "fastq") :
-            reference = record.description.split()[1].lstrip("reference=")
-            id = record.id
-            start,end,complement =  parse_positions(record.description.split()[2])
-            lectures.append([reference,id,start,end,complement])
-    with gzip.open(library_prefix+"read_2.fastq.gz","rt") as file2 :
-        for record in SeqIO.parse(file2, "fastq") :
-            reference = record.description.split()[1].lstrip("reference=")
-            id = record.id
-            start,end,complement =  parse_positions(record.description.split()[2])
-            lectures.append([reference,id,int(start),int(end),complement])
-    return pd.DataFrame(lectures,columns=["contig","lecture","start","end","complement"]).sort_values(["contig","start","end"]).set_index('lecture') 
-
-def parse_fasta(fastafile) :
-    
-    with open(fastafile,"r") as ff :
-        fasta = {record.id : pd.Series({
-            'length':len(record),
-            'sequence' : record.seq,
-            **{a.split("=")[0]:a.split("=")[1] for a in record.description.split() if a.startswith("classe")}
-            })
-        for record in SeqIO.parse(ff, "fasta")}
-        contigs = pd.DataFrame.from_dict(fasta,orient='index')
-        contigs.index.name='contig'
-    return contigs
-
-def parse_control_introns(introns_coord_file) :
-    table = pd.read_table(introns_coord_file)
-    table["length"] = table["end"]-table["start"]
-    table['intron'] = table.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
-    return table.set_index('intron')
-
-def compute_tr_length(contig,features) :
-    return contig.length -  features.loc[lambda df : df.contig == contig.name,"length" ].sum()
 
 def compute_pos_on_contig(intron,contigs) :
     pos_on_contig = intron.start/contigs.at[intron.contig,"transcript_length"]*100
@@ -235,45 +186,6 @@ def class_event(event) :
     
 
 def alignment_analysis(args_dict) :
-
-    print("Analysis "+args_dict["name"])
-    
-    path_rmpg_pick = "/".join([
-        results_dir,
-        "_".join(["reads_mapping",*args_dict["name"].split()])
-        ])
-    path_resreads_pick = "/".join([
-        results_dir,
-        os.path.basename(args_dict['library'])+"res"
-        ])
-    if not os.path.exists(path_rmpg_pick) or not os.path.exists(path_resreads_pick) :
-        # Reads library parsing and pickling 
-        print("Lib parsing")
-        path_lib_pick = '/'.join([
-                results_dir,
-                os.path.basename(args_dict['library'])
-                ])+'.gz'
-        if not os.path.exists(path_lib_pick) :
-            library = parse_library(args_dict['library'])
-            library.to_pickle(path_lib_pick)
-        else :
-            library = pd.read_pickle(path_lib_pick)
-        
-        
-        path_ref_pick = '/'.join([
-                results_dir,
-                os.path.basename(args_dict['reference'])
-                ])+'.gz'
-        path_ctrl_pick = '/'.join([
-                results_dir,
-                os.path.basename(args_dict['control'])
-                ])+'.gz'
-        if not os.path.exists(path_ref_pick) or not os.path.exists(path_ctrl_pick):
-            print("contig parsing")
-            contigs = parse_fasta(args_dict['reference'])
-            print("Control parsing")
-            control = parse_control_introns(args_dict['control'])
-            
             # For each contig, we calculate the transcript length (i.e. only the exons total length)
             print("contig computation")
             contigs["transcript_length"] = contigs.apply(
