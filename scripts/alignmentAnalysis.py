@@ -220,10 +220,19 @@ def merge_split(contig_reads) :
                     str(int(current.end_split))
                     ]),
                 data= [contig_reads.name,current.start_split,current.end_split,len(selected_reads)],
-                index=['contig','start','end','depth']
+                index=['reference','start','end','depth']
                 ))
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
+
+def class_event(event) :
+    if np.isnan(event.start_cand):
+        return 'FN'
+    elif np.isnan(event.start_ctrl) :
+        return 'FP'
+    elif 
+    
+    
 
 def alignment_analysis(args_dict) :
 
@@ -338,10 +347,11 @@ def alignment_analysis(args_dict) :
             reads_mapping = pd.read_pickle(path_rmpg_pick)
         
     else :
+        print('ICI')
         reads_mapping = pd.read_pickle(path_rmpg_pick)
         lectures = pd.read_pickle(path_resreads_pick)
     print()
-    print("####### Results  ######")
+    print("####### Results on reads ######")
     print(args_dict["name"])
     print(len(reads_mapping))
     print(reads_mapping['classe'].value_counts())
@@ -356,6 +366,7 @@ def alignment_analysis(args_dict) :
     if not os.path.exists(path_candidates_pick) :
         candidates = reads_mapping.loc[lambda df : df.split == True,:].groupby('contig').apply(merge_split).droplevel(0)
         candidates.to_pickle(path_candidates_pick)
+        control = pd.read_pickle(path_ctrl_pick)
     else :
         candidates = pd.read_pickle(path_candidates_pick)
         path_ctrl_pick = '/'.join([
@@ -364,15 +375,12 @@ def alignment_analysis(args_dict) :
                 ])+'.gz'
         control = pd.read_pickle(path_ctrl_pick)
     
-    print('Number of candidates')
-    print(len(candidates))
-    
-    print('Number of contigs with/without split reads')
-    print(reads_mapping.groupby('contig').apply(lambda df : not df['split'].any()).value_counts())
-    
-    print(candidates)
-    print(control)
-    
+    # ~ res_introns = control.reset_index().merge(candidates.reset_index(),right_on='reference',left_on='contig',suffixes=('_ctrl','_cand'),how='outer',indicator=True)
+    # ~ print(res_introns['reference'].value_counts())
+    # ~ res_introns.apply(class_event,axis=1)
+    # ~ print('Number of candidates')
+    # ~ print(len(candidates))
+
     return 
     
             
