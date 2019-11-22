@@ -50,6 +50,8 @@ then
     mkdir -p $CONDA_PREFIX/etc/conda/deactivate.d/
     cp config/unset_env_config.sh $CONDA_PREFIX/etc/conda/deactivate.d/
     
+    ln -s $HERE/bin/assemblathon_stats.pl $CONDA_PREFIX/bin/
+    ln -s $HERE/bin/FAlite.pm $CONDA_PREFIX/bin/
     
     sed -i 's#/tmp/build/80754af9/perl_1527832170752/_build_env/#'"$CONDA_PREFIX"'/#g' $CONDA_PREFIX/lib/5.26.2/x86_64-linux-thread-multi/Config.pm
     sed -i 's#/tmp/build/80754af9/perl_1527832170752/_build_env/#'"$CONDA_PREFIX"'/#g' $CONDA_PREFIX/lib/5.26.2/x86_64-linux-thread-multi/Config_heavy.pl
