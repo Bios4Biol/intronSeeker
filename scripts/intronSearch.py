@@ -99,7 +99,7 @@ def find_split(ref_id_list, bamfile, fastafile):
                 if '(3,' in str(read.cigartuples):
                     split = limit_from_cigar(read.cigartuples, read.reference_start, reference)
                     split['read'] = read.query_name
-                    split['contig'] = read.reference_name
+                    split['reference'] = read.reference_name
                     if read.is_reverse :
                         split['strand'] = '-'
                     else :
@@ -143,7 +143,7 @@ def merge_split(contig_reads,contig_name) :
                     str(int(current.end_split))
                     ]),
                 data= [contig_name,int(current.start_split),int(current.end_split),len(selected_reads)],
-                index=['contig','start','end','depth']
+                index=['reference','start','end','depth']
                 ))
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
@@ -207,42 +207,66 @@ def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
 # write truncated fasta #
 #########################
 
-def _Truncate(fasta_file : str, gff_feature : str, output_path : str) :
-    print("\nTruncate FASTA file : "+fasta_file+"\n");
-    with open(fasta_file,"r") as input_f :
-        list_seqs = input_f.read().lstrip(">").rstrip().split("\n>") ;
-        seqs = { seq.split("\n",1)[0].split()[0] : seq.split("\n",1)[1].replace("\n","") for seq in list_seqs} ;
-        with open(gff_feature,"r") as features_f :
-            list_features = features_f.read().rstrip().split("\n") ;
-            fasta_truncated = "" ;
-            num_feature = 1 ;
-            old_contig = "" ;
-            for feature in list_features :
-                items = feature.split("\t") ;
-                if old_contig != items[0] :
-                    num_feature = 1 ;
-                else :
-                    num_feature += 1 ;
-                seq_truncated = seqs[items[0]][0:int(items[3])] + seqs[items[0]][int(items[4]):]+"\n"
-                seq_head = ">"+items[0]+".e"+str(num_feature)+"\t"+items[0]+"\t"+items[3]+"-"+items[4]+"\t"+items[-1]+"\n"
-                print(seq_head)
-                fasta_truncated += seq_head + seq_truncated ;
-                old_contig = items[0] ;
-        with open(output_path + "-trq.fa","w") as fa :
-            fa.write(fasta_truncated.rstrip()) ;
+def single_trim(candidate, sequences) :
+    contig = sequences[candidate.reference]
+    new_seq = contig[0:candidate.start].seq+contig[candidate.end:].seq
+    new_record= SeqRecord(
+        new_seq,
+        id=contig.id+'::'+candidate.ID,
+        name=contig.name+'::'+candidate.ID,
+        description=contig.description+' trimmed_candidate='+candidate.ID
+        )
+    return new_record
 
-def truncate(fasta_file : str, gff_feature : str, output : str) :
+def multi_trim(candidates,sequences) :
+    contig = sequences[candidates.name]
+    new_seq = contig.seq
+    for i, row in candidates.sort_values('start',ascending=False).iterrows() :
+        new_seq = new_seq[0:row.start]+new_seq[row.end:]
+    new_record= SeqRecord(
+        new_seq,
+        id=contig.id+'.trimmed',
+        name=contig.name+'.trimmed',
+        description=contig.description+' trimmed_candidate='+','.join(candidates['ID'].values)
+        )
+    return new_record
+
+def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
     """
     From a fasta file and a ggf file, write a new fasta file which contains expurgated sequences of provided features
     :param fasta_file: original sequences file
     :param gff_feature: gff file which contains the features to delete
     :param output: name of the output fasta file
     """
-    outdir = output + "_truncate" ;
-    os.system("mkdir " + outdir) ;
-    output_path = outdir + "/" + output ;
+    output_path = output + "/tf";
+    if prefix:
+        output_path += "_" + prefix;
     
-    _Truncate(fasta_file,gff_feature,output_path) ;
+    # Create output dir if not exist
+    if not os.path.exists(output) :
+        os.mkdir(output)
+    if not force:
+        try :
+            if os.path.exists(output_path + '_trimmed.fa'):
+                   raise FileExistsError
+        except FileExistsError as e :
+            print('\nError: output file(s) already exists.\n')
+            exit(1)
+    
+    candidates=pd.read_csv(cand_file.name,sep='\t').rename(columns={'#ID':'ID'})
+    sequences = SeqIO.to_dict(SeqIO.parse(reference.name,'fasta'))
+    if not multi :
+        trimmed_records = list(candidates.loc[lambda df : df.selected == 1].apply(single_trim,axis=1,sequences = sequences))
+    else :
+        trimmed_records = list(candidates.loc[lambda df : df.selected == 1].groupby('reference',sort=False).apply(multi_trim,sequences = sequences))
+    
+    
+    no_trimmed_ids = set(sequences.keys()) - set(candidates.loc[lambda df : df.selected == 1,'reference'].values)
+    no_trimmed_records=[]
+    for c in no_trimmed_ids :
+        no_trimmed_records.append(sequences[c])
+    
+    SeqIO.write(trimmed_records+no_trimmed_records,output_path+'_trimmed.fa','fasta')
 
 
 

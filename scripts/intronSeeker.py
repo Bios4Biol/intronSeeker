@@ -4,7 +4,7 @@
 import argparse 
 import sys 
 import os 
-from intronSearch import searchProtein,predictORF,truncate,splitReadSearch
+from intronSearch import searchProtein,predictORF,trimFastaFromTXT,splitReadSearch
 from readsMapping import star,hisat2
 from dataSimulation import full_random_simulation,gtf_based_simulation,grinder
 from checkInstall import checkInstall
@@ -57,11 +57,14 @@ def parse_arguments() :
 
     # subparser for writing fasta of spliced sequence
     parser_trim = subparser.add_parser('trimFastaFromTXT',add_help=False)
-    parser_trim.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta_file')
-    parser_trim.add_argument('-f', '--features', type=argparse.FileType('r'), dest='gff_feature')
-    parser_trim.add_argument('-o','--output', type=str, default='sequences', dest='output')
+    parser_trim.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='reference')
+    parser_trim.add_argument('-c', '--candidates', type=argparse.FileType('r'),  required=True, dest='cand_file')
+    parser_trim.add_argument('-o','--output', type=str, required=True, dest='output')
+    parser_trim.add_argument('-F', '--force', action='store_true', default=False, dest='force')
+    parser_trim.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
+    parser_trim.add_argument('-m', '--multi', action='store_true', default=False, dest='multi')
     parser_trim.add_argument('-h','--help',action='store_const', const = parser_trim.prog.split()[-1],dest='c_help')
-    parser_trim.set_defaults(func=truncate)
+    parser_trim.set_defaults(func=trimFastaFromTXT)
 
     # subparser for searching ORF on sequences
     parser_orf = subparser.add_parser('analyzeORF',add_help=False)

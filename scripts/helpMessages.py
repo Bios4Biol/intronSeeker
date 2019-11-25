@@ -416,13 +416,13 @@ From a tabulated TXT which contains all the features to trim and the reference F
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker trimFastaFromTXT -r <ref.fa> -f <features.txt> -o <outfile_basename> ',
+intronSeeker trimFastaFromTXT -r <ref.fa> -c <candidates.txt> -o STR [-m, -F, -p STR]',
     width=90
     ))
     print()
     
     cw = textwrap.TextWrapper(
-        width=67,
+        width=72,
         initial_indent="\t",
         subsequent_indent="\t\t\t",
         break_long_words=False
@@ -432,13 +432,25 @@ intronSeeker trimFastaFromTXT -r <ref.fa> -f <features.txt> -o <outfile_basename
     print(cw.fill(
 'Name of the reference FASTA file where features must be spliced.'
     ))
-    print('   -f/--features FILE',end='')
+    print('   -c/--candidates FILE',end='')
     print(cw.fill(
-'Name of the features TXT file  which has  to  hold at  least the \'reference\', \'start\', \'end\', \'to_trim\' fields (detailed above).'
+'Name of the features TXT file  which has  to  hold at  least the \'reference\', \'start\', \'end\', \'selected\' fields (detailed above).'
     ))
-    print('   -o/--output STR',end='')
+    print('   -p/--prefix STR',end='')
     print(cw.fill(
-'Basename of the output directory where the FASTA ouput file will be stored.'
+'Prefix for output files name.'
+    ))
+    print('   -o/--outputDir STR',end='')
+    print(cw.fill(
+'Output dir name.'
+    ))
+    print('   -m/--multi',end='')
+    print(cw.fill(
+'\tAllow  multiple trimming for contigs with several candidates : only one ouput contig is saved with all trimmed candidates.'
+    ))
+    print('   -F/--force',end='')
+    print(cw.fill(
+'\tForce to overwrite output files.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
