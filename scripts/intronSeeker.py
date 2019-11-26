@@ -120,7 +120,7 @@ def parse_arguments() :
     parser_grinder.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='rf')
     parser_grinder.add_argument('-c','--cfg', type=argparse.FileType('r'), required=True, dest='pf')
     parser_grinder.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
-    parser_grinder.add_argument('-o','--outputDir', type=str, required=True, dest='output')
+    parser_grinder.add_argument('-o','--output', type=str, required=True, dest='output')
     parser_grinder.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_grinder.add_argument('-h','--help',action='store_const', const = parser_grinder.prog.split()[-1],dest='c_help')
     parser_grinder.set_defaults(func=grinder)

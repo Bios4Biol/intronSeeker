@@ -235,7 +235,7 @@ Calls STAR to align the reads library and the reference assembly and produce\
     print(cw.fill(
 'Prefix for output files name.'
     ))
-    print('   -o/--outputDir STR',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
 'Output dir name.'
     ))
@@ -304,7 +304,7 @@ Calls HiSat2  to align the reads library and the reference assembly and produce\
     print(cw.fill(
 'Prefix for output files name.'
     ))
-    print('   -o/--outputDir STR',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
 'Output dir name.'
     ))
@@ -371,7 +371,7 @@ intronSeeker splitReadSearch -a <alignment.bam> -r <ref.fa> -o STR [-F, -p STR, 
     print(cw.fill(
 'Prefix for output files name.'
     ))
-    print('   -o/--outputDir STR',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
 'Output dir name.'
     ))
@@ -440,7 +440,7 @@ intronSeeker trimFastaFromTXT -r <ref.fa> -c <candidates.txt> -o STR [-m, -F, -p
     print(cw.fill(
 'Prefix for output files name.'
     ))
-    print('   -o/--outputDir STR',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
 'Output dir name.'
     ))
@@ -505,7 +505,7 @@ intronSeeker analyzeORF -r <ref.fa> -o STR [-k, -F, -p STR] [--no-refine-starts]
     print(cw.fill(
 'Prefix for output files name.'
     ))
-    print('   -o/--outputDir STR',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
 'Output dir name.'
     ))
@@ -653,7 +653,7 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-rF] [-l,-H INT] [-p STR
     print(cw.fill(
 '\tPrefix for output files name.'
     ))
-    print('   -o/--outputDir STR',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
 '\tOutput dir name.'
     ))
@@ -786,7 +786,7 @@ intronSeeker simulateReads -f <file.fa> -c <grinder.cfg> [-p STR] [-F] -o STR',
     print(cw.fill(
 'Prefix for output files name.'
     ))
-    print('   -o/--outputDir STR',end='')
+    print('   -o/--output STR',end='')
     print(cw.fill(
 'Output dir name.'
     ))
