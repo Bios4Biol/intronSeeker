@@ -444,13 +444,13 @@ intronSeeker trimFastaFromTXT -r <ref.fa> -c <candidates.txt> -o STR [-m, -F, -p
     print(cw.fill(
 'Output dir name.'
     ))
-    print('   -m/--multi',end='')
-    print(cw.fill(
-'\tAllow  multiple trimming for contigs with several candidates : only one ouput contig is saved with all trimmed candidates.'
-    ))
     print('   -F/--force',end='')
     print(cw.fill(
 '\tForce to overwrite output files.'
+    ))
+    print('   -m/--multi',end='')
+    print(cw.fill(
+'\tAllow  multiple trimming for contigs with several candidates : only one ouput contig is saved with all trimmed candidates.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
@@ -485,7 +485,7 @@ Performs the ORF analysis on a reference FASTA file: predicts, with TransDecoder
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker analyzeORF -r <ref.fa> -o <outfile_basename> [-k] [--no-refine-starts]',
+intronSeeker analyzeORF -r <ref.fa> -o STR [-k, -F, -p STR] [--no-refine-starts]',
     width=90
     ))
     print()
@@ -501,9 +501,17 @@ intronSeeker analyzeORF -r <ref.fa> -o <outfile_basename> [-k] [--no-refine-star
     print(cw.fill(
 'Name  of the reference FASTA file  on which  the ORF prediction must be performed.'
     ))
-    print('   -o/--output STR',end='')
+    print('   -p/--prefix STR',end='')
     print(cw.fill(
-'Basename of the output directory where the ouput file and potential TransDEcoder\'s files  will be stored.'
+'Prefix for output files name.'
+    ))
+    print('   -o/--outputDir STR',end='')
+    print(cw.fill(
+'Output dir name.'
+    ))
+    print('   -F/--force',end='')
+    print(cw.fill(
+'\tForce to overwrite output files.'
     ))
     print('   -k/--keep',end='')
     print(cw.fill(

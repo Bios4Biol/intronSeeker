@@ -66,7 +66,7 @@ def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     flank_left = ref_seq[split_start: split_start + 2]
     flank_right = ref_seq[split_end - 2: split_end]
     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
-                    index = ["start_split","end_split","split_length","split_flanks"])
+                    index = ["start_split","end_split","split_length","split_borders"])
 
 def find_split(ref_id_list, bamfile, fastafile):
     """
@@ -89,15 +89,15 @@ def find_split(ref_id_list, bamfile, fastafile):
     
     split_alignments = []
     candidates=[]
-    for id in ref_id_list:
-        aligned = bamfile.fetch(id, multiple_iterators=True)
+    for ref_id in ref_id_list:
+        aligned = bamfile.fetch(ref_id, multiple_iterators=True)
         split_reads=[]
+        contig_seq = ref_dict.fetch(ref_id)
         for read in aligned:
-            reference = ref_dict.fetch(id)
             if read.cigartuples is not None:
             
                 if '(3,' in str(read.cigartuples):
-                    split = limit_from_cigar(read.cigartuples, read.reference_start, reference)
+                    split = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
                     split['read'] = read.query_name
                     split['reference'] = read.reference_name
                     if read.is_reverse :
@@ -107,12 +107,11 @@ def find_split(ref_id_list, bamfile, fastafile):
                     split_reads.append(split)
         df_split_reads = pd.DataFrame(split_reads)
         if not df_split_reads.empty :
-            candidates.append(merge_split(df_split_reads,id))
+            candidates.append(merge_split(df_split_reads,ref_id,contig_seq))
             split_alignments.append(df_split_reads)
-        
     return pd.concat(candidates), pd.concat(split_alignments)
 
-def merge_split(contig_reads,contig_name) :
+def merge_split(contig_reads,contig_name,contig_seq) :
     candidates = []
     split_alignments = contig_reads.sort_values(by=['start_split','end_split']).reset_index(drop=True)
     while not split_alignments.empty :
@@ -136,14 +135,21 @@ def merge_split(contig_reads,contig_name) :
                     current_end=current.end_split
                     )
                 )
+        left_border = contig_seq[int(current.start_split): int(current.start_split) + 2]
+        right_border = contig_seq[int(current.end_split) - 2: int(current.end_split)]
         candidates.append(pd.Series(
                 name= '|'.join([
                     contig_name,
                     str(int(current.start_split)),
                     str(int(current.end_split))
                     ]),
-                data= [contig_name,int(current.start_split),int(current.end_split),len(selected_reads)],
-                index=['reference','start','end','depth']
+                data= [
+                    contig_name,
+                    int(current.start_split),
+                    int(current.end_split),
+                    len(selected_reads),
+                    left_border+'_'+right_border],
+                index=['reference','start','end','depth','split_borders']
                 ))
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
@@ -196,6 +202,8 @@ def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
     # ~ candidates['selected'] = 1
     # ~ print(candidates)
     
+    
+    split_alignments=split_alignments[['reference','read','start_split','end_split','split_length','split_borders','strand']] #re-arrange the columns order of split_alignements output
     header_sa= list(split_alignments.columns.values)
     header_sa[0] = '#'+header_sa[0]
     split_alignments.to_csv(output_path+'_split_alignments.txt',header=header_sa,sep='\t',index=False)
@@ -274,17 +282,6 @@ def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
 # search ORF on fasta #
 #######################
 
-def runTransDecoder(fasta_file : str, tmp_directory : str, refine : bool) :
-    """
-    Run TransDecoder.
-    :param fasta_file: Fasta file on which the ORF prediction will be perform
-    :param output_directory: directory name where the TransDecoder files will be stored
-    :return: nothing
-    """
-    if refine :
-        os.system("TransDecoder.LongOrfs -t {fasta} -O {tempdir} ; TransDecoder.Predict -t {fasta} -O {tempdir}".format(fasta=fasta_file,tempdir=tmp_directory)) ;
-    else :
-        os.system("TransDecoder.LongOrfs -t {fasta} -O {tempdir} ; TransDecoder.Predict -t {fasta} -O {tempdir} --no_refine_starts".format(fasta=fasta_file,tempdir=tmp_directory)) ;
 
 def writeORFasTsv(transdecoder_orfs : str) : 
     """
@@ -310,26 +307,45 @@ def writeORFasTsv(transdecoder_orfs : str) :
     with open(transdecoder_orfs+".cds.tsv","w") as tsvfile :
         tsvfile.write(tsv) ;
 
-def predictORF(fasta_file, trunc, gff, rm, output : str,refine) :
+def analyzeORF(reference, output, force, prefix, no_refine, rm) :
 
-    outdir = output + "_orf" ;
-    os.system("mkdir " + outdir) ;
-    output_path = outdir + "/" + output ;
-    fasta_name = os.path.basename(fasta_file)
+    output_path = output + "/orf";
+    if prefix:
+        output_path += "_" + prefix;
     
+    # ~ # Create output dir if not exist
+    # ~ if not os.path.exists(output) :
+        # ~ os.mkdir(output)
+    # ~ if not force:
+        # ~ try :
+            # ~ if os.path.exists(output_path + '_trimmed.fa'):
+                   # ~ raise FileExistsError
+        # ~ except FileExistsError as e :
+            # ~ print('\nError: output file(s) already exists.\n')
+            # ~ exit(1)
+    
+    cmd_long_orf = ['TransDecoder.LongOrfs','-t',reference.name,'-O',output_path+'_intermediate']
+    cmd_predict = ['TransDecoder.Predict','-t',reference.name,'-O',output_path+'_intermediate']
+    if no_refine :
+        cmd_predict.append('--no_refine_starts')
+        
+    with open(output_path+'.log', 'w') as log :
+        log.write('COMMANDS launched by intronSeeker :\n')
+        log.write(' '.join(cmd_long_orf)+'\n')
+        log.write(' '.join(cmd_predict)+'\n\n')
+        sp.run(cmd_long_orf,stdout=log,stderr=sp.STDOUT)
+        sp.run(cmd_predict,stdout=log,stderr=sp.STDOUT)
+    # ~ os.system("mv *.transdecoder.* {outdir}".format(outdir=outdir)) ;
+    # ~ writeORFasTsv(outdir +"/"+ fasta_name + ".transdecoder.pep") ;
 
-    runTransDecoder(fasta_file,output_path + "_intermediate",refine) ;
-    os.system("mv *.transdecoder.* {outdir}".format(outdir=outdir)) ;
-    writeORFasTsv(outdir +"/"+ fasta_name + ".transdecoder.pep") ;
+    # ~ if trunc and gff:
+        # ~ _Truncate(fasta_file, gff, output_path) ;
+        # ~ runTransDecoder(output_path+"-trq.fa",output_path + "_intermediate-tronque",refine) ;
+        # ~ os.system("mv *.transdecoder.* {outdir}".format(outdir=outdir)) ;
+        # ~ writeORFasTsv(output_path+"-trq.fa.transdecoder.pep") ;
 
-    if trunc and gff:
-        _Truncate(fasta_file, gff, output_path) ;
-        runTransDecoder(output_path+"-trq.fa",output_path + "_intermediate-tronque",refine) ;
-        os.system("mv *.transdecoder.* {outdir}".format(outdir=outdir)) ;
-        writeORFasTsv(output_path+"-trq.fa.transdecoder.pep") ;
-
-    if rm :
-        os.system("rm pipeliner* ; rm -r {outdir}_intermediate* ".format(outdir=output_path))
+    # ~ if rm :
+        # ~ os.system("rm pipeliner* ; rm -r {outdir}_intermediate* ".format(outdir=output_path))
 
 
 #################################################
