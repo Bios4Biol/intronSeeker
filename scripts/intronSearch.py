@@ -178,7 +178,7 @@ def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
             exit(1)
     
     # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
-    assemblathon_name = output + os.path.splitext(os.path.basename(fastafile.name))[0] + '_assemblathon.txt'
+    assemblathon_name = output_path + os.path.splitext(os.path.basename(fastafile.name))[0] + '_assemblathon.txt'
     with open(assemblathon_name,'w') as assemblathon :
         sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
     
