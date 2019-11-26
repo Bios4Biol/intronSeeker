@@ -283,29 +283,48 @@ def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
 #######################
 
 
-def writeORFasTsv(transdecoder_orfs : str) : 
+def df_ORF(pep_file) : 
     """
     From the TransDecoder output, write a tsv file which contains information about each predicted ORF.
     :param transdecoder_orfs: Transdecoder output which contains all the predicte ORFs (nucleic or proteic fasta format)
     :param output_tsv: name of the tsv ouput file
     :return: nothing
     """
-    print("Write TSV file from "+transdecoder_orfs) ;
-    tsv="\t".join(["Sequence","Start","End","ORFid","length","type","strand","frame","score"]) ;
-    grep_out = sp.getoutput("grep 'CDS' {filename} | cut -f 8,9".format(filename=transdecoder_orfs.replace(".pep",".gff3"))) ;
-    frames = { cds.split("Parent=")[1] : cds.split("\t")[0] for cds in grep_out.split("\n") }
-    with open(transdecoder_orfs,"r") as ORFfile :
-        lines = [orf.split("\n",1)[0] for orf in ORFfile.read().lstrip(">").split("\n>")] ;
-        for line in lines :
-            vals = line.split() ;
-            ORFid = vals[0] ; typ=vals[3].lstrip("type:") ; length=vals[4].lstrip("len:") ;
-            strand= vals[5].split(",")[0].lstrip("(").rstrip(")") ;
-            score = vals[5].split(",")[1].lstrip("score=") ;
-            seq = vals[-1].split(":")[0] ;
-            start = vals[-1].split(":")[1].split("-")[0] ; end = vals[-1].split(":")[1].split("-")[1].split("(")[0] ;
-            tsv += "\n"+"\t".join([seq,start,end,ORFid,length,typ,strand,frames[ORFid],score]) ;
-    with open(transdecoder_orfs+".cds.tsv","w") as tsvfile :
-        tsvfile.write(tsv) ;
+    grep_out = sp.run(['grep','^>', pep_file],stdout=sp.PIPE)
+    lines = grep_out.stdout.decode('utf-8').rstrip().split('\n')
+    orfs=[]
+    for line in lines :
+        vals = line.lstrip('>').split()
+        orfs.append(pd.Series(
+            data=[
+                vals[0], #orf_id
+                vals[-1].split(':')[0], #reference
+                int(vals[-1].split(':')[1].split('-')[0]), #start
+                int(vals[-1].split(':')[1].split('-')[1].rstrip('(+-)')), #end
+                int(vals[4].split(':')[1]), #length
+                vals[3].split(':')[1], #type
+                float(vals[5].split('=')[1]), #score
+                vals[5].split(')')[0].lstrip('(')
+                ],
+            index=["#orf_id","reference","start","end","length","type","strand","score"]
+        ))
+    return pd.DataFrame(orfs)
+    
+    # ~ tsv="\t".join(["Sequence","Start","End","ORFid","length","type","strand","frame","score"]) ;
+    # ~ grep_out = sp.getoutput("grep 'CDS' {filename} | cut -f 8,9".format(filename=transdecoder_orfs.replace(".pep",".gff3"))) ;
+    # ~ frames = { cds.split("Parent=")[1] : cds.split("\t")[0] for cds in grep_out.split("\n") }
+    # ~ with open(transdecoder_orfs,"r") as ORFfile :
+        # ~ lines = [orf.split("\n",1)[0] for orf in ORFfile.read().lstrip(">").split("\n>")] ;
+        # ~ for line in lines :
+            # ~ vals = line.split() ;
+            # ~ ORFid = vals[0] ; typ=vals[3].lstrip("type:") ; length=vals[4].lstrip("len:") ;
+            # ~ strand= vals[5].split(",")[0].lstrip("(").rstrip(")") ;
+            # ~ score = vals[5].split(",")[1].lstrip("score=") ;
+            # ~ seq = vals[-1].split(":")[0] ;
+            # ~ start = vals[-1].split(":")[1].split("-")[0] ; end = vals[-1].split(":")[1].split("-")[1].split("(")[0] ;
+            # ~ tsv += "\n"+"\t".join([seq,start,end,ORFid,length,typ,strand,frames[ORFid],score]) ;
+    # ~ with open(transdecoder_orfs+".cds.tsv","w") as tsvfile :
+        # ~ tsvfile.write(tsv) ;
 
 def analyzeORF(reference, output, force, prefix, no_refine, rm) :
 
@@ -324,20 +343,23 @@ def analyzeORF(reference, output, force, prefix, no_refine, rm) :
             # ~ print('\nError: output file(s) already exists.\n')
             # ~ exit(1)
     
-    cmd_long_orf = ['TransDecoder.LongOrfs','-t',reference.name,'-O',output_path+'_intermediate']
-    cmd_predict = ['TransDecoder.Predict','-t',reference.name,'-O',output_path+'_intermediate']
+    cmd_long_orf = ['TransDecoder.LongOrfs','-t',os.path.abspath(reference.name),'-O','orf_intermediate']
+    cmd_predict = ['TransDecoder.Predict','-t',os.path.abspath(reference.name),'-O','orf_intermediate']
     if no_refine :
         cmd_predict.append('--no_refine_starts')
         
     with open(output_path+'.log', 'w') as log :
+        here = os.path.abspath('.')
+        os.chdir(output)
         log.write('COMMANDS launched by intronSeeker :\n')
         log.write(' '.join(cmd_long_orf)+'\n')
         log.write(' '.join(cmd_predict)+'\n\n')
-        sp.run(cmd_long_orf,stdout=log,stderr=sp.STDOUT)
-        sp.run(cmd_predict,stdout=log,stderr=sp.STDOUT)
-    # ~ os.system("mv *.transdecoder.* {outdir}".format(outdir=outdir)) ;
-    # ~ writeORFasTsv(outdir +"/"+ fasta_name + ".transdecoder.pep") ;
+        long_prcs = sp.run(cmd_long_orf,stdout=log,stderr=sp.STDOUT)
+        predict_prcs = sp.run(cmd_predict,stdout=log,stderr=sp.STDOUT)
+        os.system('mv *.transdecoder.* orf_intermediate ; mv pipeliner* orf_intermediate')
 
+    orfs = df_ORF('orf_intermediate/'+ os.path.basename(reference.name) + ".transdecoder.pep")
+    
     # ~ if trunc and gff:
         # ~ _Truncate(fasta_file, gff, output_path) ;
         # ~ runTransDecoder(output_path+"-trq.fa",output_path + "_intermediate-tronque",refine) ;
