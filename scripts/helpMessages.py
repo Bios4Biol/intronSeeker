@@ -485,7 +485,7 @@ Performs the ORF analysis on a reference FASTA file: predicts, with TransDecoder
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker analyzeORF -r <ref.fa> -o STR [-k, -F, -p STR] [--no-refine-starts]',
+intronSeeker analyzeORF -r <ref.fa> -c <candidates.txt> -o STR [-k, -F, -R, -p STR]',
     width=90
     ))
     print()
@@ -500,6 +500,10 @@ intronSeeker analyzeORF -r <ref.fa> -o STR [-k, -F, -p STR] [--no-refine-starts]
     print('   -r/--reference FILE',end='')
     print(cw.fill(
 'Name  of the reference FASTA file  on which  the ORF prediction must be performed.'
+    ))
+    print('   -c/--candidates FILE',end='')
+    print(cw.fill(
+'Name the candidates TXT file to consider only the ORFs which overlap a selected candidate.'
     ))
     print('   -p/--prefix STR',end='')
     print(cw.fill(
@@ -517,7 +521,7 @@ intronSeeker analyzeORF -r <ref.fa> -o STR [-k, -F, -p STR] [--no-refine-starts]
     print(cw.fill(
 '\tKeep all intermediate files.'
     ))
-    print('   --no-refine-starts',end='')
+    print('   -R/--no-refine',end='')
     print(cw.fill(
 'Allow TransDecoder  to not perform  ORF\'s starts refining. Use this option  only  if TransDecoder      fails at this step of ORF prediction.'
     ))
