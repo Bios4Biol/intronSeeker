@@ -307,14 +307,10 @@ def df_ORF(pep_file,candidates) :
             'score' : float(vals[5].split('=')[1]), #score
             'strand' : vals[5].split(')')[0].lstrip('(')
         }
-        # ~ print((candidates.reference==orf['reference'])&(~((candidates.end<orf['start'])|(candidates.start >= orf['end']))))
         c = candidates.loc[lambda c :(c.reference==orf['reference'])&~((c.end <= orf['start'])|(c.start >= orf['end'])),:]
-        
         if not c.empty :
-            print(orf)
-            print(c)
-            print()
-        orfs.append(pd.Series(orf))
+            orf['candidates'] = ",".join(c['#ID'].values)
+            orfs.append(pd.Series(orf))
     return pd.DataFrame(orfs)
     
 def analyzeORF(reference, cand_file, output, force, prefix, no_refine, rm) :
