@@ -209,7 +209,7 @@ Calls STAR to align the reads library and the reference assembly and produce\
     # Usage
     print('Usage:')
     print('intronSeeker starAlignment -r <reference.fa> -1 <reads1.fq> -o STR')
-    print('\t\t\t   [-2 <reads2.fq>] [-t INT] [-F ] [-p STR]\n')
+    print('\t\t\t   [-2 <reads2.fq>] [-F, -k] [-t INT] [-p STR]\n')
     
     cw = textwrap.TextWrapper(
         width=67,
@@ -485,7 +485,7 @@ Performs the ORF analysis on a reference FASTA file: predicts, with TransDecoder
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker analyzeORF -r <ref.fa> -c <candidates.txt> -o STR [-k, -F, -R, -p STR]',
+intronSeeker analyzeORF -r <ref.fa> -c <candidates.txt> -o STR [-p STR] [-F, -k, -R]',
     width=90
     ))
     print()
