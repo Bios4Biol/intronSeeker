@@ -85,7 +85,7 @@ def star(reference, r1, r2, output, prefix, force, rm, threads):
                     ]
     cmdlog.write('\n# Fasta indexing:\n')
     cmdlog.write(" ".join(index_command) + "\n")
-    sp.run(index_command) 
+    sp.run(index_command, stdout=sp.DEVNULL, stderr=sp.DEVNULL) 
     
     # ~ # Reads Mapping and ouput files writing 
     star_command = ['STAR',
@@ -104,7 +104,7 @@ def star(reference, r1, r2, output, prefix, force, rm, threads):
         star_command.extend(['--readFilesCommand', 'zcat'])
     cmdlog.write('\n# STAR alignement:\n')
     cmdlog.write(' '.join(star_command) + "\n")
-    sp.run(star_command)
+    sp.run(star_command, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
     star_bam_fix(output_path+'.star.Aligned.sortedByCoord.out.bam', output_path+'.sort.bam')
     sp.run(['rm',output_path+'.star.Aligned.sortedByCoord.out.bam']) # Temporary files erasure
     
