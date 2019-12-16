@@ -68,7 +68,7 @@ def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
                     index = ["start_split","end_split","split_length","split_borders"])
 
-def find_split(ref_id_list, bamfile, fastafile):
+def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
     """
     For an alignment file, list all split reads.
 
@@ -107,11 +107,13 @@ def find_split(ref_id_list, bamfile, fastafile):
                     split_reads.append(split)
         df_split_reads = pd.DataFrame(split_reads)
         if not df_split_reads.empty :
-            candidates.append(merge_split(df_split_reads,ref_id,contig_seq))
+            contig_len = len(ref_dict.fetch(ref_id))
+            candidates.append(merge_split(df_split_reads, ref_id, contig_seq, contig_len, mindepth, maxlen))
             split_alignments.append(df_split_reads)
     return pd.concat(candidates), pd.concat(split_alignments)
 
-def merge_split(contig_reads,contig_name,contig_seq) :
+# Work per contig
+def merge_split(contig_reads,contig_name,contig_seq,contig_len,mindepth,maxlen) :
     candidates = []
     split_alignments = contig_reads.sort_values(by=['start_split','end_split']).reset_index(drop=True)
     while not split_alignments.empty :
@@ -135,26 +137,42 @@ def merge_split(contig_reads,contig_name,contig_seq) :
                     current_end=current.end_split
                     )
                 )
-        left_border = contig_seq[int(current.start_split): int(current.start_split) + 2]
+        left_border  = contig_seq[int(current.start_split): int(current.start_split) + 2]
         right_border = contig_seq[int(current.end_split) - 2: int(current.end_split)]
+        
+        #Flag "filter"
+        flag = ""
+        if len(selected_reads) <= mindepth:
+            flag = "DP;"
+        if ((current.end_split - current.start_split)/contig_len)*100 > maxlen:
+            flag += "LEN;"
+        if left_border+'_'+right_border != "CT_AC" and left_border+'_'+right_border != "GT_AG":
+            flag += "SS;"
+        if flag == "":
+            flag = "PASS"
+        else:
+            flag = flag[:-1]
+        
         candidates.append(pd.Series(
-                name= '|'.join([
-                    contig_name,
-                    str(int(current.start_split)),
-                    str(int(current.end_split))
+            name = '|'.join([
+                        contig_name,
+                        str(int(current.start_split)),
+                        str(int(current.end_split))
                     ]),
-                data= [
+            data = [
                     contig_name,
                     int(current.start_split),
                     int(current.end_split),
                     len(selected_reads),
-                    left_border+'_'+right_border],
-                index=['reference','start','end','depth','split_borders']
-                ))
+                    left_border+'_'+right_border,
+                    flag
+                    ],
+            index =  ['reference','start','end','depth','split_borders','filter']
+        ))
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
 
-def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
+def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force, threads) :
     """
     Search the split reads and write two output files : the first with all the spliced events and the second where all the identical spliced events are merged
     :param bamfilename: name of the input alignment file
@@ -178,12 +196,12 @@ def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
             exit(1)
     
     # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
-    assemblathon_name = output_path + os.path.splitext(os.path.basename(fastafile.name))[0] + '_assemblathon.txt'
+    assemblathon_name = output_path + "_" + os.path.splitext(os.path.basename(fastafile.name))[0] + '_assemblathon.txt'
     with open(assemblathon_name,'w') as assemblathon :
         sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
     
-    ref_id_list = [x.split("\t")[0] for x in pysam.idxstats(bamfile.name).split("\n")[:-2]]
-
+    ref_id_list   = [x.split("\t")[0] for x in pysam.idxstats(bamfile.name).split("\n")[:-2]]
+    
     with prl.ProcessPoolExecutor(max_workers=threads) as ex :
         # ~ s_t = time.time()
         ref_id_array = np.array_split(ref_id_list,ex._max_workers)
@@ -191,11 +209,13 @@ def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
             find_split,
             ref_id_array,
             repeat(bamfile.name,ex._max_workers),
-            repeat(fastafile.name,ex._max_workers)
+            repeat(fastafile.name,ex._max_workers),
+            repeat(mindepth,ex._max_workers),
+            repeat(maxlen,ex._max_workers)
             ))))
         candidates= pd.concat(out[0])
         split_alignments = pd.concat(out[1])
-        candidates['selected'] = 1
+        
         # ~ print(time.time()-s_t)
     
     # ~ candidates = find_split(ref_id_list,bamfile.name,fastafile.name)
@@ -203,7 +223,7 @@ def splitReadSearch(bamfile, fastafile, output, prefix, force, threads) :
     # ~ print(candidates)
     
     
-    split_alignments=split_alignments[['reference','read','start_split','end_split','split_length','split_borders','strand']] #re-arrange the columns order of split_alignements output
+    split_alignments=split_alignments[['reference','read','start_split','end_split','split_length','split_borders','strand']] #re-arrange the columns order of split_alignments output
     header_sa= list(split_alignments.columns.values)
     header_sa[0] = '#'+header_sa[0]
     split_alignments.to_csv(output_path+'_split_alignments.txt',header=header_sa,sep='\t',index=False)

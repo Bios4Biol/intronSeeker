@@ -345,13 +345,9 @@ Performs  the split read  signal  extraction  from  an   alignment (BAM File)  b
     
     # Usage
     print('Usage:')
-    print(
-    textwrap.fill('\
-intronSeeker splitReadSearch -a <alignment.bam> -r <ref.fa> -o STR [-F, -p STR, -t INT]',
-    width=90
-    ))
-    print()
-    
+    print('intronSeeker splitReadSearch -a <alignment.bam> -r <reference.fa>')
+    print('\t\t\t     -o STR [-F, -p STR, -d INT, -l FLOAT, -t INT]')
+	
     cw = textwrap.TextWrapper(
         width=67,
         initial_indent="\t",
@@ -367,6 +363,14 @@ intronSeeker splitReadSearch -a <alignment.bam> -r <ref.fa> -o STR [-F, -p STR, 
     print(cw.fill(
 'Name of the reference FASTA file  of the  alignment  and  in which the introns have to be identified.'
     ))
+    print('   -d/--min-depth INT',end='')
+    print(cw.fill(
+'Candidates will be flagged if not supported by more than [1] read.'
+    ))
+    print('   -l/--max-length INT',end='')
+    print(cw.fill(
+'Candidates will be flagged if length greater  than [80] percent of contig length.'
+    ))    
     print('   -p/--prefix STR',end='')
     print(cw.fill(
 'Prefix for output files name.'
