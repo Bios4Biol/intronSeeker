@@ -75,6 +75,8 @@ Installation done.
 
 ### Test installation.
 
+NB. Installation can be quite long (15 minutes) due to the numerous grinder perl dependencies. 
+
 Before each use of intronSeeker, activate the conda environment with :
 
 ```diff
