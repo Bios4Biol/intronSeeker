@@ -43,7 +43,7 @@ def checkProgram(program : str, command : str, asked_version : str , warning : s
         if program == "gffread" :
             sdo = subprocess.run([command, "--version"], stderr=subprocess.PIPE).stderr ;
         else :
-            sdo = subprocess.run([command, "--version"], stdout=subprocess.PIPE).stdout ;
+            sdo = subprocess.run([command, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout ;
         current_ver = re.search(r'([\d.]{3,10})',str(sdo)).group(1).rstrip() ;
         if not checkVersion(asked_version,current_ver) :
             raise OldVersion() ;
