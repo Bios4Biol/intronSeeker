@@ -1,116 +1,5 @@
-How to Install ?
-================
-
-Hereafter, you will find all the details about the intronSeeker installation.
-
-Requirements
-------------
-
-IntronSeeker requires Python version 3.6 or above.
-
-It also needs Python packages and external softwares to work 
-correctly (all these dependancies and their versions are detailed in the file 
-requirements.txt). So, to make install easier, a conda enviromnent (grinder excluded)
-has been created  : [Conda environment](https://anaconda.org/elasguignes/Stalker_env/files) 
-(it is the [environment.yml](https://forgemia.inra.fr/faustine.oudin/Script_unigene/blob/modification_emilien/environment.yml) file)
-
-For an easy install, conda environments is recommended. To install Miniconda, 
-follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) or,
-to install Ananconda, follow [this one](https://docs.anaconda.com/anaconda/install/).
-
-Installation procedure
-----------------------
-
-### intronSeeker installation and environment configuration.
-
-To install intronSeeker, download all files and directories found at  
-[URL](https://forgemia.inra.fr/faustine.oudin/Script_unigene/tree/modification_emilien),
-then, open a bash session if you are not already in bash (bash command) and run the setup.sh script :
-
- ```diff
- + ./setup.sh
- ```
-
-This script will  install the Conda environment, configure the newly installed
-environment and install Grinder and its dependencies (Perl modules) wich are not yet
-available in conda. Grinder installation is performed in the Conda environment, so, despite
-the missing conda package, its installation will only affect your
-conda environment (i.e. you will be able to run Grinder only when the environment is activated).
-You should get these messages in the standard output :
-
-```
-Begin installing intronSeeker...
-
-Directory added to the PATH
-
-Conda environment installing...
-
-Solving environment: done
-
-Downloading and Extracting Packages
-libcurl-7.63.0       | 550 KB    | ###################################################### | 100% 
-[...]
-perl-uri-1.74        | 54 KB     | ###################################################### | 100%
-Preparing transaction: done
-Verifying transaction: done
-Executing transaction: done
-#
-# To activate this environment, use
-#
-#     $ conda activate ISeeker_environment
-#
-# To deactivate an active environment, use
-#
-#     $ conda deactivate
-
-Conda environment installed.
-
-Conda environment configuration...
-
-Conda environment configured.
-
-Installation done.
-
-```
-
-### Test installation.
-
-NB. Installation can be quite long (15 minutes) due to the numerous grinder perl dependencies. 
-
-Before each use of intronSeeker, activate the conda environment with :
-
-```diff
-+ source activate ISeeker_environment
-```
-
-Now, your command prompt should be like this :
-
-```
-(ISeeker_environment) elasguignes@node027 ~ $
-```
-
-Finally, to test the installation, run the command :
-
-```diff
-+ intronSeeker checkInstall
-```
-
-You should get this message in standard ouput : 
-
-```
-gffread testing...OK ! 
-
-grinder testing...OK ! 
-
-hisat2 testing...OK ! 
-
-star testing...OK ! 
-
-samtools testing...OK ! 
-
-transdecoder testing...OK ! 
-
-diamond testing...OK ! 
-
-All the dependencies are correctly installed
-```
+Œ- ‰ìµ©eêŞiû^¯*.Â)e~)İjYm…ç^µ¨¥±¦èºÛaz)í®‰Òyé®)ìµ©ejØ¨ªº*Ş™éí°‰í®‰Òyé®·ªº*Ş°ü­†‰ïz»"¢}ú¢¶›¢÷ˆµ©l¢wvÃò¶'¥§$j¬jw^Æ×«©l¡ûpj·¬¶Œ(®G(®·œ¶\š–[azÇz—§u©Ü‰ëÛaz*ïz»"¢{­ç^µ¨¥yØ§¶ŸŠW«z«¢­éÛ-ÆÔ¨¶‰š‘è§²Ö¥•æ¬‰êÚr‰İiéïŠº&éí‚¸§uêŞÅÉnuçajÆŞzw+y«^v+b²Ø^z{â®‰æz{ršXm¶›?ıú+é¢j)ëiúÿzh¥‰éåjÈ.Š	Ş³ø§¶º'Iç¤z¿Û–†ÿ™«-z¿Ü¢wâƒ÷§¾*èg§·)¥~)^jYm…ç^¥éİzw"zÆ¯j)ZnW¢Ê'uªŞ¦‹"¶ŠâzÆ«y×­j)^u:"ËZ–S"'(ÖŸ¢YhÂØb²Û­¢¸š–m¦Ïÿr‰İj*?¦º#yËlıÊ'u¯ŞŸùZµë-şë®¢uïâËZ–_â×±†Ù¥¢»hŠ{-jY@©Ü¢wZ~‰e£aŠÊ'zm¦Ïÿv‡,jvœ¢wZr‰¿jvœ¢wZş)ìµ©eü‰ìµ©ejØ¨šèqçn­è§¶º'Iç¤z¸§²Ö¥•«b¢v§uéïŠº'™éír‰ßŠ«jØ¨:"ËZ–X§¶º'Iç¤z·%¢w­…è"¶·©¢È­¢¼¨­Ú0Zu©e¶ŸŠW¬jÛaŠÅ.m¦Ïÿ~ŠàzhšŠzÚ~¿Şš)bzyZ²¢‚w¬ş)í®‰Òyé®Ø^Š^¦Ú²²È¨'ò¢æ«zz-jZŞiÜ¢¶¬…¶¬…Ê&™©İjwkº{azÇ­º›!±Êâ¦×b}ÿ¿±ën¦ÈS†+,r¸©·¥–)ìµ©e¶‚¢wZz{â®‰æz{\¢wâ‚êŞ¶§{	rŠ{-jY^uéïŠº'™éíjwbËZ–Q«Šw^­©İŠÛz—§uéÜ‰ëz¹f¡Û¥zÌ"r«zz-jö¢•¦åz)Ü¢wZ¸§uêâËZ–V­Š‰â²—«~ŠæyØ§¶‚¢wZz{â®‰æz{l¢+lŠ{-jYZ¶*'Â)e¢yri÷ŞrÜ¨º·(Öø«¢yØÊ‹°ŠY[y¦åzÚ+ºq«Šw^®‰åË^Ø^z{â®‰æz{b±§-Šö­yÖ(ºÈhºW`zÛazÇ¦zËë"Ø^²Ö§uªİ¢ëiºĞ^‚)âËZ–X§‚)í®‰Òyé¬8«yËh¯&uçm¢Ø^<Ç
+‰İiéïŠº'™éíŠ{-jYb¨–ø§éïŠº'™éív‰ŞŒ'–†ŠxÑ1¶¶œ¶)à=§$j¬–&Üº¹{ë}9çB×M)z¹n®-{ã
+]4>·©j¸§‚ÚÚÆœ¶*'v‰ŞUêâ(§‚ÚÚÆœ¶*'v‰ŞœºØ§‚ÚÚÆœ¶*'v‰ŞN†œ¶+ÚµëaŠÇ§¾*èg§¶ër‰İi§-Šö­x„zG«z{â®‰æz{S¡×šrØ¯j×š§-Š÷ø«¢yÛ¬yÊ'u§^iËb½«^
+‰İiéïŠº'™éíŠ{-jY^t*'u§§¾*èg§µÊ'~(.­«b¢p¨Öø«¢y×(ø º·"{-jYZ¶*'v‰ŞMë-Š{-jYZ¶*'4'²Ö¥•«b¢w·ªº+^–‰à×™¢ë^±Û¶‹az{¦zº.²
+â×«¥êåuê^×§r'¬çè­çšr¬z‡âÚè'‘êÚrØ¯j×­…ç(Öø«¢yÜ"¶b}ÿ¬¢êÜy§-Šö­x„zG«z{â®‰æz{M£¨º·(šf§všèš›l†‹¥u·¥ŠG­†+Iç¤z·§¾*èg§µéZ²¢‚w¬‡^ÓnÅŠv¥—+hµë-¶¢ËZ–V­Š‰ëº{ayÊ&™©İv'ßú)í®‰Òyé­È^rB'²Ö¥•Š.².•Ø¶Øb²g¬±¨Š{-jwZ­Ú.¦ë`}úŞiÛ^²Ø§€â ®)İz»^²Ø§€â¡ŠÆ­Ú×¬¶)à8«-j»^²Ø§€â¬jkh¢[-zËbŠ¶¶§±×œ¡×«µë-Šx)Øšš‰İµë-Šx(	e¶z—§uéÜ‰ë­ç(®·œ¶\¢ËZ–W
