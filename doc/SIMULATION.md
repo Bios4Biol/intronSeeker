@@ -1,4 +1,5 @@
-intronSeeker's data simulation 
+intronSeeker's data simulation module's documentation
+=====================================================
 
 
 How it works ?
@@ -6,7 +7,8 @@ How it works ?
 
 #### Full-random simulation 
 
-To simulate Full-random RNA-seq data, several commands are implemeted :
+To simulate Full-random RNA-seq data, a module is implemeted. Hereafter, we'll review the 
+different step performed to generate this type of data :
 
 1. Generate a fasta file which contains random sequences. The simulation parameters are number of sequence,
 maximum and minimum lengths of the generated sequences.
