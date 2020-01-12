@@ -24,8 +24,8 @@ Installation procedure
 
 ### intronSeeker installation and environment configuration.
 
-To install intronSeeker, download all files and directories found at  
-[URL](https://forgemia.inra.fr/faustine.oudin/Script_unigene/tree/modification_emilien),
+To install intronSeeker, clone the git repository or download all files found at this
+[URL](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker),
 then, open a bash session if you are not already in bash (bash command) and run the setup.sh script :
 
  ```diff
@@ -35,7 +35,7 @@ then, open a bash session if you are not already in bash (bash command) and run 
 This script will  install the Conda environment, configure the newly installed
 environment and install Grinder and its dependencies (Perl modules) wich are not yet
 available in conda. Grinder installation is performed in the Conda environment, so, despite
-the missing conda package, its installation will only affect your
+the missing conda package, its installation will only affect the newly installed 
 conda environment (i.e. you will be able to run Grinder only when the environment is activated).
 You should get these messages in the standard output :
 
@@ -81,7 +81,7 @@ NB. Installation can be quite long (15 minutes) due to the numerous grinder perl
 Before each use of intronSeeker, activate the conda environment with :
 
 ```diff
-+ source activate ISeeker_environment
++ conda activate ISeeker_environment
 ```
 
 Now, your command prompt should be like this :
@@ -115,3 +115,14 @@ diamond testing...OK !
 
 All the dependencies are correctly installed
 ```
+
+### Installation support.
+
+If the installation failed (`FAIL:` message during the installation or a `**WARNING**` message during the checkInstall), close your prompt,
+re-lauch it, re-activate the conda environment with this command :
+```diff
++ conda activate ISeeker_environment
+```
+And re-lauch the setup.sh script.
+
+If the problem persists, contact the support team with this mailing adress : ....
