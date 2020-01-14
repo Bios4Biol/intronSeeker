@@ -4,7 +4,7 @@ intronSeeker
 While sequencing mRNA non-spliced introns are often retained and therefore 
 present in the produced reads. These introns coming from to non mature mRNAs 
 create rupture in the proteins found in the transcripts. In order to get the 
-a correct protein sequence they have to be removed,
+correct protein sequence they have to be removed,
 These retained introns will be present in only some sequences nevertheless they 
 can therefore be present in the assembled contigs built from those reads.  
 ![](doc/splice_event.png)
