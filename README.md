@@ -78,13 +78,13 @@ results but takes longer to run and works only with paired-end library.
 Running alignment, use the commands :
 
 ```diff
-+ intronSeeker starAlignment -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignment
++ intronSeeker starAlignment -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-2.fastq.gz -o Cele_library-contigs_alignment
 ```
 
 or 
 
 ```diff
-intronSeeker hisat2Alignment -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-1.fastq.gz -o Cele_library-contigs_alignment
+intronSeeker hisat2Alignment -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-2.fastq.gz -o Cele_library-contigs_alignment
 ```
 
 
