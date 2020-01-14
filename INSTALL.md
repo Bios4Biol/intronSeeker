@@ -6,7 +6,7 @@ Hereafter, you will find all the details about the intronSeeker installation.
 Requirements
 ------------
 
-IntronSeeker requires Python version 3.6 or above.
+IntronSeeker requires Python version 3.6 or above. You don't need to change your Python version because this is managed by your Conda environment.
 
 It also needs Python packages and external softwares to work 
 correctly (all these dependancies and their versions are detailed in the file 
