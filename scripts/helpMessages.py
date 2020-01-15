@@ -135,7 +135,7 @@ The second simulation is based on an existing genome and corresponding genome\
   to   transcripts)    with potentially  retained  introns  or  spliced exons.  Three\
  files  are  generated:   one  corresponds  to   reference pseudo-assembly, another\
  one  is used  for  simulate  the reads library and the third one gathers all\
- the simulated features  (retained  intorns  or  spliced exons). gffread program\
+ the simulated features  (retained  introns  or  spliced exons). gffread program\
  is called during the simulation process.'
     ))
     # simulateReads

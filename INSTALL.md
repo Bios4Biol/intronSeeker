@@ -6,7 +6,7 @@ Hereafter, you will find all the details about the intronSeeker installation.
 Requirements
 ------------
 
-IntronSeeker requires Python version 3.6 or above.
+IntronSeeker requires Python version 3.6 or above. You don't need to change your Python version because this is managed by your Conda environment.
 
 It also needs Python packages and external softwares to work 
 correctly (all these dependancies and their versions are detailed in the file 
@@ -24,7 +24,7 @@ Installation procedure
 ### intronSeeker installation and environment configuration.
 
 To install intronSeeker, download all files and directories found at  
-[URL](https://forgemia.inra.fr/faustine.oudin/Script_unigene/tree/modification_emilien),
+[URL](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker),
 then, open a bash session if you are not already in bash (bash command) and run the setup.sh script :
 
  ```diff
