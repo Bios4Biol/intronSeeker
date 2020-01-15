@@ -261,13 +261,10 @@ def multi_trim(candidates,sequences) :
 
 def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
     """
-    From a fasta file and a ggf file, write a new fasta file which contains expurgated sequences of provided features
+    From a fasta file and a candidates file, write a new fasta file which contains expurgated sequences of provided features
     :param fasta_file: original sequences file
-    :param gff_feature: gff file which contains the features to delete
-    :param output: name of the output fasta file
+    :param gff_feature: candidates file which contains the features to delete
     """
-    
-    print(type(cand_file.name))
     output_path = output + "/tf";
     if prefix:
         output_path += "_" + prefix;
@@ -283,19 +280,20 @@ def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
             print('\nError: output file(s) already exists.\n')
             exit(1)
     
-    candidates=pd.read_csv(cand_file.name,sep='\t').rename(columns={'#ID':'ID'})
+    candidates=pd.read_csv(cand_file.name,sep='\t').rename(columns={'#ID':'ID','filter':'Filter'})
     sequences = SeqIO.to_dict(SeqIO.parse(reference.name,'fasta'))
-    if not multi :
-        trimmed_records = list(candidates.loc[lambda df : df.selected == 1].apply(single_trim,axis=1,sequences = sequences))
-    else :
-        trimmed_records = list(candidates.loc[lambda df : df.selected == 1].groupby('reference',sort=False).apply(multi_trim,sequences = sequences))
     
+    trimmed_records=[]
+    if candidates.loc[lambda df : df.Filter == "PASS"].size :
+        if not multi :
+            trimmed_records = list(candidates.loc[lambda df : df.Filter == "PASS"].apply(single_trim,axis=1,sequences = sequences))
+        else :
+            trimmed_records = list(candidates.loc[lambda df : df.Filter == "PASS"].groupby('reference',sort=False).apply(multi_trim,sequences = sequences))
     
-    no_trimmed_ids = set(sequences.keys()) - set(candidates.loc[lambda df : df.selected == 1,'reference'].values)
+    no_trimmed_ids = set(sequences.keys()) - set(candidates.loc[lambda df : df.Filter == "PASS",'reference'].values)
     no_trimmed_records=[]
     for c in no_trimmed_ids :
         no_trimmed_records.append(sequences[c])
-    
     SeqIO.write(trimmed_records+no_trimmed_records,output_path+'_trimmed.fa','fasta')
 
 
