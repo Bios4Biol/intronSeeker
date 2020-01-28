@@ -141,7 +141,7 @@ The second simulation is based on an existing genome and corresponding genome\
     # simulateReads
     print('   simulateReads',end='')
     print(cw.fill(
-'From a Fasta file,  calls Grinder program  to simulates a corresponding reads library.'
+'From a Fasta file,  calls Grinder program  to simulate a corresponding reads library.'
     ))
     print()
     
@@ -755,7 +755,7 @@ From a genome and associated ensembl GTF file, generates pseudo-contigs (corresp
 def sr_help() :
     text='\
 \nDescription:\n\
-From a Fasta file, calls Grinder program to simulates a corresponding reads library.\
+From a Fasta file, calls Grinder program to simulate a corresponding reads library.\
 '
     tw = textwrap.TextWrapper(
         width=90,

@@ -34,6 +34,10 @@ def plot_insertion_in_contig(positions) :
                        yaxis=dict(
                            title="Count"))
     fig = go.Figure(data=[hist],layout=layout)
-    print(py.offline.plot(fig, include_plotlyjs=True,output_type='div'))
+    print(py.offline.plot(fig, include_plotlyjs=True,output_type='div'))    
     # ~ pio.write_html(fig,'fig.html')
     # ~ return tools.get_embed(fig)
+    
+    fig.write_html('is_figure.html', auto_open=True)
+    fig = go.Figure(data=go.Bar(y=[2, 3, 1]))
+    fig.write_html('first_figure.html', auto_open=True)

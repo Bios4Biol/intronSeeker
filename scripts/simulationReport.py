@@ -136,7 +136,7 @@ def simulationReport(r1,r2,reference,control,threads,bamfile,splitfile) :
     )
     
     plot_insertion_in_contig(control['pos_on_contig'])
-    
+    return 0
     # Add three columns on library : one for the intron covering reads (True/False), another for the covered intron id (if True) and the last
     # for the intron insertion position in read (if True - in term of read length percentage)
     # (precision : the function is called on control DataFrame but it returns a library-like DataFrame)
