@@ -124,7 +124,7 @@ The second simulation is based on an existing genome and corresponding genome\
     # fullRandomSimulation
     print('   fullRandomSimulation',end='')
     print(cw.fill(
-'Simulates  a multi Fasta file  which contains the pseudo-contigs and a TXT file\
+'Simulates two  Fasta  files which  contains  the  pseudo-contigs and a GTF file\
  which contains the pseudo retained  introns  charesteristics.  All the sequences\
  (contigs and introns)  as  well  as  the  introns  insertion are fully random.'
     ))
@@ -605,7 +605,7 @@ intronSeeker analyzeProtein -r <ref.fa> -o <outfile_basename> [-k] [-t INT]',
 def frs_help() :
     text='\
 \nDescription:\n\
-Simulates a multi Fasta file which contains the pseudo-contigs and a TXT file which contains the pseudo retained\
+Simulates two  Fasta  files which contains  the pseudo-contigs and a GTF file which contains the pseudo retained\
  intron charesteristics. All the sequences (contigs and introns) as well as the introns insertion are fully random.\
 '
     tw = textwrap.TextWrapper(

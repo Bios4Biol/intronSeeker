@@ -157,7 +157,7 @@ def full_random_simulation(nb:int, maxi:int, mini:int, half:bool, lower:int, upp
     #Generate the contigs
     reference_contigs_set = []
     library_contigs_set = []
-    introns = ["contig\tstart\tend\treverse"]
+    introns = []
     for c in range(0,nb) :
         length = random.randint(mini, maxi) ; # Random contig length 
         name = "SEQUENCE" + str(c+1) ; # Contig name creation
@@ -188,12 +188,15 @@ def full_random_simulation(nb:int, maxi:int, mini:int, half:bool, lower:int, upp
         reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0]+".modif",description=description))
         
         if distrib[c] :
-            introns.append("\t".join([name+".modif",str(intron_start),str(intron_end),str(reverse)]))
+            r = "+"
+            if(reverse) :
+                r = "-"
+            introns.append("\t".join([name+".modif","frs","retained_intron",str(intron_start),str(intron_end),".",r,".","."]))
         
     SeqIO.write(reference_contigs_set,output_path+"_contigs-modified.fa","fasta")
     SeqIO.write(library_contigs_set,output_path+"_contigs.fa","fasta")
     
-    with open(output_path+"_modifications.txt","w") as out :
+    with open(output_path+"_modifications.gtf","w") as out :
         out.write("\n".join(introns))
     
 
