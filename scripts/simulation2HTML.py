@@ -34,7 +34,7 @@ from itertools import repeat
 #python3 simulation2HTML.py -g /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -r /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_contigs.fa -o HTML/
 #simulate reads : config/grinder_frs_testA.cfg
 
-def plot_gtf(gtf_file)
+def plot_gtf(gtf_file):
     #Tableau 1 - https://plot.ly/python/table/
     df = pd.read_fwf(gft_file, sep = "\t")
 
@@ -52,7 +52,7 @@ def plot_gtf(gtf_file)
     summary_table_1 = summary_table_1.to_html()
     return summary_table_1 
     
-def report_HTML(html_file)
+def report_HTML(html_file):
     f = open(html_file'/report.html','w')
     #Report HTML
     html_string = '''
@@ -94,10 +94,13 @@ def simulationReport(fa : str, modifiedfa : str, gtf : str, output : str, prefix
     if not os.path.exists(output) :
         os.mkdir(output)
 
-    nContigs = sum(1 for _ in open(fa.name))
-    nContigsAvecIntrons = sum(1 for _ in open(modifiedfa.name))
-    print ('Nombre de total de contigs: ' , nContigsAvecIntrons)
-    print ('Nombre de contigs avec introns retenus: ' , nContigsAvecIntrons-nContigs)
+    for line in open(fa.name):
+        if line.startswith('>'):
+		    nContigs = sum(1 for _ in open(fa.name))
+            nContigsAvecIntrons = sum(1 for _ in open(modifiedfa.name))
+            print ('Nombre de total de contigs: ' , nContigsAvecIntrons)
+            print ('Nombre de contigs avec introns retenus: ' , nContigsAvecIntrons-nContigs)
+            
     nIntrons = sum(1 for _ in open(gtf.name))
     print ('Nombre total introns retenus: ' , nIntrons)
     
