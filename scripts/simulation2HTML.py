@@ -99,7 +99,7 @@ def simulationReport(fa : str, modifiedfa : str, gtf : str, output : str, prefix
 		    nContigs = sum(1 for _ in open(fa.name))
             nContigsAvecIntrons = sum(1 for _ in open(modifiedfa.name))
             print ('Nombre de total de contigs: ' , nContigsAvecIntrons)
-            print ('Nombre de contigs avec introns retenus: ' , nContigsAvecIntrons-nContigs)
+            print ('Nombre de contigs (verif): ' , nContigsAvecIntrons-nContigs)
             
     nIntrons = sum(1 for _ in open(gtf.name))
     print ('Nombre total introns retenus: ' , nIntrons)
