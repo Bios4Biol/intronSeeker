@@ -29,7 +29,8 @@ from highcharts import Highchart # import highchart library
 #ModuleNotFoundError: No module named 'highcharts'
 #(ISeeker_environment) sigenae@genologin2 /work/project/sigenae/sarah/intronSeeker/scripts $ pip install python-highcharts
 #https://github.com/kyper-data/python-highcharts
-
+from json import JSONEncoder
+import json
 
 #The plotly.plotly module is deprecated,
 #please install the chart-studio package and use the
@@ -53,7 +54,10 @@ from highcharts import Highchart # import highchart library
 #python3 simulation2HTML.py -g ../FRS/frs_modifications.gtf -r ../FRS/frs_contigs-modified.fa -f ../FRS/frs_contigs.fa -o HTML
 #python3 simulation2HTML.py -g /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -r /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_contigs.fa -o HTML/
 #simulate reads : config/grinder_frs_testA.cfg
-
+#Tests 
+#../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/
+#simulationReport.py --R1 ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/sr_test1_R1.fastq.gz --R2 ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/sr_test1_R2.fastq.gz --reference ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/frs_test1_contigs.fa --alignment ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/hisat2_test1.sort.bam --split-alignments ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/srs_test1_split_alignments.txt  --frs ???? TODO 
+    
 def plot_gtf(gtf_file):
     #Tableau 1 - https://plot.ly/python/table/
     #df = pd.read_fwf(gtf_file, sep = "\t")
@@ -78,7 +82,10 @@ def plot_gtf(gtf_file):
 def parse_length_introns(gtf_file) :
     table = pd.read_table(gtf_file, sep='\t', header = 0, names = ['contig', 'frs', 'intron', 'start', 'end', 'x1', 'x2', 'x3', 'x4'])
     table["length"] = table["end"]-table["start"]
-    return table.set_index('length')
+    #add a column length
+    table['LENGTH_calculated'] = table["length"]
+    #return table.set_index('length')
+    return table
 
 #http://www.xavierdupre.fr/app/teachpyx/helpsphinx/i_ex.html
 def parse_nb_introns_by_contig(gtf_file) :
@@ -121,6 +128,87 @@ def stats_contigs_introns(fa_file, modifiedfa_file, gtf_file):
     return nIntrons, nContigsAvecIntrons, nContigs, nbIntronsByContig, fig, figFiles;
 #https://www.geeksforgeeks.org/g-fact-41-multiple-return-values-in-python/
    
+def barChart(gtf_file):
+
+    lengthDistrib=parse_length_introns(gtf_file)
+    print ('Intron lenght : ', lengthDistrib["LENGTH_calculated"])
+    print ('contig: ', lengthDistrib["contig"])
+    
+    #encoder les series en JSON (Object of type 'Series' is not JSON serializable)
+    #https://ncrocfer.github.io/posts/serialiser-une-instance-de-classe-en-json-sous-python/
+    #class MyEncoder(json.JSONEncoder):
+    #    def default(self, obj):
+    #        if isinstance(obj, lengthDistrib):
+    #            return vars(obj)
+    #        else:
+    #            return json.JSONEncoder.default(self, obj)
+    #json.dumps(obj, cls=MyEncoder)
+
+    #https://www.w3schools.com/python/python_json.asp
+    contigname=json.dumps(lengthDistrib["contig"])
+    contiglength=json.dumps(lengthDistrib["LENGTH_calculated"])
+   
+    distrib = Highchart(width=750, height=600)
+    options = {
+	'title': {
+        'text': 'Stacked bar chart'
+    },
+    'subtitle': {
+        'text': 'Source: Tests FRS'
+    },
+    'xAxis': {
+        'categories': contigname,
+        'title': {
+            'text': None
+        }
+    },
+    'yAxis': {
+        'min': 0,
+        'title': {
+            'text': 'Population (millions)',
+            'align': 'high'
+        },
+        'labels': {
+            'overflow': 'justify'
+        }
+    },
+    'tooltip': {
+        'valueSuffix': ' millions'
+    },
+    'legend': {
+        'layout': 'vertical',
+        'align': 'right',
+        'verticalAlign': 'top',
+        'x': -40,
+        'y': 80,
+        'floating': True,
+        'borderWidth': 1,
+        'backgroundColor': "((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF')",
+        'shadow': True
+    },
+    'credits': {
+        'enabled': False
+    },
+    'plotOptions': {
+        'bar': {
+            'dataLabels': {
+                'enabled': True
+            }
+        }
+    }
+}
+ 
+    pass
+    
+    
+def chartIntronByContig(gtf_file):
+    nbIntronsByContig=parse_nb_introns_by_contig(gtf_file)
+    IntronsByContig = Highchart()
+    IntronsByContig.add_data_set(nbIntronsByContig, series_type='line', name='Example Series')
+    IntronsByContig.save_file(reportFile)
+    
+    pass
+   
 def simulationReport(fa : str, modifiedfa : str, gtf : str, output : str, prefix : str) :
     output_path = output + "/html";
     if prefix:
@@ -148,24 +236,8 @@ def simulationReport(fa : str, modifiedfa : str, gtf : str, output : str, prefix
         .to_html()\
         .replace('<table border="1" class="dataframe">','<table class="table table-striped">') # use bootstrap styl
             
-    #introns_length_plot_url = py.plot(lengthDistrib, filename='Introns length', auto_open=False,)
-    #filesList_plot_url = py.plot(figFiles, height=1000, width=1000, auto_open=False,\
-    #                      filename='Major technology and CPG stock prices in 2014 - scatter matrix')
-    #<h3>Files list: """ + filesList_plot_url + """</h3>
-	#<h3>Introns lengths: """ + introns_length_plot_url + """</h3>
 
     reportFile = '%s/%s' % (output,'stats.html')
-    
-    #http://www.xavierdupre.fr/app/ensae_teaching_cs/helpsphinx/notebooks/td1a_cenonce_session_10.html
-    print ('length line 1', lengthDistrib.head(1))
-    #print ('length contig', lengthDistrib.loc["length"])
-    
-    IntronsByContig = Highchart()
-    IntronsByContig.add_data_set(nbIntronsByContig, series_type='line', name='Example Series')
-    IntronsByContig.save_file(reportFile)
-    
-    
-    
 	
     with open(reportFile,"a+") as f:
        contenu ="""
@@ -183,6 +255,10 @@ def simulationReport(fa : str, modifiedfa : str, gtf : str, output : str, prefix
        </html>"""
        f.write(contenu)
        f.close() 
+       
+    chartIntronByContig(gtf.name)
+    barChart(gtf.name)
+    
     
     pass
 #plots : https://python-graph-gallery.com/
