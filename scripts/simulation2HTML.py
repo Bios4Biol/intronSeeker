@@ -145,8 +145,12 @@ def barChart(gtf_file):
     #json.dumps(obj, cls=MyEncoder)
 
     #https://www.w3schools.com/python/python_json.asp
-    contigname=json.dumps(lengthDistrib["contig"])
-    contiglength=json.dumps(lengthDistrib["LENGTH_calculated"])
+    #contigname=json.dumps(lengthDistrib["contig"])
+    #contiglength=json.dumps(lengthDistrib["LENGTH_calculated"])
+    
+    #https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_json.html
+    contigname=(lengthDistrib["contig"]).to_json()
+    contiglength=(lengthDistrib["LENGTHcalculated"]).to_json()
    
     distrib = Highchart(width=750, height=600)
     options = {
@@ -201,10 +205,11 @@ def barChart(gtf_file):
     pass
     
     
-def chartIntronByContig(gtf_file):
+def chartIntronByContig(gtf_file, output):
     nbIntronsByContig=parse_nb_introns_by_contig(gtf_file)
     IntronsByContig = Highchart()
     IntronsByContig.add_data_set(nbIntronsByContig, series_type='line', name='Example Series')
+    reportFile = '%s/%s' % (output,'charts.html')
     IntronsByContig.save_file(reportFile)
     
     pass
@@ -256,7 +261,7 @@ def simulationReport(fa : str, modifiedfa : str, gtf : str, output : str, prefix
        f.write(contenu)
        f.close() 
        
-    chartIntronByContig(gtf.name)
+    chartIntronByContig(gtf.name, output)
     barChart(gtf.name)
     
     
