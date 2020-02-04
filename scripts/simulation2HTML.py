@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 
+import os
+import configparser
+import numpy as np
+import pandas as pd
+import plotly as py
+import plotly.graph_objects as go
+
+
+
 import re
 import pickle
-import os
-import pandas as pd
 import pysam
 import gzip
 import time
 import sys
-import numpy as np
-import plotly as py
-#import plotly.plotly as py
-#import plotly.tools as plotly_tools
-#import plotly.graph_objs as go
-import configparser
 import concurrent.futures as prl
 import tempfile
-os.environ['MPLCONFIGDIR'] = tempfile.mkdtemp()
 #import matplotlib.pyplot as plt
 #from scipy.stats import gaussian_kde
 from IPython.display import HTML
@@ -25,16 +25,6 @@ from collections import OrderedDict
 from itertools import repeat
 from Bio import SeqIO
 from intronSeekerPlot import *
-from highcharts import Highchart # import highchart library
-#ModuleNotFoundError: No module named 'highcharts'
-#(ISeeker_environment) sigenae@genologin2 /work/project/sigenae/sarah/intronSeeker/scripts $ pip install python-highcharts
-#https://github.com/kyper-data/python-highcharts
-
-
-#The plotly.plotly module is deprecated,
-#please install the chart-studio package and use the
-#chart_studio.plotly module instead. 
-
 
 #https://stackoverflow.com/questions/9252543/importerror-cannot-import-name-x
 #  File "/home/sigenae/.conda/envs/ISeeker_environment/lib/python3.6/site-packages/charts/__init__.py", line 5, in <module>
@@ -88,15 +78,10 @@ def parse_nb_introns_by_contig(gtf_file) :
     for x in l:
         d[x] = d.get(x, 0) + 1
     return d
-    
-def stats_contigs_introns(fa_file, modifiedfa_file, gtf_file):
-    for line in open(fa_file):
-        if line.startswith('>'):
-            nContigs = sum(1 for _ in open(fa_file))
-            nContigsAvecIntrons = sum(1 for _ in open(modifiedfa_file))
-    
-    nIntrons = sum(1 for _ in open(gtf_file))
-     
+
+
+
+def general_stats_on_contig(modifiedfa_file, gtf_file):
     #files and paths
     figFiles = go.Figure(data=[go.Table(header=dict(values=['data', 'File name/path']),
                 cells=dict(values=[['FRS'], [gtf_file, fa_file, modifiedfa_file]]))
@@ -111,17 +96,51 @@ def stats_contigs_introns(fa_file, modifiedfa_file, gtf_file):
     #fig.show()
     #Mise en forme du tableau
     #fig = fig.to_html()
-    
-    #Nombre min / max / moyen d'introns retenus par contig
-    nbIntronsByContig=parse_nb_introns_by_contig(gtf_file)
-    print ('Nb introns par contig: ', nbIntronsByContig)
-    #charts.plot(nbIntronsByContig, name='Second list data', show='inline', options=dict(title=dict(text='My second chart!')))
-    #charts.html()
-
-    return nIntrons, nContigsAvecIntrons, nContigs, nbIntronsByContig, fig, figFiles;
-#https://www.geeksforgeeks.org/g-fact-41-multiple-return-values-in-python/
    
-def simulationReport(fa : str, modifiedfa : str, gtf : str, output : str, prefix : str) :
+
+
+
+
+
+# Return int
+def count_seq_from_fa(fasta):
+    nb_seq = 0;
+    for line in open(fasta):
+        if line.startswith('>'):
+            nb_seq += 1
+    return nb_seq
+
+# Return dict : item_name => int
+def count_items_from_gtf(gtf):
+    nb_items = dict();
+    for line in open(gtf):
+        if not line.startswith('#'):
+            nb_items[line.split()[2]] = nb_items.get(line.split()[2], 0) + 1
+    return nb_items
+
+# Return ?
+def t(gtf):
+    ctg_descr = dict()
+    for line in open(gtf):
+        if not line.startswith('#'):
+            k = line.split()[0]
+            if k in ctg_descr:
+                ctg_descr[k][line.split()[2]] = ctg_descr[k].get(line.split()[2], 0) + 1
+            else:
+                ctg_descr[k] = dict()
+                ctg_descr[k][line.split()[2]] = ctg_descr[k].get(line.split()[2], 0) + 1
+    
+    res = []
+    for ctg in ctg_descr.values():
+        tmpstr = ""
+        for key1, value1 in sorted(ctg.items(), key=lambda t: t[0]):
+            tmpstr += str(key1)+"#"+str(value1)+"\n"
+        res.append(tmpstr)
+    unique_elements, counts_elements = np.unique(res, return_counts=True)
+    print(np.asarray((unique_elements, counts_elements)))
+    return
+
+def simulationReport(modifiedfa : str, gtf : str, output : str, prefix : str) :
     output_path = output + "/html";
     if prefix:
         output_path += "_" + prefix;
@@ -129,10 +148,9 @@ def simulationReport(fa : str, modifiedfa : str, gtf : str, output : str, prefix
     # Create output dir if not exist
     if not os.path.exists(output) :
         os.mkdir(output)
-
-    stats_contigs_introns(fa.name, modifiedfa.name, gtf.name)
-       
-    nIntrons, nContigsAvecIntrons, nContigs, nbIntronsByContig, fig, figFiles = stats_contigs_introns(fa.name, modifiedfa.name, gtf.name)
+    
+    t(gtf.name)
+    return
     
     #create the report in a HTML file
     figtable=fig\
@@ -192,12 +210,10 @@ if __name__ == '__main__' :
     import argparse 
     
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fa')
-    parser.add_argument('-r','--reference', type=argparse.FileType('r'), required=True, dest='modifiedfa')
+    parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='modifiedfa')
     parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=True, dest='gtf') 
-    parser.add_argument('-o','--output', type=str, required=False, dest='output')
+    parser.add_argument('-o','--output', type=str, required=True, dest='output')
     parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
-
 
     args = vars(parser.parse_args())
     
