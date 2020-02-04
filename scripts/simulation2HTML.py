@@ -234,7 +234,7 @@ def chartIntronByContig(gtf_file, output):
     
     pass
    
-def simulationReport(fa : str, modifiedfa : str, gtf : str, output : str, prefix : str) :
+def simulationReport(modifiedfa : str, gtf : str, output : str, prefix : str) :
     output_path = output + "/html";
     if prefix:
         output_path += "_" + prefix;
