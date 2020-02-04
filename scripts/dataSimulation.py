@@ -185,8 +185,11 @@ def full_random_simulation(nb:int, maxi:int, mini:int, half:bool, lower:int, upp
         library_contigs_set.append(SeqRecord(library_seq,id=name.split()[0],description="reverse="+str(reverse)))
         
         description = " ".join(["intron_start="+str(intron_start),"intron_end="+str(intron_end),"reverse="+str(reverse)])
-        reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0]+".modif",description=description))
-        
+        if intron_start == None :
+            reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
+        else:
+            reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0]+".modif",description=description))
+     
         if distrib[c] :
             r = "+"
             if(reverse) :
@@ -196,7 +199,7 @@ def full_random_simulation(nb:int, maxi:int, mini:int, half:bool, lower:int, upp
     SeqIO.write(reference_contigs_set,output_path+"_contigs-modified.fa","fasta")
     SeqIO.write(library_contigs_set,output_path+"_contigs.fa","fasta")
     
-    with open(output_path+"_modifications.gtf","w") as out :
+    with open(output_path+"_contigs-modified.gtf","w") as out :
         out.write("\n".join(introns))
     
 
@@ -611,7 +614,7 @@ def construct_new_transcript(exons, classe):
         e_start = sum(whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < spliced_exon),"end"].apply(int)-whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < spliced_exon),"start"].apply(int)+1)+1
         e_end = e_start + (int(whole_transcript.at[spliced_exon,"end"])-int(whole_transcript.at[spliced_exon,"start"]))
         ft_on_t = [[
-            whole_transcript.at[spliced_exon,"misc_attr"]["transcript_id"],
+            whole_transcript.at[spliced_exon,"misc_attr"]["transcript_id"]+".modif",
             whole_transcript.at[spliced_exon,"DB"],
             "spliced_exon",
             str(e_start),
