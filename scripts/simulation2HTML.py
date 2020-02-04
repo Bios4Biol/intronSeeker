@@ -105,48 +105,6 @@ def general_stats_on_contig(modifiedfa_file, gtf_file):
     #fig.show()
     #Mise en forme du tableau
     #fig = fig.to_html()
-   
-
-
-
-
-# Return int
-def count_seq_from_fa(fasta):
-    nb_seq = 0;
-    for line in open(fasta):
-        if line.startswith('>'):
-            nb_seq += 1
-    return nb_seq
-
-# Return dict : item_name => int
-def count_items_from_gtf(gtf):
-    nb_items = dict();
-    for line in open(gtf):
-        if not line.startswith('#'):
-            nb_items[line.split()[2]] = nb_items.get(line.split()[2], 0) + 1
-    return nb_items
-
-# Return ?
-def t(gtf):
-    ctg_descr = dict()
-    for line in open(gtf):
-        if not line.startswith('#'):
-            k = line.split()[0]
-            if k in ctg_descr:
-                ctg_descr[k][line.split()[2]] = ctg_descr[k].get(line.split()[2], 0) + 1
-            else:
-                ctg_descr[k] = dict()
-                ctg_descr[k][line.split()[2]] = ctg_descr[k].get(line.split()[2], 0) + 1
-    
-    res = []
-    for ctg in ctg_descr.values():
-        tmpstr = ""
-        for key1, value1 in sorted(ctg.items(), key=lambda t: t[0]):
-            tmpstr += str(key1)+"#"+str(value1)+"\n"
-        res.append(tmpstr)
-    unique_elements, counts_elements = np.unique(res, return_counts=True)
-    print(np.asarray((unique_elements, counts_elements)))
-    return
 
 def barChart(gtf_file):
 
@@ -233,6 +191,69 @@ def chartIntronByContig(gtf_file, output):
     IntronsByContig.save_file(reportFile)
     
     pass
+
+
+
+
+
+
+
+
+
+
+# Return int
+def count_seq_from_fa(fasta):
+    nb_seq = 0;
+    for line in open(fasta):
+        if line.startswith('>'):
+            nb_seq += 1
+    return nb_seq
+
+# Return dict : item_name => int
+def count_items_from_gtf(gtf):
+    nb_items = dict();
+    for line in open(gtf):
+        if not line.startswith('#'):
+            nb_items[line.split()[2]] = nb_items.get(line.split()[2], 0) + 1
+    return nb_items
+
+# Return two dict
+def stat_from_gtf(gtf):
+    ctg_descr          = dict()
+    nb_features        = dict()
+    nb_features_by_ctg = dict()
+    tmp_array = []
+    for line in open(gtf):
+        if not line.startswith('#'):
+            k = line.split()[0]
+            if k in ctg_descr:
+                ctg_descr[k][line.split()[2]] = ctg_descr[k].get(line.split()[2], 0) + 1
+                if(line.split()[2] not in tmp_array):
+                    tmp_array.append(line.split()[2])
+                    nb_features_by_ctg[line.split()[2]] = nb_features_by_ctg.get(line.split()[2], 0) + 1
+            else:
+                ctg_descr[k] = dict()
+                ctg_descr[k][line.split()[2]] = ctg_descr[k].get(line.split()[2], 0) + 1
+                tmp_array = []
+                tmp_array.append(line.split()[2])
+                nb_features_by_ctg[line.split()[2]] = nb_features_by_ctg.get(line.split()[2], 0) + 1
+                
+            nb_features[line.split()[2]] = nb_features.get(line.split()[2], 0) + 1
+    
+    res = []
+    for ctg in ctg_descr.values():
+        tmpstr = ""
+        for k, v in sorted(ctg.items(), key=lambda t: t[0]):
+            if(tmpstr != ""):
+                tmpstr += " and " 
+            tmpstr += str(v)+" "+str(k)
+        res.append(tmpstr)
+    unique_elements, counts_elements = np.unique(res, return_counts=True)
+    ctg_descr = dict()
+    for i, e in enumerate(unique_elements):
+        ctg_descr[e] = ctg_descr.get(e, counts_elements[i])
+    
+    return nb_features, nb_features_by_ctg, ctg_descr
    
 def simulationReport(modifiedfa : str, gtf : str, output : str, prefix : str) :
     output_path = output + "/html";
@@ -243,7 +264,7 @@ def simulationReport(modifiedfa : str, gtf : str, output : str, prefix : str) :
     if not os.path.exists(output) :
         os.mkdir(output)
     
-    t(gtf.name)
+    print(stat_from_gtf(gtf.name))
     return
     
     #create the report in a HTML file
