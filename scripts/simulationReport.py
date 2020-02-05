@@ -60,7 +60,7 @@ def parse_fasta(fastafile) :
     return contigs
 
 def parse_control_introns(introns_coord_file) :
-    table = pd.read_table(introns_coord_file)
+    table = pd.read_table(introns_coord_file, usecols=[0,3,4], names=['contig','start', 'end'], header=None)
     table["length"] = table["end"]-table["start"]
     table['intron'] = table.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
     return table.set_index('intron')
