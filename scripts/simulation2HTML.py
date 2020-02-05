@@ -72,10 +72,32 @@ def tabGlobal(fasta, gtf):
                     ])
     tab.update_layout(
         autosize=False,
-        height=300,
+        height=400,
         paper_bgcolor="LightSteelBlue",
     )
     return tab
+
+#return tab3
+def tabByContig(gtf):
+    nb_features, nb_features_by_ctg, ctg_descr=stat_from_gtf(gtf)
+    print('ctg_descr - verif', ctg_descr)
+    n=count_items_from_gtf(gtf)
+    for ctg in n.values():
+        print('ctg', ctg)
+    for k, v in n.items():
+        print ('k item:', k)
+        print('v item:', v)
+        #table features types by contig/transcript
+        tab = go.Figure(data=[go.Table(header=dict(values=['Feature(s)', 'Nb contig(s)/transcript(s) modified']),
+                    cells=dict(values=[[k], [v]]))
+                        ])
+        tab.update_layout(
+            autosize=False,
+            height=500,
+            paper_bgcolor='rgba(0,0,0,0)',
+        )
+    return tab
+
 
 #return int
 def nbContigsModified(gtf):
@@ -87,6 +109,7 @@ def nbContigsModified(gtf):
 
     return nb_contig_modif
 
+#https://plot.ly/python/creating-and-updating-figures/
 
 ##################################################
 
@@ -173,7 +196,10 @@ def simulationReport(fasta : str, gtf : str, output : str, prefix : str) :
         .to_html()\
         .replace('<table border="1" class="dataframe">','<table class="table table-striped">') 
     
-    
+    tabByCtg=tabByContig(gtf.name)
+    tab3=tabByCtg\
+        .to_html()\
+        .replace('<table border="0" class="dataframe">','<table class="table table-striped">') 
 
     reportFile = '%s/%s' % (output,'simulation_report.html')
     #to append html : a+	
@@ -188,20 +214,15 @@ def simulationReport(fasta : str, gtf : str, output : str, prefix : str) :
 	   <h1>SIMULATION REPORT</h1>
 	   <h3>Input:  """ + tab1 + """ </h3>
 	   <h3>Global statistiques: """ + tab2 + """</h3>
-	   <h3>Statistiques by contig modified: """  """</h3>
+	   <h3>Statistiques by contig modified:</h3>
+           <h4>Features types: """ + tab3 + """</h4>
+           <h4>Features description by contig modified: """ + tab3 + """</h4>
        </body>
        </html>"""
        f.write(contenu)
        f.close() 
 
     return
-       
-    chartIntronByContig(gtf.name, output)
-    
-    
-    
-    pass
-#plots : https://python-graph-gallery.com/
 
 if __name__ == '__main__' :
     
