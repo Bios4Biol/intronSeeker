@@ -53,50 +53,52 @@ import json
 #return tab1
 def tabInput(fasta, gtf):
     #files and paths
-    tab = go.Figure(data=[go.Table(header=dict(values=['File name/path']),
-                cells=dict(values=[[gtf, fasta]]))
+    tab = go.Figure(data=[go.Table(header=dict(values=['File name/path'], fill_color='paleturquoise', align='left'),
+                cells=dict(values=[[gtf, fasta]], fill_color='lavender', align='left'))
                     ])
     tab.update_layout(
         autosize=False,
         width=900,
         height=300,
-        paper_bgcolor="LightSteelBlue",
+        paper_bgcolor='rgba(0,0,0,0)',
     )
     return tab
 
 #return tab2
 def tabGlobal(fasta, gtf):
     #table contig/transcript nb and nb tot of contig/transcript modified
-    tab = go.Figure(data=[go.Table(header=dict(values=['Nb contig(s)/transcript(s)', 'Nb contig(s)/transcript(s) modified']),
-                cells=dict(values=[[count_seq_from_fa(fasta)], [nbContigsModified(gtf)]]))
+    tab = go.Figure(data=[go.Table(header=dict(values=['Nb contig(s)/transcript(s)', 'Nb contig(s)/transcript(s) modified'], fill_color='paleturquoise', align='left'),
+                cells=dict(values=[[count_seq_from_fa(fasta)], [nbContigsModified(gtf)]], fill_color='lavender', align='left'))
                     ])
     tab.update_layout(
         autosize=False,
         height=400,
-        paper_bgcolor="LightSteelBlue",
+        paper_bgcolor='rgba(0,0,0,0)',
     )
     return tab
 
 #return tab3
 def tabByContig(gtf):
     nb_features, nb_features_by_ctg, ctg_descr=stat_from_gtf(gtf)
-    print('ctg_descr - verif', ctg_descr)
-    n=count_items_from_gtf(gtf)
-    for ctg in n.values():
-        print('ctg', ctg)
-    for k, v in n.items():
-        print ('k item:', k)
-        print('v item:', v)
-        #table features types by contig/transcript
-        tab = go.Figure(data=[go.Table(header=dict(values=['Feature(s)', 'Nb contig(s)/transcript(s) modified']),
-                    cells=dict(values=[[k], [v]]))
-                        ])
-        tab.update_layout(
-            autosize=False,
-            height=500,
-            paper_bgcolor='rgba(0,0,0,0)',
-        )
-    return tab
+
+    #https://stackoverflow.com/questions/18837262/convert-python-dict-into-a-dataframe
+    df=pd.DataFrame(list(ctg_descr.items()), columns=['Features', 'nbContigsByFeature'])
+
+    tab3 = go.Figure(data=[go.Table(
+    header=dict(values=list(df.columns),
+                fill_color='paleturquoise',
+                align='left'),
+    cells=dict(values=[df.Features, df.nbContigsByFeature],
+               fill_color='lavender',
+               align='left'))
+    ])
+    tab3.update_layout(
+        autosize=False,
+        height=400,
+        paper_bgcolor='rgba(0,0,0,0)',
+    )
+
+    return tab3
 
 
 #return int
@@ -111,7 +113,7 @@ def nbContigsModified(gtf):
 
 #https://plot.ly/python/creating-and-updating-figures/
 
-##################################################
+
 
 # Return int
 def count_seq_from_fa(fasta):
@@ -180,21 +182,21 @@ def simulationReport(fasta : str, gtf : str, output : str, prefix : str) :
     
     #create the report in a HTML file
 
-    print('count gtf items', count_items_from_gtf(gtf.name))
-    nb_features, nb_features_by_ctg, ctg_descr=stat_from_gtf(gtf.name)
-    print('nb_features', nb_features)
-    print('nb_features_by_ctg', nb_features_by_ctg)
-    print('ctg_descr', ctg_descr)
+    #print('count gtf items', count_items_from_gtf(gtf.name))
+    #nb_features, nb_features_by_ctg, ctg_descr=stat_from_gtf(gtf.name)
+    #print('nb_features', nb_features)
+    #print('nb_features_by_ctg', nb_features_by_ctg)
+    #print('ctg_descr', ctg_descr)
     
     tabInputList=tabInput(fasta.name, gtf.name)
     tab1=tabInputList\
         .to_html()\
-        .replace('<table border="1" class="dataframe">','<table class="table table-striped">') # use bootstrap styl
+        .replace('<table border="0" class="dataframe">','<table class="table table-striped">') # use bootstrap styl
 
     tabStatList=tabGlobal(fasta.name, gtf.name)
     tab2=tabStatList\
         .to_html()\
-        .replace('<table border="1" class="dataframe">','<table class="table table-striped">') 
+        .replace('<table border="0" class="dataframe">','<table class="table table-striped">') 
     
     tabByCtg=tabByContig(gtf.name)
     tab3=tabByCtg\
@@ -216,7 +218,6 @@ def simulationReport(fasta : str, gtf : str, output : str, prefix : str) :
 	   <h3>Global statistiques: """ + tab2 + """</h3>
 	   <h3>Statistiques by contig modified:</h3>
            <h4>Features types: """ + tab3 + """</h4>
-           <h4>Features description by contig modified: """ + tab3 + """</h4>
        </body>
        </html>"""
        f.write(contenu)
