@@ -35,8 +35,12 @@ import json
 #module load system/Miniconda3-4.7.10;
 #source activate ISeeker_environment;
 #cd scripts/; 
+
 #python3 simulation2HTML.py -g ../../archives_intronSeeker/FRS/frs_modifications.gtf -f ../../archives_intronSeeker/FRS/frs_contigs-modified.fa -o HTML
-#python3 simulation2HTML.py -f../../archives_intronSeeker/IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/GBS/gbs_Cele_test1_transcripts-modified.fa -g ../../archives_intronSeeker/IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/GBS/gbs_Cele_test1_transcripts-modified.gtf -o HTML
+
+#(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -f../../archives_intronSeeker/IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/GBS/gbs_Cele_test1_transcripts-modified.fa -g ../../archives_intronSeeker/IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/GBS/gbs_Cele_test1_transcripts-modified.gtf -o HTML
+#({'retained_intron': 17145, 'spliced_exon': 1675}, {'retained_intron': 11359, 'spliced_exon': 1675}, {'1 retained_intron': 6847, '1 spliced_exon': 1675, '2 retained_intron': 3238, '3 retained_intron': 1274})
+
 
 #python3 simulation2HTML.py -g /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -r /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_contigs.fa -o HTML/
 #simulate reads : config/grinder_frs_testA.cfg
@@ -45,9 +49,6 @@ import json
 #simulationReport.py --R1 ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/sr_test1_R1.fastq.gz --R2 ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/sr_test1_R2.fastq.gz --reference ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/frs_test1_contigs.fa --alignment ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/hisat2_test1.sort.bam --split-alignments ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/srs_test1_split_alignments.txt  --frs ???? TODO 
 
 
-
-    
-#Tableau - https://plot.ly/python/table/
   
    
 #return tab1
@@ -67,11 +68,11 @@ def tabInput(fasta, gtf):
 #return tab2
 def tabGlobal(fasta, gtf):
     #table contig/transcript nb and nb tot of contig/transcript modified
-    tab = go.Figure(data=[go.Table(header=dict(values=['Nb contig(s)/transcript(s)', 'Nb contig(s)/transcript(s) modified'], fill_color='paleturquoise', align='left'),
-                cells=dict(values=[[count_seq_from_fa(fasta)], [nbContigsModified(gtf)]], fill_color='lavender', align='left'))
+    tab = go.Figure(data=[go.Table(header=dict(values=['Nb contig(s)/transcript(s)', 'Nb contig(s)/transcript(s) modified','Nb retained introns and spliced exons'], fill_color='paleturquoise', align='left'),
+                cells=dict(values=[[count_seq_from_fa(fasta)], [nbContigsModified(gtf)], [nbIntronsExons(gtf)]], fill_color='lavender', align='left'))
                     ])
     tab.update_layout(
-        autosize=False,
+        autosize=True,
         height=400,
         paper_bgcolor='rgba(0,0,0,0)',
     )
@@ -111,8 +112,24 @@ def nbContigsModified(gtf):
 
     return nb_contig_modif
 
-#https://plot.ly/python/creating-and-updating-figures/
 
+#return nb introns exons
+def nbIntronsExons(gtf):
+    n=count_items_from_gtf(gtf)
+    print('n',n)
+    res = []
+    tmpstr = ""
+    for k, v in n.items():
+        if(tmpstr != ""):
+            tmpstr += " and " 
+        tmpstr += str(v)+" "+str(k)
+    res.append(tmpstr)
+    print('res:', res)
+
+    return res
+
+#https://plot.ly/python/creating-and-updating-figures/
+#Tableau - https://plot.ly/python/table/
 
 
 # Return int
