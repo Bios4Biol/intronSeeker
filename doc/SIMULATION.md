@@ -36,7 +36,7 @@ Before running any intronSeeker command, activate ISeeker environment with :
 + source activate ISeeker_environment;
 ```
 
-#### Full-random data simulation
+#### Full-random data simulation and simulate reads
 
 This program offer a full-random data simulaton functionality. It is possible to 
 generate a set of random contigs (their sequences are totally random), insert random introns inside contigs
@@ -46,9 +46,9 @@ Reads simulation is done in 2 steps. First, run intronSeeker fullRandomSimulatio
 or intronSeeker GTFbasedSimulation (for GBS data) in order to write a fasta file with contigs (*-modified.fa file). 
 Then, run intronSeeker simulateReads to write sequences fastq files (R1 and R2) from your reference fasta file.
 
-##### Simulate reads for FRS data
+##### FRS data
 
-Step 10 : Fasta file with contigs result of intronSeeker fullRandomSimulation
+###### Step 1 : Fasta file with contigs result of intronSeeker fullRandomSimulation
 
 ```diff
 + intronSeeker fullRandomSimulation -o DirName -p FileNameBeginning;
@@ -68,7 +68,7 @@ A GTF file which contains all the information about introns
 (contig name, begin/end coordinates, strand).
 
 
-Step 2  : Reads results of intronSeeker simulateReads script, 
+###### Step 2  : Reads results of intronSeeker simulateReads script, 
 runned from reference fasta file (no modified) 
 
 ```diff
@@ -87,15 +87,15 @@ Other files are archive which contains reads : there is only
 one file for single-end library or two for paired-end library.
 
 
-##### Simulate reads for GBS data
+##### GBS data
 
-Step 1 : Fasta file with contigs result of intronSeeker GTFbasedSimulation
+###### Step 1 : Fasta file with contigs result of intronSeeker GTFbasedSimulation
 
  ```diff
  + intronSeeker GTFbasedSimulation -a gtfFile -r RefFastaFile -o DirName -p FileNameBeginning;
  ``` 
  
-Step 2 Generate the reads library : Reads results of intronSeeker simulateReads script, 
+###### Step 2 Generate the reads library : Reads results of intronSeeker simulateReads script, 
 runned from reference fasta file (no modified)
 
  ```diff
