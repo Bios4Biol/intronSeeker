@@ -187,7 +187,7 @@ def get_html_body1():
 			    	</a>
 			    </li>
 			    <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#intron-len">
+				    <a class="nav-link" href="#feat_len_dist">
 				        <span class="oi oi-graph" aria-hidden="true"></span>
 				        Features len. distribution
 				    </a>
@@ -222,8 +222,9 @@ def get_html_inputfiles(fasta : str, mfasta : str, gtf : str):
 		</div>
 '''
 
-def get_html_seq_descr(global_stat : dict, nb_ctg_by_feature : dict, ctg_descr : dict):
-    return '''
+
+def get_html_seq_descr(global_stat : dict, nb_ctg_by_feature : dict, ctg_descr : dict, gtf : str):
+    r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Sequences description</h1>
                 <span class="anchor" id="seq-descr"></span>
@@ -247,6 +248,19 @@ def get_html_seq_descr(global_stat : dict, nb_ctg_by_feature : dict, ctg_descr :
         </div>
 '''
 
+    # Len dist for gtf
+    len_by_features, feature_names = len_dist_from_gtf(gtf)
+    r += '''
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5>Features length distribution</h5>
+                <span class="anchor" id="feat_len_dist"></span>
+'''+plot_dist(len_by_features, feature_names)+'''
+            </div>
+'''
+
+    return r
+
+
 def get_html_footer():
     return '''
         </main>
@@ -264,6 +278,7 @@ def get_html_footer():
   </body>
 </html>
 '''
+
 
 # Return HTML table from dict
 # Param 1 : dict (key, val)
@@ -364,10 +379,16 @@ def plot_dist(len_by_features, feature_names):
     colors = ['#333F44', '#37AA9C', '#94F3E4']
 
     # Create distplot with curve_type set to 'normal'
-    fig = ff.create_distplot(hist_data, group_labels, show_hist=False, colors=colors)
-
-    # Add title
-    fig.update_layout(title_text='Curve and Rug Plot')
+    fig = ff.create_distplot(hist_data, group_labels, show_hist=False, show_rug=True, colors=colors)
+    fig.update_layout(
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
+    )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
    
@@ -409,12 +430,8 @@ def simulationReport(fasta : str, mfasta : str, gtf : str, output : str, prefix 
     for k, v in nb_distinct_features.items():
         global_stat[str(c)+k] = v
         c+=1
-    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr)
+    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name)
     
-    # Len dist for gtf
-    len_by_features, feature_names = len_dist_from_gtf(gtf.name)
-    html += plot_dist(len_by_features, feature_names)
-
     # FOOTER
     html += get_html_footer()
 
