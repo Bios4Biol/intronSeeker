@@ -24,16 +24,16 @@ generate an intron free simulated contigs read library file.
 How to use ? 
 ------------
 
-Here, we'll present a non-exhaustive documentation on how to use the intronSeeker's 
-data simulation features. For an exhaustive documentation about the different functions 
+This documentation, not exhaustive, explain intronSeeker's data simulation features. 
+For an exhaustive documentation about the different functions 
 (description, options...), read the HOW TO USE file in doc directory. 
-We'll just present a fast and basic usage with examples of the program. All the 
-input files or output files presented here are available in data directory. 
+This is a fast and basic usage documentation with program examples. All  
+input or output files presented here are availables in data directory. 
 
-Before running any intronSeeker command, activate the conda environment with :
+Before running any intronSeeker command, activate ISeeker environment with :
 
 ```diff
-+ source activate Stalker_environment
++ source activate ISeeker_environment;
 ```
 
 #### Full-random data simulation
