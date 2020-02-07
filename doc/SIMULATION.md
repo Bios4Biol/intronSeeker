@@ -42,53 +42,64 @@ This program offer a full-random data simulaton functionality. It is possible to
 generate a set of random contigs (their sequences are totally random), insert random introns inside contigs
 and generate a library of reads from these contigs. 
 
-##### Contigs generation
+Reads simulation is done in 2 steps. First, run intronSeeker fullRandomSimulation (for FRS data) 
+or intronSeeker GTFbasedSimulation (for GBS data) in order to write a fasta file with contigs (*-modified.fa file). 
+Then, run intronSeeker simulateReads to write sequences fastq files (R1 and R2) from your reference fasta file.
 
-To generate the set of contigs **without** introns, run the command : 
+##### Simulate reads for FRS data
+
+Step 10 : Fasta file with contigs result of intronSeeker fullRandomSimulation
+
 ```diff
-+ intronStalker contig -n 10 --min 150 --max 1000 --output OutputRandomContig.fa
++ intronSeeker fullRandomSimulation -o DirName -p FileNameBeginning;
 ```
-Or just run :
+
+
+Results generated in a separate directory.
+This command insert random introns in each contig. 
+`-r` option : introns will be inserted in only 
+half of the contigs (randomly choosen). 
+For the details of default values and available parameters, 
+see the HOW TO USE file in doc directory.
+Outputs : 
+A FASTA file which contains contigs.
+A modified FASTA file which contains contigs with inserted introns.
+A GTF file which contains all the information about introns 
+(contig name, begin/end coordinates, strand).
+
+
+Step 2  : Reads results of intronSeeker simulateReads script, 
+runned from reference fasta file (no modified) 
 
 ```diff
-+ intronStalker contig
++ intronSeeker simulateReads -o DirName -p FileNameBeginning -f frs*contigs.fa -c grinderFile; 
 ```
-The two commands above give the same results : the arguments given in the first 
-command are the defaults values. The `-n` argument rules the total number of 
-sequences (i.e. contigs), `--min` is the minimal length of the contigs and `--max`
-the maximal length. Finally, `--output` (or `-o`) correspond to output filename.
-Like all of this program's features, the result will be generate in a separate 
-directory. Here, the results will be store in `OutputRandomContig_contig`.
 
-##### Introns insertion 
 
-Now, to insert random introns in all newly generated contigs, you have to run :
+
+##### Simulate reads for GBS data
+
+Step 1 : Fasta file with contigs result of intronSeeker GTFbasedSimulation
 
  ```diff
- + intronStalker intron -i OutputRandomContig_contig/OutputRandomContig.fa
+ + intronSeeker GTFbasedSimulation -a gtfFile -r RefFastaFile -o DirName -p FileNameBeginning;
+ ``` 
+ 
+Step 2 Generate the reads library : Reads results of intronSeeker simulateReads script, 
+runned from reference fasta file (no modified)
+
+ ```diff
+ + intronSeeker simulateReads -f RefFastaFile -c $grinderFile -o DirName -p FileNameBeginning;
  ``` 
 
-This command insert random introns in each contig. If you don't want intron in 
-each contig, you can use the `--rand` option : introns will be inserted in only 
-half of the contigs (randomly choosen). For the details of default values and 
-available parameters, see the HOW TO USE file in doc directory.
-This command creates three files but two are interesting : the fasta file which 
-contains the contigs with inserted introns and the `Coord.txt` file which contains 
-all the information about introns (contig name, begin/end coordinates, strand).
 
-##### Library generation : Grinder running
-
-Now, we get the contigs and the introns, we have to generate the reads library. 
 The library is generated from reference contigs (i.e. without introns). Grinder 
-needs a lot of parameter (detailed in Grinder documentation and in Grinder section
+needs a lot of parameters (detailed in Grinder documentation and in Grinder section
 in HOW TO USE file in doc repertory). An example of basic grinder.cfg file (i.e. the file 
-which conatains all grinder parameters) is available in config directory. The command is : 
+which contains all grinder parameters) is available in config directory.
 
-```diff
-+ intronStalker simulatedReads -r ref.fa -p grinder.cfg -o outputDirName
-```
-
-This command generates two or three files : the first one is the `ranks.txt` file
-which contains information about the library (abundance percentage of each contig 
-in term of reads). Other files are archive which contains reads : there is only 
+Outputs:
+A txt file which contains information about the library (abundance percentage of each contig 
+in term of reads).
+Other files are archive which contains reads : there is only 
 one file for single-end library or two for paired-end library.
