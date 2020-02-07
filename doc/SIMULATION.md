@@ -75,6 +75,16 @@ runned from reference fasta file (no modified)
 + intronSeeker simulateReads -o DirName -p FileNameBeginning -f frs*contigs.fa -c grinderFile; 
 ```
 
+The library is generated from reference contigs (i.e. without introns). Grinder 
+needs a lot of parameters (detailed in Grinder documentation and in Grinder section
+in HOW TO USE file in doc repertory). An example of basic grinder.cfg file (i.e. the file 
+which contains all grinder parameters) is available in config directory.
+
+Outputs:
+A txt file which contains information about the library (abundance percentage of each contig 
+in term of reads).
+Other files are archive which contains reads : there is only 
+one file for single-end library or two for paired-end library.
 
 
 ##### Simulate reads for GBS data
@@ -93,13 +103,3 @@ runned from reference fasta file (no modified)
  ``` 
 
 
-The library is generated from reference contigs (i.e. without introns). Grinder 
-needs a lot of parameters (detailed in Grinder documentation and in Grinder section
-in HOW TO USE file in doc repertory). An example of basic grinder.cfg file (i.e. the file 
-which contains all grinder parameters) is available in config directory.
-
-Outputs:
-A txt file which contains information about the library (abundance percentage of each contig 
-in term of reads).
-Other files are archive which contains reads : there is only 
-one file for single-end library or two for paired-end library.
