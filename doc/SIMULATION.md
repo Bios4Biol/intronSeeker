@@ -48,7 +48,9 @@ Then, run intronSeeker simulateReads to write sequences fastq files (R1 and R2) 
 
 ##### FRS data
 
-###### Step 1 : Fasta file with contigs result of intronSeeker fullRandomSimulation
+###### Step 1 : intronSeeker fullRandomSimulation
+
+Fasta file with contigs result of intronSeeker fullRandomSimulation
 
 ```diff
 + intronSeeker fullRandomSimulation -o DirName -p FileNameBeginning;
@@ -68,8 +70,11 @@ A GTF file which contains all the information about introns
 (contig name, begin/end coordinates, strand).
 
 
-###### Step 2  : Reads results of intronSeeker simulateReads script, 
+###### Step 2  :  intronSeeker simulateReads 
+
+Reads results of intronSeeker simulateReads script, 
 runned from reference fasta file (no modified) 
+
 
 ```diff
 + intronSeeker simulateReads -o DirName -p FileNameBeginning -f frs*contigs.fa -c grinderFile; 
@@ -89,13 +94,17 @@ one file for single-end library or two for paired-end library.
 
 ##### GBS data
 
-###### Step 1 : Fasta file with contigs result of intronSeeker GTFbasedSimulation
+###### Step 1 : intronSeeker GTFbasedSimulation
+
+Fasta file with contigs result of intronSeeker GTFbasedSimulation
 
  ```diff
  + intronSeeker GTFbasedSimulation -a gtfFile -r RefFastaFile -o DirName -p FileNameBeginning;
  ``` 
  
-###### Step 2 Generate the reads library : Reads results of intronSeeker simulateReads script, 
+###### Step 2 Generate the reads library
+
+Reads results of intronSeeker simulateReads script, 
 runned from reference fasta file (no modified)
 
  ```diff
