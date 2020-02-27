@@ -9,7 +9,6 @@ import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import argparse
 
-
 import re
 import pickle
 import pysam
@@ -36,22 +35,8 @@ import json
 #module load system/Miniconda3-4.7.10;
 #source activate ISeeker_environment;
 #cd scripts/; 
-
-#python3 simulation2HTML.py -g ../../archives_intronSeeker/FRS/frs_modifications.gtf -f ../../archives_intronSeeker/FRS/frs_contigs-modified.fa -o HTML
-
-#(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -f../../archives_intronSeeker/IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/GBS/gbs_Cele_test1_transcripts-modified.fa -g ../../archives_intronSeeker/IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/GBS/gbs_Cele_test1_transcripts-modified.gtf -o HTML
-#({'retained_intron': 17145, 'spliced_exon': 1675}, {'retained_intron': 11359, 'spliced_exon': 1675}, {'1 retained_intron': 6847, '1 spliced_exon': 1675, '2 retained_intron': 3238, '3 retained_intron': 1274})
-
-
-#python3 simulation2HTML.py -g /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -r /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/intronSeeker/FRS/CAS-A/sample1/frs_sample1_contigs.fa -o HTML/
-#simulate reads : config/grinder_frs_testA.cfg
-#Tests 
-#../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/
-#simulationReport.py --R1 ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/sr_test1_R1.fastq.gz --R2 ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/sr_test1_R2.fastq.gz --reference ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/frs_test1_contigs.fa --alignment ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/hisat2_test1.sort.bam --split-alignments ../../IntronSeeker_1rst_tests/Tests_Janv2020/intronSeeker/FRS/srs_test1_split_alignments.txt  --frs ???? TODO 
-
-
-
-
+#(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -o HTML -p tests -F  --frs  ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf  -D ../../archives_intronSeeker/TESTS/
+#(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o HTML -p tests -F  -D ../../archives_intronSeeker/TESTS/
 
 
 def get_html_header():
@@ -163,9 +148,9 @@ def get_html_body1():
                 </a>
               </li>
 			  <li class="nav-item">
-				<a class="nav-link" href="#seq-descr">
-				  <span class="oi oi-eye" aria-hidden="true"></span>
-					Sequences description
+				<a class="nav-link" href="#ref-descr">
+				  <span class="oi oi-collapse-down" aria-hidden="true"></span>
+					Reference
 				</a>
 			  </li>
 			    <li class="nav-item" style="padding-left:10px">
@@ -192,6 +177,18 @@ def get_html_body1():
 				        Features len. distribution
 				    </a>
 			    </li>
+			  <li class="nav-item">
+				<a class="nav-link" href="#read-descr">
+				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
+					Reads
+				</a>
+			  </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#readgstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Global statistics
+			    	</a>
+			    </li>
             </ul>
           </div>
           <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
@@ -204,8 +201,8 @@ def get_html_body1():
 		<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
 '''
 
-def get_html_inputfiles(fasta : str, mfasta : str, gtf : str):
-    return '''
+def get_html_inputfiles(fasta:str, mfasta:str, gtf:str, r1:str, r2=""):
+    r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 border-bottom">
 			<h1 class="h4">Input files</h1>
 			<span class="anchor" id="inputs-parameters"></span>
@@ -217,23 +214,29 @@ def get_html_inputfiles(fasta : str, mfasta : str, gtf : str):
                     <li class="list-group-item d-flex justify-content-between align-items-center p-2">FASTA file <span class="badge badge-success badge-pill ml-4">'''+fasta+'''</span></li>
                     <li class="list-group-item d-flex justify-content-between align-items-center p-2">Modified FASTA file <span class="badge badge-success badge-pill ml-4">'''+mfasta+'''</span></li>
                     <li class="list-group-item d-flex justify-content-between align-items-center p-2">GTF file of modified sequences <span class="badge badge-success badge-pill ml-4">'''+gtf+'''</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Read1 FASTQ file <span class="badge badge-success badge-pill ml-4">'''+r1+'''</span></li>'''
+    if r2:
+        r += '''
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Read2 FASTQ file <span class="badge badge-success badge-pill ml-4">'''+r2+'''</span></li>'''
+    r += '''
 				</ul>
 			</div>
 		</div>
 '''
+    return r
 
 
 def get_html_seq_descr(global_stat : dict, nb_ctg_by_feature : dict, ctg_descr : dict, gtf : str):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Sequences description</h1>
-                <span class="anchor" id="seq-descr"></span>
+            <h1 class="h4">Sequences</h1>
+                <span class="anchor" id="ref-descr"></span>
         </div>
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Global statistics</h5>
                 <span class="anchor" id="gstat"></span>
-'''+dict_to_table(global_stat,4,True)+'''
+'''+dict_to_table(global_stat,7,True)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Number of sequences by feature type</h5>
@@ -257,10 +260,26 @@ def get_html_seq_descr(global_stat : dict, nb_ctg_by_feature : dict, ctg_descr :
 '''+plot_dist(len_by_features, feature_names)+'''
             </div>
 '''
-
     return r
 
 
+def get_html_reads_descr(global_stat_fastq : dict):
+    r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Reads</h1>
+                <span class="anchor" id="read-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-4 pl-0 col-md-4">
+                <h5>Global statistics</h5>
+                <span class="anchor" id="readgstat"></span>
+'''+dict_to_table(global_stat_fastq,-1,True)+'''
+            <div>
+        </div>
+'''
+    return r
+    
+    
 def get_html_footer():
     return '''
         </main>
@@ -301,14 +320,6 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool):
         c += 1
     table += "</tbody></table>"
     return table
-
-# Return int
-def count_seq_from_fa(fasta):
-    nb_seq = 0;
-    for line in open(fasta):
-        if line.startswith('>'):
-            nb_seq += 1
-    return nb_seq
 
 
 # Return 3 dict : nb_distinct_features, nb_ctg_by_feature, ctg_descr
@@ -373,7 +384,6 @@ def len_dist_from_gtf(gtf):
 
 # Distribution plot
 def plot_dist(len_by_features, feature_names):
-
     hist_data = len_by_features
     group_labels = feature_names
     colors = ['#333F44', '#37AA9C', '#94F3E4']
@@ -391,8 +401,83 @@ def plot_dist(len_by_features, feature_names):
     )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
-   
-def simulationReport(fasta : str, mfasta : str, gtf : str, output : str, prefix : str, force: bool) :
+
+# Parse fasta file and return pandas.DataFrame
+def parse_fasta(fastafile, save_seq) :
+    with open(fastafile,"r") as ff :
+        if(save_seq) :
+            fasta = {record.id : pd.Series({
+                'length':len(record),
+                'sequence':record.seq,
+                **{a.split("=")[0]:a.split("=")[1] for a in record.description.split() if a.startswith("class")}
+            })
+            for record in SeqIO.parse(ff, "fasta")}
+        else :
+            fasta = {record.id : pd.Series({
+                'length':len(record),
+                **{a.split("=")[0]:a.split("=")[1] for a in record.description.split() if a.startswith("class")}
+            })
+            for record in SeqIO.parse(ff, "fasta")}
+        df = pd.DataFrame.from_dict(fasta,orient='index')
+        df.index.name='contig'
+    return df
+
+
+# Parse library R1 and R2 return a pandas.DataFrame named library where each line is a read description
+def parse_library(r1,r2) :
+    if r1.endswith('.gz') :
+        my_open = gzip.open
+    else :
+        my_open = open
+    lectures=[]
+    with my_open(r1,"rt") as file1 :
+        for record in SeqIO.parse(file1, "fastq") :
+            reference = record.description.split()[1].lstrip("reference=")
+            id = record.id
+            start,end,complement =  parse_positions(record.description.split()[2])
+            lectures.append([reference,id,start,end,complement])
+    if r2 :
+        with my_open(r2,"rt") as file2 :
+            for record in SeqIO.parse(file2, "fastq") :
+                reference = record.description.split()[1].lstrip("reference=")
+                id = record.id
+                start,end,complement =  parse_positions(record.description.split()[2])
+                lectures.append([reference,id,int(start),int(end),complement])
+    return pd.DataFrame(lectures,columns=["contig","lecture","start","end","complement"]).sort_values(["contig","start","end"]).set_index('lecture') 
+
+
+# Return read description (start, end, complement)
+def parse_positions(fastq_pos) :
+    pos = fastq_pos.lstrip("position=").split("..")
+    complement = ('complement(' in pos[0])
+    start = int(pos[0].lstrip("complement("))-1
+    end = int(pos[1].rstrip(")"))
+    return start,end,complement
+
+
+# Return panda which contains gtf features desc (seqref feature start end)
+def parse_gtf(gtf) :
+    t = pd.read_table(gtf, usecols=[0,2,3,4], names=['contig','feature','start', 'end'], header=None)
+    t["length"] = t["end"]-t["start"]
+    t['features'] = t.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
+    return t.set_index('features')
+
+
+def compute_tr_length(df_mfasta, df_features) :
+    return df_mfasta.length - df_features.loc[lambda df : df.contig == df_mfasta.name,"length" ].sum()
+
+
+def compute_pos_on_mfasta(df_features, df_mfasta) :
+    pos_on_contig = df_features.start/df_mfasta.at[df_features.contig,"short_length"]*100
+    c_seq = str(df_mfasta.at[df_features.contig,'sequence'])
+    flanks = str(c_seq[df_features.start:df_features.start+2])+"_"+str(c_seq[df_features.end-2:df_features.end])
+    return pd.Series([flanks,pos_on_contig],index=["flanks","pos_on_contig"])
+
+    
+############
+# SUB MAIN #
+############
+def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, output:str, prefix:str, force:bool) :
     output_path = output + "/report";
     if prefix:
         output_path += "_" + prefix;
@@ -411,28 +496,94 @@ def simulationReport(fasta : str, mfasta : str, gtf : str, output : str, prefix 
             print('\nError: output file already exists.\n')
             exit(1)
 
+	### MEMO 
+	# fasta  = sequences used to generate reads
+	# mfasta = sequences used to align reads
+	
+	### Build pandas ###
+    # df_fasta    : pandas.DataFrame where each line is a seq description from FASTA file
+    # df_mfasta   : pandas.DataFrame where each line is a modified seq description from modified FASTA file
+    # df_library  : pandas.DataFrame where each line is a read description from R1 (& R2) fastq file(s)
+    # df_features : pandas.DataFrame where each line is a simulated features description 
+    df_fasta  = parse_fasta(fasta.name, False)
+    df_mfasta = parse_fasta(mfasta.name, True)
+
+    if r2 :
+        df_library = parse_library(r1.name, r2.name)
+    else :
+        df_library = parse_library(r1.name)
+
+    df_features = parse_gtf(gtf.name)
+    
+    # add a column to df_fasta with the "fasta" length (without any simulated features)
+    df_mfasta["short_length"] = df_mfasta.apply(
+        compute_tr_length,
+        axis = 1,
+        df_features=df_features
+    )
+    
+    # add two columns to df_features:
+    #  1- the true insertion position of the simulated feature (in term of mfasta length percentage)
+    #  2- the borders of the simulated features (in term of nucleotides)
+    df_features = df_features.join(
+        other = df_features.apply(
+            compute_pos_on_mfasta,
+            axis=1,
+            df_mfasta=df_mfasta
+        )
+    )
+    
+    print('fasta head :' , df_fasta.head(5))
+    print('mfasta head :' , df_mfasta.head(5))
+    print('library head :' , df_library.head(5))
+    print('features head :', df_features.head(5))
+
+
+
     # HEADER
     html = get_html_header()
     html += get_html_body1()
 
     # INPUT FILES
-    html += get_html_inputfiles(os.path.basename(fasta.name), os.path.basename(mfasta.name), os.path.basename(gtf.name))
+    if r2:
+        html += get_html_inputfiles(os.path.basename(fasta.name), os.path.basename(mfasta.name), os.path.basename(gtf.name), os.path.basename(r1.name), os.path.basename(r2.name))
+    else:
+        html += get_html_inputfiles(os.path.basename(fasta.name), os.path.basename(mfasta.name), os.path.basename(gtf.name), os.path.basename(r1.name))
 
     # SEQUENCE STAT
     # Global stat
     nb_distinct_features, nb_ctg_by_feature, ctg_descr = stat_from_gtf(gtf.name)
     global_stat = dict()
-    global_stat["0Number of sequences in FASTA file"] = count_seq_from_fa(fasta.name)
-    global_stat["1Number of sequences in modified FASTA file"] = count_seq_from_fa(mfasta.name)
-    global_stat["2Number of modified sequences"] = sum(nb_ctg_by_feature.values())
-    global_stat["3Number of features in GTF"]    = sum(nb_distinct_features.values())
-    c = 4    
-    for k, v in nb_distinct_features.items():
+    global_stat["0FASTA file - Number of seq."]            = df_fasta.shape[0]
+    global_stat["1FASTA file - Mean seq. length"]          = int(df_fasta['length'].mean())
+    global_stat["2Modified FASTA file - Number of seq."]   = df_mfasta.shape[0]
+    global_stat["3Modified FASTA file - Mean seq. length"] = int(df_mfasta['length'].mean())
+    global_stat["4Number of modified sequences"]           = df_mfasta.loc[df_mfasta.index.str.contains(".modif")].shape[0]
+    global_stat["5Number of distinct features in GTF"]     = df_features.feature.value_counts().shape[0]
+    global_stat["6Number of features in GTF"]              = df_features.shape[0]
+    c = 7
+    for k, v in (df_features.feature.value_counts()).items() :
         global_stat[str(c)+k] = v
         c+=1
+
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name)
+       
+    # READS STAT 
+    # Global stat
+    global_stat_fastq = dict()
+    global_stat_fastq["0Number of fragments"] = df_library['contig'].count()
+    global_stat_fastq["1Mean coverage"] = 0
+    for i,row in df_library.iterrows():
+        global_stat_fastq["1Mean coverage"] += row['end'] - row['start'] + 1
+    global_stat_fastq["1Mean coverage"] /= (global_stat["1FASTA file - Mean seq. length"] * global_stat["0FASTA file - Number of seq."])
+    global_stat_fastq["1Mean coverage"] = round(global_stat_fastq["1Mean coverage"], 2)
     
+    html += get_html_reads_descr(global_stat_fastq)
+    
+    ## ALIGNMENT STAT
+        
     # FOOTER
+    html += "<br/>"
     html += get_html_footer()
 
     with open(output_file, "w") as f:
@@ -442,7 +593,9 @@ if __name__ == '__main__' :
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta')
     parser.add_argument('-m','--modifiedfasta', type=argparse.FileType('r'), required=True, dest='mfasta')
-    parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=True, dest='gtf') 
+    parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=True, dest='gtf')
+    parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1')
+    parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
     parser.add_argument('-o','--output', type=str, required=True, dest='output')
     parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
