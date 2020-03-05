@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import argparse
 
+
 import re
 import pickle
 import pysam
@@ -36,8 +37,7 @@ import json
 #source activate ISeeker_environment;
 #cd scripts/; 
 #(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -o HTML -p tests -F  --frs  ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf  -D ../../archives_intronSeeker/TESTS/
-#(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o HTML -p tests -F  -D ../../archives_intronSeeker/TESTS/
-
+#(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o HTML -p tests -F  -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz
 
 def get_html_header():
     return '''
@@ -128,7 +128,6 @@ def get_html_header():
     <title>IntronSeeker simulation report</title>
   </head>
 '''
-
 def get_html_body1():
     return '''
   <body>
@@ -201,6 +200,97 @@ def get_html_body1():
 		<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
 '''
 
+def get_html_body2(flagstat="", candidat=""):
+    r = '''
+  <body>
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">IntronSeeker simulation report</a>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="#inputs-parameters">
+                  <span class="oi oi-file" aria-hidden="true"></span>
+                  Input files
+                </a>
+              </li>
+			  <li class="nav-item">
+				<a class="nav-link" href="#ref-descr">
+				  <span class="oi oi-collapse-down" aria-hidden="true"></span>
+					Reference
+				</a>
+			  </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#gstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Global statistics
+			    	</a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#nb_ctg_by_feature">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Nb. of seq. by feature type
+			    	</a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ctg_descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Nb. of seq. with same features
+			    	</a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#feat_len_dist">
+				        <span class="oi oi-graph" aria-hidden="true"></span>
+				        Features len. distribution
+				    </a>
+			    </li>
+			  <li class="nav-item">
+				<a class="nav-link" href="#read-descr">
+				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
+					Reads
+				</a>
+			  </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#readgstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Global statistics
+			    	</a>
+			    </li>'''
+    if flagstat:
+        r += '''
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#readastat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Alignment statistics
+			    	</a>
+			    </li>'''
+    r += ''' '''
+    if candidat:
+        r += '''
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#readsstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Split statistics
+			    	</a>
+			    </li>
+            </ul>
+          </div>
+          <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
+		    Produced by IntronSeeker_v1.0<br>
+		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://www.inrae.fr/themes/custom/inrae_socle/favicon.ico"><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
+		    <a style="color:#212529;" href="https://inrae.fr" target="_blank">INRAE</a><br>
+		    Designed by the <a style="color:#212529;" href="http://sigenae.org" target="_blank">Sigenae</a> team.
+          </div>
+        </nav>
+		<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+'''
+    return r
+    
+
 def get_html_inputfiles(fasta:str, mfasta:str, gtf:str, r1:str, r2=""):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 border-bottom">
@@ -271,7 +361,6 @@ def get_html_reads_descr(global_stat_fastq : dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-4 pl-0 col-md-4">
-                <h5>Global statistics</h5>
                 <span class="anchor" id="readgstat"></span>
 '''+dict_to_table(global_stat_fastq,-1,True)+'''
             <div>
@@ -279,6 +368,38 @@ def get_html_reads_descr(global_stat_fastq : dict):
 '''
     return r
     
+def get_html_bam_descr(global_stat_flagstat : dict):
+    r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Bam</h1>
+                <span class="anchor" id="read-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-4 pl-0 col-md-4">
+                <span class="anchor" id="readastat"></span>
+'''+dict_to_table(global_stat_flagstat,-1,True)+'''
+            <div>
+        </div>
+'''
+    return r    
+    
+    
+def get_html_candidat_descr(global_stat_candidat : dict):
+    r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Candidats</h1>
+                <span class="anchor" id="read-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-4 pl-0 col-md-4">
+                <h5>Global statistics</h5>
+                <span class="anchor" id="readsstat"></span>
+'''+dict_to_table(global_stat_candidat,-1,True)+'''
+            <div>
+        </div>
+'''
+
+    return r      
     
 def get_html_footer():
     return '''
@@ -381,7 +502,6 @@ def len_dist_from_gtf(gtf):
                 len_by_features[feature_names.index(feature)].append(int(end)-int(start)+1)
     return len_by_features, feature_names
 
-
 # Distribution plot
 def plot_dist(len_by_features, feature_names):
     hist_data = len_by_features
@@ -461,7 +581,32 @@ def parse_gtf(gtf) :
     t["length"] = t["end"]-t["start"]
     t['features'] = t.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
     return t.set_index('features')
+    
+# Return panda which contains gtf features desc (seqref feature start end)  -- WARNING : header=0 car il y a déjà une lettre de titre commentée !!
+def parse_candidat(candidat) :
+    t = pd.read_table(candidat, usecols=[0,2,3,4,6], names=['ID', 'start', 'end', 'depth', 'filter'],  header=0)
+    print(type(t))
+    print(t.dtypes)
+    return t.set_index('ID')
+    
 
+# Return int : nbreads, mapped, paired, proper
+def parse_flagstat(flagstat) :
+    with open(flagstat) as f:
+        mylist = [line.rstrip('\n') for line in f]
+        for i in range(0, 12):
+            line=mylist[i]
+            #pos1 = line.find('\D\s')
+            pos2 = line.find('+')  
+            if "QC-passed reads" in line:
+                nbreads=line[0:pos2]
+            if "mapped (" in line:
+                mapped=line[0:pos2]
+            if "paired in sequencing" in line:
+                paired=line[0:pos2]
+            if "properly paired" in line:
+                proper=line[0:pos2]
+    return nbreads, mapped, paired, proper
 
 def compute_tr_length(df_mfasta, df_features) :
     return df_mfasta.length - df_features.loc[lambda df : df.contig == df_mfasta.name,"length" ].sum()
@@ -477,7 +622,7 @@ def compute_pos_on_mfasta(df_features, df_mfasta) :
 ############
 # SUB MAIN #
 ############
-def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, output:str, prefix:str, force:bool) :
+def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:str, candidat:str, output:str, prefix:str, force:bool) :
     output_path = output + "/report";
     if prefix:
         output_path += "_" + prefix;
@@ -543,6 +688,15 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, output:str,
     # HEADER
     html = get_html_header()
     html += get_html_body1()
+    #if flagstat:
+    #    html += get_html_body2(flagstat.name)
+    #elif candidat:
+    #    html += get_html_body2(candidat.name)
+    #elif candidat and flagstat:
+    #    html += get_html_body2(flagstat.name, candidat.name)
+    #else:
+    #    html += get_html_body2()
+        
 
     # INPUT FILES
     if r2:
@@ -581,7 +735,34 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, output:str,
     html += get_html_reads_descr(global_stat_fastq)
     
     ## ALIGNMENT STAT
+    if flagstat:
+        nbreads, mapped, paired, proper = parse_flagstat(flagstat.name)
+        global_stat_flagstat = dict()
+        global_stat_flagstat["0Total number of reads passing quality controls"] = nbreads
+        global_stat_flagstat["1Mapped"]                                         = mapped
+        global_stat_flagstat["2Paired in sequencing"]                           = paired
+        global_stat_flagstat["3Properly paired"]                                = proper
+        html += get_html_bam_descr(global_stat_flagstat)
         
+        
+    ## SPLITREADSEARCH STAT
+    if candidat:
+        df_candidat = parse_candidat(candidat.name)
+        print('candidat head :' , df_candidat.head(5))
+        global_stat_candidat = dict()
+        global_stat_candidat["0Number of candidats"] = df_candidat.shape[0]
+        global_stat_candidat["1Mean length"] = 0
+        nbPASS = 0
+        for i,row in df_candidat.iterrows():
+            global_stat_candidat["1Mean length"] += row['end'] - row['start'] + 1
+            if "PASS" in row['filter']:
+                nbPASS += 1
+        global_stat_candidat["1Mean length"] /= (global_stat_candidat["0Number of candidats"])
+        global_stat_candidat["1Mean length"] = round(global_stat_candidat["1Mean length"], 2)
+        global_stat_candidat["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
+        global_stat_candidat["3Number of canonic junction"] = nbPASS
+        html += get_html_candidat_descr(global_stat_candidat)
+            
     # FOOTER
     html += "<br/>"
     html += get_html_footer()
@@ -596,6 +777,8 @@ if __name__ == '__main__' :
     parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=True, dest='gtf')
     parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1')
     parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
+    parser.add_argument('-a','--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat')
+    parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
     parser.add_argument('-o','--output', type=str, required=True, dest='output')
     parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
