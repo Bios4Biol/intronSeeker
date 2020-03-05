@@ -128,79 +128,8 @@ def get_html_header():
     <title>IntronSeeker simulation report</title>
   </head>
 '''
-def get_html_body1():
-    return '''
-  <body>
-    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">IntronSeeker simulation report</a>
-    </nav>
 
-    <div class="container-fluid">
-      <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-          <div class="sidebar-sticky">
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link" href="#inputs-parameters">
-                  <span class="oi oi-file" aria-hidden="true"></span>
-                  Input files
-                </a>
-              </li>
-			  <li class="nav-item">
-				<a class="nav-link" href="#ref-descr">
-				  <span class="oi oi-collapse-down" aria-hidden="true"></span>
-					Reference
-				</a>
-			  </li>
-			    <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#gstat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Global statistics
-			    	</a>
-			    </li>
-			    <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#nb_ctg_by_feature">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Nb. of seq. by feature type
-			    	</a>
-			    </li>
-			    <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#ctg_descr">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Nb. of seq. with same features
-			    	</a>
-			    </li>
-			    <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#feat_len_dist">
-				        <span class="oi oi-graph" aria-hidden="true"></span>
-				        Features len. distribution
-				    </a>
-			    </li>
-			  <li class="nav-item">
-				<a class="nav-link" href="#read-descr">
-				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
-					Reads
-				</a>
-			  </li>
-			    <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#readgstat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Global statistics
-			    	</a>
-			    </li>
-            </ul>
-          </div>
-          <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
-		    Produced by IntronSeeker_v1.0<br>
-		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://www.inrae.fr/themes/custom/inrae_socle/favicon.ico"><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
-		    <a style="color:#212529;" href="https://inrae.fr" target="_blank">INRAE</a><br>
-		    Designed by the <a style="color:#212529;" href="http://sigenae.org" target="_blank">Sigenae</a> team.
-          </div>
-        </nav>
-		<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-'''
-
-def get_html_body2(flagstat="", candidat=""):
+def get_html_body1(flagstat="", candidat=""):
     r = '''
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
@@ -268,7 +197,6 @@ def get_html_body2(flagstat="", candidat=""):
 				    	Alignment statistics
 			    	</a>
 			    </li>'''
-    r += ''' '''
     if candidat:
         r += '''
                 <li class="nav-item" style="padding-left:10px">
@@ -276,7 +204,8 @@ def get_html_body2(flagstat="", candidat=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Split statistics
 			    	</a>
-			    </li>
+			    </li>'''
+    r += '''            
             </ul>
           </div>
           <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
@@ -687,16 +616,14 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:st
 
     # HEADER
     html = get_html_header()
-    html += get_html_body1()
-    #if flagstat:
-    #    html += get_html_body2(flagstat.name)
-    #elif candidat:
-    #    html += get_html_body2(candidat.name)
-    #elif candidat and flagstat:
-    #    html += get_html_body2(flagstat.name, candidat.name)
-    #else:
-    #    html += get_html_body2()
-        
+    if flagstat:
+        html += get_html_body1(flagstat.name)
+    elif candidat:
+        html += get_html_body1(candidat.name)
+    elif candidat and flagstat:
+        html += get_html_body1(flagstat.name, candidat.name)
+    else:
+        html += get_html_body1()
 
     # INPUT FILES
     if r2:
