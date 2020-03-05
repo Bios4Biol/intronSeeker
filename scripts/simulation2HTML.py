@@ -344,7 +344,7 @@ def get_html_seq_descr(global_stat : dict, nb_ctg_by_feature : dict, ctg_descr :
     # Len dist for gtf
     len_by_features, feature_names = len_dist_from_gtf(gtf)
     r += '''
-            <div class="mt-4 mr-0 pl-0 col-md-12">
+            <div class="mt-4 mr-0 pl-0 col-md-6">
                 <h5>Features length distribution</h5>
                 <span class="anchor" id="feat_len_dist"></span>
 '''+plot_dist(len_by_features, feature_names)+'''
