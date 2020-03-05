@@ -510,6 +510,12 @@ def parse_gtf(gtf) :
     t["length"] = t["end"]-t["start"]
     t['features'] = t.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
     return t.set_index('features')
+
+def parse_control_introns(introns_coord_file) :
+    table = pd.read_table(introns_coord_file, usecols=[0,3,4], names=['contig','start', 'end'], header=None)
+    table["length"] = table["end"]-table["start"]
+    table['intron'] = table.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
+    return table.set_index('intron')    
     
 # Return panda which contains gtf features desc (seqref feature start end)  -- WARNING : header=0 car il y a déjà une lettre de titre commentée !!
 def parse_candidat(candidat) :
@@ -546,7 +552,6 @@ def compute_pos_on_mfasta(df_features, df_mfasta) :
     c_seq = str(df_mfasta.at[df_features.contig,'sequence'])
     flanks = str(c_seq[df_features.start:df_features.start+2])+"_"+str(c_seq[df_features.end-2:df_features.end])
     return pd.Series([flanks,pos_on_contig],index=["flanks","pos_on_contig"])
-
     
 ############
 # SUB MAIN #
@@ -579,6 +584,7 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:st
     # df_mfasta   : pandas.DataFrame where each line is a modified seq description from modified FASTA file
     # df_library  : pandas.DataFrame where each line is a read description from R1 (& R2) fastq file(s)
     # df_features : pandas.DataFrame where each line is a simulated features description 
+    # df_candidat : pandas.DataFrame where each line is a candidat description
     df_fasta  = parse_fasta(fasta.name, False)
     df_mfasta = parse_fasta(mfasta.name, True)
 
@@ -589,14 +595,14 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:st
 
     df_features = parse_gtf(gtf.name)
     
-    # add a column to df_fasta with the "fasta" length (without any simulated features)
+    # Add a column to df_fasta with the "fasta" length (without any simulated features)
     df_mfasta["short_length"] = df_mfasta.apply(
         compute_tr_length,
         axis = 1,
         df_features=df_features
     )
     
-    # add two columns to df_features:
+    # Add two columns to df_features:
     #  1- the true insertion position of the simulated feature (in term of mfasta length percentage)
     #  2- the borders of the simulated features (in term of nucleotides)
     df_features = df_features.join(
@@ -660,6 +666,9 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:st
     global_stat_fastq["1Mean coverage"] = round(global_stat_fastq["1Mean coverage"], 2)
     
     html += get_html_reads_descr(global_stat_fastq)
+    
+    # Plot intron position on contig
+    #plot_insertion_in_contig(df_features['pos_on_contig'])
     
     ## ALIGNMENT STAT
     if flagstat:
