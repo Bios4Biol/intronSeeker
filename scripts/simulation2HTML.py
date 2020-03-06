@@ -18,14 +18,10 @@ import time
 import sys
 import concurrent.futures as prl
 import tempfile
-#import matplotlib.pyplot as plt
-#from scipy.stats import gaussian_kde
-from IPython.display import HTML
 from pprint import pprint
 from collections import OrderedDict
 from itertools import repeat
 from Bio import SeqIO
-from intronSeekerPlot import *
 
 from json import JSONEncoder
 import json
@@ -38,6 +34,7 @@ import json
 #cd scripts/; 
 #(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -o HTML -p tests -F  --frs  ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf  -D ../../archives_intronSeeker/TESTS/
 #(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o HTML -p tests -F  -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz
+#python3 simulation2HTML.py -m /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/HTML -p TOTO -F  -1 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt
 
 def get_html_header():
     return '''
@@ -177,6 +174,12 @@ def get_html_body1(flagstat="", candidat=""):
 				        Features len. distribution
 				    </a>
 			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#feat_dist_intron">
+				        <span class="oi oi-graph" aria-hidden="true"></span>
+				        Introns positions
+				    </a>
+			    </li>  
 			  <li class="nav-item">
 				<a class="nav-link" href="#read-descr">
 				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
@@ -245,7 +248,7 @@ def get_html_inputfiles(fasta:str, mfasta:str, gtf:str, r1:str, r2=""):
     return r
 
 
-def get_html_seq_descr(global_stat : dict, nb_ctg_by_feature : dict, ctg_descr : dict, gtf : str):
+def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Sequences</h1>
@@ -273,11 +276,20 @@ def get_html_seq_descr(global_stat : dict, nb_ctg_by_feature : dict, ctg_descr :
     # Len dist for gtf
     len_by_features, feature_names = len_dist_from_gtf(gtf)
     r += '''
+        <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-6">
                 <h5>Features length distribution</h5>
                 <span class="anchor" id="feat_len_dist"></span>
 '''+plot_dist(len_by_features, feature_names)+'''
             </div>
+'''
+    r += '''
+            <div class="mt-4 mr-0 pl-0 col-md-6">
+                <h5>Distribution of introns insertion position along the contigs</h5>
+                <span class="anchor" id="feat_dist_intron"></span>
+'''+plot_insertion_in_contig(pos)+'''
+            </div>
+        </div>    
 '''
     return r
 
@@ -431,14 +443,43 @@ def len_dist_from_gtf(gtf):
                 len_by_features[feature_names.index(feature)].append(int(end)-int(start)+1)
     return len_by_features, feature_names
 
+
 # Distribution plot
 def plot_dist(len_by_features, feature_names):
     hist_data = len_by_features
     group_labels = feature_names
     colors = ['#333F44', '#37AA9C', '#94F3E4']
-
     # Create distplot with curve_type set to 'normal'
     fig = ff.create_distplot(hist_data, group_labels, show_hist=False, show_rug=True, colors=colors)
+    fig.update_layout(
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
+    )
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
+
+# Plot introns position on a contigs
+def plot_insertion_in_contig(positions) :
+    hist = go.Histogram(
+            x=positions,
+            xbins=dict(
+                start=0,
+                end=100,
+                size=2),
+            marker=dict(
+                color='purple'
+            )
+    )
+    layout = go.Layout(xaxis=dict(
+                           title="% of contig length"),
+                       yaxis=dict(
+                           title="Count"))
+    fig = go.Figure(data=[hist],layout=layout)
     fig.update_layout(
         margin=go.layout.Margin(
             l=50,
@@ -473,7 +514,7 @@ def parse_fasta(fastafile, save_seq) :
 
 
 # Parse library R1 and R2 return a pandas.DataFrame named library where each line is a read description
-def parse_library(r1,r2) :
+def parse_library(r1, r2=0) :
     if r1.endswith('.gz') :
         my_open = gzip.open
     else :
@@ -548,11 +589,17 @@ def compute_tr_length(df_mfasta, df_features) :
 
 
 def compute_pos_on_mfasta(df_features, df_mfasta) :
+    #print(df_mfasta.at[df_features.contig,"short_length"]) #608
     pos_on_contig = df_features.start/df_mfasta.at[df_features.contig,"short_length"]*100
+    #print('pos_on_contig',pos_on_contig) #pos_on_contig 42.26973684210527
     c_seq = str(df_mfasta.at[df_features.contig,'sequence'])
+    #print('c_seq',c_seq)
+    #c_seq TCAGGGCTCGAATAAACAGGCAAGCGGCTCGTAGATGGTGCTATCTTAACAACAAGGAAACGGCCCTGGATCGCCAGTTATACAAGGCGGAG...
     flanks = str(c_seq[df_features.start:df_features.start+2])+"_"+str(c_seq[df_features.end-2:df_features.end])
-    return pd.Series([flanks,pos_on_contig],index=["flanks","pos_on_contig"])
+    #print('flanks',flanks) #flanks CT_AC
     
+    return pd.Series([flanks,pos_on_contig],index=["flanks","pos_on_contig"])
+        
 ############
 # SUB MAIN #
 ############
@@ -652,8 +699,8 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:st
     for k, v in (df_features.feature.value_counts()).items() :
         global_stat[str(c)+k] = v
         c+=1
-
-    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name)
+    
+    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'])
        
     # READS STAT 
     # Global stat
@@ -664,11 +711,12 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:st
         global_stat_fastq["1Mean coverage"] += row['end'] - row['start'] + 1
     global_stat_fastq["1Mean coverage"] /= (global_stat["1FASTA file - Mean seq. length"] * global_stat["0FASTA file - Number of seq."])
     global_stat_fastq["1Mean coverage"] = round(global_stat_fastq["1Mean coverage"], 2)
-    
+    #to remove ?
+    global_stat_fastq["2Min fragments length"] = df_features['length'].min()
+    global_stat_fastq["3Max fragments length"] = df_features['length'].max()
+    global_stat_fastq["4Mean fragments length"] = round(df_features['length'].mean())
+        
     html += get_html_reads_descr(global_stat_fastq)
-    
-    # Plot intron position on contig
-    #plot_insertion_in_contig(df_features['pos_on_contig'])
     
     ## ALIGNMENT STAT
     if flagstat:
