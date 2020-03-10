@@ -243,7 +243,7 @@ def get_html_body1(flagstat=""):
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#candidatstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Split statistics
+				    	Candidats statistics
 			    	</a>
 			    </li> 
             </ul>
@@ -418,10 +418,6 @@ def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagst
 
 #def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagstat_star:dict):
 #    r = '''
-#        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-#            <h1 class="h4">Description of alignments performed</h1>
-#                <span class="anchor" id="flag-descr"></span>
-#        </div>
 #		<div class="d-flex">
 #            <div class="mt-4 mr-0 pl-0 col-md-4">
 #                <h5>HiSAT2</h5>
@@ -434,12 +430,9 @@ def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagst
 
 def get_html_assemblathon_descr(global_stat_assemblathon):
     r = '''
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Comparison of the three pseudo-assembly with Assemblathon.pl statistics</h1>
-                <span class="anchor" id="assembly-descr"></span>
-        </div>
 		<div class="d-flex">
             <div class="mt-4 mr-4 pl-0 col-md-4">
+            <h5>Pseudo-assembly comparison with assemblathon statistics</h5>
                 <span class="anchor" id="assemblystat"></span>
 '''+dict_to_table(global_stat_assemblathon,-1,True)+'''
             <div>
@@ -467,12 +460,9 @@ def get_html_split(mapping_hisat_all, names, colors):
     
 def get_html_candidat_descr(global_stat_candidat : dict):
     r = '''
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Candidats</h1>
-                <span class="anchor" id="read-descr"></span>
-        </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Candidats</h5>
                 <span class="anchor" id="candidatstat"></span>
 '''+dict_to_table(global_stat_candidat,-1,True)+'''
             <div>
