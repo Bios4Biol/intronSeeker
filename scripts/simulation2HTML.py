@@ -35,6 +35,8 @@ import json
 #(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -o HTML -p tests -F  --frs  ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf  -D ../../archives_intronSeeker/TESTS/
 #(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o HTML -p tests -F  -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz
 #python3 simulation2HTML.py -m /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/HTML -p TOTO -F  -1 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt
+#python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -S /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -H /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.flagstat.txt
+
 
 def get_html_header():
     return '''
@@ -126,7 +128,7 @@ def get_html_header():
   </head>
 '''
 
-def get_html_body1(flagstat="", candidat=""):
+def get_html_body1(flagstat="", candidat="", ranksfile=""):
     r = '''
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
@@ -186,12 +188,20 @@ def get_html_body1(flagstat="", candidat=""):
 					Reads
 				</a>
 			  </li>
-			    <li class="nav-item" style="padding-left:10px">
+			  <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#readgstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Global statistics
 			    	</a>
 			    </li>'''
+    if ranksfile:
+        r += '''
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#abundstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	FRS abundance
+			    	</a>
+			    </li>'''             
     if flagstat:
         r += '''
                 <li class="nav-item" style="padding-left:10px">
@@ -199,7 +209,7 @@ def get_html_body1(flagstat="", candidat=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Alignment statistics
 			    	</a>
-			    </li>'''
+			    </li>'''           
     if candidat:
         r += '''
                 <li class="nav-item" style="padding-left:10px">
@@ -208,7 +218,25 @@ def get_html_body1(flagstat="", candidat=""):
 				    	Split statistics
 			    	</a>
 			    </li>'''
-    r += '''            
+    r += '''      
+              <li class="nav-item">
+				<a class="nav-link" href="#flag-descr">
+				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
+					Mapping
+				</a>
+			  </li>
+			  <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#flaghstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Hisat2 statistics
+			    	</a>
+			    </li>  
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#flagsstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Star statistics
+			    	</a>
+			    </li>      
             </ul>
           </div>
           <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
@@ -293,6 +321,38 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 '''
     return r
 
+def get_html_ranks_descr(rank:dict, real_abund_perc:dict):
+    r = '''
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5>Percentage of abundance of each contig in FRS library</h5>
+                <span class="anchor" id="abundstat"></span>
+'''+abondance_model(rank, real_abund_perc)+'''
+            </div>
+        </div>    
+'''
+    return r
+
+
+#def get_html_mapping_descr(*args,**kwargs):
+#    r = '''
+#        <div class="d-flex">
+#            <div class="mt-4 mr-0 pl-0 col-md-12">
+#                <h5> Counting table and barplots of mapped covering reads' main characteristics</h5>
+#                <span class="anchor" id="abundstat"></span>
+#'''+ plot_covering_reads(*zip(names,[
+#                    mapping_hisat_all.loc[lambda df : df.covering == True,:],
+#                    #mapping_hisat_mixed.loc[lambda df : df.covering == True,:],
+#                    mapping_star_all.loc[lambda df : df.covering == True,:],
+#                    #mapping_star_mixed.loc[lambda df : df.covering == True,:]
+#                    ]),
+#                colors=colors,
+#                library=library) +'''
+#            </div>
+#        </div>    
+#'''
+#    return r
+
 
 def get_html_reads_descr(global_stat_fastq : dict):
     r = '''
@@ -312,11 +372,11 @@ def get_html_reads_descr(global_stat_fastq : dict):
 def get_html_bam_descr(global_stat_flagstat : dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Bam</h1>
+            <h1 class="h4">Bam (remove ?)</h1>
                 <span class="anchor" id="read-descr"></span>
         </div>
 		<div class="d-flex">
-            <div class="mt-4 mr-4 pl-0 col-md-4">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
                 <span class="anchor" id="readastat"></span>
 '''+dict_to_table(global_stat_flagstat,-1,True)+'''
             <div>
@@ -324,6 +384,24 @@ def get_html_bam_descr(global_stat_flagstat : dict):
 '''
     return r    
     
+def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagstat_star:dict):
+    r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Description of alignments performed with Hisat2 and STAR</h1>
+                <span class="anchor" id="flag-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+                <span class="anchor" id="flaghstat"></span>
+'''+dict_to_table(global_stat_flagstat_hisat2,-1,True)+'''
+            <div>
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+                <span class="anchor" id="flagsstat"></span>
+'''+dict_to_table(global_stat_flagstat_star,-1,True)+'''
+            <div>
+        </div>
+'''
+    return r
     
 def get_html_candidat_descr(global_stat_candidat : dict):
     r = '''
@@ -332,7 +410,7 @@ def get_html_candidat_descr(global_stat_candidat : dict):
                 <span class="anchor" id="read-descr"></span>
         </div>
 		<div class="d-flex">
-            <div class="mt-4 mr-4 pl-0 col-md-4">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Global statistics</h5>
                 <span class="anchor" id="readsstat"></span>
 '''+dict_to_table(global_stat_candidat,-1,True)+'''
@@ -491,7 +569,67 @@ def plot_insertion_in_contig(positions) :
     )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
+# Plot ranks file
+def abondance_model(rank:dict, real_abund_perc:dict) :
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x = rank,
+            y = real_abund_perc,
+            mode = 'lines',
+            name = 'Simulated abundance model'
+        )
+    )
 
+    fig.add_trace(
+        go.Scatter(
+            x = rank,
+            y = real_abund_perc,
+            mode = 'lines',
+            name ='Waited abundance model'
+        )
+    )
+
+    fig.update_layout(
+        xaxis=dict(title="Contigs"),
+        yaxis=dict(title="Relative Abundance percentage",
+            range=[-0.25,0.5])
+    )
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
+# Plot : Counting table and barplots of mapped covering reads' main characteristics.
+'''def plot_covering_reads(*args,**kwargs):    
+    series=[]
+    fig = go.Figure()
+    to_plot = s[['Unmapped','Unsplit','Correct splitting']]/s['Covering']*100
+    for name, val in args :
+        s = pd.Series(name=name)
+        s['Covering']=len(val)
+        s['Unmapped']=len(val.loc[lambda df : df.mapped == False])
+        tmp = val.merge(library,left_on='read',right_index=True,suffixes=("","_lib"))
+        s['Mismapped'] = len(tmp.loc[lambda df : (df.contig.str.rstrip('.ori') != df.contig_lib.str.rstrip('.ori'))& (df.mapped == True)])
+        s['Unsplit'] = len(val.loc[lambda df : (df.mapped==True)&(df.split==False)])
+        s['Missplit'] = len(val.loc[lambda df : (df.split==True)&(df.missplit==True)])
+        s['Correct splitting'] = len(val.loc[lambda df : df.classe == 'TP'])
+        series.append(s)
+    fig.add_trace(
+        go.Bar(
+            x=to_plot.index,
+            y=to_plot.values,
+            name = s.name,
+            marker_color=colors[s.name]
+            ))
+
+    table = pd.concat(series,axis=1,sort=False)
+    print('table',table)
+    
+    fig.update_layout(
+        title='Global mapping results on introns-covering reads',
+        xaxis=dict(title='Lectures charecteristics'),
+        yaxis=dict(title='Percentage of total covering reads alignements')
+        )
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div'), series
+'''
 # Parse fasta file and return pandas.DataFrame
 def parse_fasta(fastafile, save_seq) :
     with open(fastafile,"r") as ff :
@@ -567,7 +705,7 @@ def parse_candidat(candidat) :
     
 
 # Return int : nbreads, mapped, paired, proper
-def parse_flagstat(flagstat) :
+def parse_flagstat2(flagstat) :
     with open(flagstat) as f:
         mylist = [line.rstrip('\n') for line in f]
         for i in range(0, 12):
@@ -583,6 +721,63 @@ def parse_flagstat(flagstat) :
             if "properly paired" in line:
                 proper=line[0:pos2]
     return nbreads, mapped, paired, proper
+
+
+
+def parse_flagstat(filename : str , lib_size : int, name : str) :
+    flagstat = OrderedDict({})
+    with open(filename,"r") as f :
+        
+        first = f.readline().split(" ",3)
+        if int(first[2]) == 0 :
+            qc_failed = False
+            flagstat["Total count"] = int(first[0])
+        else :
+            qc_failed = True
+            flagstat["Total count"] = [int(first[0]),int(first[2])]
+            
+        items_of_interest=["secondary",
+                           "supplementary",
+                           "duplicates",
+                           "mapped",
+                           "properly paired",
+                           "singletons",
+                           "with mate mapped to a different chr"]
+        
+        for ligne in f :
+            values = ligne.rstrip().split(" ",3)
+            if not qc_failed and not int(values[0]) == 0 :
+                item = values[-1].split(" (")[0]
+                if item in items_of_interest :
+                    if item in ["mapped","properly paired","singletons"] :
+                        flagstat[item] = "{value} ({percentage}%)".format(
+                            value=values[0],
+                            percentage=round((int(values[0])/(lib_size+flagstat["secondary"]))*100,2))
+                    else :
+                        flagstat[item] = int(values[0])
+                    
+            elif qc_failed and (not int(values[0]) == 0 or not int(values[2]) == 0) :
+                item = values[-1].split(" (")[0]
+                if item in items_of_interest :
+                    if item in ["mapped","properly paired","singletons"] :
+                        flagstat[item] = [
+                            "{value} ({percentage}%)".format(
+                                value=values[0],
+                                percentage=round((int(values[0])/(lib_size+flagstat["secondary"]))*100,2)
+                            ),
+                            "{value} ({percentage}%)".format(
+                                value=values[2],
+                                percentage=round((int(values[2])/(lib_size+flagstat["secondary"]))*100,2)
+                            )]
+                    else :
+                        flagstat[item] = [int(values[0]),int(values[2])]
+            if item == "with mate mapped to a different chr" :
+                break
+        if not qc_failed :
+            return pd.DataFrame.from_dict(flagstat,"index",columns=[name])
+        else :
+            return pd.DataFrame.from_dict(flagstat,"index",columns=pd.MultiIndex.from_tuples([(name,"QC-passed"),(name,"QC-failed")]))
+
 
 def compute_tr_length(df_mfasta, df_features) :
     return df_mfasta.length - df_features.loc[lambda df : df.contig == df_mfasta.name,"length" ].sum()
@@ -600,10 +795,16 @@ def compute_pos_on_mfasta(df_features, df_mfasta) :
     
     return pd.Series([flanks,pos_on_contig],index=["flanks","pos_on_contig"])
         
+# Parse ranks file
+def parse_rank_file(rank_file) :
+    with open(rank_file,"r") as rf :
+        ranks = [ligne.lstrip("# ").split("\t") for ligne in rf.read().rstrip().split("\n")]
+    return pd.DataFrame(data = ranks[1:], columns=ranks[0] )
+
 ############
 # SUB MAIN #
 ############
-def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:str, candidat:str, output:str, prefix:str, force:bool) :
+def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:str, flagstat:str, flgSTARintrons:str, flgHISAT2introns:str, candidat:str, output:str, prefix:str, force:bool) :
     output_path = output + "/report";
     if prefix:
         output_path += "_" + prefix;
@@ -665,16 +866,16 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:st
     print('library head :' , df_library.head(5))
     print('features head :', df_features.head(5))
 
-
-
     # HEADER
     html = get_html_header()
     if flagstat:
         html += get_html_body1(flagstat.name)
     elif candidat:
         html += get_html_body1(candidat.name)
-    elif candidat and flagstat:
-        html += get_html_body1(flagstat.name, candidat.name)
+    elif ranksfile:
+        html += get_html_body1(ranksfile.name)    
+    elif candidat and flagstat and ranksfile:
+        html += get_html_body1(flagstat.name, candidat.name, ranksfile.name)
     else:
         html += get_html_body1()
 
@@ -701,8 +902,68 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:st
         c+=1
     
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'])
-       
-    # READS STAT 
+    
+    ranks = parse_rank_file(ranksfile.name)
+    real = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100,columns = ['real_abund_perc']).reset_index()
+    df_abund = ranks.merge(real,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_real'))
+    print('abund',df_abund)
+    html += get_html_ranks_descr(df_abund['rank'], df_abund['real_abund_perc'])
+
+    #https://stackoverflow.com/questions/45759966/counting-unique-values-in-a-column-in-pandas-dataframe-like-in-qlik
+    print('6Number of features in GTF:', df_features['contig'].nunique())
+    
+    #REPLACE IN get_html_seq_descr :
+    #nb_distinct_features = dict()   # Number of distinct features from all GTF lines
+    #https://stackoverflow.com/questions/45759966/counting-unique-values-in-a-column-in-pandas-dataframe-like-in-qlik
+    print('5Number of distinct features in GTF:', df_features['feature'].nunique())
+    #ou
+    df2=df_features.groupby('feature')['contig'].nunique()
+    print('**Number of distinct features in GTF:', df2.count())
+    
+    #nb_ctg_by_feature    = dict()   # Number of ctg by feature from all GTF lines (Ex: "Exon" see in X ctg, "Intron" see in Y ctg, ...)
+    #https://stackoverflow.com/questions/38309729/count-unique-values-with-pandas-per-groups/38309823
+    #https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
+    #print('**TEST**Number of sequences by feature type (1):', df_features.groupby('feature')['contig'].count())  #series
+    #print('**TEST**Number of sequences by feature type (2):', df_features.groupby('feature')[['contig']].count())  #panda dataframe
+    #print('**TEST**Number of sequences by feature type (4):', df_features.groupby('feature', as_index=False).agg({"contig": "count"})) 
+    
+    df_features.insert(1, 'nbfeature', 1)
+    print ('new df_features', df_features)
+    pddf=df_features.groupby(['feature','contig'])['nbfeature'].nunique()
+    print('**TEST**Number of sequences by feature type (5):', pddf)
+    df_features = df_features.drop(columns='nbfeature')
+    print('**Number of sequences by feature type: (6)', (df_features.groupby('feature')['contig'].nunique()).values) # type ; pandas.core.series.Series
+    print('**Number of sequences by feature type (7):', (df_features.groupby('feature')['contig'].nunique()).index) 
+    '''
+    #Methode troooop longue 
+    i=0
+    k=0
+    c=""
+    f=""
+    while i < df_features.shape[0]:
+        if c != df_features['contig'][i]:
+            k += 1
+            #print('Same contig : ', str(k) + " " + df_features['contig'][i]+ ":" + str(k) + " " + df_features['feature'][i] +"(s)")
+            k=0
+        else:
+            i+=1
+            k+=1
+            if f == df_features['feature'][i]:
+                k+=1
+                #print('same contig, same feature : ', str(k) + " " + df_features['contig'][i]+ ":" + str(k) + " " + f +"(s)") 
+            else:
+                k+=1
+                #print('same contig, feature diff : ',str(k) + " " + df_features['contig'][i]+ ":" + str(k) + " " + f +"(s)")
+        c=df_features['contig'][i] 
+        f=df_features['feature'][i]  
+        i += 1
+        k=0
+        
+    #ctg_descr            = dict()   # Number of features profiles by ctg (Ex: "1 Exon & 2 Intron" see in X ctg, "3 Introns" see in Y ctg, ...)
+'''
+    
+
+    # READS STAT
     # Global stat
     global_stat_fastq = dict()
     global_stat_fastq["0Number of fragments"] = df_library['contig'].count()
@@ -720,15 +981,45 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, flagstat:st
     
     ## ALIGNMENT STAT
     if flagstat:
-        nbreads, mapped, paired, proper = parse_flagstat(flagstat.name)
-        global_stat_flagstat = dict()
-        global_stat_flagstat["0Total number of reads passing quality controls"] = nbreads
-        global_stat_flagstat["1Mapped"]                                         = mapped
-        global_stat_flagstat["2Paired in sequencing"]                           = paired
-        global_stat_flagstat["3Properly paired"]                                = proper
-        html += get_html_bam_descr(global_stat_flagstat)
-        
-        
+        nbreads, mapped, paired, proper = parse_flagstat2(flagstat.name)
+        global2_stat_flagstat = dict()
+        global2_stat_flagstat["0Total number of reads passing quality controls"] = nbreads
+        global2_stat_flagstat["1Mapped"]                                         = mapped
+        global2_stat_flagstat["2Paired in sequencing"]                           = paired
+        global2_stat_flagstat["3Properly paired"]                                = proper
+        html += get_html_bam_descr(global2_stat_flagstat)
+
+    ## OTHER ALIGNMENT STATS (EMILIEN)
+    df_flag_all_hisat = parse_flagstat(flgHISAT2introns.name, len(df_library),"All with introns - Hisat2")
+    #df_flag_half_hisat = parse_flagstat(flgSTAR, len(df_library),"Mix-states contigs - Hisat2")
+    df_flag_all_star = parse_flagstat(flgSTARintrons.name, len(df_library),"All with introns - STAR")
+    #df_flag_half_star = parse_flagstat(flgHISAT2, len(df_library),"Mix-states contigs - STAR")    
+
+    #ADD MORE FLAGSTAT STATS
+    print(pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0))
+    df_flag_all=pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0)
+    global_stat_flagstat_hisat2 = dict()
+    print(df_flag_all.shape[0])#lignes 
+    print(df_flag_all.shape[1])#colonnes 
+    print(df_flag_all.iloc[0,1])
+    global_stat_flagstat_hisat2["0Total counts of reads to map"] = str(len(df_library))
+    global_stat_flagstat_hisat2["1Total count"]     = df_flag_all.iloc[0,0]
+    global_stat_flagstat_hisat2["2Secondary"]       = df_flag_all.iloc[1,0]
+    global_stat_flagstat_hisat2["3Mapped"]          = df_flag_all.iloc[2,0]
+    global_stat_flagstat_hisat2["4Properly paired"] = df_flag_all.iloc[3,0]
+    global_stat_flagstat_hisat2["5Singletons"]      = df_flag_all.iloc[4,0]
+    global_stat_flagstat_star= dict()
+    global_stat_flagstat_star["0Total counts of reads to map"] = str(len(df_library))
+    global_stat_flagstat_star["1Total count"]     = df_flag_all.iloc[0,1]
+    global_stat_flagstat_star["2Secondary"]       = df_flag_all.iloc[1,1]
+    global_stat_flagstat_star["3Mapped"]          = df_flag_all.iloc[2,1]
+    global_stat_flagstat_star["4Properly paired"] = df_flag_all.iloc[3,1]
+    global_stat_flagstat_star["5Singletons"]      = df_flag_all.iloc[4,1]
+    html += get_html_flagstat_descr(global_stat_flagstat_hisat2, global_stat_flagstat_star)
+    
+    #Counting table and barplots of mapped covering reads' main characteristics
+    #html += get_html_mapping_descr(df_flag_all_hisat, df_flag_all_star)
+
     ## SPLITREADSEARCH STAT
     if candidat:
         df_candidat = parse_candidat(candidat.name)
@@ -762,6 +1053,13 @@ if __name__ == '__main__' :
     parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1')
     parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
     parser.add_argument('-a','--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat')
+    #flgSTARintrons:str, flgSTAR:str, flgHISAT2introns:str, flgHISAT2:str
+    parser.add_argument('-S','--flgSTARintrons', type=argparse.FileType('r'), required=True, dest='flgSTARintrons')
+    #parser.add_argument('-s','--flgSTAR', type=argparse.FileType('r'), required=True, dest='flgSTAR')
+    parser.add_argument('-H','--flgHISAT2introns', type=argparse.FileType('r'), required=True, dest='flgHISAT2introns')
+    #parser.add_argument('-h','--flgHISAT2', type=argparse.FileType('r'), required=True, dest='flgHISAT2')
+
+    parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranksfile')
     parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
     parser.add_argument('-o','--output', type=str, required=True, dest='output')
     parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
