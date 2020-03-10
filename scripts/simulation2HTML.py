@@ -129,7 +129,7 @@ def get_html_header():
   </head>
 '''
 
-def get_html_body1(flagstat="", candidat="", ranksfile=""):
+def get_html_body1(flagstat=""):
     r = '''
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
@@ -194,15 +194,13 @@ def get_html_body1(flagstat="", candidat="", ranksfile=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Global statistics
 			    	</a>
-			    </li>'''
-    if ranksfile:
-        r += '''
+			    </li>
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#abundstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	FRS abundance
 			    	</a>
-			    </li>'''             
+			    </li> '''           
     if flagstat:
         r += '''
                 <li class="nav-item" style="padding-left:10px">
@@ -210,16 +208,14 @@ def get_html_body1(flagstat="", candidat="", ranksfile=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Alignment statistics
 			    	</a>
-			    </li>'''           
-    if candidat:
-        r += '''
-                <li class="nav-item" style="padding-left:10px">
+			    </li>'''      
+    r += '''                    
+              <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#readsstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Split statistics
 			    	</a>
-			    </li>'''
-    r += '''      
+			  </li>
               <li class="nav-item">
 				<a class="nav-link" href="#flag-descr">
 				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
@@ -420,6 +416,22 @@ def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagst
 '''
     return r
 
+#def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagstat_star:dict):
+#    r = '''
+#        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+#            <h1 class="h4">Description of alignments performed</h1>
+#                <span class="anchor" id="flag-descr"></span>
+#        </div>
+#		<div class="d-flex">
+#            <div class="mt-4 mr-0 pl-0 col-md-4">
+#                <h5>HiSAT2</h5>
+#                <span class="anchor" id="flaghstat"></span>
+#'''+dict2_to_table(global_stat_flagstat_hisat2,global_stat_flagstat_star,-1,True)+'''
+#            <div>
+#        </div>
+#'''
+#    return r    
+
 def get_html_assemblathon_descr(global_stat_assemblathon):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
@@ -510,6 +522,38 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool):
         c += 1
     table += "</tbody></table>"
     return table
+
+# Return HTML table from dict
+# Param 1 : dict (key, val)
+# Param 2 : int for which line number first col (key) will be right align
+# Param 3 : bool to remove first char of the key (used to sort by key)
+def dict2_to_table(d1 : dict, d2:dict, i : int, rmfirstchar : bool):
+    table = '''
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+'''
+    c = 0
+    c2 = 0
+    for k, v in sorted(d1.items(), key=lambda t: t[0]):
+        table += "<tr><td class='valn"
+        if(c >= i & i!=-1):
+            table += " text-right"
+        if(rmfirstchar):
+            table += "'>" + k[1:] + "</td><td class='valn text-right'>" + str(v) + "</td></tr>"
+        else:
+            table += "'>" + k + "</td><td class='valn text-right'>" + str(v) + "</td></tr>"
+        c += 1
+    for k2, v2 in sorted(d2.items(), key=lambda t: t[0]):
+        table += "<tr><td class='valn"
+        if(c2 >= i & i!=-1):
+            table += " text-right"
+        if(rmfirstchar):
+            table += "'>" + k2[1:] + "</td><td class='valn text-right'>" + str(v2) + "</td></tr>"
+        else:
+            table += "'>" + k2 + "</td><td class='valn text-right'>" + str(v2) + "</td></tr>"
+        c2 += 1    
+    table += "</tbody></table>"
+    return table    
 
 
 # Return 3 dict : nb_distinct_features, nb_ctg_by_feature, ctg_descr
@@ -1018,14 +1062,15 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
     html = get_html_header()
     if flagstat:
         html += get_html_body1(flagstat.name)
-    elif candidat:
+    else:
+        html += get_html_body1()
+
+    '''elif candidat:
         html += get_html_body1(candidat.name)
     elif ranksfile:
         html += get_html_body1(ranksfile.name)    
     elif candidat and flagstat and ranksfile:
-        html += get_html_body1(flagstat.name, candidat.name, ranksfile.name)
-    else:
-        html += get_html_body1()
+        html += get_html_body1(flagstat.name, candidat.name, ranksfile.name)'''    
 
     # INPUT FILES
     if r2:
@@ -1235,8 +1280,8 @@ if __name__ == '__main__' :
     #parser.add_argument('-awi','--FRS_without_introns_assemblathon', type=argparse.FileType('r'), required=False, dest='wointronsassemblathon')
     parser.add_argument('-aia','--FRS_all_modified_assemblathon', type=argparse.FileType('r'), required=True, dest='allwiintronsassemblathon') 
     #parser.add_argument('-aim','--FRS_Mixed_states_assemblathon', type=argparse.FileType('r'), required=False, dest='halfwiintronsassemblathon')
-    parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranksfile')
-    parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
+    parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=True, dest='ranksfile')
+    parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=True, dest='candidat')
     parser.add_argument('-o','--output', type=str, required=True, dest='output')
     parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
