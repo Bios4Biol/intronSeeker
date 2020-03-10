@@ -210,12 +210,6 @@ def get_html_body1(flagstat=""):
 			    	</a>
 			    </li>'''      
     r += '''                    
-              <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#readsstat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Split statistics
-			    	</a>
-			  </li>
               <li class="nav-item">
 				<a class="nav-link" href="#flag-descr">
 				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
@@ -245,7 +239,13 @@ def get_html_body1(flagstat=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Intron insertion
 			    	</a>
-			    </li>    
+			    </li>   
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#candidatstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Split statistics
+			    	</a>
+			    </li> 
             </ul>
           </div>
           <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
@@ -473,8 +473,7 @@ def get_html_candidat_descr(global_stat_candidat : dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Global statistics</h5>
-                <span class="anchor" id="readsstat"></span>
+                <span class="anchor" id="candidatstat"></span>
 '''+dict_to_table(global_stat_candidat,-1,True)+'''
             <div>
         </div>  
