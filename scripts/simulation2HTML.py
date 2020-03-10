@@ -36,7 +36,8 @@ import json
 #(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -o HTML -p tests -F  --frs  ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf  -D ../../archives_intronSeeker/TESTS/
 #(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o HTML -p tests -F  -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz
 #python3 simulation2HTML.py -m /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/HTML -p TOTO -F  -1 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt
-#python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -S /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -H /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.flagstat.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam
+#python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -S /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -H /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.flagstat.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -aia /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_HISAT2/srs_frs_sample1_contigs-modified_assemblathon.txt
+
 
 def get_html_header():
     return '''
@@ -237,10 +238,16 @@ def get_html_body1(flagstat="", candidat="", ranksfile=""):
 				    	Star statistics
 			    	</a>
 			    </li> 
-                 <li class="nav-item" style="padding-left:10px">
+                <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#splitHISAT">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Hisat2 Split
+			    	</a>
+			    </li>    
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#assemblystat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Intron insertion
 			    	</a>
 			    </li>    
             </ul>
@@ -408,6 +415,21 @@ def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagst
                 <h5>STAR</h5>
                 <span class="anchor" id="flagsstat"></span>
 '''+dict_to_table(global_stat_flagstat_star,-1,True)+'''
+            <div>
+        </div>
+'''
+    return r
+
+def get_html_assemblathon_descr(global_stat_assemblathon):
+    r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Comparison of the three pseudo-assembly with Assemblathon.pl statistics</h1>
+                <span class="anchor" id="assembly-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-4 pl-0 col-md-4">
+                <span class="anchor" id="assemblystat"></span>
+'''+dict_to_table(global_stat_assemblathon,-1,True)+'''
             <div>
         </div>
 '''
@@ -930,11 +952,11 @@ def parse_assemblathon(filename : str, name : str ) :
 ############
 # SUB MAIN #
 ############
-def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:str, flagstat:str, flgSTARintrons:str, flgHISAT2introns:str, bamHISATall:str, candidat:str, output:str, prefix:str, force:bool) :
+def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:str, allwiintronsassemblathon:str, flagstat:str, flgSTARintrons:str, flgHISAT2introns:str, bamHISATall:str, candidat:str, output:str, prefix:str, force:bool) :
     output_path = output + "/report";
     if prefix:
         output_path += "_" + prefix;
-    
+
     # Create output dir if not exist
     if not os.path.exists(output) :
         os.mkdir(output)
@@ -1118,7 +1140,6 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
     df_flag_all_star = parse_flagstat(flgSTARintrons.name, len(df_library),"All with introns - STAR")
     #df_flag_half_star = parse_flagstat(flgHISAT2, len(df_library),"Mix-states contigs - STAR")    
 
-    #ADD MORE FLAGSTAT STATS
     print(pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0))
     df_flag_all=pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0)
     global_stat_flagstat_hisat2 = dict()
@@ -1142,11 +1163,23 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
     
 
     #MAPPING
-    #Compare assemblethon files
-    '''assemblathon_wo = parse_assemblathon(wo-introns.assemblathon,"FRS without introns")
-    assemblathon_all = parse_assemblathon(all-wi-introns.assemblathon, "FRS all modified")
-    assemblathon_half = parse_assemblathon(half-wi-introns.assemblathon.txt,"FRS Mixed states")
-    df_assemblathon=pd.concat([assemblathon_wo,assemblathon_all,assemblathon_half],axis=1)'''
+    #Compare assemblathon files
+    #df_assemblathon_wo = parse_assemblathon(wointronsassemblathon.name,"FRS without introns")
+    df_assemblathon_all = parse_assemblathon(allwiintronsassemblathon.name, "FRS all modified")
+    #df_assemblathon_half = parse_assemblathon(halfwiintronsassemblathon.name,"FRS Mixed states")
+    #df_assemblathon=pd.concat([df_assemblathon_wo,df_assemblathon_all.name,df_assemblathon_half],axis=1)
+    print('df_assemblathon_all', df_assemblathon_all)
+    global_stat_assemblathon = dict()
+    print(df_assemblathon_all.shape[0])#lignes 
+    print(df_assemblathon_all.shape[1])#colonnes 
+    global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
+    global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
+    global_stat_assemblathon["2Longest contig"]            = df_assemblathon_all.iloc[2,0]
+    global_stat_assemblathon["3Shortest contiged"]         = df_assemblathon_all.iloc[3,0]
+    global_stat_assemblathon["4Number of contigs > 1K nt"] = df_assemblathon_all.iloc[4,0]
+    global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
+    global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
+    html += get_html_assemblathon_descr(global_stat_assemblathon)
 
     #Analysis of alignments by seaching split reads and comparing with simulated introns
     #Split read signal analysis
@@ -1199,9 +1232,9 @@ if __name__ == '__main__' :
     parser.add_argument('-H','--flgHISAT2introns', type=argparse.FileType('r'), required=True, dest='flgHISAT2introns')
     #parser.add_argument('-h','--flgHISAT2', type=argparse.FileType('r'), required=True, dest='flgHISAT2')
     parser.add_argument('-b','--mappingHISATall', type=argparse.FileType('r'), required=True, dest='bamHISATall')
-    #parser.add_argument('-awi','--FRS_without_introns_assemblathon', type=argparse.FileType('r'), required=False, dest='wo-introns.assemblathon')
-    #parser.add_argument('-aia','--FRS_all_modified_assemblathon', type=argparse.FileType('r'), required=False, dest='all-wi-introns.assemblathon') 
-    #parser.add_argument('-aim','--FRS_Mixed_states_assemblathon', type=argparse.FileType('r'), required=False, dest='half-wi-introns.assemblathon')
+    #parser.add_argument('-awi','--FRS_without_introns_assemblathon', type=argparse.FileType('r'), required=False, dest='wointronsassemblathon')
+    parser.add_argument('-aia','--FRS_all_modified_assemblathon', type=argparse.FileType('r'), required=True, dest='allwiintronsassemblathon') 
+    #parser.add_argument('-aim','--FRS_Mixed_states_assemblathon', type=argparse.FileType('r'), required=False, dest='halfwiintronsassemblathon')
     parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranksfile')
     parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
     parser.add_argument('-o','--output', type=str, required=True, dest='output')
