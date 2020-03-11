@@ -369,7 +369,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
                 <span class="anchor" id="read-descr"></span>
         </div>
 		<div class="d-flex">
-            <div class="mt-4 mr-4 pl-0 col-md-6">
+            <div class="mt-4 mr-4 pl-0 col-md-4">
                 <span class="anchor" id="readgstat"></span>
 '''+dict_to_table(global_stat_fastq,-1,True)+'''
             </div>
@@ -401,12 +401,12 @@ def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagst
                 <span class="anchor" id="flag-descr"></span>
         </div>
 		<div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-6">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>HiSAT2</h5>
                 <span class="anchor" id="flaghstat"></span>
 '''+dict_to_table(global_stat_flagstat_hisat2,-1,True)+'''
             </div>
-            <div class="mt-4 mr-0 pl-0 col-md-6">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>STAR</h5>
                 <span class="anchor" id="flagsstat"></span>
 '''+dict_to_table(global_stat_flagstat_star,-1,True)+'''
@@ -779,8 +779,8 @@ def plot_class_reads(*args,**kwargs) :
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 # Plot : Counting table and barplots of mapped covering reads' main characteristics.
-#def plot_covering_reads(*args,**kwargs) :
-def plot_covering_reads(*args, colors:dict, library:dict) :
+#def plot_covering_reads(*args, **kwargs) :
+def plot_covering_reads(*args, library:dict, colors:dict) :
     series=[]
     fig = go.Figure()
     for name, val in args :
@@ -802,13 +802,14 @@ def plot_covering_reads(*args, colors:dict, library:dict) :
                     name = s.name,
                     marker_color=colors[s.name]
             ))
-    table = pd.concat(series,axis=1,sort=False)  #todo :recup ce tableau
-    
+    table = pd.concat(series,axis=1,sort=False)
+        
     fig.update_layout(
         title='Global mapping results on introns-covering reads',
         xaxis=dict(title='Lectures charecteristics'),
         yaxis=dict(title='Percentage of total covering reads alignements')
         )
+
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div'), table
 
 # Parse fasta file and return pandas.DataFrame
@@ -1105,11 +1106,13 @@ def process_intron(intron,lectures) :
                           ])              
     df_cov_lect['covering'] = True
     df_cov_lect['intron'] = intron.name
+    #print('df_cov_lect[intron]',df_cov_lect['intron'])
     df_cov_lect['pos_on_read'] = df_cov_lect.apply(
             compute_pos_on_read,
             axis=1,
             intron_start=intron.start
             )
+    #print('df_cov_lect[pos_on_read]',df_cov_lect['pos_on_read'])        
     '''print('df_cov_lect', df_cov_lect)
     df_cov_lect                contig  start  end  complement  covering                     intron  pos_on_read
     lecture                                                                                        
@@ -1359,9 +1362,8 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
     global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
     global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
     html += get_html_assemblathon_descr(global_stat_assemblathon)
-
-    #Analysis of alignments by seaching split reads and comparing with simulated introns
-    '''   
+    '''
+    #Analysis of alignments by seaching split reads and comparing with simulated introns   
     #Split read signal analysis
     #Effectives table and barplots of split reads signal detection for STAR and HiSAT2 for the two types of reference.
     # # Add three columns on df_library : one for the intron covering reads (True/False), another for the covered intron id (if True) and the last
@@ -1384,7 +1386,8 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
           'All with introns - STAR':"darkorange",
           'Mix-states contigs - STAR':"chocolate"}
     html += get_html_split(mapping_hisat_all, mapping_hisat_mixed, mapping_star_all, mapping_star_mixed, names, colors)
-    '''   
+    '''
+
     #Counting table and barplots of mapped covering reads' main characteristics
     '''
     library = pd.read_pickle(df_library)
