@@ -9,11 +9,11 @@ import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import plotly.subplots as psp
 import argparse
+import pysam   # To generate a dataframe from a BAM : pysam and pickle
+import pickle
 
 
 import re
-import pickle
-import pysam
 import gzip
 import time
 import sys
@@ -36,8 +36,7 @@ import json
 #(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -o HTML -p tests -F  --frs  ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf  -D ../../archives_intronSeeker/TESTS/
 #(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o HTML -p tests -F  -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz
 #python3 simulation2HTML.py -m /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/HTML -p TOTO -F  -1 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt
-#python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -S /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -H /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.flagstat.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -aia /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_HISAT2/srs_frs_sample1_contigs-modified_assemblathon.txt
-
+#python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -S /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -H /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.flagstat.txt -bha /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -bhm /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -bsa /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -bsm /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -aia /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_HISAT2/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
 
 def get_html_header():
     return '''
@@ -229,9 +228,9 @@ def get_html_body1(flagstat=""):
 			    	</a>
 			    </li> 
                 <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#splitHISAT">
+				    <a class="nav-link" href="#split">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Hisat2 Split
+				    	Split detection
 			    	</a>
 			    </li>    
                 <li class="nav-item" style="padding-left:10px">
@@ -343,24 +342,24 @@ def get_html_ranks_descr(rank:dict, real_abund_perc:dict):
     return r
 
 
-#def get_html_mapping_descr(*args,**kwargs):
-#    r = '''
-#        <div class="d-flex">
-#            <div class="mt-4 mr-0 pl-0 col-md-12">
-#                <h5> Counting table and barplots of mapped covering reads' main characteristics</h5>
-#                <span class="anchor" id="abundstat"></span>
-#'''+ plot_covering_reads(*zip(names,[
-#                    mapping_hisat_all.loc[lambda df : df.covering == True,:],
-#                    #mapping_hisat_mixed.loc[lambda df : df.covering == True,:],
-#                    mapping_star_all.loc[lambda df : df.covering == True,:],
-#                    #mapping_star_mixed.loc[lambda df : df.covering == True,:]
-#                    ]),
-#                colors=colors,
-#                library=library) +'''
-#            </div>
-#        </div>    
-#'''
-#    return r
+def get_html_mapping_descr(names:dict, mapping_hisat_all:dict, mapping_hisat_mixed:dict, mapping_star_all:dict, mapping_star_mixed:dict, colors:dict, library:dict):
+    r = '''
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5> Counting table and barplots of mapped covering reads' main characteristics</h5>
+                <span class="anchor" id="abundstat"></span>
+'''+ plot_covering_reads(*zip(names,[
+                    mapping_hisat_all.loc[lambda df : df.covering == True,:],
+                    mapping_hisat_mixed.loc[lambda df : df.covering == True,:],
+                    mapping_star_all.loc[lambda df : df.covering == True,:],
+                    mapping_star_mixed.loc[lambda df : df.covering == True,:]
+                    ]),
+                colors=colors,
+                library=library) +'''
+            </div>
+        </div>    
+'''
+    return r
 
 
 def get_html_reads_descr(global_stat_fastq : dict):
@@ -370,10 +369,10 @@ def get_html_reads_descr(global_stat_fastq : dict):
                 <span class="anchor" id="read-descr"></span>
         </div>
 		<div class="d-flex">
-            <div class="mt-4 mr-4 pl-0 col-md-4">
+            <div class="mt-4 mr-4 pl-0 col-md-6">
                 <span class="anchor" id="readgstat"></span>
 '''+dict_to_table(global_stat_fastq,-1,True)+'''
-            <div>
+            </div>
         </div>
 '''
     return r
@@ -389,7 +388,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
 #            <div class="mt-4 mr-0 pl-0 col-md-4">
 #                <span class="anchor" id="readastat"></span>
 #'''+dict_to_table(global_stat_flagstat,-1,True)+'''
-#            <div>
+#            </div>
 #        </div>
 #'''
 #    return r    
@@ -398,20 +397,20 @@ def get_html_reads_descr(global_stat_fastq : dict):
 def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagstat_star:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Description of alignments performed</h1>
+            <h1 class="h4">Mapping</h1>
                 <span class="anchor" id="flag-descr"></span>
         </div>
 		<div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <div class="mt-4 mr-0 pl-0 col-md-6">
                 <h5>HiSAT2</h5>
                 <span class="anchor" id="flaghstat"></span>
 '''+dict_to_table(global_stat_flagstat_hisat2,-1,True)+'''
-            <div>
-            <div class="mt-4 mr-0 pl-0 col-md-4">
+            </div>
+            <div class="mt-4 mr-0 pl-0 col-md-6">
                 <h5>STAR</h5>
                 <span class="anchor" id="flagsstat"></span>
 '''+dict_to_table(global_stat_flagstat_star,-1,True)+'''
-            <div>
+            </div>
         </div>
 '''
     return r
@@ -423,32 +422,47 @@ def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagst
 #                <h5>HiSAT2</h5>
 #                <span class="anchor" id="flaghstat"></span>
 #'''+dict2_to_table(global_stat_flagstat_hisat2,global_stat_flagstat_star,-1,True)+'''
-#            <div>
+#            </div>
 #        </div>
 #'''
 #    return r    
 
-def get_html_assemblathon_descr(global_stat_assemblathon):
+def get_html_assemblathon_descr(global_stat_assemblathon:dict):
     r = '''
 		<div class="d-flex">
             <div class="mt-4 mr-4 pl-0 col-md-4">
             <h5>Pseudo-assembly comparison with assemblathon statistics</h5>
                 <span class="anchor" id="assemblystat"></span>
 '''+dict_to_table(global_stat_assemblathon,-1,True)+'''
-            <div>
+            </div>
+        </div>
+'''
+    return r
+
+def get_html_table_descr(global_stats_table):
+    r = '''
+		<div class="d-flex">
+            <div class="mt-4 mr-4 pl-0 col-md-4">
+            <h5>TO COMPLETE</h5>
+                <span class="anchor" id="assemblystat"></span>
+'''+dict_to_table(global_stats_table,-1,True)+'''
+            </div>
         </div>
 '''
     return r
 
 
-def get_html_split(mapping_hisat_all, names, colors):
+def get_html_split(mapping_hisat_all:dict , mapping_hisat_mixed:dict, mapping_star_all:dict, names:dict, mapping_star_mixed:dict, colors:dict):
     r = '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Barplots of split reads signal detection for HiSAT2</h5>
-                <span class="anchor" id="splitHISAT"></span>
+                <h5>Barplots of split reads signal detection</h5>
+                <span class="anchor" id="split"></span>
 '''+plot_class_reads(*zip(names,[
-        mapping_hisat_all
+        mapping_hisat_all,
+        mapping_hisat_mixed,
+        mapping_star_all,
+        mapping_star_mixed
         ]),
         colors=colors)+'''
             </div>
@@ -458,14 +472,14 @@ def get_html_split(mapping_hisat_all, names, colors):
 
 
     
-def get_html_candidat_descr(global_stat_candidat : dict):
+def get_html_candidat_descr(global_stat_candidat:dict):
     r = '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Candidats</h5>
                 <span class="anchor" id="candidatstat"></span>
 '''+dict_to_table(global_stat_candidat,-1,True)+'''
-            <div>
+            </div>
         </div>  
 '''
 
@@ -765,10 +779,10 @@ def plot_class_reads(*args,**kwargs) :
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 # Plot : Counting table and barplots of mapped covering reads' main characteristics.
-'''def plot_covering_reads(*args,**kwargs):    
+#def plot_covering_reads(*args,**kwargs) :
+def plot_covering_reads(*args, colors:dict, library:dict) :
     series=[]
     fig = go.Figure()
-    to_plot = s[['Unmapped','Unsplit','Correct splitting']]/s['Covering']*100
     for name, val in args :
         s = pd.Series(name=name)
         s['Covering']=len(val)
@@ -779,24 +793,24 @@ def plot_class_reads(*args,**kwargs) :
         s['Missplit'] = len(val.loc[lambda df : (df.split==True)&(df.missplit==True)])
         s['Correct splitting'] = len(val.loc[lambda df : df.classe == 'TP'])
         series.append(s)
-    fig.add_trace(
-        go.Bar(
-            x=to_plot.index,
-            y=to_plot.values,
-            name = s.name,
-            marker_color=colors[s.name]
+        
+        to_plot = s[['Unmapped','Unsplit','Correct splitting']]/s['Covering']*100
+        fig.add_trace(
+            go.Bar(
+                    x=to_plot.index,
+                    y=to_plot.values,
+                    name = s.name,
+                    marker_color=colors[s.name]
             ))
-
-    table = pd.concat(series,axis=1,sort=False)
-    print('table',table)
+    table = pd.concat(series,axis=1,sort=False)  #todo :recup ce tableau
     
     fig.update_layout(
         title='Global mapping results on introns-covering reads',
         xaxis=dict(title='Lectures charecteristics'),
         yaxis=dict(title='Percentage of total covering reads alignements')
         )
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div'), series
-'''
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div'), table
+
 # Parse fasta file and return pandas.DataFrame
 def parse_fasta(fastafile, save_seq) :
     with open(fastafile,"r") as ff :
@@ -972,9 +986,9 @@ def parse_rank_file(rank_file) :
 def parsing_test(items) :
     items_of_interest = ["Number of contigs","Total size of contigs","Longest contig","Shortest contig","Number of contigs > 1K nt","N50 contig length","L50 contig count"]
     if len(items) == 2 and items[0] in items_of_interest :
-        return True ;
+        return True
     else :
-        return False ;
+        return False
 
 # Parse assemblathon files to compare assembly with Assemblathon.pl statistics
 def parse_assemblathon(filename : str, name : str ) :
@@ -982,13 +996,144 @@ def parse_assemblathon(filename : str, name : str ) :
         assemblathon = { re.split("\s\s+",line.strip(),1)[0] : re.split("\s\s+",line.strip(),1)[1] for line in f if parsing_test(re.split("\s\s+",line.strip(),1))}
     return pd.DataFrame(data=assemblathon.values(),index=assemblathon.keys(),columns=[name])    
 
+# Parse Alignment BAM files
+    #bamfile = pysam.AlignmentFile(args_dict["bamfile"], "rb")
+def parse_BAM(BamPath:str):    
+    bamfile = pysam.AlignmentFile(BamPath, "rb")
+    alignments = [{
+        'query_name' : record.query_name,
+        'reference_name' : record.reference_name,
+        'reference_start' : record.reference_start,
+        'reference_end' : record.reference_end,
+        'cigartuples' : record.cigartuples,
+        'is_secondary' : record.is_secondary,
+        'is_supplementary' : record.is_supplementary,
+        'mapping_quality' : record.mapping_quality
+        } for record in bamfile.fetch(until_eof=True)]
+    return alignments
+
+def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
+    """
+    Write the intron extract from cigar line in file_r
+
+    :param reference: reference sequence to extract flanking sequence of split read
+    :param cigar_list: list of tuple (equal to the cigar line)
+    :param start: beginning of the read alignment
+    :param ref_name: reference name on which the read is aligned
+    :param read_name: read name
+    :return:
+    """
+    values = [1, 0, 1, 1, 0]  # [M, I, D, N, S]
+    limit_from_start = [0, 0]
+    i = 0
+    cigar_tuple = cigar_list[i]
+    # if there is a split, calculate its position based on cigar line tuple
+    while cigar_tuple[0] != 3:
+        limit_from_start[0] += values[cigar_tuple[0]] * cigar_tuple[1]
+        i += 1
+        cigar_tuple = cigar_list[i]
+    # enf of the split, equal to the number of 'N'
+    limit_from_start[1] = cigar_tuple[1]
+    split_start = start + limit_from_start[0]
+    split_end = start + limit_from_start[0] + limit_from_start[1]
+    length = limit_from_start[1]
+    flank_left = ref_seq[split_start: split_start + 2]
+    flank_right = ref_seq[split_end - 2: split_end]
+    return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
+                    index = ["start_split","end_split","split_length","split_flanks"])
+
+
+def process_bam(alignments, df_mfasta, df_features, df_library):
+    """
+    For an alignment file, list all split reads.
+
+    :param fastafilename: reference fasta file
+    :param bamfilename: AlignmentFile object with all reads alignment information
+    :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
+    """
+    rows = []
+    for record in alignments :
+        begin = pd.Series([
+            record['query_name'],                        # ID of the read
+            record['reference_name'],                    # ID of the contig where the read is mapped
+            record['reference_start'],                   # Start of the alignment on the contig
+            record['reference_end'],                     # End of the alignment on the contig1
+            df_library.at[record['query_name'],"covering"], # Bool if the read normally covers an intron (i.e. should be split)
+            record['cigartuples'] is not None,           # Bool if the read is mapped
+            not record['reference_name'] == df_library.at[record['query_name'],"contig"].rstrip(".ori"), # Bool if the read is mapped on right contig
+            (record['cigartuples'] is not None) and ('(3,' in str(record['cigartuples'])), # Bool if the read is split by aligner
+            record['is_secondary'],
+            record['is_supplementary'],
+            record['mapping_quality']]
+            ,
+            index = ["read","contig","align_start","align_end",'covering','mapped',"mismapped",'split','second','suppl','score']
+        )
+        
+        
+        if record['cigartuples'] is not None and '(3,' in str(record['cigartuples']) :
+            
+            row = begin.append(limit_from_cigar(
+                record['cigartuples'], 
+                record['reference_start'], 
+                str(df_mfasta.at[record['reference_name'],"sequence"])
+            ))
+            introns_to_check = df_features.loc[lambda df : df.contig == record['reference_name'],:]
+            for limits in zip(introns_to_check["start"],introns_to_check["end"]) :
+                row["missplit"] = not (limits[0]-row.start_split in range(-3,4) and limits[1]-row.end_split in range(-3,4))
+        else :
+            row = begin.append(pd.Series([None,None,None,None,None],
+                                         index=["start_split","end_split","split_length","split_flanks","missplit"]))
+        rows.append(row)
+    
+    return pd.DataFrame(rows)
+
+def compute_pos_on_read(cov_lect,intron_start):
+    if not cov_lect.complement :
+        return (intron_start - cov_lect.start)/(cov_lect.end-cov_lect.start)*100
+    else :
+        return (cov_lect.end - intron_start)/(cov_lect.end-cov_lect.start)*100
+
+# Return df_cov_lect, a new Dataframe, which contains df_library (lecture, contig, start, end, complement) join with 3 news columns:
+# "covering" : one for the intron covering reads (True/False), 
+# "intron (name)" : another for the covered intron id (if True) 
+# pos_on_read : intron insertion position in read (if True - in term of read length percentage)
+def process_intron(intron,lectures) :
+    df_cov_lect = pd.DataFrame(lectures.loc[lambda df : 
+                         (df.contig+'.modif'== str(intron.contig))
+                         & (intron.start > df.start)
+                         & (intron.start < df.end)
+                          ])              
+    df_cov_lect['covering'] = True
+    df_cov_lect['intron'] = intron.name
+    df_cov_lect['pos_on_read'] = df_cov_lect.apply(
+            compute_pos_on_read,
+            axis=1,
+            intron_start=intron.start
+            )
+    '''print('df_cov_lect', df_cov_lect)
+    df_cov_lect                contig  start  end  complement  covering                     intron  pos_on_read
+    lecture                                                                                        
+    203770/1  SEQUENCE685    457  558       False      True  SEQUENCE685.modif|556|897    98.019802'''
+    return df_cov_lect
+
+# Return DataFrame Reads
+def prlz_process_intron(df_introns,library) :
+    df_reads = pd.concat(
+        df_introns.apply(
+            process_intron,
+            axis=1,
+            lectures=library
+            ).values
+        )
+    return df_reads   
+
 ############
 # SUB MAIN #
 ############
-def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:str, allwiintronsassemblathon:str, flagstat:str, flgSTARintrons:str, flgHISAT2introns:str, bamHISATall:str, candidat:str, output:str, prefix:str, force:bool) :
-    output_path = output + "/report";
+def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:str, allwiintronsassemblathon:str, flagstat:str, flgSTARintrons:str, flgHISAT2introns:str, bamHISATall:str, bamHISATmix: str, bamSTARall: str, bamSTARmix: str, candidat:str, output:str, prefix:str, force:bool, threads:int) :
+    output_path = output + "/report"
     if prefix:
-        output_path += "_" + prefix;
+        output_path += "_" + prefix
 
     # Create output dir if not exist
     if not os.path.exists(output) :
@@ -1168,7 +1313,7 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
         global2_stat_flagstat["3Properly paired"]                                = proper
         html += get_html_bam_descr(global2_stat_flagstat)'''
 
-    ## OTHER ALIGNMENT STATS (EMILIEN)
+    ## ALIGNMENT STATS
     df_flag_all_hisat = parse_flagstat(flgHISAT2introns.name, len(df_library),"All with introns - Hisat2")
     #df_flag_half_hisat = parse_flagstat(flgSTAR, len(df_library),"Mix-states contigs - Hisat2")
     df_flag_all_star = parse_flagstat(flgSTARintrons.name, len(df_library),"All with introns - STAR")
@@ -1216,16 +1361,46 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
     html += get_html_assemblathon_descr(global_stat_assemblathon)
 
     #Analysis of alignments by seaching split reads and comparing with simulated introns
+    '''   
     #Split read signal analysis
-    #Effectives table and barplots of split reads signal detection for STAR and HiSAT2 for the two types of reference.   
-    #/home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam
-    #mapping_hisat_all = pd.read_pickle(bamHISATall.name)
-    #names = ['All with introns - Hisat2'] 
-    #colors = {'All with introns - Hisat2':"limegreen"}
-    #html += get_html_split(mapping_hisat_all, names, colors)      
+    #Effectives table and barplots of split reads signal detection for STAR and HiSAT2 for the two types of reference.
+    # # Add three columns on df_library : one for the intron covering reads (True/False), another for the covered intron id (if True) and the last
+    # for the intron insertion position in read (if True - in term of read length percentage)
+    # (precision : the function is called on df_library DataFrame but it returns a library-like DataFrame)
+    with prl.ProcessPoolExecutor(max_workers=threads) as ex :
+        introns_split = np.array_split(df_features,ex._max_workers)
+        library_cov = pd.concat(ex.map(prlz_process_intron,introns_split,repeat(df_library,ex._max_workers)))
     
+    df_library = df_library.join(library_cov,lsuffix='',rsuffix='_cov').loc[:,library_cov.columns]
+    df_library.loc[lambda df : df.covering != True, "covering"] = False
+    #process_bam(alignments, contigs, introns, library)
+    mapping_hisat_all   = pd.read_pickle(process_bam(parse_BAM(bamHISATall.name), df_mfasta, df_features, df_library))  #read_pickle takes as input as compressed file or a dataframe. Here it is a dataframe.
+    mapping_hisat_mixed = pd.read_pickle(process_bam(parse_BAM(bamHISATmix.name), df_mfasta, df_features, df_library))
+    mapping_star_all    = pd.read_pickle(process_bam(parse_BAM(bamSTARall.name), df_mfasta, df_features, df_library))
+    mapping_star_mixed  = pd.read_pickle(process_bam(parse_BAM(bamSTARmix.name), df_mfasta, df_features, df_library))
+    names = ['All with introns - Hisat2','Mix-states contigs - Hisat2','All with introns - STAR','Mix-states contigs - STAR'] 
+    colors = {'All with introns - Hisat2':"limegreen",
+          'Mix-states contigs - Hisat2':"forestgreen",
+          'All with introns - STAR':"darkorange",
+          'Mix-states contigs - STAR':"chocolate"}
+    html += get_html_split(mapping_hisat_all, mapping_hisat_mixed, mapping_star_all, mapping_star_mixed, names, colors)
+    '''   
     #Counting table and barplots of mapped covering reads' main characteristics
-    #html += get_html_mapping_descr(df_flag_all_hisat, df_flag_all_star)
+    '''
+    library = pd.read_pickle(df_library)
+    html += get_html_mapping_descr(names, mapping_hisat_all, mapping_hisat_mixed, mapping_star_all, mapping_star_mixed, colors, library)
+    fig , table = plot_covering_reads(*zip(names,[
+                    mapping_hisat_all.loc[lambda df : df.covering == True,:],
+                    mapping_hisat_mixed.loc[lambda df : df.covering == True,:],
+                    mapping_star_all.loc[lambda df : df.covering == True,:],
+                    mapping_star_mixed.loc[lambda df : df.covering == True,:]
+                    ]),
+                colors=colors,
+                library=library)
+    global_stats_table=[]
+    global_stats_table['0titre']=table[0,1]
+    html += get_html_table_descr(global_stats_table)
+    '''
 
     ## SPLITREADSEARCH STAT
     if candidat:
@@ -1265,7 +1440,10 @@ if __name__ == '__main__' :
     #parser.add_argument('-s','--flgSTAR', type=argparse.FileType('r'), required=True, dest='flgSTAR')
     parser.add_argument('-H','--flgHISAT2introns', type=argparse.FileType('r'), required=True, dest='flgHISAT2introns')
     #parser.add_argument('-h','--flgHISAT2', type=argparse.FileType('r'), required=True, dest='flgHISAT2')
-    parser.add_argument('-b','--mappingHISATall', type=argparse.FileType('r'), required=True, dest='bamHISATall')
+    parser.add_argument('-bha','--mappingHISATall', type=argparse.FileType('r'), required=True, dest='bamHISATall')
+    parser.add_argument('-bhm','--mappingHISATmix', type=argparse.FileType('r'), required=True, dest='bamHISATmix')
+    parser.add_argument('-bsa','--mappingSTARall', type=argparse.FileType('r'), required=True, dest='bamSTARall')
+    parser.add_argument('-bsm','--mappingSTARmix', type=argparse.FileType('r'), required=True, dest='bamSTARmix')
     #parser.add_argument('-awi','--FRS_without_introns_assemblathon', type=argparse.FileType('r'), required=False, dest='wointronsassemblathon')
     parser.add_argument('-aia','--FRS_all_modified_assemblathon', type=argparse.FileType('r'), required=True, dest='allwiintronsassemblathon') 
     #parser.add_argument('-aim','--FRS_Mixed_states_assemblathon', type=argparse.FileType('r'), required=False, dest='halfwiintronsassemblathon')
@@ -1273,6 +1451,7 @@ if __name__ == '__main__' :
     parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=True, dest='candidat')
     parser.add_argument('-o','--output', type=str, required=True, dest='output')
     parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
+    parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads')
     parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
 
     args = vars(parser.parse_args())
