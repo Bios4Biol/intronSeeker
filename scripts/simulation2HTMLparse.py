@@ -1,31 +1,12 @@
 #!/usr/bin/env python3
 
-import os
-import configparser
 import numpy as np
 import pandas as pd
-import plotly as py
-import plotly.graph_objects as go
-import plotly.figure_factory as ff
-import plotly.subplots as psp
-import argparse
 import pysam   # To generate a dataframe from a BAM : pysam and pickle
-import pickle
-
-
-import re
-import gzip
-import time
-import sys
-import concurrent.futures as prl
-import tempfile
-from pprint import pprint
-from collections import OrderedDict
-from itertools import repeat
-from Bio import SeqIO
-
-from json import JSONEncoder
-import json
+import re      # To work on regular expression
+import gzip    # To open gzip files R1 R2
+from collections import OrderedDict   # To parse flagstat
+from Bio import SeqIO   # To parse fasta file
 
 
 

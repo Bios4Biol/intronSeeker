@@ -2,35 +2,20 @@
 
 import os
 import configparser
-import numpy as np
+import numpy as np  # For Split read signal analysis
 import pandas as pd
-import plotly as py
-import plotly.graph_objects as go
-import plotly.figure_factory as ff
-import plotly.subplots as psp
 import argparse
 import pysam   # To generate a dataframe from a BAM : pysam and pickle
 import pickle
 import glob
+import concurrent.futures as prl # For Split read signal analysis
+from itertools import repeat     # For Split read signal analysis
 # Import all functions from internal modules
 from simulation2HTMLparse import *
 from simulation2HTMLtags import *
 from simulation2HTMLplots import *
 
 
-import re
-import gzip
-import time
-import sys
-import concurrent.futures as prl
-import tempfile
-from pprint import pprint
-from collections import OrderedDict
-from itertools import repeat
-from Bio import SeqIO
-
-from json import JSONEncoder
-import json
 
 
 #step 1  full random simulation : intronSeeker fullRandomSimulation -r -o FRS/ 
@@ -262,6 +247,7 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
     print(df_flag_all.iloc[2,0])
     print(df_flag_all.iloc[3,0])
     print(df_flag_all.iloc[4,0])
+    
     
     global_stat_flagstat_hisat2["0Total counts of reads to map"] = str(len(df_library))
     global_stat_flagstat_hisat2["1Total count"]     = df_flag_all.iloc[0,0]

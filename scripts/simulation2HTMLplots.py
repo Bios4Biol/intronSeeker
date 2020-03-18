@@ -1,33 +1,14 @@
 #!/usr/bin/env python3
 
-import os
-import configparser
-import numpy as np
 import pandas as pd
 import plotly as py
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import plotly.subplots as psp
-import argparse
-import pysam   # To generate a dataframe from a BAM : pysam and pickle
-import pickle
 from plotly.subplots import make_subplots   #for flagstat pie
 import re   #for flagstat pie
 
 
-
-import gzip
-import time
-import sys
-import concurrent.futures as prl
-import tempfile
-from pprint import pprint
-from collections import OrderedDict
-from itertools import repeat
-from Bio import SeqIO
-
-from json import JSONEncoder
-import json
 
 # Distribution plot
 def plot_dist(len_by_features, feature_names):
@@ -249,7 +230,7 @@ def plot_flagstat(df_flag_all:dict):
     tot_star=int(df_flag_all.iloc[0,1])
     fig.add_trace(go.Pie(labels=labels, values=[round((int(df_flag_all.iloc[1,1])*100)/tot_star, 2), round(cast_to_value_star(df_flag_all.iloc[2,1],tot_star),2), round(cast_to_value_star(df_flag_all.iloc[3,1],tot_star),2), round(cast_to_value_star(df_flag_all.iloc[4,1],tot_star),2)], name="STAR"),
                 1, 1)
-                
+
     # Use `hole` to create a donut-like pie chart
     fig.update_traces(hole=.4, hoverinfo="label+percent+name")
 
