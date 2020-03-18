@@ -423,7 +423,7 @@ def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagst
 def get_html_flagstat_pie(df_flag_all:dict):
     r = '''
         <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-12">
+            <div class="mt-4 mr-0 pl-0 col-md-8">
                 <h5> Mapping statistics from flagstat files</h5>
                 <span class="anchor" id="abundstat"></span>
 '''+ plot_flagstat(df_flag_all) +'''
