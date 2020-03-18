@@ -235,20 +235,6 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
     print(pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0))
     df_flag_all=pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0)
     global_stat_flagstat_hisat2 = dict()
-    print(df_flag_all.shape[0])#lignes 
-    print(df_flag_all.shape[1])#colonnes 
-    print(df_flag_all.iloc[0,1]) #436872
-    print(df_flag_all.iloc[1,1]) #522
-    print(df_flag_all.iloc[2,1]) #436307 (99.87%)
-    print(df_flag_all.iloc[3,1])  #435782 (99.75%)
-    print(df_flag_all.iloc[4,1])  #3 (0.0%)
-    print(df_flag_all.iloc[0,0])
-    print(df_flag_all.iloc[1,0])
-    print(df_flag_all.iloc[2,0])
-    print(df_flag_all.iloc[3,0])
-    print(df_flag_all.iloc[4,0])
-    
-    
     global_stat_flagstat_hisat2["0Total counts of reads to map"] = str(len(df_library))
     global_stat_flagstat_hisat2["1Total count"]     = df_flag_all.iloc[0,0]
     global_stat_flagstat_hisat2["2Secondary"]       = df_flag_all.iloc[1,0]
