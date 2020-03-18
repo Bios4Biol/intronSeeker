@@ -11,9 +11,11 @@ import plotly.subplots as psp
 import argparse
 import pysam   # To generate a dataframe from a BAM : pysam and pickle
 import pickle
+from plotly.subplots import make_subplots   #for flagstat pie
+import re   #for flagstat pie
 
 
-import re
+
 import gzip
 import time
 import sys
@@ -219,3 +221,40 @@ def plot_covering_reads(*args, library:dict, colors:dict) :
         )
 
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div'), table
+
+# Return int from flagstat HISAT mapping in string format (only for the last 3 values : Mapped, Properly paired, Singletons)
+def cast_to_value_hisat(str_mapping:str, tot_hisat:int):
+    #p = int(re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", df_flag_all.iloc[2,1]))
+    mapping=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str_mapping)
+    val=(int(mapping)*100)/tot_hisat
+    return val
+
+# Return int from flagstat HISAT mapping in string format
+def cast_to_value_star(str_mapping:str, tot_star:int):
+    mapping=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str_mapping)
+    val=(int(mapping)*100)/tot_star
+    return val
+
+# Pie Chart with mapping stats from flagstat files
+# https://plot.ly/python/pie-charts/
+def plot_flagstat(df_flag_all:dict):
+    labels = ["Secondary","Mapped", "Properly paired", "Singletons"]
+
+    # Create subplots: use 'domain' type for Pie subplot
+    fig = make_subplots(rows=1, cols=2, specs=[[{'type':'domain'}, {'type':'domain'}]])
+    tot_star=int(df_flag_all.iloc[0,1])
+    fig.add_trace(go.Pie(labels=labels, values=[round((int(df_flag_all.iloc[1,1])*100)/tot_star, 2), round(cast_to_value_star(df_flag_all.iloc[2,1],tot_star),2), round(cast_to_value_star(df_flag_all.iloc[3,1],tot_star),2), round(cast_to_value_star(df_flag_all.iloc[4,1],tot_star),2)], name="STAR"),
+                1, 1)
+    tot_hisat=int(df_flag_all.iloc[0,0])
+    fig.add_trace(go.Pie(labels=labels, values=[round((int(df_flag_all.iloc[1,0])*100)/tot_hisat, 2), round(cast_to_value_hisat(df_flag_all.iloc[2,0],tot_hisat),2), round(cast_to_value_hisat(df_flag_all.iloc[3,0],tot_hisat),2), round(cast_to_value_hisat(df_flag_all.iloc[4,0],tot_hisat),2)], name="HISAT2"),
+                1, 2)
+
+    # Use `hole` to create a donut-like pie chart
+    fig.update_traces(hole=.4, hoverinfo="label+percent+name")
+
+    fig.update_layout(
+        # Add annotations in the center of the donut pies.
+        annotations=[dict(text='STAR', x=0.20, y=0.5, font_size=12, showarrow=False),
+                     dict(text='HISAT', x=0.80, y=0.5, font_size=12, showarrow=False)])
+
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')

@@ -397,7 +397,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
 #    return r    
 
 
-def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagstat_star:dict):
+def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagstat_star:dict, flgSTARintrons:str, flgHISAT2introns:str):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Mapping</h1>
@@ -406,17 +406,32 @@ def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagst
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>HiSAT2</h5>
+                <i>'''+flgHISAT2introns+'''</i>
                 <span class="anchor" id="flaghstat"></span>
 '''+dict_to_table(global_stat_flagstat_hisat2,-1,True)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>STAR</h5>
+                <i>'''+flgSTARintrons+'''</i>
                 <span class="anchor" id="flagsstat"></span>
 '''+dict_to_table(global_stat_flagstat_star,-1,True)+'''
             </div>
         </div>
 '''
     return r
+
+def get_html_flagstat_pie(df_flag_all:dict):
+    r = '''
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5> Mapping statistics from flagstat files</h5>
+                <span class="anchor" id="abundstat"></span>
+'''+ plot_flagstat(df_flag_all) +'''
+            </div>
+        </div>    
+'''
+    return r
+    
 
 #def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagstat_star:dict):
 #    r = '''
