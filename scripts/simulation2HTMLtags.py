@@ -510,10 +510,11 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool):
         table += "<tr><td class='valn"
         if(c >= i & i!=-1):
             table += " text-right"
+        val=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str(v))   # Remove (nb%) in val    
         if(rmfirstchar):
-            table += "'>" + k[1:] + "</td><td class='valn text-right'>" + str(v) + "</td></tr>"
+            table += "'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(val)), ' ') + "</td></tr>"
         else:
-            table += "'>" + k + "</td><td class='valn text-right'>" + str(v) + "</td></tr>"
+            table += "'>" + k + "</td><td class='valn text-right'>" + split_int(round(float(val)), ' ') + "</td></tr>"
         c += 1
     table += "</tbody></table>"
     return table

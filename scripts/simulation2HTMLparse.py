@@ -374,6 +374,7 @@ def process_intron(intron,lectures) :
     df_cov_lect                contig  start  end  complement  covering                     intron  pos_on_read
     lecture                                                                                        
     203770/1  SEQUENCE685    457  558       False      True  SEQUENCE685.modif|556|897    98.019802'''
+    #df_cov_lect.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/df_cov_lect.txt', sep='\t', encoding='utf-8')
     return df_cov_lect
 
 # Return DataFrame Reads
@@ -386,3 +387,7 @@ def prlz_process_intron(df_introns,library) :
             ).values
         )
     return df_reads
+
+# Return string split by 3 characters
+def split(str, num):
+    return [ str[start:start+num] for start in range(0, len(str), num) ]

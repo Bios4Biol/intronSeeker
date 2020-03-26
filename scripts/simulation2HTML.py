@@ -28,6 +28,7 @@ from simulation2HTMLplots import *
 #python3 simulation2HTML.py -m /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/HTML -p TOTO -F  -1 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt
 #python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -S /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -H /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.flagstat.txt -bha /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -bhm /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -bsa /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -bsm /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -aia /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_HISAT2/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
 #python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt --workDirSTAR /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/ --workDirHISAT /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/ -bha /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -bhm /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -bsa /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -bsm /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -aia /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_HISAT2/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+# scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 
 ############
 # SUB MAIN #
@@ -266,38 +267,60 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
     global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
     global_stat_assemblathon["2Longest contig"]            = df_assemblathon_all.iloc[2,0]
     global_stat_assemblathon["3Shortest contiged"]         = df_assemblathon_all.iloc[3,0]
-    global_stat_assemblathon["4Number of contigs > 1K nt"] = df_assemblathon_all.iloc[4,0]
+    nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_all.iloc[4,0])
+    print('nbLongContigs', nbLongContigs)
+    global_stat_assemblathon["4Number of contigs > 1K nt"] = nbLongContigs
     global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
     global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
     html += get_html_assemblathon_descr(global_stat_assemblathon)
-    '''
+    
+    '''    
     #Analysis of alignments by seaching split reads and comparing with simulated introns   
     #Split read signal analysis
     #Effectives table and barplots of split reads signal detection for STAR and HiSAT2 for the two types of reference.
     # # Add three columns on df_library : one for the intron covering reads (True/False), another for the covered intron id (if True) and the last
     # for the intron insertion position in read (if True - in term of read length percentage)
     # (precision : the function is called on df_library DataFrame but it returns a library-like DataFrame)
+    #print('df_library (without cov, id, pos_on_read) : ', df_library)
+    #lecture   contig  start  end  complement                              
+    #5898/1      SEQUENCE1      0  101       False
     with prl.ProcessPoolExecutor(max_workers=threads) as ex :
         introns_split = np.array_split(df_features,ex._max_workers)
+        #print(introns_split)
+        #  features                    contig          feature             start   end  length flanks  pos_on_contig                                                                                          
+        #SEQUENCE1000.modif|257|596   SEQUENCE1000.modif  retained_intron    257   596     339  CT_AC      42.269737
+                                              
+        #==> KeyError: 'pos_on_read' for prlz_process_intron
+
+        #df_cov_lect
+        #lecture   contig         start end  complement   covering    intron                  pos_on_read                                                                                        
+        #203770/1  SEQUENCE685    457  558       False      True  SEQUENCE685.modif|556|897    98.019802
+
+
+        #with open('/home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/introns_split.txt', 'w') as f:
+        #    for item in introns_split:
+        #        f.write("%s\n" % item)
         library_cov = pd.concat(ex.map(prlz_process_intron,introns_split,repeat(df_library,ex._max_workers)))
+        
     
     df_library = df_library.join(library_cov,lsuffix='',rsuffix='_cov').loc[:,library_cov.columns]
     df_library.loc[lambda df : df.covering != True, "covering"] = False
+
     #process_bam(alignments, contigs, introns, library)
     mapping_hisat_all   = pd.read_pickle(process_bam(parse_BAM(bamHISATall.name), df_mfasta, df_features, df_library))  #read_pickle takes as input as compressed file or a dataframe. Here it is a dataframe.
     mapping_hisat_mixed = pd.read_pickle(process_bam(parse_BAM(bamHISATmix.name), df_mfasta, df_features, df_library))
     mapping_star_all    = pd.read_pickle(process_bam(parse_BAM(bamSTARall.name), df_mfasta, df_features, df_library))
     mapping_star_mixed  = pd.read_pickle(process_bam(parse_BAM(bamSTARmix.name), df_mfasta, df_features, df_library))
+
     names = ['All with introns - Hisat2','Mix-states contigs - Hisat2','All with introns - STAR','Mix-states contigs - STAR'] 
     colors = {'All with introns - Hisat2':"limegreen",
           'Mix-states contigs - Hisat2':"forestgreen",
           'All with introns - STAR':"darkorange",
           'Mix-states contigs - STAR':"chocolate"}
     html += get_html_split(mapping_hisat_all, mapping_hisat_mixed, mapping_star_all, mapping_star_mixed, names, colors)
-    '''
 
     #Counting table and barplots of mapped covering reads' main characteristics
-    '''
+  
     library = pd.read_pickle(df_library)
     html += get_html_mapping_descr(names, mapping_hisat_all, mapping_hisat_mixed, mapping_star_all, mapping_star_mixed, colors, library)
     fig , table = plot_covering_reads(*zip(names,[
