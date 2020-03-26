@@ -222,6 +222,12 @@ def get_html_body1(flagstat=""):
 				    	Candidats statistics
 			    	</a>
 			    </li> 
+                <li class="nav-item">
+                    <a class="nav-link" href="#def">
+                        <span class="oi oi-file" aria-hidden="true"></span>
+                        Definitions
+                    </a>
+                </li>
             </ul>
           </div>
           <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
@@ -477,6 +483,29 @@ def get_html_candidat_descr(global_stat_candidat:dict):
 
     return r      
     
+def get_html_definitions():
+    r = '''
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+            <h5>Definitions</h5>
+                <span class="anchor" id="def"></span>
+                Contig :  A contig (from contiguous) is a set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
+                Candidat : </br>
+                Intron : An intron is any nucleotide sequence within a gene that is removed by RNA splicing during maturation of the final RNA product. (source : Wikipedia)</br>
+                Reads :  In DNA sequencing, a read is an inferred sequence of base pairs (or base pair probabilities) corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
+                Fragment : </br>
+                Sequence :  </br>
+                Splice events : </br>
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/splice_event.png" alt="Splice events" style="width:825;height:245;"> </br>
+                Number of features in GTF :  Number of distinct features from all GTF lines</br>
+                Number of sequences by feature type :  Number of ctg by feature from all GTF lines (Ex: "Exon" see in X ctg, "Intron" see in Y ctg, ...)</br>
+                Number of sequences with same feature(s) : Number of features profiles by ctg (Ex: "1 Exon & 2 Intron" see in X ctg, "3 Introns" see in Y ctg , ...) </br>
+            </div>
+        </div>  
+'''
+
+    return r    
+
 def get_html_footer():
     return '''
         </main>

@@ -388,6 +388,12 @@ def prlz_process_intron(df_introns,library) :
         )
     return df_reads
 
+# Return int formatted by 3 numbers. Example : 1 234 instead of 1234
+def split_int(number, separator=' ', count=3):
+    return separator.join(
+        [str(number)[::-1][i:i+count] for i in range(0, len(str(number)), count)]
+    )[::-1]
+
 # Return string split by 3 characters
 def split(str, num):
     return [ str[start:start+num] for start in range(0, len(str), num) ]

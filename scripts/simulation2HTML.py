@@ -354,6 +354,9 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranksfile:s
         global_stat_candidat["3Number of canonic junction"] = nbPASS
         html += get_html_candidat_descr(global_stat_candidat)
             
+    # DEFINITIONS
+    html += get_html_definitions()
+
     # FOOTER
     html += "<br/>"
     html += get_html_footer()
