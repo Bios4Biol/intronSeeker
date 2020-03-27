@@ -5,15 +5,6 @@ from simulation2HTMLparse import *
 from simulation2HTMLplots import *
 
 
-#step 1  full random simulation : intronSeeker fullRandomSimulation -r -o FRS/ 
-#$ conda deactivate
-#module load system/Miniconda3-4.7.10;
-#source activate ISeeker_environment;
-#cd scripts/; 
-#(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -o HTML -p tests -F  --frs  ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf  -D ../../archives_intronSeeker/TESTS/
-#(ISeeker_environment) sigenae@genologin1 /work/project/sigenae/sarah/intronSeeker/scripts $ python3 simulation2HTML.py -m ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o HTML -p tests -F  -1 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 ../../archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz
-#python3 simulation2HTML.py -m /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/HTML -p TOTO -F  -1 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /work/project/sigenae/sarah/archives_intronSeeker/TESTS/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt
-#python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz -a /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -S /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -H /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.flagstat.txt -bha /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -bhm /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam -bsa /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -bsm /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -aia /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_HISAT2/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
 
 def get_html_header():
     return '''
@@ -105,7 +96,7 @@ def get_html_header():
   </head>
 '''
 
-def get_html_body1(flagstat=""):
+def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
     r = '''
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
@@ -170,62 +161,68 @@ def get_html_body1(flagstat=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Global statistics
 			    	</a>
-			    </li>
+			    </li>'''
+    if ranks:
+        r +='''            
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#abundstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	FRS abundance
+				    	Abundance
 			    	</a>
-			    </li> '''           
+			    </li>'''              
     if flagstat:
-        r += '''
-                <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#readastat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Alignment statistics
-			    	</a>
-			    </li>'''      
-    r += '''                    
+        r += '''      
               <li class="nav-item">
 				<a class="nav-link" href="#flag-descr">
 				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
 					Mapping
 				</a>
-			  </li>
-			  <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#flaghstat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Hisat2 statistics
-			    	</a>
-			    </li>  
                 <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#flagsstat">
+				    <a class="nav-link" href="#flagstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Star statistics
+				    	Alignment statistics
 			    	</a>
-			    </li> 
+			    </li>     
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#pie">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Mapping pie
+			    	</a>
+			    </li>'''      
+    r += '''          
+                <li class="nav-item">
+				   <a class="nav-link" href="#results">
+				        <span class="oi oi-collapse-down" aria-hidden="true"></span>
+					    Results
+				   </a>
+			    </li>
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#split">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Split detection
 			    	</a>
-			    </li>    
+			    </li>'''
+    if assemblathon:
+        r += '''                 
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#assemblystat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Intron insertion
 			    	</a>
-			    </li>   
+			    </li>'''      
+    if candidat:
+        r += '''             
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#candidatstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Candidats statistics
 			    	</a>
-			    </li> 
+			    </li>'''
+    r +='''            
                 <li class="nav-item">
-                    <a class="nav-link" href="#def">
+                    <a class="nav-link" href="#glossary">
                         <span class="oi oi-file" aria-hidden="true"></span>
-                        Definitions
+                        Glossary
                     </a>
                 </li>
             </ul>
@@ -242,7 +239,7 @@ def get_html_body1(flagstat=""):
     return r
     
 
-def get_html_inputfiles(fasta:str, mfasta:str, gtf:str, r1:str, r2=""):
+def get_html_inputfiles(files:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 border-bottom">
 			<h1 class="h4">Input files</h1>
@@ -251,14 +248,11 @@ def get_html_inputfiles(fasta:str, mfasta:str, gtf:str, r1:str, r2=""):
 		<div class="d-flex">
 			<div class="mt-4 mr-4 pl-0 col-md-6">
 				<h5>Files</h5>
-				<ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">FASTA file <span class="badge badge-success badge-pill ml-4">'''+fasta+'''</span></li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Modified FASTA file <span class="badge badge-success badge-pill ml-4">'''+mfasta+'''</span></li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">GTF file of modified sequences <span class="badge badge-success badge-pill ml-4">'''+gtf+'''</span></li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Read1 FASTQ file <span class="badge badge-success badge-pill ml-4">'''+r1+'''</span></li>'''
-    if r2:
+				<ul class="list-group">'''
+    for f in files:
+        label, name = f.split("#")
         r += '''
-                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Read2 FASTQ file <span class="badge badge-success badge-pill ml-4">'''+r2+'''</span></li>'''
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">'''+label+''' <span class="badge badge-success badge-pill ml-4">'''+name+'''</span></li>'''
     r += '''
 				</ul>
 			</div>
@@ -270,7 +264,7 @@ def get_html_inputfiles(fasta:str, mfasta:str, gtf:str, r1:str, r2=""):
 def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Sequences</h1>
+            <h1 class="h4">Reference</h1>
                 <span class="anchor" id="ref-descr"></span>
         </div>
         <div class="d-flex">
@@ -312,11 +306,25 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 '''
     return r
 
+
+def get_html_plot_contig_len(df_mfasta:dict):
+    # Contif len from mfasta
+    len_by_contig = df_mfasta['length']
+    r = '''
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-6">
+                <h5>Features length distribution</h5>
+                <span class="anchor" id="feat_len_dist"></span>
+'''+histogramme_distrib(len_by_contig, "contig")+'''
+            </div>
+'''
+    return r
+
 def get_html_ranks_descr(rank:dict, real_abund_perc:dict):
     r = '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Percentage of abundance of each contig in FRS library</h5>
+                <h5>Percentage of abundance of each contig in library</h5>
                 <span class="anchor" id="abundstat"></span>
 '''+abondance_model(rank, real_abund_perc)+'''
             </div>
@@ -377,7 +385,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
 #    return r    
 
 
-def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagstat_star:dict, flgSTARintrons:str, flgHISAT2introns:str):
+def get_html_flagstat_descr(global_stat_flagstat:dict, flagstat:str,df_flag_all:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Mapping</h1>
@@ -385,51 +393,29 @@ def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagst
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>HiSAT2</h5>
-                <i>'''+flgHISAT2introns+'''</i>
-                <span class="anchor" id="flaghstat"></span>
-'''+dict_to_table(global_stat_flagstat_hisat2,-1,True)+'''
+                <h5>Alignment statistics</h5>
+                <i>'''+flagstat+'''</i>
+                <span class="anchor" id="flagstat"></span>
+'''+dict_to_table(global_stat_flagstat,-1,True)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>STAR</h5>
-                <i>'''+flgSTARintrons+'''</i>
-                <span class="anchor" id="flagsstat"></span>
-'''+dict_to_table(global_stat_flagstat_star,-1,True)+'''
+                <h5>Mapping pie</h5>
+                <span class="anchor" id="pie"></span>
+'''+ plot_flagstat(df_flag_all) +'''
             </div>
         </div>
 '''
     return r
-
-def get_html_flagstat_pie(df_flag_all:dict):
-    r = '''
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-8">
-                <h5> Mapping statistics from flagstat files</h5>
-                <span class="anchor" id="abundstat"></span>
-'''+ plot_flagstat(df_flag_all) +'''
-            </div>
-        </div>    
-'''
-    return r
-    
-
-#def get_html_flagstat_descr(global_stat_flagstat_hisat2:dict, global_stat_flagstat_star:dict):
-#    r = '''
-#		<div class="d-flex">
-#            <div class="mt-4 mr-0 pl-0 col-md-4">
-#                <h5>HiSAT2</h5>
-#                <span class="anchor" id="flaghstat"></span>
-#'''+dict2_to_table(global_stat_flagstat_hisat2,global_stat_flagstat_star,-1,True)+'''
-#            </div>
-#        </div>
-#'''
-#    return r    
-
+   
 def get_html_assemblathon_descr(global_stat_assemblathon:dict):
     r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Results</h1>
+                <span class="anchor" id="results"></span>
+        </div>
 		<div class="d-flex">
             <div class="mt-4 mr-4 pl-0 col-md-4">
-            <h5>Pseudo-assembly comparison with assemblathon statistics</h5>
+            <h5>Assemblathon statistics</h5>
                 <span class="anchor" id="assemblystat"></span>
 '''+dict_to_table(global_stat_assemblathon,-1,True)+'''
             </div>
@@ -483,14 +469,18 @@ def get_html_candidat_descr(global_stat_candidat:dict):
 
     return r      
     
-def get_html_definitions():
+def get_html_glossary():
     r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Glossary</h1>
+                <span class="anchor" id="glossary"></span>
+        </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
-            <h5>Definitions</h5>
-                <span class="anchor" id="def"></span>
+                <span class="anchor" id="glossary"></span>
                 Contig :  A contig (from contiguous) is a set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
                 Candidat : </br>
+                Feature : </br>
                 Intron : An intron is any nucleotide sequence within a gene that is removed by RNA splicing during maturation of the final RNA product. (source : Wikipedia)</br>
                 Reads :  In DNA sequencing, a read is an inferred sequence of base pairs (or base pair probabilities) corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
                 Fragment : </br>

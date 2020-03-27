@@ -66,7 +66,7 @@ def len_dist_from_gtf(gtf):
                 len_by_features.append([int(end)-int(start)+1])
                 nbf += 1
             else:
-                len_by_features[feature_names.index(feature)].append(int(end)-int(start)+1)
+                len_by_features[feature_names.index(feature)].append(int(end)-int(start)+1)        
     return len_by_features, feature_names
 
 # Parse fasta file and return pandas.DataFrame
