@@ -21,7 +21,7 @@ from simulation2HTMLplots import *
 #step 1  full random simulation : intronSeeker fullRandomSimulation -r -o FRS/ 
 #source activate ISeeker_environment;
 #cd scripts/; 
-#python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_HISAT2/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+# python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_HISAT2/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
 # scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 # See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_test1_simulation.html
 
@@ -67,6 +67,11 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
 
     df_features = parse_gtf(gtf.name)
     
+    print("###1:", df_features.shape[0]) 
+    print("###1:", df_features.shape[1]) 
+    df_features.to_csv('df_features_BEFORE.csv')
+
+
     # Add a column to df_fasta with the "fasta" length (without any simulated features)
     df_mfasta["short_length"] = df_mfasta.apply(
         compute_tr_length,
@@ -84,7 +89,10 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
             df_mfasta=df_mfasta
         )
     )
-    
+    print("###2:", df_features.shape[0])
+    print("###2:", df_features.shape[1])
+    df_features.to_csv('df_features_AFTER.csv')
+
     print('fasta head :' , df_fasta.head(5))
     print('mfasta head :' , df_mfasta.head(5))
     print('library head :' , df_library.head(5))
@@ -106,20 +114,20 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
         ranks_file=ranks.name
         inputfiles.append("Ranks#" + os.path.basename(ranks.name))
     assemblathon_file=""    
+    if bam:
+        inputfiles.append("Bam#" + os.path.basename(bam.name))
+    flagstat_file = ""
+    if flagstat :
+        flagstat_file = flagstat.name
+        inputfiles.append("Flagstat#" + os.path.basename(flagstat_file))
     if assemblathon:
         assemblathon_file=assemblathon.name
         inputfiles.append("Assemblathon#" + os.path.basename(assemblathon.name))
-    if bam:
-        inputfiles.append("Bam#" + os.path.basename(bam.name))
     candidat_file=""    
     if candidat:
         candidat_file=candidat.name
         inputfiles.append("Candidat#" + os.path.basename(candidat.name))
 
-    flagstat_file = ""
-    if flagstat :
-        flagstat_file = flagstat.name
-        inputfiles.append("Flagstat#" + os.path.basename(flagstat_file))
     html += get_html_body1(flagstat_file, candidat_file, ranks_file, assemblathon_file)
 
    
@@ -142,12 +150,9 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
         global_stat[str(c)+k] = v
         c+=1
     
-    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'])
+    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
 
-    # Distrib of contig length
-    #html += get_html_plot_contig_len(df_mfasta)
-    
-    
+    print('features:', df_features)
 
     #https://stackoverflow.com/questions/45759966/counting-unique-values-in-a-column-in-pandas-dataframe-like-in-qlik
     print('6Number of features in GTF:', df_features['contig'].nunique())
@@ -187,7 +192,7 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
     global_stat_fastq["4Mean fragments length"] = round(df_features['length'].mean())
         
     html += get_html_reads_descr(global_stat_fastq)
-    
+        
     # ABUNDANCE
     ranks_file=""    
     if ranks:

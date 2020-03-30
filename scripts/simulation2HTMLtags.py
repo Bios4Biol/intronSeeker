@@ -138,6 +138,12 @@ def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
 				    	Nb. of seq. with same features
 			    	</a>
 			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#contigs_len_dist">
+				        <span class="oi oi-bar-chart" aria-hidden="true"></span>
+				        Contigs len. distribution
+				    </a>
+			    </li>
 			    <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#feat_len_dist">
 				        <span class="oi oi-graph" aria-hidden="true"></span>
@@ -146,7 +152,7 @@ def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
 			    </li>
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#feat_dist_intron">
-				        <span class="oi oi-graph" aria-hidden="true"></span>
+				        <span class="oi oi-bar-chart" aria-hidden="true"></span>
 				        Introns positions
 				    </a>
 			    </li>  
@@ -261,7 +267,7 @@ def get_html_inputfiles(files:dict):
     return r
 
 
-def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict):
+def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict, df_fasta:dict, df_mfasta:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Reference</h1>
@@ -289,11 +295,16 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
     # Len dist for gtf
     len_by_features, feature_names = len_dist_from_gtf(gtf)
     r += '''
+        <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5>Contigs length distribution</h5>
+                <span class="anchor" id="contigs_len_dist"></span>
+'''+plot_hist_contigs_len(df_fasta['length'], df_mfasta['length'])+'''
+        </div>
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-6">
                 <h5>Features length distribution</h5>
                 <span class="anchor" id="feat_len_dist"></span>
-'''+plot_dist(len_by_features, feature_names)+'''
+'''+plot_dist_features_len(len_by_features, feature_names)+'''
             </div>
 '''
     r += '''
@@ -306,19 +317,6 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 '''
     return r
 
-
-def get_html_plot_contig_len(df_mfasta:dict):
-    # Contif len from mfasta
-    len_by_contig = df_mfasta['length']
-    r = '''
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-6">
-                <h5>Features length distribution</h5>
-                <span class="anchor" id="feat_len_dist"></span>
-'''+histogramme_distrib(len_by_contig, "contig")+'''
-            </div>
-'''
-    return r
 
 def get_html_ranks_descr(rank:dict, real_abund_perc:dict):
     r = '''
@@ -364,11 +362,10 @@ def get_html_reads_descr(global_stat_fastq : dict):
                 <span class="anchor" id="readgstat"></span>
 '''+dict_to_table(global_stat_fastq,-1,True)+'''
             </div>
-        </div>
+        </div>  
 '''
     return r
     
-
 #def get_html_bam_descr(global_stat_flagstat : dict):
 #    r = '''
 #        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">

@@ -8,13 +8,35 @@ import plotly.subplots as psp
 from plotly.subplots import make_subplots   #for flagstat pie
 import re   #for flagstat pie
 
-# Histogram 
-def histogram_distrib(len_by_contig, contig):
-    return
+# Histogram   https://plotly.com/python/v3/histograms/
+def plot_hist_contigs_len(fastaContigsLen, mFastaContigsLen):
+    contigs = go.Histogram(
+        x=fastaContigsLen,
+        name='Contigs',
+        opacity=0.65
+    )
+    modifiedContigs = go.Histogram(
+        x=mFastaContigsLen,
+        name='Modified contigs',
+        opacity=0.65
+    )
+    data = [contigs, modifiedContigs]
+    layout = go.Layout(barmode='overlay')
+    fig = go.Figure(data=data, layout=layout)
+    fig.update_layout(
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
+    )   
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 
 # Distribution plot
-def plot_dist(len_by_features, feature_names):
+def plot_dist_features_len(len_by_features, feature_names):
     hist_data = len_by_features
     group_labels = feature_names
     colors = ['#333F44', '#37AA9C', '#94F3E4']
@@ -39,15 +61,13 @@ def plot_insertion_in_contig(positions) :
             xbins=dict(
                 start=0,
                 end=100,
-                size=2),
-            marker=dict(
-                color='purple'
-            )
+                size=2)#,
+            #marker=dict(
+            #    color='purple'
+            #)
     )
-    layout = go.Layout(xaxis=dict(
-                           title="% of contig length"),
-                       yaxis=dict(
-                           title="Count"))
+    layout = go.Layout(xaxis=dict(title="% of contig length"),
+                       yaxis=dict(title="Count"))
     fig = go.Figure(data=[hist],layout=layout)
     fig.update_layout(
         margin=go.layout.Margin(
@@ -84,7 +104,14 @@ def abondance_model(rank:dict, real_abund_perc:dict) :
     fig.update_layout(
         xaxis=dict(title="Contigs"),
         yaxis=dict(title="Relative Abundance percentage",
-            range=[-0.25,0.5])
+        range=[-0.25,0.5]),
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
     )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
