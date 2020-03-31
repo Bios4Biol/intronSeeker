@@ -96,6 +96,7 @@ def get_html_header():
   </head>
 '''
 
+# icons : https://useiconic.com/open/
 def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
     r = '''
   <body>
@@ -172,7 +173,7 @@ def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
         r +='''            
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#abundstat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	<span class="oi oi-graph" aria-hidden="true"></span>
 				    	Abundance
 			    	</a>
 			    </li>'''              
@@ -191,14 +192,14 @@ def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
 			    </li>     
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#pie">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	<span class="oi oi-pie-chart" aria-hidden="true"></span>
 				    	Mapping pie
 			    	</a>
 			    </li>'''      
     r += '''          
                 <li class="nav-item">
 				   <a class="nav-link" href="#results">
-				        <span class="oi oi-collapse-down" aria-hidden="true"></span>
+				        <span class="oi oi-key" aria-hidden="true"></span>
 					    Results
 				   </a>
 			    </li>
@@ -446,13 +447,18 @@ def get_html_split(mapping_hisat_all:dict , mapping_hisat_mixed:dict, mapping_st
 
 
     
-def get_html_candidat_descr(global_stat_candidat:dict):
+def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
     r = '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Candidats</h5>
                 <span class="anchor" id="candidatstat"></span>
 '''+dict_to_table(global_stat_candidat,-1,True)+'''
+            </div>
+            <div class="mt-4 mr-0 pl-0 col-md-8">
+                <h5>Candidats depth (!!!!!!  PB avec nb candidats PASS !!!! en cours)</h5>
+                <span class="anchor" id="contigs_len_dist"></span>
+'''+plot_hist_candidats_depth(df_candidat['depth'])+'''
             </div>
         </div>  
 '''

@@ -284,7 +284,7 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
     ## SPLITREADSEARCH STAT
     if candidat:
         df_candidat = parse_candidat(candidat.name)
-        print('candidat head :' , df_candidat.head(5))
+        print('candidat head :' , df_candidat)
         global_stat_candidat = dict()
         global_stat_candidat["0Number of candidats"] = df_candidat.shape[0]
         global_stat_candidat["1Mean length"] = 0
@@ -297,8 +297,8 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
         global_stat_candidat["1Mean length"] = round(global_stat_candidat["1Mean length"], 2)
         global_stat_candidat["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
         global_stat_candidat["3Number of canonic junction"] = nbPASS
-        html += get_html_candidat_descr(global_stat_candidat)
-            
+        html += get_html_candidat_descr(global_stat_candidat, df_candidat[df_candidat['filter'] == 'PASS'])
+             
     # GLOSSARY
     html += get_html_glossary()
 
