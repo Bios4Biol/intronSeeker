@@ -66,11 +66,6 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
         df_library = parse_library(r1.name)
 
     df_features = parse_gtf(gtf.name)
-    
-    print("###1:", df_features.shape[0]) 
-    print("###1:", df_features.shape[1]) 
-    df_features.to_csv('df_features_BEFORE.csv')
-
 
     # Add a column to df_fasta with the "fasta" length (without any simulated features)
     df_mfasta["short_length"] = df_mfasta.apply(
@@ -89,9 +84,6 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
             df_mfasta=df_mfasta
         )
     )
-    print("###2:", df_features.shape[0])
-    print("###2:", df_features.shape[1])
-    df_features.to_csv('df_features_AFTER.csv')
 
     print('fasta head :' , df_fasta.head(5))
     print('mfasta head :' , df_mfasta.head(5))
@@ -193,20 +185,15 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
         
     html += get_html_reads_descr(global_stat_fastq)
         
-    # ABUNDANCE
-    ranks_file=""    
+    # ABUNDANCE   
     if ranks:
-        ranks_file=ranks.name
         ranks_parsed = parse_rank_file(ranks_file)
         real = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100,columns = ['real_abund_perc']).reset_index()
         df_abund = ranks_parsed.merge(real,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_real'))
-        print('abund',df_abund)
         html += get_html_ranks_descr(df_abund['rank'], df_abund['real_abund_perc'])
 
     ## ALIGNMENT STATS
-    flagstat_file=""
     if flagstat:
-        flagstat_file=flagstat.name
         df_flag_all=parse_flagstat(flagstat_file, len(df_library),"Parse flagstat")
    
         #print(pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0))
@@ -222,9 +209,7 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
     
     #MAPPING
     #Compare assemblathon files
-    assemblathon_file=""
     if assemblathon:
-        assemblathon_file=assemblathon.name
         df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
         print('df_assemblathon_all', df_assemblathon_all)
         global_stat_assemblathon = dict()
@@ -284,23 +269,17 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
           'All with introns - STAR':"darkorange",
           'Mix-states contigs - STAR':"chocolate"}
     html += get_html_split(mapping_hisat_all, mapping_hisat_mixed, mapping_star_all, mapping_star_mixed, names, colors)
+    '''
 
     #Counting table and barplots of mapped covering reads' main characteristics
-  
-    library = pd.read_pickle(df_library)
-    html += get_html_mapping_descr(names, mapping_hisat_all, mapping_hisat_mixed, mapping_star_all, mapping_star_mixed, colors, library)
-    fig , table = plot_covering_reads(*zip(names,[
-                    mapping_hisat_all.loc[lambda df : df.covering == True,:],
-                    mapping_hisat_mixed.loc[lambda df : df.covering == True,:],
-                    mapping_star_all.loc[lambda df : df.covering == True,:],
-                    mapping_star_mixed.loc[lambda df : df.covering == True,:]
-                    ]),
-                colors=colors,
-                library=library)
-    global_stats_table=[]
+    #library = pd.read_pickle(df_library)
+    if bam:
+        bam_file=bam.name
+        #html += get_html_mapping_descr(parse_BAM(bam_file))
+    '''global_stats_table=[]
     global_stats_table['0titre']=table[0,1]
-    html += get_html_table_descr(global_stats_table)
-    '''
+    html += get_html_table_descr(global_stats_table)'''
+    
 
     ## SPLITREADSEARCH STAT
     if candidat:

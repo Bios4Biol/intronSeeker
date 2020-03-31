@@ -88,22 +88,13 @@ def abondance_model(rank:dict, real_abund_perc:dict) :
             x = rank,
             y = real_abund_perc,
             mode = 'lines',
-            name = 'Simulated abundance model'
-        )
-    )
-
-    fig.add_trace(
-        go.Scatter(
-            x = rank,
-            y = real_abund_perc,
-            mode = 'lines',
-            name ='Waited abundance model'
+            name = 'Abundance model'
         )
     )
 
     fig.update_layout(
         xaxis=dict(title="Contigs"),
-        yaxis=dict(title="Relative Abundance percentage",
+        yaxis=dict(title="Abundance percentage",
         range=[-0.25,0.5]),
         margin=go.layout.Margin(
             l=50,
@@ -201,27 +192,25 @@ def plot_class_reads(*args,**kwargs) :
 
 # Plot : Counting table and barplots of mapped covering reads' main characteristics.
 #def plot_covering_reads(*args, **kwargs) :
-def plot_covering_reads(*args, library:dict, colors:dict) :
+def plot_covering_reads(alignments:dict) :
     series=[]
     fig = go.Figure()
-    for name, val in args :
-        s = pd.Series(name=name)
+    for val in alignments:
+        s = pd.Series()
+        #{'query_name': '97482/2', 'reference_name': 'SEQUENCE103.modif', 'reference_start': 817, 'reference_end': 918, 'cigartuples': [(0, 101)], 'is_secondary': False, 'is_supplementary': False, 'mapping_quality': 60}
         s['Covering']=len(val)
-        s['Unmapped']=len(val.loc[lambda df : df.mapped == False])
-        tmp = val.merge(library,left_on='read',right_index=True,suffixes=("","_lib"))
-        s['Mismapped'] = len(tmp.loc[lambda df : (df.contig.str.rstrip('.ori') != df.contig_lib.str.rstrip('.ori'))& (df.mapped == True)])
-        s['Unsplit'] = len(val.loc[lambda df : (df.mapped==True)&(df.split==False)])
-        s['Missplit'] = len(val.loc[lambda df : (df.split==True)&(df.missplit==True)])
-        s['Correct splitting'] = len(val.loc[lambda df : df.classe == 'TP'])
+        s['Unmapped']=len(val[lambda df : df.mapped == False])
+        #s['Mismapped'] = len(tmp.loc[lambda df : (df.contig.str.rstrip('.ori') != df.contig_lib.str.rstrip('.ori'))& (df.mapped == True)])
+        #s['Unsplit'] = len(val.loc[lambda df : (df.mapped==True)&(df.split==False)])
+        #s['Missplit'] = len(val.loc[lambda df : (df.split==True)&(df.missplit==True)])
+        #s['Correct splitting'] = len(val.loc[lambda df : df.classe == 'TP'])
         series.append(s)
         
         to_plot = s[['Unmapped','Unsplit','Correct splitting']]/s['Covering']*100
         fig.add_trace(
             go.Bar(
                     x=to_plot.index,
-                    y=to_plot.values,
-                    name = s.name,
-                    marker_color=colors[s.name]
+                    y=to_plot.values
             ))
     table = pd.concat(series,axis=1,sort=False)
         

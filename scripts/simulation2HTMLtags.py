@@ -331,20 +331,13 @@ def get_html_ranks_descr(rank:dict, real_abund_perc:dict):
     return r
 
 
-def get_html_mapping_descr(names:dict, mapping_hisat_all:dict, mapping_hisat_mixed:dict, mapping_star_all:dict, mapping_star_mixed:dict, colors:dict, library:dict):
+def get_html_mapping_descr(alignments:dict):
     r = '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5> Counting table and barplots of mapped covering reads' main characteristics</h5>
-                <span class="anchor" id="abundstat"></span>
-'''+ plot_covering_reads(*zip(names,[
-                    mapping_hisat_all.loc[lambda df : df.covering == True,:],
-                    mapping_hisat_mixed.loc[lambda df : df.covering == True,:],
-                    mapping_star_all.loc[lambda df : df.covering == True,:],
-                    mapping_star_mixed.loc[lambda df : df.covering == True,:]
-                    ]),
-                colors=colors,
-                library=library) +'''
+                <span class="anchor" id="bam"></span>
+'''+ plot_covering_reads(alignments) +'''
             </div>
         </div>    
 '''
