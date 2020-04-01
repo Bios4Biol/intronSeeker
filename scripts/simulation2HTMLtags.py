@@ -456,7 +456,7 @@ def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
 '''+dict_to_table(global_stat_candidat,-1,True)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-8">
-                <h5>Candidats depth (!!!!!!  PB avec nb candidats PASS !!!! en cours)</h5>
+                <h5>Candidats depth distribution</h5>
                 <span class="anchor" id="contigs_len_dist"></span>
 '''+plot_hist_candidats_depth(df_candidat['depth'])+'''
             </div>
