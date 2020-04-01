@@ -189,8 +189,11 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
     if ranks:
         ranks_parsed = parse_rank_file(ranks_file)
         real = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100,columns = ['real_abund_perc']).reset_index()
+        print('contigs size', df_library.groupby('contig').size())
+        #add column len contig to contig size 
+        #normalized = pd.Data, Frame(((df_library.groupby('contig').size()/df_fasta)/len(df_library))*100,columns = ['real_abund_perc']).reset_index()
         df_abund = ranks_parsed.merge(real,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_real'))
-        html += get_html_ranks_descr(df_abund['rank'], df_abund['real_abund_perc'])
+        html += get_html_ranks_descr(df_abund)
 
     ## ALIGNMENT STATS
     if flagstat:

@@ -13,15 +13,24 @@ def plot_hist_contigs_len(fastaContigsLen, mFastaContigsLen):
     contigs = go.Histogram(
         x=fastaContigsLen,
         name='Contigs',
-        opacity=0.65
+        opacity=0.75
     )
     modifiedContigs = go.Histogram(
         x=mFastaContigsLen,
         name='Modified contigs',
-        opacity=0.65
+        opacity=0.75
     )
     data = [contigs, modifiedContigs]
-    layout = go.Layout(barmode='overlay')
+    layout = go.Layout(
+        xaxis=dict(
+            title='Contigs length'
+        ),
+        yaxis=dict(
+            title='Number of contigs'
+        ),
+        bargap=0.2,
+        bargroupgap=0.1
+    )
     fig = go.Figure(data=data, layout=layout)
     fig.update_layout(
         margin=go.layout.Margin(
@@ -31,8 +40,10 @@ def plot_hist_contigs_len(fastaContigsLen, mFastaContigsLen):
             t=30,
             pad=0
         )
-    )   
+    )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
+
 
 def plot_hist_candidats_depth(candidatsDepth):
     candidats = go.Histogram(
@@ -41,7 +52,14 @@ def plot_hist_candidats_depth(candidatsDepth):
         opacity=0.85
     )
     data = [candidats]
-    layout = go.Layout(barmode='overlay')
+    layout = go.Layout(
+         xaxis=dict(
+            title='Candidats depth'
+        ),
+        yaxis=dict(
+            title='Number of candidats'
+        )
+    )
     fig = go.Figure(data=data, layout=layout)
     fig.update_layout(
         margin=go.layout.Margin(
@@ -63,6 +81,9 @@ def plot_dist_features_len(len_by_features, feature_names):
     # Create distplot with curve_type set to 'normal'
     fig = ff.create_distplot(hist_data, group_labels, show_hist=False, show_rug=True, colors=colors)
     fig.update_layout(
+        xaxis=dict(
+            title='Features length'
+        ),
         margin=go.layout.Margin(
             l=50,
             r=50,
@@ -87,7 +108,7 @@ def plot_insertion_in_contig(positions) :
             #)
     )
     layout = go.Layout(xaxis=dict(title="% of contig length"),
-                       yaxis=dict(title="Count"))
+                       yaxis=dict(title="Number of introns"))
     fig = go.Figure(data=[hist],layout=layout)
     fig.update_layout(
         margin=go.layout.Margin(
@@ -101,14 +122,22 @@ def plot_insertion_in_contig(positions) :
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 # Plot ranks file
-def abondance_model(rank:dict, real_abund_perc:dict) :
+def plot_abondance_model(df_abund:dict) :
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
-            x = rank,
-            y = real_abund_perc,
+            x = df_abund['rank'],
+            y = df_abund['real_abund_perc'],
             mode = 'lines',
             name = 'Abundance model'
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x = df_abund['rank'],
+            y = df_abund['rel_abund_perc'],
+            mode = 'lines',
+            name ='Waited abundance model'
         )
     )
 

@@ -199,7 +199,7 @@ def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
     r += '''          
                 <li class="nav-item">
 				   <a class="nav-link" href="#results">
-				        <span class="oi oi-key" aria-hidden="true"></span>
+				        <span class="oi oi-folder" aria-hidden="true"></span>
 					    Results
 				   </a>
 			    </li>
@@ -228,7 +228,7 @@ def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
     r +='''            
                 <li class="nav-item">
                     <a class="nav-link" href="#glossary">
-                        <span class="oi oi-file" aria-hidden="true"></span>
+                        <span class="oi oi-question-mark" aria-hidden="true"></span>
                         Glossary
                     </a>
                 </li>
@@ -310,7 +310,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 '''
     r += '''
             <div class="mt-4 mr-0 pl-0 col-md-6">
-                <h5>Distribution of introns insertion position along the contigs</h5>
+                <h5>Insertion position of introns along contigs</h5>
                 <span class="anchor" id="feat_dist_intron"></span>
 '''+plot_insertion_in_contig(pos)+'''
             </div>
@@ -319,13 +319,13 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
     return r
 
 
-def get_html_ranks_descr(rank:dict, real_abund_perc:dict):
+def get_html_ranks_descr(df_abund_perc:dict):
     r = '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5>Percentage of abundance of each contig in library</h5>
                 <span class="anchor" id="abundstat"></span>
-'''+abondance_model(rank, real_abund_perc)+'''
+'''+plot_abondance_model(df_abund_perc)+'''
             </div>
         </div>    
 '''
@@ -353,6 +353,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-4 pl-0 col-md-4">
+                <h5>Global statistics</h5>
                 <span class="anchor" id="readgstat"></span>
 '''+dict_to_table(global_stat_fastq,-1,True)+'''
             </div>
