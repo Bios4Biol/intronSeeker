@@ -319,13 +319,13 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
     return r
 
 
-def get_html_ranks_descr(df_abund_perc:dict):
+def get_html_ranks_descr(df_abund_perc:dict, df_nAbund:dict):
     r = '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5>Percentage of abundance of each contig in library</h5>
                 <span class="anchor" id="abundstat"></span>
-'''+plot_abondance_model(df_abund_perc)+'''
+'''+plot_abondance_model(df_abund_perc, df_nAbund)+'''
             </div>
         </div>    
 '''
@@ -428,7 +428,7 @@ def get_html_table_descr(global_stats_table):
     return r
 
 
-def get_html_split(mapping_hisat_all:dict , mapping_hisat_mixed:dict, mapping_star_all:dict, names:dict, mapping_star_mixed:dict, colors:dict):
+def get_html_split_OLD(mapping_hisat_all:dict , mapping_hisat_mixed:dict, mapping_star_all:dict, names:dict, mapping_star_mixed:dict, colors:dict):
     r = '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
@@ -446,6 +446,17 @@ def get_html_split(mapping_hisat_all:dict , mapping_hisat_mixed:dict, mapping_st
 '''
     return r
 
+def get_html_split(mapping_bam:dict):
+    r = '''
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5>Barplots of split reads signal detection</h5>
+                <span class="anchor" id="split"></span>
+'''+plot_class_reads(mapping_bam)+'''
+            </div>
+        </div>    
+'''
+    return r
 
     
 def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):

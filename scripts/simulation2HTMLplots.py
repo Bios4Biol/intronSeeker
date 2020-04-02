@@ -122,7 +122,7 @@ def plot_insertion_in_contig(positions) :
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 # Plot ranks file
-def plot_abondance_model(df_abund:dict) :
+def plot_abondance_model(df_abund:dict, df_nAbund:dict) :
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -140,7 +140,16 @@ def plot_abondance_model(df_abund:dict) :
             name ='Waited abundance model'
         )
     )
-
+    print('rank',df_nAbund['rank'])                        
+    print('val',df_nAbund['norm_abund_perc'])       # Val trop elevees pour figurer dans le graph../ range
+    fig.add_trace(
+        go.Scatter(
+            x = df_nAbund['rank'],                              
+            y = df_nAbund['norm_abund_perc'],
+            mode = 'lines',
+            name = 'Normalized abundance model'
+        )
+    )
     fig.update_layout(
         xaxis=dict(title="Contigs"),
         yaxis=dict(title="Abundance percentage",
@@ -238,6 +247,7 @@ def plot_class_reads(*args,**kwargs) :
             ]
         )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
 
 # Plot : Counting table and barplots of mapped covering reads' main characteristics.
 #def plot_covering_reads(*args, **kwargs) :

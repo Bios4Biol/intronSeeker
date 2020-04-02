@@ -189,11 +189,26 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
     if ranks:
         ranks_parsed = parse_rank_file(ranks_file)
         real = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100,columns = ['real_abund_perc']).reset_index()
-        print('contigs size', df_library.groupby('contig').size())
+        print('####################################### ABUNDANCE ##############################################################')
         #add column len contig to contig size 
-        #normalized = pd.Data, Frame(((df_library.groupby('contig').size()/df_fasta)/len(df_library))*100,columns = ['real_abund_perc']).reset_index()
+        print('1- on prend le nombre de read sur un contig ', df_library.groupby('contig').size())
+        df_normalized = pd.concat([df_library.groupby('contig').size(), df_fasta['length']], axis=1, sort=False)
+        print('df_normalized', df_normalized)
+        print('2- on divise ce nombre par la longueur de ce contig', df_normalized['length'])
+        print('3- on multiplie ensuite par la longueur moyenne de l ensemble des contigs : len library / nb tot contigs', len(df_library)/df_fasta.shape[0])
+        print('4- on divise par le nombre total de reads', df_library.shape[0])
+        print('5- on multiple par 100')                                     
+        # Calcul
+        nAbundCal = (((df_library.groupby('contig').size()/df_normalized['length'])*(len(df_library)/df_fasta.shape[0]))/df_library.shape[0])*100
+        print('nAbundCal', nAbundCal)
+        # Dataframes
+        tmp=pd.DataFrame(nAbundCal,columns = ['norm_abund_perc']).reset_index()
+        df_nAbund=ranks_parsed.merge(tmp,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_norm'))
+        print('df_nAbund', df_nAbund)
         df_abund = ranks_parsed.merge(real,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_real'))
-        html += get_html_ranks_descr(df_abund)
+        print('df_abund', df_abund)
+        print('####################################### END ABUNDANCE ##########################################################')
+        html += get_html_ranks_descr(df_abund, df_nAbund)
 
     ## ALIGNMENT STATS
     if flagstat:
@@ -278,10 +293,16 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
     #library = pd.read_pickle(df_library)
     if bam:
         bam_file=bam.name
+        #df_library= df_library.join(df_features,lsuffix='',rsuffix='_cov').loc[:,df_features.columns]
+        #print('df_library', df_library)
+        #df_library.loc[lambda df : df.covering != True, "covering"] = False
+        #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library))
+        #html += get_html_split(mapping_bam)
         #html += get_html_mapping_descr(parse_BAM(bam_file))
-    '''global_stats_table=[]
-    global_stats_table['0titre']=table[0,1]
-    html += get_html_table_descr(global_stats_table)'''
+        '''
+        global_stats_table=[]
+        global_stats_table['0titre']=table[0,1]
+        html += get_html_table_descr(global_stats_table)'''
     
 
     ## SPLITREADSEARCH STAT
