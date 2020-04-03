@@ -187,7 +187,12 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         
     html += get_html_reads_descr(global_stat_fastq)
         
-    # ABUNDANCE
+    # ABUNDANCE number of reads by contig
+    # Build a dataframe with:
+    #   ctg
+    #   abund_perc => (number of read on this contig / number of reads) * 100
+    #   requested  => if grinder ranks output file is given ...
+    #   norm       => (((number of read on this contig / contig len) * mean len of all contigs) / number of reads) * 100
     df_read_abun_by_ctg = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100, columns = ['abund_perc']).reset_index()
     print("BEFORE:",df_read_abun_by_ctg.head(5))
     if ranks:
