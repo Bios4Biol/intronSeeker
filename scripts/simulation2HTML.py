@@ -309,8 +309,9 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
         #Waiting dataframe: 
         #df_cov_lect                contig  start  end  complement  covering                     intron  pos_on_read
         #203770/1  SEQUENCE685    457  558       False      True  SEQUENCE685.modif|556|897    98.019802
-       # df_cov=prlz_process_intron(df_features, df_library)
-       # print('cov', df_cov)
+        
+        #df_cov=prlz_process_intron(df_features, df_library)
+        #print('cov', df_cov)
         #df_library= df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
         #df_library.loc[lambda df : df.covering != True, "covering"] = False
         #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library))

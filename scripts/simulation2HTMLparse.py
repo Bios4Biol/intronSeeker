@@ -377,12 +377,13 @@ def process_intron(intron,lectures) :
     return df_cov_lect
 
 # Return DataFrame Reads
-def prlz_process_intron(df_introns,library) :
+def prlz_process_intron(df_features,df_library) :
     df_reads = pd.concat(
-        df_introns.apply(
+        df_features.apply(
             process_intron,
             axis=1,
-            lectures=library
+            #lectures=df_library
+            lecture=df_library
             ).values
         )
     return df_reads
