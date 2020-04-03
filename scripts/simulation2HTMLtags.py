@@ -319,13 +319,13 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
     return r
 
 
-def get_html_ranks_descr(df_abund_perc:dict, df_nAbund:dict):
+def get_html_ranks_descr(ranks_parsed_real_norm:dict):
     r = '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5>Percentage of abundance of each contig in library</h5>
                 <span class="anchor" id="abundstat"></span>
-'''+plot_abondance_model(df_abund_perc, df_nAbund)+'''
+'''+plot_abondance_model(ranks_parsed_real_norm)+'''
             </div>
         </div>    
 '''

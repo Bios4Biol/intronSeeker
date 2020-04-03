@@ -122,30 +122,28 @@ def plot_insertion_in_contig(positions) :
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 # Plot ranks file
-def plot_abondance_model(df_abund:dict, df_nAbund:dict) :
+def plot_abondance_model(ranks_parsed_real_norm:dict) :
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
-            x = df_abund['rank'],
-            y = df_abund['real_abund_perc'],
+            x = ranks_parsed_real_norm['rank'],
+            y = ranks_parsed_real_norm['real_abund_perc'],
             mode = 'lines',
             name = 'Abundance model'
         )
     )
     fig.add_trace(
         go.Scatter(
-            x = df_abund['rank'],
-            y = df_abund['rel_abund_perc'],
+            x = ranks_parsed_real_norm['rank'],
+            y = ranks_parsed_real_norm['rel_abund_perc'],
             mode = 'lines',
             name ='Waited abundance model'
         )
     )
-    print('rank',df_nAbund['rank'])                        
-    print('val',df_nAbund['norm_abund_perc'])       # Val trop elevees pour figurer dans le graph../ range
     fig.add_trace(
         go.Scatter(
-            x = df_nAbund['rank'],                              
-            y = df_nAbund['norm_abund_perc'],
+            x = ranks_parsed_real_norm['rank'],                              
+            y = ranks_parsed_real_norm['norm_abund_perc'],
             mode = 'lines',
             name = 'Normalized abundance model'
         )

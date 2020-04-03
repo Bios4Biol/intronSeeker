@@ -369,7 +369,6 @@ def process_intron(intron,lectures) :
             axis=1,
             intron_start=intron.start
             )
-    #print('df_cov_lect[pos_on_read]',df_cov_lect['pos_on_read'])        
     '''print('df_cov_lect', df_cov_lect)
     df_cov_lect                contig  start  end  complement  covering                     intron  pos_on_read
     lecture                                                                                        

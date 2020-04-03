@@ -21,7 +21,7 @@ from simulation2HTMLplots import *
 #step 1  full random simulation : intronSeeker fullRandomSimulation -r -o FRS/ 
 #source activate ISeeker_environment;
 #cd scripts/; 
-# python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HISAT2_alignment/hisat2.sort.bam --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_HISAT2/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+# python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
 # scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 # See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_test1_simulation.html
 
@@ -187,28 +187,29 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
         
     # ABUNDANCE   
     if ranks:
-        ranks_parsed = parse_rank_file(ranks_file)
-        real = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100,columns = ['real_abund_perc']).reset_index()
         print('####################################### ABUNDANCE ##############################################################')
-        #add column len contig to contig size 
-        print('1- on prend le nombre de read sur un contig ', df_library.groupby('contig').size())
+        # Rel abund calcul
+        df_ranks_parsed = parse_rank_file(ranks_file)
+        print('df_ranks_parsed head', df_ranks_parsed.head(5))
+        
+        # Real abund calcul
+        df_real = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100,columns = ['real_abund_perc']).reset_index()
+        ranks_parsed_real=df_ranks_parsed.merge(df_real,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_real'))
+        print('ranks_parsed_real', ranks_parsed_real.head(5))
+        
+        # Normalized abund calcul
         df_normalized = pd.concat([df_library.groupby('contig').size(), df_fasta['length']], axis=1, sort=False)
-        print('df_normalized', df_normalized)
-        print('2- on divise ce nombre par la longueur de ce contig', df_normalized['length'])
-        print('3- on multiplie ensuite par la longueur moyenne de l ensemble des contigs : len library / nb tot contigs', len(df_library)/df_fasta.shape[0])
-        print('4- on divise par le nombre total de reads', df_library.shape[0])
-        print('5- on multiple par 100')                                     
-        # Calcul
-        nAbundCal = (((df_library.groupby('contig').size()/df_normalized['length'])*(len(df_library)/df_fasta.shape[0]))/df_library.shape[0])*100
-        print('nAbundCal', nAbundCal)
-        # Dataframes
-        tmp=pd.DataFrame(nAbundCal,columns = ['norm_abund_perc']).reset_index()
-        df_nAbund=ranks_parsed.merge(tmp,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_norm'))
-        print('df_nAbund', df_nAbund)
-        df_abund = ranks_parsed.merge(real,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_real'))
-        print('df_abund', df_abund)
+        print('df_normalized', df_normalized.head(5))                                    
+        nAbundCal = (((df_library.groupby('contig').size()                #1- Nombre de read sur un contig
+        /df_normalized['length'])                                         #2- Diviser ce nombre par la longueur de ce contig
+        *(df_fasta['length'].mean()))                                     #3- Multiplier ensuite par la longueur moyenne de l ensemble des contigs : int(df_fasta['length'].mean())
+        /df_library.shape[0])*100                                         #4- Diviser par le nombre total de reads 
+        print('nAbundCal', nAbundCal)                                     #5- Multiplier par 100
+        df_tmp=pd.DataFrame(nAbundCal,columns = ['norm_abund_perc']).reset_index()
+        ranks_parsed_real_norm=ranks_parsed_real.merge(df_tmp,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_norm'))
+        print('ranks_parsed_real_norm', ranks_parsed_real_norm)
         print('####################################### END ABUNDANCE ##########################################################')
-        html += get_html_ranks_descr(df_abund, df_nAbund)
+        html += get_html_ranks_descr(ranks_parsed_real_norm)
 
     ## ALIGNMENT STATS
     if flagstat:
@@ -293,17 +294,32 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
     #library = pd.read_pickle(df_library)
     if bam:
         bam_file=bam.name
-        #df_library= df_library.join(df_features,lsuffix='',rsuffix='_cov').loc[:,df_features.columns]
+        # Add three columns on df_library : 
+        # 1 - one for the intron covering reads (True/False) :   covering  : True/False 
+        # 2 - another for the covered intron id (if True)  intron : SEQUENCE685.modif|556|897
+        # 3 - and the last for the intron insertion position in read (if True - in term of read length percentage) : pos_on_read : 98.019802
         #print('df_library', df_library)
+        #library head :             contig  start  end  complement
+        #lecture                                   
+        #5898/1   SEQUENCE1      0  101       False
+        #print('df_features', df_features)
+        #features head :                                   contig          feature  start  end  length flanks  pos_on_contig
+        #features                                                                                           
+        #SEQUENCE3.modif|135|401  SEQUENCE3.modif  retained_intron    135  401     266  CT_AC      10.714286
+        #Waiting dataframe: 
+        #df_cov_lect                contig  start  end  complement  covering                     intron  pos_on_read
+        #203770/1  SEQUENCE685    457  558       False      True  SEQUENCE685.modif|556|897    98.019802
+       # df_cov=prlz_process_intron(df_features, df_library)
+       # print('cov', df_cov)
+        #df_library= df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
         #df_library.loc[lambda df : df.covering != True, "covering"] = False
         #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library))
         #html += get_html_split(mapping_bam)
-        #html += get_html_mapping_descr(parse_BAM(bam_file))
         '''
         global_stats_table=[]
         global_stats_table['0titre']=table[0,1]
-        html += get_html_table_descr(global_stats_table)'''
-    
+        html += get_html_table_descr(global_stats_table)
+        '''
 
     ## SPLITREADSEARCH STAT
     if candidat:
