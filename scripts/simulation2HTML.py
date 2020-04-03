@@ -28,7 +28,9 @@ from simulation2HTMLplots import *
 ############
 # SUB MAIN #
 ############
-def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, assemblathon:str, flagstat:str, bam:str, candidat:str, output:str, prefix:str, force:bool, threads:int) :
+def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str,
+                        assemblathon:str, flagstat:str, bam:str, candidat:str,
+                        output:str, prefix:str, force:bool, threads:int ) :
     output_path = output + "/report"
     if prefix:
         output_path += "_" + prefix
@@ -185,7 +187,24 @@ def simulationReport(fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str, 
         
     html += get_html_reads_descr(global_stat_fastq)
         
-    # ABUNDANCE   
+    # ABUNDANCE number of reads by contig
+    # Build a dataframe with:
+    #   ctg
+    #   abund_perc => (number of read on this contig / number of reads) * 100
+    #   requested  => if grinder ranks output file is given ...
+    #   norm       => (((number of read on this contig / contig len) * mean len of all contigs) / number of reads) * 100
+    df_read_abun_by_ctg = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100, columns = ['abund_perc']).reset_index()
+    print("BEFORE:",df_read_abun_by_ctg.head(5))
+    if ranks:
+        df_tmp = parse_rank_file(ranks_file)
+        df_read_abun_by_ctg = df_read_abun_by_ctg.assign(requested=df_tmp.values)
+    print("AFTER:",df_read_abun_by_ctg.head(5))
+
+    dt_tmp = (((df_library.groupby('contig').size()/df_fasta['length'])*(df_fasta['length'].mean()))/df_library.shape[0])*100
+    df_read_abun_by_ctg = df_read_abun_by_ctg.assign(normalized=df_tmp.values)
+    del df_tmp
+    print("END:",df_read_abun_by_ctg.head(5))
+
     if ranks:
         print('####################################### ABUNDANCE ##############################################################')
         # Rel abund calcul
