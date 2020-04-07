@@ -122,7 +122,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         candidat_file=candidat.name
         inputfiles.append("Candidat#" + os.path.basename(candidat.name))
 
-    html += get_html_body1(flagstat_file, candidat_file, ranks_file, assemblathon_file)
+    html += get_html_body1(flagstat_file, candidat_file, assemblathon_file)
 
    
     # INPUT FILES
@@ -146,11 +146,9 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
 
-    print('features:', df_features)
-
+    '''
     #https://stackoverflow.com/questions/45759966/counting-unique-values-in-a-column-in-pandas-dataframe-like-in-qlik
     print('6Number of features in GTF:', df_features['contig'].nunique())
-    #https://stackoverflow.com/questions/45759966/counting-unique-values-in-a-column-in-pandas-dataframe-like-in-qlik
     print('5Number of distinct features in GTF:', df_features['feature'].nunique())
     #ou
     df2=df_features.groupby('feature')['contig'].nunique()
@@ -170,65 +168,42 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     #df_features = df_features.drop(columns='nbfeature')
     print('**Number of sequences by feature type: (6)', (df_features.groupby('feature')['contig'].nunique()).values) # type ; pandas.core.series.Series
     print('**Number of sequences by feature type (7):', (df_features.groupby('feature')['contig'].nunique()).index) 
+    '''
 
     # READS STAT
     # Global stat
     global_stat_fastq = dict()
-    global_stat_fastq["0Number of fragments"] = df_library['contig'].count()
+    global_stat_fastq["0Number of reads"] = df_library['contig'].count()
     global_stat_fastq["1Mean coverage"] = 0
     for i,row in df_library.iterrows():
         global_stat_fastq["1Mean coverage"] += row['end'] - row['start'] + 1
     global_stat_fastq["1Mean coverage"] /= (global_stat["1FASTA file - Mean seq. length"] * global_stat["0FASTA file - Number of seq."])
     global_stat_fastq["1Mean coverage"] = round(global_stat_fastq["1Mean coverage"], 2)
     #to remove ?
-    global_stat_fastq["2Min fragments length"] = df_features['length'].min()
-    global_stat_fastq["3Max fragments length"] = df_features['length'].max()
-    global_stat_fastq["4Mean fragments length"] = round(df_features['length'].mean())
-        
+    global_stat_fastq["2Min reads length"] = df_features['length'].min()
+    global_stat_fastq["3Max reads length"] = df_features['length'].max()
+    global_stat_fastq["4Mean reads length"] = round(df_features['length'].mean())
+      
     html += get_html_reads_descr(global_stat_fastq)
-        
+          
     # ABUNDANCE number of reads by contig
     # Build a dataframe with:
     #   ctg
     #   abund_perc => (number of read on this contig / number of reads) * 100
     #   requested  => if grinder ranks output file is given ...
     #   norm       => (((number of read on this contig / contig len) * mean len of all contigs) / number of reads) * 100
-    df_read_abun_by_ctg = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100, columns = ['abund_perc']).reset_index()
-    print("BEFORE:",df_read_abun_by_ctg.head(5))
+    df_tmp = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100, columns = ['abund_perc'])
+    df_fasta = df_fasta.assign(real=df_tmp.abund_perc.values)
     if ranks:
         df_tmp = parse_rank_file(ranks_file)
-        df_read_abun_by_ctg = df_read_abun_by_ctg.assign(requested=df_tmp.values)
-    print("AFTER:",df_read_abun_by_ctg.head(5))
-
-    dt_tmp = (((df_library.groupby('contig').size()/df_fasta['length'])*(df_fasta['length'].mean()))/df_library.shape[0])*100
-    df_read_abun_by_ctg = df_read_abun_by_ctg.assign(normalized=df_tmp.values)
+        df_fasta = df_fasta.assign(rank=df_tmp['rank'].values)
+        df_fasta = df_fasta.assign(waiting=df_tmp.rel_abund_perc.values)
+    df_tmp = pd.DataFrame(
+        (((df_library.groupby('contig').size()/df_fasta['length'])*(df_fasta['length'].mean()))/df_library.shape[0])*100,
+        columns = ['norm'])
+    df_fasta = df_fasta.assign(norm=df_tmp['norm'].values)
     del df_tmp
-    print("END:",df_read_abun_by_ctg.head(5))
-
-    if ranks:
-        print('####################################### ABUNDANCE ##############################################################')
-        # Rel abund calcul
-        df_ranks_parsed = parse_rank_file(ranks_file)
-        print('df_ranks_parsed head', df_ranks_parsed.head(5))
-        
-        # Real abund calcul
-        df_real = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100,columns = ['real_abund_perc']).reset_index()
-        ranks_parsed_real=df_ranks_parsed.merge(df_real,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_real'))
-        print('ranks_parsed_real', ranks_parsed_real.head(5))
-        
-        # Normalized abund calcul
-        df_normalized = pd.concat([df_library.groupby('contig').size(), df_fasta['length']], axis=1, sort=False)
-        print('df_normalized', df_normalized.head(5))                                    
-        nAbundCal = (((df_library.groupby('contig').size()                #1- Nombre de read sur un contig
-        /df_normalized['length'])                                         #2- Diviser ce nombre par la longueur de ce contig
-        *(df_fasta['length'].mean()))                                     #3- Multiplier ensuite par la longueur moyenne de l ensemble des contigs : int(df_fasta['length'].mean())
-        /df_library.shape[0])*100                                         #4- Diviser par le nombre total de reads 
-        print('nAbundCal', nAbundCal)                                     #5- Multiplier par 100
-        df_tmp=pd.DataFrame(nAbundCal,columns = ['norm_abund_perc']).reset_index()
-        ranks_parsed_real_norm=ranks_parsed_real.merge(df_tmp,right_on = 'contig',left_on='seq_id',suffixes = ('_grinder','_norm'))
-        print('ranks_parsed_real_norm', ranks_parsed_real_norm)
-        print('####################################### END ABUNDANCE ##########################################################')
-        html += get_html_ranks_descr(ranks_parsed_real_norm)
+    html += get_html_abundance(df_fasta)
 
     ## ALIGNMENT STATS
     if flagstat:
@@ -244,6 +219,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_flagstat["4Properly paired"] = df_flag_all.iloc[3,0]
         global_stat_flagstat["5Singletons"]      = df_flag_all.iloc[4,0]
         html += get_html_flagstat_descr(global_stat_flagstat, flagstat.name, df_flag_all)
+        #https://plotly.com/python/sunburst-charts/
     
     #MAPPING
     #Compare assemblathon files
@@ -263,83 +239,20 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
         html += get_html_assemblathon_descr(global_stat_assemblathon)
     
-    '''    
-    #Analysis of alignments by seaching split reads and comparing with simulated introns   
-    #Split read signal analysis
-    #Effectives table and barplots of split reads signal detection for STAR and HiSAT2 for the two types of reference.
-    # # Add three columns on df_library : one for the intron covering reads (True/False), another for the covered intron id (if True) and the last
-    # for the intron insertion position in read (if True - in term of read length percentage)
-    # (precision : the function is called on df_library DataFrame but it returns a library-like DataFrame)
-    #print('df_library (without cov, id, pos_on_read) : ', df_library)
-    #lecture   contig  start  end  complement                              
-    #5898/1      SEQUENCE1      0  101       False
-    with prl.ProcessPoolExecutor(max_workers=threads) as ex :
-        introns_split = np.array_split(df_features,ex._max_workers)
-        #print(introns_split)
-        #  features                    contig          feature             start   end  length flanks  pos_on_contig                                                                                          
-        #SEQUENCE1000.modif|257|596   SEQUENCE1000.modif  retained_intron    257   596     339  CT_AC      42.269737
-                                              
-        #==> KeyError: 'pos_on_read' for prlz_process_intron
-
-        #df_cov_lect
-        #lecture   contig         start end  complement   covering    intron                  pos_on_read                                                                                        
-        #203770/1  SEQUENCE685    457  558       False      True  SEQUENCE685.modif|556|897    98.019802
-
-
-        #with open('/home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/introns_split.txt', 'w') as f:
-        #    for item in introns_split:
-        #        f.write("%s\n" % item)
-        library_cov = pd.concat(ex.map(prlz_process_intron,introns_split,repeat(df_library,ex._max_workers)))
-        
-    
-    df_library = df_library.join(library_cov,lsuffix='',rsuffix='_cov').loc[:,library_cov.columns]
-    df_library.loc[lambda df : df.covering != True, "covering"] = False
-
-    #process_bam(alignments, contigs, introns, library)
-    mapping_hisat_all   = pd.read_pickle(process_bam(parse_BAM(bamHISATall.name), df_mfasta, df_features, df_library))  #read_pickle takes as input as compressed file or a dataframe. Here it is a dataframe.
-    mapping_hisat_mixed = pd.read_pickle(process_bam(parse_BAM(bamHISATmix.name), df_mfasta, df_features, df_library))
-    mapping_star_all    = pd.read_pickle(process_bam(parse_BAM(bamSTARall.name), df_mfasta, df_features, df_library))
-    mapping_star_mixed  = pd.read_pickle(process_bam(parse_BAM(bamSTARmix.name), df_mfasta, df_features, df_library))
-
-    names = ['All with introns - Hisat2','Mix-states contigs - Hisat2','All with introns - STAR','Mix-states contigs - STAR'] 
-    colors = {'All with introns - Hisat2':"limegreen",
-          'Mix-states contigs - Hisat2':"forestgreen",
-          'All with introns - STAR':"darkorange",
-          'Mix-states contigs - STAR':"chocolate"}
-    html += get_html_split(mapping_hisat_all, mapping_hisat_mixed, mapping_star_all, mapping_star_mixed, names, colors)
-    '''
-
     #Counting table and barplots of mapped covering reads' main characteristics
-    #library = pd.read_pickle(df_library)
     if bam:
         bam_file=bam.name
         # Add three columns on df_library : 
         # 1 - one for the intron covering reads (True/False) :   covering  : True/False 
         # 2 - another for the covered intron id (if True)  intron : SEQUENCE685.modif|556|897
         # 3 - and the last for the intron insertion position in read (if True - in term of read length percentage) : pos_on_read : 98.019802
-        #print('df_library', df_library)
-        #library head :             contig  start  end  complement
-        #lecture                                   
-        #5898/1   SEQUENCE1      0  101       False
-        #print('df_features', df_features)
-        #features head :                                   contig          feature  start  end  length flanks  pos_on_contig
-        #features                                                                                           
-        #SEQUENCE3.modif|135|401  SEQUENCE3.modif  retained_intron    135  401     266  CT_AC      10.714286
-        #Waiting dataframe: 
-        #df_cov_lect                contig  start  end  complement  covering                     intron  pos_on_read
-        #203770/1  SEQUENCE685    457  558       False      True  SEQUENCE685.modif|556|897    98.019802
-        
-        #df_cov=prlz_process_intron(df_features, df_library)
-        #print('cov', df_cov)
-        #df_library= df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
-        #df_library.loc[lambda df : df.covering != True, "covering"] = False
+        df_cov=prlz_process_intron(df_features, df_library)
+        df_library = df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
+        df_library.loc[lambda df : df.covering != True, "covering"] = False
         #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library))
         #html += get_html_split(mapping_bam)
-        '''
-        global_stats_table=[]
-        global_stats_table['0titre']=table[0,1]
-        html += get_html_table_descr(global_stats_table)
-        '''
+        #html += get_html_mapping_descr(parse_BAM(bam_file))
+
 
     ## SPLITREADSEARCH STAT
     if candidat:

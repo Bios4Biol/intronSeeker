@@ -237,8 +237,14 @@ def compute_pos_on_mfasta(df_features, df_mfasta) :
 # Parse ranks file
 def parse_rank_file(rank_file) :
     with open(rank_file,"r") as rf :
-        ranks = [ligne.lstrip("# ").split("\t") for ligne in rf.read().rstrip().split("\n")]
-    return pd.DataFrame(data = ranks[1:], columns=ranks[0] )
+        for line in rf.read().rstrip().split("\n") :
+            if line.startswith('#') :
+                names = line.lstrip("# ").split("\t")
+                names[1] = 'contig'
+                ranks = []
+            else :
+                ranks.append(line.split("\t"))
+    return pd.DataFrame(data=ranks, columns=names).set_index(names[1]).sort_index()
 
 #Useful functions :
 def parsing_test(items) :
@@ -318,7 +324,7 @@ def process_bam(alignments, df_mfasta, df_features, df_library):
             record['reference_end'],                     # End of the alignment on the contig1
             df_library.at[record['query_name'],"covering"], # Bool if the read normally covers an intron (i.e. should be split)
             record['cigartuples'] is not None,           # Bool if the read is mapped
-            not record['reference_name'] == df_library.at[record['query_name'],"contig"].rstrip(".ori"), # Bool if the read is mapped on right contig
+            not record['reference_name'] == df_library.at[record['query_name'],"contig"],  # Bool if the read is mapped on right contig
             (record['cigartuples'] is not None) and ('(3,' in str(record['cigartuples'])), # Bool if the read is split by aligner
             record['is_secondary'],
             record['is_supplementary'],
@@ -327,9 +333,7 @@ def process_bam(alignments, df_mfasta, df_features, df_library):
             index = ["read","contig","align_start","align_end",'covering','mapped',"mismapped",'split','second','suppl','score']
         )
         
-        
         if record['cigartuples'] is not None and '(3,' in str(record['cigartuples']) :
-            
             row = begin.append(limit_from_cigar(
                 record['cigartuples'], 
                 record['reference_start'], 
@@ -351,29 +355,25 @@ def compute_pos_on_read(cov_lect,intron_start):
     else :
         return (cov_lect.end - intron_start)/(cov_lect.end-cov_lect.start)*100
 
-# Return df_cov_lect, a new Dataframe, which contains df_library (lecture, contig, start, end, complement) join with 3 news columns:
-# "covering" : one for the intron covering reads (True/False), 
-# "intron (name)" : another for the covered intron id (if True) 
-# pos_on_read : intron insertion position in read (if True - in term of read length percentage)
-def process_intron(intron,lectures) :
-    df_cov_lect = pd.DataFrame(lectures.loc[lambda df : 
-                         (df.contig+'.modif'== str(intron.contig))
-                         & (intron.start > df.start)
-                         & (intron.start < df.end)
-                          ])              
-    df_cov_lect['covering'] = True
-    df_cov_lect['intron'] = intron.name
-    #print('df_cov_lect[intron]',df_cov_lect['intron'])
-    df_cov_lect['pos_on_read'] = df_cov_lect.apply(
-            compute_pos_on_read,
-            axis=1,
-            intron_start=intron.start
-            )
-    '''print('df_cov_lect', df_cov_lect)
-    df_cov_lect                contig  start  end  complement  covering                     intron  pos_on_read
-    lecture                                                                                        
-    203770/1  SEQUENCE685    457  558       False      True  SEQUENCE685.modif|556|897    98.019802'''
-    #df_cov_lect.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/df_cov_lect.txt', sep='\t', encoding='utf-8')
+# Return df_cov_lect, a new Dataframe which contains reads from df_library if INTRON cov (lecture,
+# contig, start, end, complement) join with 3 news columns:
+#   "covering"      : one for the intron covering reads (True/False)
+#   "intron (name)" : another for the covered intron id (if True) 
+#   "pos_on_read"   : intron insertion position in read (if True - in term of read length percentage)
+def process_intron(df_features,df_library) :
+    df_cov_lect = pd.DataFrame(df_library.loc[lambda df : 
+                         (df.contig+'.modif'== str(df_features.contig))
+                         & (df_features.start > df.start)
+                         & (df_features.start < df.end)
+                          ])
+    if df_cov_lect.shape[0] > 0 :
+        df_cov_lect['covering'] = True
+        df_cov_lect['intron'] = df_features.name
+        df_cov_lect['pos_on_read'] = df_cov_lect.apply(
+                compute_pos_on_read,
+                axis=1,
+                intron_start=df_features.start
+                )
     return df_cov_lect
 
 # Return DataFrame Reads
@@ -382,8 +382,7 @@ def prlz_process_intron(df_features,df_library) :
         df_features.apply(
             process_intron,
             axis=1,
-            #lectures=df_library
-            lecture=df_library
+            df_library=df_library
             ).values
         )
     return df_reads

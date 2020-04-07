@@ -122,34 +122,35 @@ def plot_insertion_in_contig(positions) :
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 # Plot ranks file
-def plot_abondance_model(ranks_parsed_real_norm:dict) :
+def plot_abondance_model(df_fasta:dict) :
     fig = go.Figure()
+    if 'waiting' in df_fasta.columns:
+        fig.add_trace(
+            go.Scatter(
+                x = df_fasta.index,
+                y = df_fasta['waiting'],
+                mode = 'lines',
+                name ='Waited abundance'
+            )
+        )
     fig.add_trace(
         go.Scatter(
-            x = ranks_parsed_real_norm['rank'],
-            y = ranks_parsed_real_norm['real_abund_perc'],
+            x = df_fasta.index,
+            y = df_fasta['real'],
             mode = 'lines',
-            name = 'Abundance model'
+            name = 'Abundance'
         )
     )
     fig.add_trace(
         go.Scatter(
-            x = ranks_parsed_real_norm['rank'],
-            y = ranks_parsed_real_norm['rel_abund_perc'],
+            x = df_fasta.index,                              
+            y = df_fasta['norm'],
             mode = 'lines',
-            name ='Waited abundance model'
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x = ranks_parsed_real_norm['rank'],                              
-            y = ranks_parsed_real_norm['norm_abund_perc'],
-            mode = 'lines',
-            name = 'Normalized abundance model'
+            name = 'Normalized abundance'
         )
     )
     fig.update_layout(
-        xaxis=dict(title="Contigs"),
+        xaxis=dict(title="Contig names"),
         yaxis=dict(title="Abundance percentage",
         range=[-0.25,0.5]),
         margin=go.layout.Margin(
@@ -161,91 +162,6 @@ def plot_abondance_model(ranks_parsed_real_norm:dict) :
         )
     )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
-
-# Barplots of split reads signal detection for HiSAT2
-def plot_class_reads(*args,**kwargs) :
-    series = [[],[]]
-    colors = kwargs['colors']
-    
-    fig = psp.make_subplots(
-        rows = 2, cols=1,
-        shared_xaxes=True,
-        vertical_spacing=0.03,
-        specs=[[{"type":"table"}],
-               [{"type":"bar"}]])
-
-    for name,val in args :
-        for idx,val in enumerate([val,val.loc[lambda df : df.contig == df.contig.str.rstrip(".ori"),:]]) :
-            s = val.loc[:,'classe'].value_counts()
-            s.name=name
-            
-        
-            if idx == 0 :
-                visibility = True
-            else :
-                visibility = False
-        
-            fig.add_trace(
-                go.Bar(
-                    visible=visibility,
-                    x=s.index[1:],
-                    y=s.values[1:]/s.sum()*100,
-                    name = s.name,
-                    marker_color=colors[s.name]
-                ),row=2,col=1)
-            
-            s['Total'] = s.sum()
-            series[idx].append(s)
-
-    for idx,serie in enumerate(series) :
-        table = pd.concat(serie,axis=1,sort=False).fillna(0)
-        
-        
-        if idx == 0 :
-            visibility = True
-        else :
-            visibility = False
-            
-        fig.add_trace(
-            go.Table(
-                visible=visibility,
-                columnwidth=[40,80],
-                header = dict(
-                    values=["",*[c.join(["<b>","</b>"]) for c in table.columns.to_list()]],
-                    fill_color='lightgrey'
-                    ),
-                cells = dict(
-                    values=[[v.join(["<b>","</b>"]) for v in list(table.reset_index().T.values)[0]],
-                           *list(table.reset_index().T.values)[1:]],
-                    fill=dict(color=['lightgrey','lavender'])
-                    )
-                ),
-            row=1,col=1)
-    
-    fig.update_layout(
-        height=700,
-        legend=dict(
-            x=-0.4,y=0.40
-            ),
-        updatemenus=[
-            go.layout.Updatemenu(
-                buttons=[
-                    dict(
-                        args=[{"visible":[True,False]}],
-                        label='All alignements',
-                        method='restyle'
-                        ),
-                    dict(
-                        args=[{"visible":[False,True]}],
-                        label='Alignements on contigs with introns',
-                        method='restyle'
-                        ),
-                    ]
-                )
-            ]
-        )
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
-
 
 # Plot : Counting table and barplots of mapped covering reads' main characteristics.
 #def plot_covering_reads(*args, **kwargs) :

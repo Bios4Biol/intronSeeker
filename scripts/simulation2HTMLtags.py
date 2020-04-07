@@ -97,7 +97,7 @@ def get_html_header():
 '''
 
 # icons : https://useiconic.com/open/
-def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
+def get_html_body1(flagstat="", candidat="", assemblathon=""):
     r = '''
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
@@ -168,9 +168,7 @@ def get_html_body1(flagstat="", candidat="", ranks="", assemblathon=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Global statistics
 			    	</a>
-			    </li>'''
-    if ranks:
-        r +='''            
+			    </li>   
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#abundstat">
 				    	<span class="oi oi-graph" aria-hidden="true"></span>
@@ -319,13 +317,13 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
     return r
 
 
-def get_html_ranks_descr(ranks_parsed_real_norm:dict):
+def get_html_abundance(df_fasta:dict):
     r = '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Percentage of abundance of each contig in library</h5>
+                <h5>Pourcentage of read abundance for each contig</h5>
                 <span class="anchor" id="abundstat"></span>
-'''+plot_abondance_model(ranks_parsed_real_norm)+'''
+'''+plot_abondance_model(df_fasta)+'''
             </div>
         </div>    
 '''
@@ -428,31 +426,13 @@ def get_html_table_descr(global_stats_table):
     return r
 
 
-def get_html_split_OLD(mapping_hisat_all:dict , mapping_hisat_mixed:dict, mapping_star_all:dict, names:dict, mapping_star_mixed:dict, colors:dict):
-    r = '''
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Barplots of split reads signal detection</h5>
-                <span class="anchor" id="split"></span>
-'''+plot_class_reads(*zip(names,[
-        mapping_hisat_all,
-        mapping_hisat_mixed,
-        mapping_star_all,
-        mapping_star_mixed
-        ]),
-        colors=colors)+'''
-            </div>
-        </div>    
-'''
-    return r
-
 def get_html_split(mapping_bam:dict):
     r = '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5>Barplots of split reads signal detection</h5>
                 <span class="anchor" id="split"></span>
-'''+plot_class_reads(mapping_bam)+'''
+''' + '''
             </div>
         </div>    
 '''
