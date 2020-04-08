@@ -96,8 +96,8 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     html = get_html_header()
     
     inputfiles = [
-        "FASTA#" + os.path.basename(fasta.name),
-        "Modified FASTA#" + os.path.basename(mfasta.name),
+        "Contig FASTA#" + os.path.basename(fasta.name),
+        "Contig FASTA with feature(s)#" + os.path.basename(mfasta.name),
         "GTF of modified sequences#" + os.path.basename(gtf.name),
         "Read1 FASTQ#" + os.path.basename(r1.name)
     ]
@@ -146,6 +146,23 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
 
+    #Compare assemblathon files
+    if assemblathon:
+        df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
+        print('df_assemblathon_all', df_assemblathon_all)
+        global_stat_assemblathon = dict()
+        print(df_assemblathon_all.shape[0])#lignes 
+        print(df_assemblathon_all.shape[1])#colonnes 
+        global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
+        global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
+        global_stat_assemblathon["2Longest contig"]            = df_assemblathon_all.iloc[2,0]
+        global_stat_assemblathon["3Shortest contiged"]         = df_assemblathon_all.iloc[3,0]
+        nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_all.iloc[4,0])
+        global_stat_assemblathon["4Number of contigs > 1K nt"] = nbLongContigs
+        global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
+        global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
+        html += get_html_assemblathon_descr(global_stat_assemblathon)
+
     '''
     #https://stackoverflow.com/questions/45759966/counting-unique-values-in-a-column-in-pandas-dataframe-like-in-qlik
     print('6Number of features in GTF:', df_features['contig'].nunique())
@@ -185,7 +202,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     global_stat_fastq["4Mean reads length"] = round(df_features['length'].mean())
       
     html += get_html_reads_descr(global_stat_fastq)
-          
+
     # ABUNDANCE number of reads by contig
     # Build a dataframe with:
     #   ctg
@@ -222,23 +239,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         #https://plotly.com/python/sunburst-charts/
     
     #MAPPING
-    #Compare assemblathon files
-    if assemblathon:
-        df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
-        print('df_assemblathon_all', df_assemblathon_all)
-        global_stat_assemblathon = dict()
-        print(df_assemblathon_all.shape[0])#lignes 
-        print(df_assemblathon_all.shape[1])#colonnes 
-        global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
-        global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
-        global_stat_assemblathon["2Longest contig"]            = df_assemblathon_all.iloc[2,0]
-        global_stat_assemblathon["3Shortest contiged"]         = df_assemblathon_all.iloc[3,0]
-        nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_all.iloc[4,0])
-        global_stat_assemblathon["4Number of contigs > 1K nt"] = nbLongContigs
-        global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
-        global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
-        html += get_html_assemblathon_descr(global_stat_assemblathon)
-    
     #Counting table and barplots of mapped covering reads' main characteristics
     if bam:
         bam_file=bam.name

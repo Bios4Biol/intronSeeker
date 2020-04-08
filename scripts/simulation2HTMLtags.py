@@ -118,7 +118,7 @@ def get_html_body1(flagstat="", candidat="", assemblathon=""):
 			  <li class="nav-item">
 				<a class="nav-link" href="#ref-descr">
 				  <span class="oi oi-collapse-down" aria-hidden="true"></span>
-					Reference
+					Contigs
 				</a>
 			  </li>
 			    <li class="nav-item" style="padding-left:10px">
@@ -198,7 +198,7 @@ def get_html_body1(flagstat="", candidat="", assemblathon=""):
                 <li class="nav-item">
 				   <a class="nav-link" href="#results">
 				        <span class="oi oi-folder" aria-hidden="true"></span>
-					    Results
+					    Feature(s) extraction results
 				   </a>
 			    </li>
                 <li class="nav-item" style="padding-left:10px">
@@ -269,7 +269,7 @@ def get_html_inputfiles(files:dict):
 def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict, df_fasta:dict, df_mfasta:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Reference</h1>
+            <h1 class="h4">Contigs</h1>
                 <span class="anchor" id="ref-descr"></span>
         </div>
         <div class="d-flex">
@@ -399,10 +399,6 @@ def get_html_flagstat_descr(global_stat_flagstat:dict, flagstat:str,df_flag_all:
    
 def get_html_assemblathon_descr(global_stat_assemblathon:dict):
     r = '''
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Results</h1>
-                <span class="anchor" id="results"></span>
-        </div>
 		<div class="d-flex">
             <div class="mt-4 mr-4 pl-0 col-md-4">
             <h5>Assemblathon statistics</h5>
@@ -441,6 +437,10 @@ def get_html_split(mapping_bam:dict):
     
 def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
     r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Feature(s) extraction results</h1>
+                <span class="anchor" id="results"></span>
+        </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Candidats</h5>
