@@ -7,6 +7,7 @@ import plotly.figure_factory as ff
 import plotly.subplots as psp
 from plotly.subplots import make_subplots   #for flagstat pie
 import re   #for flagstat pie
+import plotly.express as px #sunburst-charts
 
 # Histogram   https://plotly.com/python/v3/histograms/
 def plot_hist_contigs_len(fastaContigsLen, mFastaContigsLen):
@@ -204,12 +205,26 @@ def pourcent(str_mapping:str, tot:int):
 # Pie Chart with mapping stats from flagstat files
 # https://plot.ly/python/pie-charts/
 def plot_flagstat(df_flag_all:dict):
-    labels = ["Secondary","Mapped", "Properly paired", "Singletons"]
     tot=int(df_flag_all.iloc[0,0])
-    print('tot', tot)
-    values=[round((int(df_flag_all.iloc[1,0])*100)/tot, 2), round(pourcent(df_flag_all.iloc[2,0],tot),2), round(pourcent(df_flag_all.iloc[3,0],tot),2), round(pourcent(df_flag_all.iloc[4,0],tot),2)]
-    print('values', values)
-    # Use `hole` to create a donut-like pie chart
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    unmapp= round(100.00 - pourcent(df_flag_all.iloc[2,0],tot), 2)
+    data = dict(
+        character=["Unmapped", "Secondary","Mapped", "Properly paired", "Singletons"],
+        parent=["", "Mapped", "", "Mapped", "Mapped"],
+        value=[unmapp, round((int(df_flag_all.iloc[1,0])*100)/tot, 2), round(pourcent(df_flag_all.iloc[2,0],tot),2), round(pourcent(df_flag_all.iloc[3,0],tot),2), round(pourcent(df_flag_all.iloc[4,0],tot),2)])
+    fig =px.sunburst(
+        data,
+        names='character',
+        parents='parent',
+        values='value',
+    )
+    fig.update_layout(
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
+    )
 
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
