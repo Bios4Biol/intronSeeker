@@ -266,7 +266,7 @@ def get_html_inputfiles(files:dict):
     return r
 
 
-def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict, df_fasta:dict, df_mfasta:dict):
+def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict, df_fasta:dict, df_mfasta:dict, global_stat_assemblathon:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Contigs</h1>
@@ -274,16 +274,19 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
         </div>
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Global statistics</h5>
+                <h5>Contigs statistics before reads simulation</h5>
                 <span class="anchor" id="gstat"></span>
 '''+dict_to_table(global_stat,7,True)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
+                <h5>Contigs statistics after reads simulation</h5>
+                <span class="anchor" id="nb_ctg_by_feature"></span>
+'''+dict_to_table(global_stat_assemblathon,-1,True)+'''
+            </div>      
+            <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Number of sequences by feature type</h5>
                 <span class="anchor" id="nb_ctg_by_feature"></span>
 '''+dict_to_table(nb_ctg_by_feature,-1,False)+'''
-            </div>
-            <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Number of sequences with same feature(s)</h5>
                 <span class="anchor" id="nb_ctg_by_feature"></span>
 '''+dict_to_table(ctg_descr,-1,False)+'''

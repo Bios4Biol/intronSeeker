@@ -143,14 +143,13 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     for k, v in (df_features.feature.value_counts()).items() :
         global_stat[str(c)+k] = v
         c+=1
-    
-    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
 
+    global_stat_assemblathon = dict()
     #Compare assemblathon files
     if assemblathon:
         df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
         print('df_assemblathon_all', df_assemblathon_all)
-        global_stat_assemblathon = dict()
+        #global_stat_assemblathon = dict()
         print(df_assemblathon_all.shape[0])#lignes 
         print(df_assemblathon_all.shape[1])#colonnes 
         global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
@@ -161,8 +160,10 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_assemblathon["4Number of contigs > 1K nt"] = nbLongContigs
         global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
         global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
-        html += get_html_assemblathon_descr(global_stat_assemblathon)
+       # html += get_html_assemblathon_descr(global_stat_assemblathon)
 
+    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta, global_stat_assemblathon)
+  
     '''
     #https://stackoverflow.com/questions/45759966/counting-unique-values-in-a-column-in-pandas-dataframe-like-in-qlik
     print('6Number of features in GTF:', df_features['contig'].nunique())
