@@ -382,13 +382,13 @@ def get_html_flagstat_descr(global_stat_flagstat:dict, flagstat:str,df_flag_all:
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Mapping</h1>
-                <span class="anchor" id="flagstat"></span>
+                <span class="anchor" id="flag-descr"></span>
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Alignment statistics</h5>
-                <i>'''+flagstat+'''</i>
                 <span class="anchor" id="flagstat"></span>
+                <i>'''+flagstat+'''</i>
 '''+dict_to_table(global_stat_flagstat,-1,True)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
