@@ -98,7 +98,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     inputfiles = [
         "Contig FASTA#" + os.path.basename(fasta.name),
         "Contig FASTA with feature(s)#" + os.path.basename(mfasta.name),
-        "GTF of modified sequences#" + os.path.basename(gtf.name),
+        "GTF of contig with feature(s)#" + os.path.basename(gtf.name),
         "Read1 FASTQ#" + os.path.basename(r1.name)
     ]
     if r2:
@@ -132,10 +132,10 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # Global stat
     nb_distinct_features, nb_ctg_by_feature, ctg_descr = stat_from_gtf(gtf.name)
     global_stat = dict()
-    global_stat["0FASTA file - Number of seq."]            = df_fasta.shape[0]
-    global_stat["1FASTA file - Mean seq. length"]          = int(df_fasta['length'].mean())
-    global_stat["2Modified FASTA file - Number of seq."]   = df_mfasta.shape[0]
-    global_stat["3Modified FASTA file - Mean seq. length"] = int(df_mfasta['length'].mean())
+    global_stat["0Contig FASTA - Number of seq."]            = df_fasta.shape[0]
+    global_stat["1Contig FASTA - Mean seq. length"]          = int(df_fasta['length'].mean())
+    global_stat["2Contig FASTA with feature(s) - Number of seq."]   = df_mfasta.shape[0]
+    global_stat["3Contig FASTA with feature(s) - Mean seq. length"] = int(df_mfasta['length'].mean())
     global_stat["4Number of modified sequences"]           = df_mfasta.loc[df_mfasta.index.str.contains(".modif")].shape[0]
     global_stat["5Number of distinct features in GTF"]     = df_features.feature.value_counts().shape[0]
     global_stat["6Number of features in GTF"]              = df_features.shape[0]
@@ -144,25 +144,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat[str(c)+k] = v
         c+=1
 
-    global_stat_assemblathon = dict()
-    #Compare assemblathon files
-    if assemblathon:
-        df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
-        print('df_assemblathon_all', df_assemblathon_all)
-        #global_stat_assemblathon = dict()
-        print(df_assemblathon_all.shape[0])#lignes 
-        print(df_assemblathon_all.shape[1])#colonnes 
-        global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
-        global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
-        global_stat_assemblathon["2Longest contig"]            = df_assemblathon_all.iloc[2,0]
-        global_stat_assemblathon["3Shortest contiged"]         = df_assemblathon_all.iloc[3,0]
-        nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_all.iloc[4,0])
-        global_stat_assemblathon["4Number of contigs > 1K nt"] = nbLongContigs
-        global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
-        global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
-       # html += get_html_assemblathon_descr(global_stat_assemblathon)
-
-    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta, global_stat_assemblathon)
+    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
   
     '''
     #https://stackoverflow.com/questions/45759966/counting-unique-values-in-a-column-in-pandas-dataframe-like-in-qlik
@@ -195,7 +177,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     global_stat_fastq["1Mean coverage"] = 0
     for i,row in df_library.iterrows():
         global_stat_fastq["1Mean coverage"] += row['end'] - row['start'] + 1
-    global_stat_fastq["1Mean coverage"] /= (global_stat["1FASTA file - Mean seq. length"] * global_stat["0FASTA file - Number of seq."])
+    global_stat_fastq["1Mean coverage"] /= (global_stat["1Contig FASTA - Mean seq. length"] * global_stat["0Contig FASTA - Number of seq."])
     global_stat_fastq["1Mean coverage"] = round(global_stat_fastq["1Mean coverage"], 2)
     #to remove ?
     global_stat_fastq["2Min reads length"] = df_features['length'].min()
@@ -236,7 +218,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_flagstat["3Mapped"]          = df_flag_all.iloc[2,0]
         global_stat_flagstat["4Properly paired"] = df_flag_all.iloc[3,0]
         global_stat_flagstat["5Singletons"]      = df_flag_all.iloc[4,0]
-        html += get_html_flagstat_descr(global_stat_flagstat, flagstat.name, df_flag_all)
+        html += get_html_flagstat_descr(global_stat_flagstat,df_flag_all)
         #https://plotly.com/python/sunburst-charts/
     
     #MAPPING
@@ -272,6 +254,25 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_candidat["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
         global_stat_candidat["3Number of canonic junction"] = nbPASS
         html += get_html_candidat_descr(global_stat_candidat, df_candidat[df_candidat['filter'] == 'PASS'])
+
+        global_stat_assemblathon = dict()
+    
+    #Compare assemblathon files
+    if assemblathon:
+        df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
+        print('df_assemblathon_all', df_assemblathon_all)
+        #global_stat_assemblathon = dict()
+        print(df_assemblathon_all.shape[0])#lignes 
+        print(df_assemblathon_all.shape[1])#colonnes 
+        global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
+        global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
+        global_stat_assemblathon["2Longest contig"]            = df_assemblathon_all.iloc[2,0]
+        global_stat_assemblathon["3Shortest contiged"]         = df_assemblathon_all.iloc[3,0]
+        nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_all.iloc[4,0])
+        global_stat_assemblathon["4Number of contigs > 1K nt"] = nbLongContigs
+        global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
+        global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
+        html += get_html_assemblathon_descr(global_stat_assemblathon)    
              
     # GLOSSARY
     html += get_html_glossary()
