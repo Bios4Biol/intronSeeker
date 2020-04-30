@@ -465,6 +465,10 @@ def get_html_glossary():
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <span class="anchor" id="glossary"></span>
+                <strong>Bioinformatic Worflow</strong><br>
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-Workflow_intronSeeker.jpg" alt="intronSeeker workflow" style="width:825;height:245;"> </br>
+                <br><br><strong>Biological glossary</strong><br>
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-GLOSSARY.jpg" alt="Splice events" style="width:825;height:245;"> </br>
                 Contig :  A contig (from contiguous) is a set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
                 Candidat : </br>
                 Feature : </br>
@@ -472,7 +476,6 @@ def get_html_glossary():
                 Reads :  In DNA sequencing, a read is an inferred sequence of base pairs (or base pair probabilities) corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
                 Sequence :  </br>
                 Splice events : </br>
-                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/splice_event.png" alt="Splice events" style="width:825;height:245;"> </br>
                 Number of features in GTF :  Number of distinct features from all GTF lines</br>
                 Number of sequences by feature type :  Number of ctg by feature from all GTF lines (Ex: "Exon" see in X ctg, "Intron" see in Y ctg, ...)</br>
                 Number of sequences with same feature(s) : Number of features profiles by ctg (Ex: "1 Exon & 2 Intron" see in X ctg, "3 Introns" see in Y ctg , ...) </br>
