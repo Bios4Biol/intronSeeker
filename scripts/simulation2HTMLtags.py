@@ -470,7 +470,6 @@ def get_html_glossary():
                 Feature : </br>
                 Intron : An intron is any nucleotide sequence within a gene that is removed by RNA splicing during maturation of the final RNA product. (source : Wikipedia)</br>
                 Reads :  In DNA sequencing, a read is an inferred sequence of base pairs (or base pair probabilities) corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
-                Fragment : </br>
                 Sequence :  </br>
                 Splice events : </br>
                 <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/splice_event.png" alt="Splice events" style="width:825;height:245;"> </br>
