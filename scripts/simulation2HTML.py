@@ -21,7 +21,7 @@ from simulation2HTMLplots import *
 #step 1  full random simulation : intronSeeker fullRandomSimulation -r -o FRS/ 
 #source activate ISeeker_environment;
 #cd scripts/; 
-# python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_modifications.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+# python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
 # scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 # See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_test1_simulation.html
 
@@ -230,8 +230,11 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         # 2 - another for the covered intron id (if True)  intron : SEQUENCE685.modif|556|897
         # 3 - and the last for the intron insertion position in read (if True - in term of read length percentage) : pos_on_read : 98.019802
         df_cov=prlz_process_intron(df_features, df_library)
+        print('df_lib MAJ 1', df_cov.head(5))
         df_library = df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
+        print('df_lib MAJ 2', df_library.head(5))
         df_library.loc[lambda df : df.covering != True, "covering"] = False
+        print('df_lib MAJ 3', df_library.head(5))
         #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library))
         #html += get_html_split(mapping_bam)
         #html += get_html_mapping_descr(parse_BAM(bam_file))
@@ -240,7 +243,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     ## SPLITREADSEARCH STAT
     if candidat:
         df_candidat = parse_candidat(candidat.name)
-        print('candidat head :' , df_candidat)
+        #print('candidat head :' , df_candidat)
         global_stat_candidat = dict()
         global_stat_candidat["0Number of candidats"] = df_candidat.shape[0]
         global_stat_candidat["1Mean length"] = 0
@@ -260,7 +263,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     #Compare assemblathon files
     if assemblathon:
         df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
-        print('df_assemblathon_all', df_assemblathon_all)
+        #print('df_assemblathon_all', df_assemblathon_all)
         #global_stat_assemblathon = dict()
         print(df_assemblathon_all.shape[0])#lignes 
         print(df_assemblathon_all.shape[1])#colonnes 

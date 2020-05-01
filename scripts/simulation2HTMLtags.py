@@ -456,6 +456,7 @@ def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
 
     return r      
     
+#<img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-GLOSSARY.jpg" alt="Splice events" style="width:825;height:245;"> </br>    
 def get_html_glossary():
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
@@ -468,7 +469,7 @@ def get_html_glossary():
                 <strong>Bioinformatic Worflow</strong><br>
                 <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-Workflow_intronSeeker.jpg" alt="intronSeeker workflow" style="width:825;height:245;"> </br>
                 <br><br><strong>Biological glossary</strong><br>
-                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-GLOSSARY.jpg" alt="Splice events" style="width:825;height:245;"> </br>
+                
                 Contig :  A contig (from contiguous) is a set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
                 Candidat : </br>
                 Feature : </br>
