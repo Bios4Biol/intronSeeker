@@ -468,15 +468,14 @@ def get_html_glossary():
                 <span class="anchor" id="glossary"></span>
                 <strong>Bioinformatic Worflow</strong><br>
                 <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-Workflow_intronSeeker.jpg" alt="intronSeeker workflow" style="width:825;height:245;"> </br>
-                <br><br><strong>Biological glossary</strong><br>
-                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-GLOSSARY.jpg" alt="intronSeeker glossary" style="width:825;height:245;"> </br>
-                
-                Contig :  A contig (from contiguous) is a set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
+                <br><br><strong>Biological glossary</strong><br><br>
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-GLOSSARY.jpg" alt="intronSeeker glossary" style="width:825;height:245;"> </br><br>
+                Contig / sequence :  A contig (from contiguous) is a set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
                 Candidat : </br>
-                Feature : </br>
-                Intron : An intron is any nucleotide sequence within a gene that is removed by RNA splicing during maturation of the final RNA product. (source : Wikipedia)</br>
-                Reads :  In DNA sequencing, a read is an inferred sequence of base pairs (or base pair probabilities) corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
-                Sequence :  </br>
+                Feature : Retained intron by splicing.</br>
+                Exon : An exon is a coding sequence, kept by translation.<br>
+                Intron : An intron is a no coding sequence, removed by RNA splicing.</br>
+                Reads / lecture :  In DNA sequencing, a read is an inferred sequence of base pairs (or base pair probabilities) corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
                 Splice events : </br>
                 Number of features in GTF :  Number of distinct features from all GTF lines</br>
                 Number of sequences by feature type :  Number of ctg by feature from all GTF lines (Ex: "Exon" see in X ctg, "Intron" see in Y ctg, ...)</br>
