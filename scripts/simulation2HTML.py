@@ -237,8 +237,8 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library))
         df_cov.loc[lambda df : df.covering != True, "covering"] = False #test
         print('df_cov', df_cov.head(5))
-        mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_cov))
-        print('mapping_bam',mapping_bam)
+        #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_cov))
+        #print('mapping_bam',mapping_bam)
         #html += get_html_split(mapping_bam)
         #html += get_html_mapping_descr(parse_BAM(bam_file))
 
