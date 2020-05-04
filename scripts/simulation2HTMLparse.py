@@ -274,6 +274,9 @@ def parse_BAM(BamPath:str):
         'is_supplementary' : record.is_supplementary,
         'mapping_quality' : record.mapping_quality
         } for record in bamfile.fetch(until_eof=True)]
+    #print("BAM*********",alignments)    
+    #{'query_name': '14503/1', 'reference_name': 'SEQUENCE661.modif', 'reference_start': 509, 'reference_end': 610, 'cigartuples': [(0, 101)], 'is_secondary': False, 'is_supplementary': False, 'mapping_quality': 255}, 
+    #{'query_name': '58518/1', 'reference_name': 'SEQUENCE661.modif', 'reference_start': 511, 'reference_end': 612, 'cigartuples': [(0, 101)], 'is_secondary': False, 'is_supplementary': False, 'mapping_quality': 255}, 
     return alignments
 
 def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
@@ -306,7 +309,7 @@ def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
                     index = ["start_split","end_split","split_length","split_flanks"])
 
-
+#return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
 def process_bam(alignments, df_mfasta, df_features, df_library):
     """
     For an alignment file, list all split reads.
@@ -373,7 +376,7 @@ def process_intron(df_features,df_library) :
                 compute_pos_on_read,
                 axis=1,
                 intron_start=df_features.start
-                )
+                )             
     return df_cov_lect
 
 # Return DataFrame Reads
@@ -384,7 +387,7 @@ def prlz_process_intron(df_features,df_library) :
             axis=1,
             df_library=df_library
             ).values
-        )
+        )   
     return df_reads
 
 # Return int formatted by 3 numbers. Example : 1 234 instead of 1234

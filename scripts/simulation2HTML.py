@@ -230,12 +230,15 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         # 2 - another for the covered intron id (if True)  intron : SEQUENCE685.modif|556|897
         # 3 - and the last for the intron insertion position in read (if True - in term of read length percentage) : pos_on_read : 98.019802
         df_cov=prlz_process_intron(df_features, df_library)
-        print('df_lib MAJ 1', df_cov.head(5))
-        df_library = df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
-        print('df_lib MAJ 2', df_library.head(5))
-        df_library.loc[lambda df : df.covering != True, "covering"] = False
-        print('df_lib MAJ 3', df_library.head(5))
+        #df_library = df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
+        #print('df_lib MAJ 2', df_library.head(5))
+        ##df_library.loc[lambda df : df.covering != True, "covering"] = False
+        #print('df_lib MAJ 3', df_library.head(5))
         #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library))
+        df_cov.loc[lambda df : df.covering != True, "covering"] = False #test
+        print('df_cov', df_cov.head(5))
+        mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_cov))
+        print('mapping_bam',mapping_bam)
         #html += get_html_split(mapping_bam)
         #html += get_html_mapping_descr(parse_BAM(bam_file))
 
