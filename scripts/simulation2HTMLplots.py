@@ -203,7 +203,7 @@ def pourcent(str_mapping:str, tot:int):
     return val
 
 # Pie Chart with mapping stats from flagstat files
-def plot_flagstat(df_flag_all:dict):
+def OLD_plot_flagstat(df_flag_all:dict):
     tot=int(df_flag_all.iloc[0,0])
     unmapp= round(100.00 - pourcent(df_flag_all.iloc[2,0],tot), 2)
     data = dict(
@@ -225,5 +225,11 @@ def plot_flagstat(df_flag_all:dict):
             pad=0
         )
     )
+
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
+#Return bar chart
+    def plot_flagstat(df_flag:dict):
+    
 
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')

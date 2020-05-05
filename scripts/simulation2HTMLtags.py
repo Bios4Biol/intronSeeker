@@ -375,7 +375,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
 #    return r    
 
 
-def get_html_flagstat_descr(global_stat_flagstat:dict,df_flag_all:dict):
+def get_html_flagstat_descr(df_flag:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Mapping</h1>
@@ -383,16 +383,11 @@ def get_html_flagstat_descr(global_stat_flagstat:dict,df_flag_all:dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Alignment statistics</h5>
-                <span class="anchor" id="flagstat"></span>
-'''+dict_to_table(global_stat_flagstat,-1,True)+'''
-            </div>
-            <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Mapping pie</h5>
                 <span class="anchor" id="pie"></span>
-'''+ plot_flagstat(df_flag_all) +'''
+'''+ plot_flagstat(df_flag) +'''
             </div>
-        </div>
+        </div>s
 '''
     return r
    
@@ -466,17 +461,8 @@ def get_html_glossary():
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <span class="anchor" id="glossary"></span>
-                <strong>Bioinformatic Worflow</strong><br>
-                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-Workflow_intronSeeker.jpg" alt="intronSeeker workflow" style="width:825;height:245;"> </br>
-                <br><br><strong>Biological glossary</strong><br><br>
-                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-GLOSSARY.jpg" alt="intronSeeker glossary" style="width:825;height:245;"> </br><br>
-                Contig / sequence :  A contig (from contiguous) is a set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
-                Candidat : </br>
-                Feature : Retained intron by splicing.</br>
-                Exon : An exon is a coding sequence, kept by translation.<br>
-                Intron : An intron is a no coding sequence, removed by RNA splicing.</br>
-                Reads / lecture :  In DNA sequencing, a read is an inferred sequence of base pairs (or base pair probabilities) corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
-                Splice events : </br>
+                <br>
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:825;height:245;"> </br><br>
                 Number of features in GTF :  Number of distinct features from all GTF lines</br>
                 Number of sequences by feature type :  Number of ctg by feature from all GTF lines (Ex: "Exon" see in X ctg, "Intron" see in Y ctg, ...)</br>
                 Number of sequences with same feature(s) : Number of features profiles by ctg (Ex: "1 Exon & 2 Intron" see in X ctg, "3 Introns" see in Y ctg , ...) </br>

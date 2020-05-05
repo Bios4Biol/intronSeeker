@@ -207,22 +207,14 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     ## ALIGNMENT STATS
     if flagstat:
-        df_flag_all=parse_flagstat(flagstat_file, len(df_library),"Parse flagstat")
-   
+        df_flag = parse_flagstat(flagstat_file, len(df_library), "file1")
+        print('flagstat',df_flag.head(5))
         #print(pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0))
         #df_flag_all=pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0)
-        global_stat_flagstat = dict()
-        global_stat_flagstat["0Total counts of reads to map"] = str(len(df_library))
-        global_stat_flagstat["1Total count"]     = df_flag_all.iloc[0,0]
-        global_stat_flagstat["2Secondary"]       = df_flag_all.iloc[1,0]
-        global_stat_flagstat["3Mapped"]          = df_flag_all.iloc[2,0]
-        global_stat_flagstat["4Properly paired"] = df_flag_all.iloc[3,0]
-        global_stat_flagstat["5Singletons"]      = df_flag_all.iloc[4,0]
-        html += get_html_flagstat_descr(global_stat_flagstat,df_flag_all)
+        html += get_html_flagstat_descr(df_flag)
         #https://plotly.com/python/sunburst-charts/
     
-    #MAPPING
-    #Counting table and barplots of mapped covering reads' main characteristics
+    #MAPPING : Counting table and barplots of mapped covering reads' main characteristics
     if bam:
         bam_file=bam.name
         # Add three columns on df_library : 

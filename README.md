@@ -7,7 +7,7 @@ create rupture in the proteins found in the transcripts. In order to get the
 correct protein sequence they have to be removed,
 These retained introns will be present in only some sequences nevertheless they 
 can therefore be present in the assembled contigs built from those reads.  
-![](doc/splice_event.png)
+![](doc/IntronSeeker-glossary.png)
 
 The read splicing signal of these introns can be used to find and remove them. 
 The intron splice site boundaries (canonical or not), the Open Reading Frame size
@@ -37,6 +37,8 @@ How it works ?
 --------------
 
 #### Searching for introns
+
+![](doc/IntronSeeker-workflow.png)
 
 1. Use [Star](https://github.com/alexdobin/STAR) or 
 [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml) to map reads on 
