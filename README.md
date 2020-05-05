@@ -7,6 +7,7 @@ create rupture in the proteins found in the transcripts. In order to get the
 correct protein sequence they have to be removed,
 These retained introns will be present in only some sequences nevertheless they 
 can therefore be present in the assembled contigs built from those reads.  
+
 ![](doc/IntronSeeker-glossary.png)
 
 The read splicing signal of these introns can be used to find and remove them. 
@@ -46,7 +47,7 @@ assembled contigs.
 
 2. Search splice events in bam file using CIGAR string.
 
-3. Write a GFF file of intron candidate. 
+3. Write a file of intron candidats. 
 
 How to install ?
 ----------------
@@ -80,13 +81,13 @@ results but takes longer to run and works only with paired-end library.
 Running alignment, use the commands :
 
 ```diff
-+ intronSeeker starAlignment -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-2.fastq.gz -o Cele_library-contigs_alignment
++ intronSeeker starAlignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/Reduced_real_dataset/Cele_library-contigs_starAlignment
 ```
 
 or 
 
 ```diff
-intronSeeker hisat2Alignment -r Test_set_Cele_contig-assembly.fasta -1 Test_set_Cele_reads-1.fastq.gz -2 Test_set_Cele_reads-2.fastq.gz -o Cele_library-contigs_alignment
+intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
 ```
 
 
@@ -95,5 +96,13 @@ intronSeeker hisat2Alignment -r Test_set_Cele_contig-assembly.fasta -1 Test_set_
 When the alignment is ended, you can search for splicing events with :
 
 ```diff
-+ intronSeeker splitReadSearch -a Cele_library-contigs_alignment_hisat2/Cele_library-contigs_alignment.Aligned.sortedByCoord.out.bam -r Test_set_Cele_contig-assembly.fasta -o Test_Cele_splicing_event
++ intronSeeker splitReadSearch -a data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
+```
+
+##### List features by FASTA trimming
+
+When trimFastaFromTXT produces a new FASTA reference file where features, listed in candidats file, are trimmed from the reference FASTA.
+
+```diff
++ intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_trimFASTA
 ```
