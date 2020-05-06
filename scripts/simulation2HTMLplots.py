@@ -202,34 +202,23 @@ def pourcent(str_mapping:str, tot:int):
     val=(int(mapping)*100)/tot
     return val
 
-# Pie Chart with mapping stats from flagstat files
-def OLD_plot_flagstat(df_flag_all:dict):
-    tot=int(df_flag_all.iloc[0,0])
-    unmapp= round(100.00 - pourcent(df_flag_all.iloc[2,0],tot), 2)
+#Return bar chart from flagstat dataframe
+def plot_flagstat(df_flag:dict):
+    print('df_flag.size', df_flag.size)
+    print(df_flag.shape[0])  #nb lines
+    print(df_flag.shape[1])  #nb columns
+    secondary=df_flag.iloc[1,0]
+    print('secondary',secondary)
+    mapped=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", df_flag.iloc[2,0])
+    print('mapped',mapped)
+    properly=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", df_flag.iloc[3,0])
+    print('properly',properly)
+    singletons=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", df_flag.iloc[4,0])
+    print('singletons',singletons)
+
     data = dict(
-        character=["Unmapped", "Secondary","Mapped", "Properly paired", "Singletons"],
-        parent=["", "Mapped", "", "Mapped", "Mapped"],
-        value=[unmapp, round((int(df_flag_all.iloc[1,0])*100)/tot, 2), round(pourcent(df_flag_all.iloc[2,0],tot),2), round(pourcent(df_flag_all.iloc[3,0],tot),2), round(pourcent(df_flag_all.iloc[4,0],tot),2)])
-    fig =px.sunburst(
-        data,
-        names='character',
-        parents='parent',
-        values='value',
-    )
-    fig.update_layout(
-        margin=go.layout.Margin(
-            l=50,
-            r=50,
-            b=20,
-            t=30,
-            pad=0
-        )
-    )
-
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
-
-#Return bar chart
-    def plot_flagstat(df_flag:dict):
-    
-
+        xvalues=["Mapped", "Properly paired", "Secondary", "Singletons"],
+        yvalues=[mapped,properly,secondary,singletons])
+    fig = px.bar(data, x='xvalues', y='yvalues')
+        
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')

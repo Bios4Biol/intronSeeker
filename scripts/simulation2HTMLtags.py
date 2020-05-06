@@ -275,16 +275,19 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Contigs statistics</h5>
-                <span class="anchor" id="gstat"></span>
+                <span id="gstat" class="oi oi-question-mark" aria-hidden="true" title="Number of features in GTF: Number of distinct features from all GTF lines"></span>
+                
 '''+dict_to_table(global_stat,7,True)+'''
             </div>   
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Number of sequences by feature type</h5>
+                <span class="oi oi-question-mark" aria-hidden="true" title="Number of ctg by feature from all GTF lines (Ex: 'Exon' see in X ctg, 'Intron' see in Y ctg, ...)"></span>
                 <span class="anchor" id="nb_ctg_by_feature"></span>
 '''+dict_to_table(nb_ctg_by_feature,-1,False)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Number of sequences with same feature(s)</h5>
+                <span class="oi oi-question-mark" aria-hidden="true" title="Number of features profiles by ctg (Ex: '1 Exon & 2 Intron' see in X ctg, '3 Introns' see in Y ctg , ...) "></span>
                 <span class="anchor" id="nb_ctg_by_feature"></span>
 '''+dict_to_table(ctg_descr,-1,False)+'''
             </div>
@@ -383,11 +386,11 @@ def get_html_flagstat_descr(df_flag:dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Mapping pie</h5>
+                <h5>Flagstat statistics</h5>
                 <span class="anchor" id="pie"></span>
 '''+ plot_flagstat(df_flag) +'''
             </div>
-        </div>s
+        </div>
 '''
     return r
    
@@ -462,10 +465,7 @@ def get_html_glossary():
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <span class="anchor" id="glossary"></span>
                 <br>
-                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:825;height:245;"> </br><br>
-                Number of features in GTF :  Number of distinct features from all GTF lines</br>
-                Number of sequences by feature type :  Number of ctg by feature from all GTF lines (Ex: "Exon" see in X ctg, "Intron" see in Y ctg, ...)</br>
-                Number of sequences with same feature(s) : Number of features profiles by ctg (Ex: "1 Exon & 2 Intron" see in X ctg, "3 Introns" see in Y ctg , ...) </br>
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:825;height:245;">
             </div>
         </div>  
 '''

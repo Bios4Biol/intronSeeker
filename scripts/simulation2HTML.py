@@ -212,7 +212,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         #print(pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0))
         #df_flag_all=pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0)
         html += get_html_flagstat_descr(df_flag)
-        #https://plotly.com/python/sunburst-charts/
     
     #MAPPING : Counting table and barplots of mapped covering reads' main characteristics
     if bam:
