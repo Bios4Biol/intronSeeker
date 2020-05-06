@@ -202,6 +202,10 @@ def pourcent(str_mapping:str, tot:int):
     val=(int(mapping)*100)/tot
     return val
 
+def nbWithoutPourcent(str_mapping:str):
+    val=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str_mapping)
+    return val    
+
 #Return bar chart from flagstat dataframe
 def plot_flagstat(df_flag:dict):
     print('df_flag.size', df_flag.size)
@@ -209,16 +213,18 @@ def plot_flagstat(df_flag:dict):
     print(df_flag.shape[1])  #nb columns
     secondary=df_flag.iloc[1,0]
     print('secondary',secondary)
-    mapped=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", df_flag.iloc[2,0])
+    #mapped=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", df_flag.iloc[2,0])
+    mapped=nbWithoutPourcent(df_flag.iloc[2,0])
     print('mapped',mapped)
-    properly=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", df_flag.iloc[3,0])
+    properly=nbWithoutPourcent(df_flag.iloc[3,0])
     print('properly',properly)
-    singletons=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", df_flag.iloc[4,0])
+    singletons=nbWithoutPourcent(df_flag.iloc[4,0])
     print('singletons',singletons)
 
     data = dict(
-        xvalues=["Mapped", "Properly paired", "Secondary", "Singletons"],
-        yvalues=[mapped,properly,secondary,singletons])
-    fig = px.bar(data, x='xvalues', y='yvalues')
+        Flagstat=["Mapped", "Properly paired", "Secondary", "Singletons"],
+        nbReads=[mapped,properly,secondary,singletons])
+    fig = px.bar(data, x='Flagstat', y='nbReads')
+    
         
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')

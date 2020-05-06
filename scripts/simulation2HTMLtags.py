@@ -332,20 +332,6 @@ def get_html_abundance(df_fasta:dict):
 '''
     return r
 
-
-def get_html_mapping_descr(alignments:dict):
-    r = '''
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5> Counting table and barplots of mapped covering reads' main characteristics</h5>
-                <span class="anchor" id="bam"></span>
-'''+ plot_covering_reads(alignments) +'''
-            </div>
-        </div>    
-'''
-    return r
-
-
 def get_html_reads_descr(global_stat_fastq : dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">

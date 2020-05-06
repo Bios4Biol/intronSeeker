@@ -209,8 +209,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     if flagstat:
         df_flag = parse_flagstat(flagstat_file, len(df_library), "file1")
         print('flagstat',df_flag.head(5))
-        #print(pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0))
-        #df_flag_all=pd.concat([df_flag_all_hisat,df_flag_all_star],axis=1,sort=False).fillna(0)
         html += get_html_flagstat_descr(df_flag)
     
     #MAPPING : Counting table and barplots of mapped covering reads' main characteristics
@@ -221,17 +219,34 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         # 2 - another for the covered intron id (if True)  intron : SEQUENCE685.modif|556|897
         # 3 - and the last for the intron insertion position in read (if True - in term of read length percentage) : pos_on_read : 98.019802
         df_cov=prlz_process_intron(df_features, df_library)
-        #df_library = df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
-        #print('df_lib MAJ 2', df_library.head(5))
-        ##df_library.loc[lambda df : df.covering != True, "covering"] = False
-        #print('df_lib MAJ 3', df_library.head(5))
-        #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library))
-        df_cov.loc[lambda df : df.covering != True, "covering"] = False #test
-        print('df_cov', df_cov.head(5))
-        #mapping_bam=pd.read_pickle(process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_cov))
-        #print('mapping_bam',mapping_bam)
+        print('df_lib MAJ 0', df_library.head(5))
+        df_library.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_lib_INI.csv')
+        df_cov.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_cov.csv')
+        print('add df_cov', df_cov.head(5))
+        #df_library = df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns] #https://stackoverflow.com/questions/52002017/pandas-left-join-gives-nan
+        #df_cov.columns = ['lecture', 'contig','start','end','complement','covering','intron','pos_on_read'] #ValueError: Length mismatch: Expected axis has 7 elements, new values have 8 elements
+        #df_library.columns = ['lecture', 'contig','start','end','complement']
+        #df_library = df_library.join(df_cov.set_index('lecture'),on='lecture',lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
+        df_library = pd.concat([df_library, df_cov], axis=1, sort=False)#in 9 : https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html   
+        #then remove duplicated columns
+        df_library = df_library.loc[:,~df_library.columns.duplicated()]
+        df_library.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_library.csv')
+        print('df_library', df_library.head(5))
+        #df_cov.loc[lambda df : df.covering != True, "covering"] = False #test ok
+        df_library.loc[lambda df : df.covering != True, "covering"] = False
+        print('df_library', df_library.head(5))
+        df_library.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_lib_VF.csv')
+        mapping_bam=process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library)
+        print('mapping_bam',mapping_bam)
+        mapping_bam.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_mapping_bam.csv')
+        #read	contig	align_start	align_end	covering	mapped	mismapped	split	second	suppl	score	start_split	end_split	split_length	split_flanks	missplit
+        #0	80032/1	SEQUENCE1.modif	0	101.0	False	True	True	False	False	False	255					
+        #46512	37025/2	SEQUENCE108.modif	336	773.0	True	True	True	True	False	False	255	402.0	738.0	336.0	GT_AG	False
+        #46513	118665/2	SEQUENCE108.modif	339	776.0	True	True	True	True	False	False	255	402.0	738.0	336.0	GT_AG	False
+
         #html += get_html_split(mapping_bam)
-        #html += get_html_mapping_descr(parse_BAM(bam_file))
+        #plot_covering_reads ?
+   
 
 
     ## SPLITREADSEARCH STAT

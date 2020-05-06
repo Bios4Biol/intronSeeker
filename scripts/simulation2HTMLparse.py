@@ -275,6 +275,7 @@ def parse_BAM(BamPath:str):
         'mapping_quality' : record.mapping_quality
         } for record in bamfile.fetch(until_eof=True)]
     #print("BAM*********",alignments)    
+    print("End parse BAM")    
     #{'query_name': '14503/1', 'reference_name': 'SEQUENCE661.modif', 'reference_start': 509, 'reference_end': 610, 'cigartuples': [(0, 101)], 'is_secondary': False, 'is_supplementary': False, 'mapping_quality': 255}, 
     #{'query_name': '58518/1', 'reference_name': 'SEQUENCE661.modif', 'reference_start': 511, 'reference_end': 612, 'cigartuples': [(0, 101)], 'is_secondary': False, 'is_supplementary': False, 'mapping_quality': 255}, 
     return alignments
@@ -318,6 +319,7 @@ def process_bam(alignments, df_mfasta, df_features, df_library):
     :param bamfilename: AlignmentFile object with all reads alignment information
     :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
     """
+    print("Enter process bam")
     rows = []
     for record in alignments :
         begin = pd.Series([
