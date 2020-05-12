@@ -11,8 +11,6 @@ import re   #for flagstat pie
 import plotly.express as px #sunburst-charts
 
 
-#source : https://plotly.com/python/
-
 # Histogram   https://plotly.com/python/v3/histograms/
 def plot_hist_contigs_len(fastaContigsLen, mFastaContigsLen):
     contigs = go.Histogram(

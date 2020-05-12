@@ -236,7 +236,7 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
           </div>
           <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
 		    Produced by IntronSeeker_v1.0<br>
-		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://www.inrae.fr/themes/custom/inrae_socle/favicon.ico"><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
+		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://www.inrae.fr/themes/custom/inrae_socle/favicon.ico"   ><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
 		    <a style="color:#212529;" href="https://inrae.fr" target="_blank">INRAE</a><br>
 		    Designed by the <a style="color:#212529;" href="http://sigenae.org" target="_blank">Sigenae</a> team.
           </div>
@@ -244,7 +244,6 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
 		<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
 '''
     return r
-    
 
 def get_html_inputfiles(files:dict):
     r = '''
