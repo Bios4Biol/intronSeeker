@@ -236,20 +236,26 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         df_library.loc[lambda df : df.covering != True, "covering"] = False
         print('df_library', df_library.head(5))
         df_library.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_lib_VF.csv')
-        mapping_bam=process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library)
-        print('mapping_bam',mapping_bam)
-        mapping_bam.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_mapping_bam.csv')
+        df_mapping_bam=process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library)
+        print('df_mapping_bam',df_mapping_bam)
+        df_mapping_bam.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_mapping_bam.csv')
         #read	contig	align_start	align_end	covering	mapped	mismapped	split	second	suppl	score	start_split	end_split	split_length	split_flanks	missplit
         #0	80032/1	SEQUENCE1.modif	0	101.0	False	True	True	False	False	False	255					
         #46512	37025/2	SEQUENCE108.modif	336	773.0	True	True	True	True	False	False	255	402.0	738.0	336.0	GT_AG	False
         #46513	118665/2	SEQUENCE108.modif	339	776.0	True	True	True	True	False	False	255	402.0	738.0	336.0	GT_AG	False
-
-        #html += get_html_split(mapping_bam)
-        #plot_covering_reads ?
+        
+        # Compute align_length for plot_splice_event_position plot 
+        df_mapping_bam['align_length'] = df_mapping_bam['align_end'].subtract(df_mapping_bam['align_start'], fill_value=0)
+        html += get_html_bam(df_mapping_bam)
+        
    
 
-
     ## SPLITREADSEARCH STAT
+
+    # Split statistics from BAM file
+    html += get_html_split(df_mapping_bam)
+
+    # Candidats statistics
     if candidat:
         df_candidat = parse_candidat(candidat.name)
         #print('candidat head :' , df_candidat)
@@ -266,6 +272,20 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_candidat["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
         global_stat_candidat["3Number of canonic junction"] = nbPASS
         html += get_html_candidat_descr(global_stat_candidat, df_candidat[df_candidat['filter'] == 'PASS'])
+
+        # Compare nb candidats / nb candidat PASS / nb splice events in df_mapping_bam
+        global_comparison_candidats_introns = dict()
+        nb_splice_events=df_mapping_bam['split_length'].isna().sum()
+        global_comparison_candidats_introns["0Number of splice events"]=nb_splice_events
+        pourcent_splice_events=(nb_splice_events*100)/(df_mapping_bam.shape[0])
+        global_comparison_candidats_introns["1Pourcentage of splice events per reads"]=round(pourcent_splice_events,4)
+        global_comparison_candidats_introns["2Number of candidats with a canonic junction"]=nbPASS
+        pourcent_PASS=(nbPASS*100)/(df_candidat.shape[0])
+        global_comparison_candidats_introns["3Pourcentage of candidats with a canonic junction / all candidats"]=round(pourcent_PASS,4)
+        pourcent_PASS_reads=(nbPASS*100)/(df_mapping_bam.shape[0])
+        global_comparison_candidats_introns["3Pourcentage of candidats with a canonic junction / reads"]=round(pourcent_PASS_reads,4)
+        html += get_html_candidat_comp(global_comparison_candidats_introns)
+
 
         global_stat_assemblathon = dict()
     

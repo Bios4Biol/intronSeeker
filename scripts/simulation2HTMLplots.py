@@ -2,12 +2,16 @@
 
 import pandas as pd
 import plotly as py
+import numpy as np 
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import plotly.subplots as psp
 from plotly.subplots import make_subplots   #for flagstat pie
 import re   #for flagstat pie
 import plotly.express as px #sunburst-charts
+
+
+#source : https://plotly.com/python/
 
 # Histogram   https://plotly.com/python/v3/histograms/
 def plot_hist_contigs_len(fastaContigsLen, mFastaContigsLen):
@@ -164,37 +168,77 @@ def plot_abondance_model(df_fasta:dict) :
     )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
-# Plot : Counting table and barplots of mapped covering reads' main characteristics.
-#def plot_covering_reads(*args, **kwargs) :
-def plot_covering_reads(alignments:dict) :
-    series=[]
-    fig = go.Figure()
-    for val in alignments:
-        s = pd.Series()
-        #{'query_name': '97482/2', 'reference_name': 'SEQUENCE103.modif', 'reference_start': 817, 'reference_end': 918, 'cigartuples': [(0, 101)], 'is_secondary': False, 'is_supplementary': False, 'mapping_quality': 60}
-        s['Covering']=len(val)
-        s['Unmapped']=len(val[lambda df : df.mapped == False])
-        #s['Mismapped'] = len(tmp.loc[lambda df : (df.contig.str.rstrip('.ori') != df.contig_lib.str.rstrip('.ori'))& (df.mapped == True)])
-        #s['Unsplit'] = len(val.loc[lambda df : (df.mapped==True)&(df.split==False)])
-        #s['Missplit'] = len(val.loc[lambda df : (df.split==True)&(df.missplit==True)])
-        #s['Correct splitting'] = len(val.loc[lambda df : df.classe == 'TP'])
-        series.append(s)
-        
-        to_plot = s[['Unmapped','Unsplit','Correct splitting']]/s['Covering']*100
-        fig.add_trace(
-            go.Bar(
-                    x=to_plot.index,
-                    y=to_plot.values
-            ))
-    table = pd.concat(series,axis=1,sort=False)
-        
-    fig.update_layout(
-        title='Global mapping results on introns-covering reads',
-        xaxis=dict(title='Lectures charecteristics'),
-        yaxis=dict(title='Percentage of total covering reads alignements')
-        )
+# Plot : barplots of mapped covering reads' main characteristics.
+def plot_covering_reads(df_mapping_bam:dict):
 
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div'), table
+    cov              = df_mapping_bam.covering.sum()
+    mappedCount      = df_mapping_bam.mapped.sum()
+    mismap           = df_mapping_bam.mismapped.sum()
+    split            = df_mapping_bam.split.sum()
+    missplit         = df_mapping_bam.missplit.sum()
+    second           = df_mapping_bam.second.sum()
+    suppl            = df_mapping_bam.suppl.sum()
+
+    data = dict(
+        readsCharacteristics=["Covering", "Mapped", "Mismapped", "split", "Missplit", "Secondary", "Supplementary"],
+        mapping=[cov,mappedCount,mismap,split,missplit,second,suppl])
+    fig = px.bar(data, x='readsCharacteristics', y='mapping')
+    fig.update_layout(
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
+    )
+
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+    
+
+# Split len distribution plot
+def plot_dist_split_len(df_mapping_bam):
+    fig = px.bar(df_mapping_bam, x='contig', y='split_length')
+    fig.update_layout(
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
+    )
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
+# Plot split len versus align length - source : https://plotly.com/python/splom/
+def plot_splice_event_position(df_mapping_bam):
+    fig = px.scatter(df_mapping_bam, x="align_length", y="split_length")
+    fig.update_layout(
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
+    )
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
+# Plot split len versus align start - source : https://plotly.com/python/splom/
+def plot_splice_event_vs_align_start(df_mapping_bam):
+    fig = px.scatter(df_mapping_bam, x="align_start", y="split_length")
+    fig.update_layout(
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
+    )
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
+
 
 # Return int from flagstat HISAT2/STAR mapping in string format (only for the last 3 values : Mapped, Properly paired, Singletons)
 def pourcent(str_mapping:str, tot:int):
@@ -211,20 +255,16 @@ def plot_flagstat(df_flag:dict):
     print('df_flag.size', df_flag.size)
     print(df_flag.shape[0])  #nb lines
     print(df_flag.shape[1])  #nb columns
-    secondary=df_flag.iloc[1,0]
-    print('secondary',secondary)
-    #mapped=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", df_flag.iloc[2,0])
-    mapped=nbWithoutPourcent(df_flag.iloc[2,0])
-    print('mapped',mapped)
-    properly=nbWithoutPourcent(df_flag.iloc[3,0])
-    print('properly',properly)
-    singletons=nbWithoutPourcent(df_flag.iloc[4,0])
-    print('singletons',singletons)
+    
+    secondary  =df_flag.iloc[1,0]
+    mapped     =nbWithoutPourcent(df_flag.iloc[2,0])
+    properly   =nbWithoutPourcent(df_flag.iloc[3,0])
+    singletons =nbWithoutPourcent(df_flag.iloc[4,0])
 
     data = dict(
-        Flagstat=["Mapped", "Properly paired", "Secondary", "Singletons"],
+        flagstat=["Mapped", "Properly paired", "Secondary", "Singletons"],
         nbReads=[mapped,properly,secondary,singletons])
-    fig = px.bar(data, x='Flagstat', y='nbReads')
+    fig = px.bar(data, x='flagstat', y='nbReads')
     
         
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')

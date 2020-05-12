@@ -97,7 +97,7 @@ def get_html_header():
 '''
 
 # icons : https://useiconic.com/open/
-def get_html_body1(flagstat="", candidat="", assemblathon=""):
+def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
     r = '''
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
@@ -187,11 +187,13 @@ def get_html_body1(flagstat="", candidat="", assemblathon=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Alignment statistics
 			    	</a>
-			    </li>     
+			    </li>'''
+    if bam:
+        r += '''                   
                 <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#pie">
-				    	<span class="oi oi-pie-chart" aria-hidden="true"></span>
-				    	Mapping pie
+				    <a class="nav-link" href="#mapping_stats">
+				    	<span class="oi oi-graph" aria-hidden="true"></span>
+				    	Mapping statistics
 			    	</a>
 			    </li>'''      
     r += '''          
@@ -203,7 +205,7 @@ def get_html_body1(flagstat="", candidat="", assemblathon=""):
 			    </li>
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#split">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	<span class="oi oi-graph" aria-hidden="true"></span>
 				    	Split detection
 			    	</a>
 			    </li>'''
@@ -404,26 +406,53 @@ def get_html_table_descr(global_stats_table):
 '''
     return r
 
-
-def get_html_split(mapping_bam:dict):
+# Plot mapping statistics
+def get_html_bam(df_mapping_bam:dict):
     r = '''
-        <div class="d-flex">
+        <div class="d-flex">    
             <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Barplots of split reads signal detection</h5>
-                <span class="anchor" id="split"></span>
-''' + '''
+                <h5>Mapping and covering statistics</h5>
+                <span class="anchor" id="mapping_stats"></span>
+''' + plot_covering_reads(df_mapping_bam) + '''
             </div>
-        </div>    
+        </div>
 '''
     return r
 
-    
-def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
+# Plots split detection    
+def get_html_split(df_mapping_bam:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Feature(s) extraction results</h1>
                 <span class="anchor" id="results"></span>
         </div>
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5>Split length by contig</h5>
+                <span class="anchor" id="split"></span>
+''' + plot_dist_split_len(df_mapping_bam) + '''
+            </div>
+        </div>
+        <div class="d-flex">    
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5>Splice event on contig</h5>
+                <span class="anchor" id="split"></span>
+''' + plot_splice_event_position(df_mapping_bam) + '''
+            </div>  
+        </div>
+        <div class="d-flex">    
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5>Splice event on contig</h5>
+                <span class="anchor" id="split"></span>
+''' + plot_splice_event_vs_align_start(df_mapping_bam) + '''
+            </div>  
+        </div>
+'''
+    return r
+
+
+def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
+    r = '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Candidats</h5>
@@ -438,9 +467,24 @@ def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
         </div>  
 '''
 
-    return r      
+    return r   
+
+# Candidats versus features comparison
+def get_html_candidat_comp(global_comparison_candidats_introns:dict):
+    r = '''
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Comparison candidats versus splice events</h5>
+                <span class="anchor" id="candidatstat"></span>
+'''+dict_to_table(global_comparison_candidats_introns,-1,True)+'''
+            </div>
+        </div>  
+'''
+
+    return r     
     
-#<img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeekerDiagram-GLOSSARY.jpg" alt="Splice events" style="width:825;height:245;"> </br>    
+# Define all term used in this simulation report
+# style="width:825;height:245;"
 def get_html_glossary():
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
@@ -451,7 +495,7 @@ def get_html_glossary():
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <span class="anchor" id="glossary"></span>
                 <br>
-                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:825;height:245;">
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:60%;height:60%;">
             </div>
         </div>  
 '''
