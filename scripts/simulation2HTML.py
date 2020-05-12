@@ -276,24 +276,23 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         # Compare nb candidats / nb candidat PASS / nb splice events in df_mapping_bam
         global_comparison_candidats_introns = dict()
         nb_splice_events=df_mapping_bam['split_length'].isna().sum()
-        global_comparison_candidats_introns["0Number of splice events"]=nb_splice_events
+        global_comparison_candidats_introns["0Number of reads splitted"]=df_mapping_bam.shape[0] - nb_splice_events
+        global_comparison_candidats_introns["1Number of candidats with a canonic junction"]=nbPASS
         pourcent_splice_events=(nb_splice_events*100)/(df_mapping_bam.shape[0])
-        global_comparison_candidats_introns["1Pourcentage of splice events per reads"]=round(pourcent_splice_events,4)
-        global_comparison_candidats_introns["2Number of candidats with a canonic junction"]=nbPASS
+        global_comparison_candidats_introns["2Pourcentage of splice events / reads"]=pourcent_splice_events
         pourcent_PASS=(nbPASS*100)/(df_candidat.shape[0])
-        global_comparison_candidats_introns["3Pourcentage of candidats with a canonic junction / all candidats"]=round(pourcent_PASS,4)
+        global_comparison_candidats_introns["3Pourcentage of candidats with a canonic junction / all candidats"]=pourcent_PASS
         pourcent_PASS_reads=(nbPASS*100)/(df_mapping_bam.shape[0])
-        global_comparison_candidats_introns["3Pourcentage of candidats with a canonic junction / reads"]=round(pourcent_PASS_reads,4)
+        global_comparison_candidats_introns["4Pourcentage of candidats with a canonic junction / reads"]=pourcent_PASS_reads
+        
         html += get_html_candidat_comp(global_comparison_candidats_introns)
 
-
-        global_stat_assemblathon = dict()
     
     #Compare assemblathon files
     if assemblathon:
         df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
         #print('df_assemblathon_all', df_assemblathon_all)
-        #global_stat_assemblathon = dict()
+        global_stat_assemblathon = dict()
         print(df_assemblathon_all.shape[0])#lignes 
         print(df_assemblathon_all.shape[1])#colonnes 
         global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]

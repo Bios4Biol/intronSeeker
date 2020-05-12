@@ -193,7 +193,7 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#mapping_stats">
 				    	<span class="oi oi-graph" aria-hidden="true"></span>
-				    	Mapping statistics
+				    	Mapping and covering statistics
 			    	</a>
 			    </li>'''      
     r += '''          
@@ -484,7 +484,6 @@ def get_html_candidat_comp(global_comparison_candidats_introns:dict):
     return r     
     
 # Define all term used in this simulation report
-# style="width:825;height:245;"
 def get_html_glossary():
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
@@ -495,7 +494,7 @@ def get_html_glossary():
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <span class="anchor" id="glossary"></span>
                 <br>
-                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:60%;height:60%;">
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:825;height:245;">
             </div>
         </div>  
 '''
