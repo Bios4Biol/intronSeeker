@@ -188,20 +188,7 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
 				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
 					Mapping
 				</a>
-                <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#flagstat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Alignment statistics
-			    	</a>
-			    </li>'''
-    if bam:
-        r += '''                   
-                <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#mapping_stats">
-				    	<span class="oi oi-graph" aria-hidden="true"></span>
-				    	Mapping and covering statistics
-			    	</a>
-			    </li>'''      
+			   </li>'''
     r += '''          
                 <li class="nav-item">
 				   <a class="nav-link" href="#results">
@@ -355,7 +342,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
 '''
     return r
     
-def get_html_flagstat_descr(df_flag:dict):
+def get_html_flagstat_descr(global_stat_flagstat:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Mapping</h1>
@@ -363,9 +350,7 @@ def get_html_flagstat_descr(df_flag:dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Flagstat statistics</h5>
-                <span class="anchor" id="pie"></span>
-'''+ plot_flagstat(df_flag) +'''
+'''+ dict_to_table(global_stat_flagstat, -1,True) +'''
             </div>
         </div>
 '''
@@ -445,6 +430,10 @@ def get_html_split(df_mapping_bam:dict):
 
 def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
     r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Feature(s) extraction results</h1>
+                <span class="anchor" id="flag-descr"></span>
+        </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Candidats</h5>

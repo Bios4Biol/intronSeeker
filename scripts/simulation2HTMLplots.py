@@ -6,7 +6,7 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 import plotly.subplots as psp
-from plotly.subplots import make_subplots   #for flagstat pie
+#from plotly.subplots import make_subplots   #for flagstat pie
 import re   #for flagstat pie
 import plotly.express as px #sunburst-charts
 
@@ -248,21 +248,21 @@ def nbWithoutPourcent(str_mapping:str):
     val=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str_mapping)
     return val    
 
-#Return bar chart from flagstat dataframe
-def plot_flagstat(df_flag:dict):
-    print('df_flag.size', df_flag.size)
-    print(df_flag.shape[0])  #nb lines
-    print(df_flag.shape[1])  #nb columns
+# #Return bar chart from flagstat dataframe
+# def plot_flagstat(df_flag:dict):
+#     print('df_flag.size', df_flag.size)
+#     print(df_flag.shape[0])  #nb lines
+#     print(df_flag.shape[1])  #nb columns
     
-    secondary  =df_flag.iloc[1,0]
-    mapped     =nbWithoutPourcent(df_flag.iloc[2,0])
-    properly   =nbWithoutPourcent(df_flag.iloc[3,0])
-    singletons =nbWithoutPourcent(df_flag.iloc[4,0])
+#     secondary  =df_flag.iloc[1,0]
+#     mapped     =nbWithoutPourcent(df_flag.iloc[2,0])
+#     properly   =nbWithoutPourcent(df_flag.iloc[3,0])
+#     singletons =nbWithoutPourcent(df_flag.iloc[4,0])
 
-    data = dict(
-        flagstat=["Mapped", "Properly paired", "Secondary", "Singletons"],
-        nbReads=[mapped,properly,secondary,singletons])
-    fig = px.bar(data, x='flagstat', y='nbReads')
+#     data = dict(
+#         flagstat=["Mapped", "Properly paired", "Secondary", "Singletons"],
+#         nbReads=[mapped,properly,secondary,singletons])
+#     fig = px.bar(data, x='flagstat', y='nbReads')
     
         
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+#     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
