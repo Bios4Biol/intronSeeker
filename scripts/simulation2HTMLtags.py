@@ -5,6 +5,9 @@ from simulation2HTMLparse import *
 from simulation2HTMLplots import *
 
 
+# https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css                             : scripts/css/dataTables.bootstrap4.min.css
+# https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css  : scripts/css/open-iconic-bootstrap.min.css
+# https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css                            : scripts/css/bootstrap.min.css
 
 def get_html_header():
     return '''
@@ -20,7 +23,7 @@ def get_html_header():
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css ">
     <!-- Datatable -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
 
@@ -95,6 +98,9 @@ def get_html_header():
     <title>IntronSeeker simulation report</title>
   </head>
 '''
+
+# https://cdn.plot.ly/plotly-latest.min.js  :  scripts/js/plotly-latest.min.js
+
 
 # icons : https://useiconic.com/open/
 def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
@@ -236,7 +242,7 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
           </div>
           <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
 		    Produced by IntronSeeker_v1.0<br>
-		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://www.inrae.fr/themes/custom/inrae_socle/favicon.ico"   ><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
+		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/scripts/icon/favicon.ico"   ><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
 		    <a style="color:#212529;" href="https://inrae.fr" target="_blank">INRAE</a><br>
 		    Designed by the <a style="color:#212529;" href="http://sigenae.org" target="_blank">Sigenae</a> team.
           </div>
@@ -349,22 +355,6 @@ def get_html_reads_descr(global_stat_fastq : dict):
 '''
     return r
     
-#def get_html_bam_descr(global_stat_flagstat : dict):
-#    r = '''
-#        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-#            <h1 class="h4">Bam (remove ?)</h1>
-#                <span class="anchor" id="read-descr"></span>
-#        </div>
-#		<div class="d-flex">
-#            <div class="mt-4 mr-0 pl-0 col-md-4">
-#                <span class="anchor" id="readastat"></span>
-#'''+dict_to_table(global_stat_flagstat,-1,True)+'''
-#            </div>
-#        </div>
-#'''
-#    return r    
-
-
 def get_html_flagstat_descr(df_flag:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
@@ -405,18 +395,21 @@ def get_html_table_descr(global_stats_table):
 '''
     return r
 
-# Plot mapping statistics
-def get_html_bam(df_mapping_bam:dict):
-    r = '''
-        <div class="d-flex">    
-            <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Mapping and covering statistics</h5>
-                <span class="anchor" id="mapping_stats"></span>
-''' + plot_covering_reads(df_mapping_bam) + '''
-            </div>
-        </div>
-'''
-    return r
+## Plot mapping statistics
+#def get_html_bam(df_mapping_bam:dict):
+#    r = '''
+#        <div class="d-flex">    
+#            <div class="mt-4 mr-0 pl-0 col-md-12">
+#                <h5>Mapping and covering statistics</h5>
+#                <span class="anchor" id="mapping_stats"></span>
+#''' + plot_covering_reads(df_mapping_bam) + '''
+#            </div>
+#        </div>
+#'''
+#    return r
+# + plot_dist_split_len(df_mapping_bam) +
+# + plot_splice_event_position(df_mapping_bam) +
+# + plot_splice_event_vs_align_start(df_mapping_bam) +
 
 # Plots split detection    
 def get_html_split(df_mapping_bam:dict):
@@ -429,21 +422,21 @@ def get_html_split(df_mapping_bam:dict):
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5>Split length by contig</h5>
                 <span class="anchor" id="split"></span>
-''' + plot_dist_split_len(df_mapping_bam) + '''
+'''  '''
             </div>
         </div>
         <div class="d-flex">    
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5>Splice event on contig</h5>
                 <span class="anchor" id="split"></span>
-''' + plot_splice_event_position(df_mapping_bam) + '''
+'''  '''
             </div>  
         </div>
         <div class="d-flex">    
             <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5>Splice event on contig</h5>
                 <span class="anchor" id="split"></span>
-''' + plot_splice_event_vs_align_start(df_mapping_bam) + '''
+'''  '''
             </div>  
         </div>
 '''
@@ -509,7 +502,7 @@ def get_html_footer():
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script type="text/javascript" language="javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script type="text/javascript" language="javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js " integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <!-- Datatable -->
     <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
@@ -517,6 +510,11 @@ def get_html_footer():
   </body>
 </html>
 '''
+# https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js         : scripts/js/bootstrap.min.js
+# https://code.jquery.com/jquery-3.2.1.slim.min.js                            : scripts/js/jquery-3.2.1.slim.min.js
+# https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js   : scripts/js/popper.min.js
+# https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js              : scripts/js/jquery.dataTables.min.js
+# https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js          : scripts/js/dataTables.bootstrap4.min.js
 
 
 # Return HTML table from dict

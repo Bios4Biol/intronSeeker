@@ -260,137 +260,133 @@ def parse_assemblathon(filename : str, name : str ) :
         assemblathon = { re.split("\s\s+",line.strip(),1)[0] : re.split("\s\s+",line.strip(),1)[1] for line in f if parsing_test(re.split("\s\s+",line.strip(),1))}
     return pd.DataFrame(data=assemblathon.values(),index=assemblathon.keys(),columns=[name])    
 
-# Parse Alignment BAM files
-    #bamfile = pysam.AlignmentFile(args_dict["bamfile"], "rb")
-def parse_BAM(BamPath:str):    
-    bamfile = pysam.AlignmentFile(BamPath, "rb")
-    alignments = [{
-        'query_name' : record.query_name,
-        'reference_name' : record.reference_name,
-        'reference_start' : record.reference_start,
-        'reference_end' : record.reference_end,
-        'cigartuples' : record.cigartuples,
-        'is_secondary' : record.is_secondary,
-        'is_supplementary' : record.is_supplementary,
-        'mapping_quality' : record.mapping_quality
-        } for record in bamfile.fetch(until_eof=True)]
-    #print("BAM*********",alignments)    
-    print("End parse BAM")    
-    #{'query_name': '14503/1', 'reference_name': 'SEQUENCE661.modif', 'reference_start': 509, 'reference_end': 610, 'cigartuples': [(0, 101)], 'is_secondary': False, 'is_supplementary': False, 'mapping_quality': 255}, 
-    #{'query_name': '58518/1', 'reference_name': 'SEQUENCE661.modif', 'reference_start': 511, 'reference_end': 612, 'cigartuples': [(0, 101)], 'is_secondary': False, 'is_supplementary': False, 'mapping_quality': 255}, 
-    return alignments
-
-def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
-    """
-    Write the intron extract from cigar line in file_r
-
-    :param reference: reference sequence to extract flanking sequence of split read
-    :param cigar_list: list of tuple (equal to the cigar line)
-    :param start: beginning of the read alignment
-    :param ref_name: reference name on which the read is aligned
-    :param read_name: read name
-    :return:
-    """
-    values = [1, 0, 1, 1, 0]  # [M, I, D, N, S]
-    limit_from_start = [0, 0]
-    i = 0
-    cigar_tuple = cigar_list[i]
-    # if there is a split, calculate its position based on cigar line tuple
-    while cigar_tuple[0] != 3:
-        limit_from_start[0] += values[cigar_tuple[0]] * cigar_tuple[1]
-        i += 1
-        cigar_tuple = cigar_list[i]
-    # enf of the split, equal to the number of 'N'
-    limit_from_start[1] = cigar_tuple[1]
-    split_start = start + limit_from_start[0]
-    split_end = start + limit_from_start[0] + limit_from_start[1]
-    length = limit_from_start[1]
-    flank_left = ref_seq[split_start: split_start + 2]
-    flank_right = ref_seq[split_end - 2: split_end]
-    return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
-                    index = ["start_split","end_split","split_length","split_flanks"])
-
-#return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
-def process_bam(alignments, df_mfasta, df_features, df_library):
-    """
-    For an alignment file, list all split reads.
-
-    :param fastafilename: reference fasta file
-    :param bamfilename: AlignmentFile object with all reads alignment information
-    :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
-    """
-    print("Enter process bam")
-    rows = []
-    for record in alignments :
-        begin = pd.Series([
-            record['query_name'],                        # ID of the read
-            record['reference_name'],                    # ID of the contig where the read is mapped
-            record['reference_start'],                   # Start of the alignment on the contig
-            record['reference_end'],                     # End of the alignment on the contig1
-            df_library.at[record['query_name'],"covering"], # Bool if the read normally covers an intron (i.e. should be split)
-            record['cigartuples'] is not None,           # Bool if the read is mapped
-            not record['reference_name'] == df_library.at[record['query_name'],"contig"],  # Bool if the read is mapped on right contig
-            (record['cigartuples'] is not None) and ('(3,' in str(record['cigartuples'])), # Bool if the read is split by aligner
-            record['is_secondary'],
-            record['is_supplementary'],
-            record['mapping_quality']]
-            ,
-            index = ["read","contig","align_start","align_end",'covering','mapped',"mismapped",'split','second','suppl','score']
-        )
-        
-        if record['cigartuples'] is not None and '(3,' in str(record['cigartuples']) :
-            row = begin.append(limit_from_cigar(
-                record['cigartuples'], 
-                record['reference_start'], 
-                str(df_mfasta.at[record['reference_name'],"sequence"])
-            ))
-            introns_to_check = df_features.loc[lambda df : df.contig == record['reference_name'],:]
-            for limits in zip(introns_to_check["start"],introns_to_check["end"]) :
-                row["missplit"] = not (limits[0]-row.start_split in range(-3,4) and limits[1]-row.end_split in range(-3,4))
-        else :
-            row = begin.append(pd.Series([None,None,None,None,None],
-                                         index=["start_split","end_split","split_length","split_flanks","missplit"]))
-        rows.append(row)
+# # Parse Alignment BAM files
+# def parse_BAM(BamPath:str):    
+#     bamfile = pysam.AlignmentFile(BamPath, "rb")
+#     alignments = [{
+#         'query_name' : record.query_name,
+#         'reference_name' : record.reference_name,
+#         'reference_start' : record.reference_start,
+#         'reference_end' : record.reference_end,
+#         'cigartuples' : record.cigartuples,
+#         'is_secondary' : record.is_secondary,
+#         'is_supplementary' : record.is_supplementary,
+#         'mapping_quality' : record.mapping_quality
+#         } for record in bamfile.fetch(until_eof=True)]   
     
-    return pd.DataFrame(rows)
+#     return alignments
 
-def compute_pos_on_read(cov_lect,intron_start):
-    if not cov_lect.complement :
-        return (intron_start - cov_lect.start)/(cov_lect.end-cov_lect.start)*100
-    else :
-        return (cov_lect.end - intron_start)/(cov_lect.end-cov_lect.start)*100
+# def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
+#     """
+#     Write the intron extract from cigar line in file_r
 
-# Return df_cov_lect, a new Dataframe which contains reads from df_library if INTRON cov (lecture,
-# contig, start, end, complement) join with 3 news columns:
-#   "covering"      : one for the intron covering reads (True/False)
-#   "intron (name)" : another for the covered intron id (if True) 
-#   "pos_on_read"   : intron insertion position in read (if True - in term of read length percentage)
-def process_intron(df_features,df_library) :
-    df_cov_lect = pd.DataFrame(df_library.loc[lambda df : 
-                         (df.contig+'.modif'== str(df_features.contig))
-                         & (df_features.start > df.start)
-                         & (df_features.start < df.end)
-                          ])
-    if df_cov_lect.shape[0] > 0 :
-        df_cov_lect['covering'] = True
-        df_cov_lect['intron'] = df_features.name
-        df_cov_lect['pos_on_read'] = df_cov_lect.apply(
-                compute_pos_on_read,
-                axis=1,
-                intron_start=df_features.start
-                )             
-    return df_cov_lect
+#     :param reference: reference sequence to extract flanking sequence of split read
+#     :param cigar_list: list of tuple (equal to the cigar line)
+#     :param start: beginning of the read alignment
+#     :param ref_name: reference name on which the read is aligned
+#     :param read_name: read name
+#     :return:
+#     """
+#     values = [1, 0, 1, 1, 0]  # [M, I, D, N, S]
+#     limit_from_start = [0, 0]
+#     i = 0
+#     cigar_tuple = cigar_list[i]
+#     # if there is a split, calculate its position based on cigar line tuple
+#     while cigar_tuple[0] != 3:
+#         limit_from_start[0] += values[cigar_tuple[0]] * cigar_tuple[1]
+#         i += 1
+#         cigar_tuple = cigar_list[i]
+#     # enf of the split, equal to the number of 'N'
+#     limit_from_start[1] = cigar_tuple[1]
+#     split_start = start + limit_from_start[0]
+#     split_end = start + limit_from_start[0] + limit_from_start[1]
+#     length = limit_from_start[1]
+#     flank_left = ref_seq[split_start: split_start + 2]
+#     flank_right = ref_seq[split_end - 2: split_end]
+#     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
+#                     index = ["start_split","end_split","split_length","split_flanks"])
 
-# Return DataFrame Reads
-def prlz_process_intron(df_features,df_library) :
-    df_reads = pd.concat(
-        df_features.apply(
-            process_intron,
-            axis=1,
-            df_library=df_library
-            ).values
-        )   
-    return df_reads
+# #return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
+# def process_bam(alignments, df_mfasta, df_features, df_library):
+#     """
+#     For an alignment file, list all split reads.
+
+#     :param fastafilename: reference fasta file
+#     :param bamfilename: AlignmentFile object with all reads alignment information
+#     :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
+#     """
+#     print("Enter process bam")
+#     rows = []
+#     for record in alignments :
+#         begin = pd.Series([
+#             record['query_name'],                        # ID of the read
+#             record['reference_name'],                    # ID of the contig where the read is mapped
+#             record['reference_start'],                   # Start of the alignment on the contig
+#             record['reference_end'],                     # End of the alignment on the contig1
+#             df_library.at[record['query_name'],"covering"], # Bool if the read normally covers an intron (i.e. should be split)
+#             record['cigartuples'] is not None,           # Bool if the read is mapped
+#             not record['reference_name'] == df_library.at[record['query_name'],"contig"],  # Bool if the read is mapped on right contig
+#             (record['cigartuples'] is not None) and ('(3,' in str(record['cigartuples'])), # Bool if the read is split by aligner
+#             record['is_secondary'],
+#             record['is_supplementary'],
+#             record['mapping_quality']]
+#             ,
+#             index = ["read","contig","align_start","align_end",'covering','mapped',"mismapped",'split','second','suppl','score']
+#         )
+        
+#         if record['cigartuples'] is not None and '(3,' in str(record['cigartuples']) :
+#             row = begin.append(limit_from_cigar(
+#                 record['cigartuples'], 
+#                 record['reference_start'], 
+#                 str(df_mfasta.at[record['reference_name'],"sequence"])
+#             ))
+#             introns_to_check = df_features.loc[lambda df : df.contig == record['reference_name'],:]
+#             for limits in zip(introns_to_check["start"],introns_to_check["end"]) :
+#                 row["missplit"] = not (limits[0]-row.start_split in range(-3,4) and limits[1]-row.end_split in range(-3,4))
+#         else :
+#             row = begin.append(pd.Series([None,None,None,None,None],
+#                                          index=["start_split","end_split","split_length","split_flanks","missplit"]))
+#         rows.append(row)
+    
+#     return pd.DataFrame(rows)
+
+# def compute_pos_on_read(cov_lect,intron_start):
+#     if not cov_lect.complement :
+#         return (intron_start - cov_lect.start)/(cov_lect.end-cov_lect.start)*100
+#     else :
+#         return (cov_lect.end - intron_start)/(cov_lect.end-cov_lect.start)*100
+
+# # Return df_cov_lect, a new Dataframe which contains reads from df_library if INTRON cov (lecture,
+# # contig, start, end, complement) join with 3 news columns:
+# #   "covering"      : one for the intron covering reads (True/False)
+# #   "intron (name)" : another for the covered intron id (if True) 
+# #   "pos_on_read"   : intron insertion position in read (if True - in term of read length percentage)
+# def process_intron(df_features,df_library) :
+#     df_cov_lect = pd.DataFrame(df_library.loc[lambda df : 
+#                          (df.contig+'.modif'== str(df_features.contig))
+#                          & (df_features.start > df.start)
+#                          & (df_features.start < df.end)
+#                           ])
+#     if df_cov_lect.shape[0] > 0 :
+#         df_cov_lect['covering'] = True
+#         df_cov_lect['intron'] = df_features.name
+#         df_cov_lect['pos_on_read'] = df_cov_lect.apply(
+#                 compute_pos_on_read,
+#                 axis=1,
+#                 intron_start=df_features.start
+#                 )             
+#     return df_cov_lect
+
+# # Return DataFrame Reads
+# def prlz_process_intron(df_features,df_library) :
+#     df_reads = pd.concat(
+#         df_features.apply(
+#             process_intron,
+#             axis=1,
+#             df_library=df_library
+#             ).values
+#         )   
+#     return df_reads
 
 # Return int formatted by 3 numbers. Example : 1 234 instead of 1234
 def split_int(number, separator=' ', count=3):

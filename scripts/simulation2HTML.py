@@ -211,49 +211,28 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         print('flagstat',df_flag.head(5))
         html += get_html_flagstat_descr(df_flag)
     
-    #MAPPING : Counting table and barplots of mapped covering reads' main characteristics
-    if bam:
-        bam_file=bam.name
-        # Add three columns on df_library : 
-        # 1 - one for the intron covering reads (True/False) :   covering  : True/False 
-        # 2 - another for the covered intron id (if True)  intron : SEQUENCE685.modif|556|897
-        # 3 - and the last for the intron insertion position in read (if True - in term of read length percentage) : pos_on_read : 98.019802
-        df_cov=prlz_process_intron(df_features, df_library)
-        print('df_lib MAJ 0', df_library.head(5))
-        df_library.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_lib_INI.csv')
-        df_cov.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_cov.csv')
-        print('add df_cov', df_cov.head(5))
-        #df_library = df_library.join(df_cov,lsuffix='',rsuffix='_cov').loc[:,df_cov.columns] #https://stackoverflow.com/questions/52002017/pandas-left-join-gives-nan
-        #df_cov.columns = ['lecture', 'contig','start','end','complement','covering','intron','pos_on_read'] #ValueError: Length mismatch: Expected axis has 7 elements, new values have 8 elements
-        #df_library.columns = ['lecture', 'contig','start','end','complement']
-        #df_library = df_library.join(df_cov.set_index('lecture'),on='lecture',lsuffix='',rsuffix='_cov').loc[:,df_cov.columns]
-        df_library = pd.concat([df_library, df_cov], axis=1, sort=False)#in 9 : https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html   
-        #then remove duplicated columns
-        df_library = df_library.loc[:,~df_library.columns.duplicated()]
-        df_library.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_library.csv')
-        print('df_library', df_library.head(5))
-        #df_cov.loc[lambda df : df.covering != True, "covering"] = False #test ok
-        df_library.loc[lambda df : df.covering != True, "covering"] = False
-        print('df_library', df_library.head(5))
-        df_library.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_lib_VF.csv')
-        df_mapping_bam=process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library)
-        print('df_mapping_bam',df_mapping_bam)
-        df_mapping_bam.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_df_mapping_bam.csv')
-        #read	contig	align_start	align_end	covering	mapped	mismapped	split	second	suppl	score	start_split	end_split	split_length	split_flanks	missplit
-        #0	80032/1	SEQUENCE1.modif	0	101.0	False	True	True	False	False	False	255					
-        #46512	37025/2	SEQUENCE108.modif	336	773.0	True	True	True	True	False	False	255	402.0	738.0	336.0	GT_AG	False
-        #46513	118665/2	SEQUENCE108.modif	339	776.0	True	True	True	True	False	False	255	402.0	738.0	336.0	GT_AG	False
-        
-        # Compute align_length for plot_splice_event_position plot 
-        df_mapping_bam['align_length'] = df_mapping_bam['align_end'].subtract(df_mapping_bam['align_start'], fill_value=0)
-        html += get_html_bam(df_mapping_bam)
+   ##MAPPING : Counting table and barplots of mapped covering reads' main characteristics
+   # if bam:
+   #     bam_file=bam.name
+   #     # Add three columns on df_library : 
+   #     # 1 - one for the intron covering reads (True/False) :   covering  : True/False 
+   #     # 2 - another for the covered intron id (if True)  intron : SEQUENCE685.modif|556|897
+   #     # 3 - and the last for the intron insertion position in read (if True - in term of read length percentage) : pos_on_read : 98.019802
+   #     df_cov=prlz_process_intron(df_features, df_library)
+   #     df_library = pd.concat([df_library, df_cov], axis=1, sort=False)
+   #     df_library = df_library.loc[:,~df_library.columns.duplicated()]
+   #     df_library.loc[lambda df : df.covering != True, "covering"] = False
+   #     df_mapping_bam=process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library)
+   #     df_mapping_bam['align_length'] = df_mapping_bam['align_end'].subtract(df_mapping_bam['align_start'], fill_value=0)
+   #     html += get_html_bam(df_mapping_bam)
         
    
 
     ## SPLITREADSEARCH STAT
 
     # Split statistics from BAM file
-    html += get_html_split(df_mapping_bam)
+    #df_split=parse_split(split.name)
+    #html += get_html_split(df_split)
 
     # Candidats statistics
     if candidat:
@@ -275,15 +254,17 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
         # Compare nb candidats / nb candidat PASS / nb splice events in df_mapping_bam
         global_comparison_candidats_introns = dict()
-        nb_splice_events=df_mapping_bam['split_length'].isna().sum()
-        global_comparison_candidats_introns["0Number of reads splitted"]=df_mapping_bam.shape[0] - nb_splice_events
+        #nb_splice_events=df_mapping_bam['split_length'].isna().sum()
+        nb_splice_events='42'
+        #global_comparison_candidats_introns["0Number of reads splitted"]=df_mapping_bam.shape[0] - nb_splice_events
+        global_comparison_candidats_introns["0Number of reads splitted"]='42'
         global_comparison_candidats_introns["1Number of candidats with a canonic junction"]=nbPASS
-        pourcent_splice_events=(nb_splice_events*100)/(df_mapping_bam.shape[0])
-        global_comparison_candidats_introns["2Pourcentage of splice events / reads"]=pourcent_splice_events
-        pourcent_PASS=(nbPASS*100)/(df_candidat.shape[0])
-        global_comparison_candidats_introns["3Pourcentage of candidats with a canonic junction / all candidats"]=pourcent_PASS
-        pourcent_PASS_reads=(nbPASS*100)/(df_mapping_bam.shape[0])
-        global_comparison_candidats_introns["4Pourcentage of candidats with a canonic junction / reads"]=pourcent_PASS_reads
+        # pourcent_splice_events=(nb_splice_events*100)/(df_mapping_bam.shape[0])
+        # global_comparison_candidats_introns["2Pourcentage of splice events / reads"]=pourcent_splice_events
+        # pourcent_PASS=(nbPASS*100)/(df_candidat.shape[0])
+        # global_comparison_candidats_introns["3Pourcentage of candidats with a canonic junction / all candidats"]=pourcent_PASS
+        # pourcent_PASS_reads=(nbPASS*100)/(df_mapping_bam.shape[0])
+        # global_comparison_candidats_introns["4Pourcentage of candidats with a canonic junction / reads"]=pourcent_PASS_reads
         
         html += get_html_candidat_comp(global_comparison_candidats_introns)
 

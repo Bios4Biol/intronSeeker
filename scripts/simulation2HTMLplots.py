@@ -166,75 +166,75 @@ def plot_abondance_model(df_fasta:dict) :
     )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
-# Plot : barplots of mapped covering reads' main characteristics.
-def plot_covering_reads(df_mapping_bam:dict):
+# # Plot : barplots of mapped covering reads' main characteristics.
+# def plot_covering_reads(df_mapping_bam:dict):
 
-    cov              = df_mapping_bam.covering.sum()
-    mappedCount      = df_mapping_bam.mapped.sum()
-    mismap           = df_mapping_bam.mismapped.sum()
-    split            = df_mapping_bam.split.sum()
-    missplit         = df_mapping_bam.missplit.sum()
-    second           = df_mapping_bam.second.sum()
-    suppl            = df_mapping_bam.suppl.sum()
+#     cov              = df_mapping_bam.covering.sum()
+#     mappedCount      = df_mapping_bam.mapped.sum()
+#     mismap           = df_mapping_bam.mismapped.sum()
+#     split            = df_mapping_bam.split.sum()
+#     missplit         = df_mapping_bam.missplit.sum()
+#     second           = df_mapping_bam.second.sum()
+#     suppl            = df_mapping_bam.suppl.sum()
 
-    data = dict(
-        readsCharacteristics=["Covering", "Mapped", "Mismapped", "split", "Missplit", "Secondary", "Supplementary"],
-        mapping=[cov,mappedCount,mismap,split,missplit,second,suppl])
-    fig = px.bar(data, x='readsCharacteristics', y='mapping')
-    fig.update_layout(
-        margin=go.layout.Margin(
-            l=50,
-            r=50,
-            b=20,
-            t=30,
-            pad=0
-        )
-    )
+#     data = dict(
+#         readsCharacteristics=["Covering", "Mapped", "Mismapped", "split", "Missplit", "Secondary", "Supplementary"],
+#         mapping=[cov,mappedCount,mismap,split,missplit,second,suppl])
+#     fig = px.bar(data, x='readsCharacteristics', y='mapping')
+#     fig.update_layout(
+#         margin=go.layout.Margin(
+#             l=50,
+#             r=50,
+#             b=20,
+#             t=30,
+#             pad=0
+#         )
+#     )
 
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+#     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
     
 
-# Split len distribution plot
-def plot_dist_split_len(df_mapping_bam):
-    fig = px.bar(df_mapping_bam, x='contig', y='split_length')
-    fig.update_layout(
-        margin=go.layout.Margin(
-            l=50,
-            r=50,
-            b=20,
-            t=30,
-            pad=0
-        )
-    )
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+# # Split len distribution plot
+# def plot_dist_split_len(df_mapping_bam):
+#     fig = px.bar(df_mapping_bam, x='contig', y='split_length')
+#     fig.update_layout(
+#         margin=go.layout.Margin(
+#             l=50,
+#             r=50,
+#             b=20,
+#             t=30,
+#             pad=0
+#         )
+#     )
+#     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
-# Plot split len versus align length - source : https://plotly.com/python/splom/
-def plot_splice_event_position(df_mapping_bam):
-    fig = px.scatter(df_mapping_bam, x="align_length", y="split_length")
-    fig.update_layout(
-        margin=go.layout.Margin(
-            l=50,
-            r=50,
-            b=20,
-            t=30,
-            pad=0
-        )
-    )
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+# # Plot split len versus align length - source : https://plotly.com/python/splom/
+# def plot_splice_event_position(df_mapping_bam):
+#     fig = px.scatter(df_mapping_bam, x="align_length", y="split_length")
+#     fig.update_layout(
+#         margin=go.layout.Margin(
+#             l=50,
+#             r=50,
+#             b=20,
+#             t=30,
+#             pad=0
+#         )
+#     )
+#     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
-# Plot split len versus align start - source : https://plotly.com/python/splom/
-def plot_splice_event_vs_align_start(df_mapping_bam):
-    fig = px.scatter(df_mapping_bam, x="align_start", y="split_length")
-    fig.update_layout(
-        margin=go.layout.Margin(
-            l=50,
-            r=50,
-            b=20,
-            t=30,
-            pad=0
-        )
-    )
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+# # Plot split len versus align start - source : https://plotly.com/python/splom/
+# def plot_splice_event_vs_align_start(df_mapping_bam):
+#     fig = px.scatter(df_mapping_bam, x="align_start", y="split_length")
+#     fig.update_layout(
+#         margin=go.layout.Margin(
+#             l=50,
+#             r=50,
+#             b=20,
+#             t=30,
+#             pad=0
+#         )
+#     )
+#     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 
 
