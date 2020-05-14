@@ -135,13 +135,19 @@ def parse_control_introns(introns_coord_file) :
     table['intron'] = table.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
     return table.set_index('intron')    
     
-# Return panda which contains gtf features desc (seqref feature start end)  -- WARNING : header=0 car il y a déjà une lettre de titre commentée !!
+# Return panda which contains candidats desc 
 def parse_candidat(candidat) :
-    t = pd.read_table(candidat, usecols=[0,2,3,4,6], names=['ID', 'start', 'end', 'depth', 'filter'],  header=0)
+    t = pd.read_table(candidat, usecols=[0,2,3,4,5,6], names=['ID', 'start', 'end', 'depth','split_borders', 'filter'],  header=0)   #header=0 to remove commented header
     print(type(t))
     print(t.dtypes)
     return t.set_index('ID')
-    
+
+# Return panda which contains split desc 
+def parse_split(split):
+    t = pd.read_table(split, usecols=[0,1,4,5,6], names=['reference', 'read', 'split_length', 'split_borders', 'strand'],  header=0)
+    print(t.head(5))
+    return t.set_index('read')
+
 
 # Return int : nbreads, mapped, paired, proper
 def parse_flagstat2(flagstat) :

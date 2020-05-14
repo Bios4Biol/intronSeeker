@@ -191,15 +191,25 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
 			   </li>'''
     r += '''          
                 <li class="nav-item">
-				   <a class="nav-link" href="#results">
+				   <a class="nav-link" href="#features-descr">
 				        <span class="oi oi-folder" aria-hidden="true"></span>
 					    Feature(s) extraction results
 				   </a>
-			    </li>
+			    </li>'''
+    if split:
+        r += '''    
                 <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#split">
+				    <a class="nav-link" href="#splitstat">
 				    	<span class="oi oi-graph" aria-hidden="true"></span>
 				    	Split detection
+			    	</a>
+			    </li>'''  
+    if candidat:
+        r += '''             
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#candidatstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Candidats statistics
 			    	</a>
 			    </li>'''
     if assemblathon:
@@ -209,15 +219,7 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Intron insertion
 			    	</a>
-			    </li>'''      
-    if candidat:
-        r += '''             
-                <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#candidatstat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Candidats statistics
-			    	</a>
-			    </li>'''
+			    </li>'''    
     r +='''            
                 <li class="nav-item">
                     <a class="nav-link" href="#glossary">
@@ -396,49 +398,46 @@ def get_html_table_descr(global_stats_table):
 # + plot_splice_event_position(df_mapping_bam) +
 # + plot_splice_event_vs_align_start(df_mapping_bam) +
 
-# Plots split detection    
-def get_html_split(df_mapping_bam:dict):
+
+# Results
+def get_html_results():
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Feature(s) extraction results</h1>
-                <span class="anchor" id="results"></span>
-        </div>
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Split length by contig</h5>
-                <span class="anchor" id="split"></span>
-'''  '''
-            </div>
-        </div>
-        <div class="d-flex">    
-            <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Splice event on contig</h5>
-                <span class="anchor" id="split"></span>
-'''  '''
-            </div>  
-        </div>
-        <div class="d-flex">    
-            <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Splice event on contig</h5>
-                <span class="anchor" id="split"></span>
-'''  '''
-            </div>  
+                <span class="anchor" id="features-descr"></span>
         </div>
 '''
-    return r
 
+    return r   
 
+# Plots split detection stats   
+def get_html_split_descr(global_stat_split:dict, df_split:dict):
+    r =  '''
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Split reads</h5>
+                <span class="anchor" id="splitstat"></span>
+'''+dict_to_table(global_stat_split,2,True)+ '''
+            </div>
+        <div class="mt-4 mr-0 pl-0 col-md-8">
+                <h5>Splits length distribution</h5>
+                <span class="anchor" id="contigs_len_dist"></span>
+'''  '''
+            </div> 
+        </div>  
+'''
+
+    return r  
+# +plot_hist_split_length(df_split['split_length'])+    
+
+# Plots candidats stats   
 def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
-    r = '''
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Feature(s) extraction results</h1>
-                <span class="anchor" id="flag-descr"></span>
-        </div>
+    r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Candidats</h5>
                 <span class="anchor" id="candidatstat"></span>
-'''+dict_to_table(global_stat_candidat,-1,True)+'''
+'''+dict_to_table(global_stat_candidat,3,True)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-8">
                 <h5>Candidats depth distribution</h5>
@@ -450,20 +449,7 @@ def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
 
     return r   
 
-# Candidats versus features comparison
-def get_html_candidat_comp(global_comparison_candidats_introns:dict):
-    r = '''
-		<div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Comparison candidats versus splice events</h5>
-                <span class="anchor" id="candidatstat"></span>
-'''+dict_to_table(global_comparison_candidats_introns,-1,True)+'''
-            </div>
-        </div>  
-'''
 
-    return r     
-    
 # Define all term used in this simulation report
 def get_html_glossary():
     r = '''

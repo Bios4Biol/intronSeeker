@@ -75,6 +75,34 @@ def plot_hist_candidats_depth(candidatsDepth):
     )   
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
+# Plot split length
+def plot_hist_split_length(splitLength):
+    candidats = go.Histogram(
+        x=splitLength,
+        name='Split reads',
+        opacity=0.85
+    )
+    data = [candidats]
+    layout = go.Layout(
+         xaxis=dict(
+            title='Split length'
+        ),
+        yaxis=dict(
+            title='Number of split reads'
+        )
+    )
+    fig = go.Figure(data=data, layout=layout)
+    fig.update_layout(
+        margin=go.layout.Margin(
+            l=50,
+            r=50,
+            b=20,
+            t=30,
+            pad=0
+        )
+    )   
+    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
 
 # Distribution plot
 def plot_dist_features_len(len_by_features, feature_names):

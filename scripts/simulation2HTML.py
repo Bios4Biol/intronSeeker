@@ -21,7 +21,7 @@ from simulation2HTMLplots import *
 #step 1  full random simulation : intronSeeker fullRandomSimulation -r -o FRS/ 
 #source activate ISeeker_environment;
 #cd scripts/; 
-# python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+# python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -s  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_split_alignments.txt  --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
 # scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 # See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_test1_simulation.html
 
@@ -29,7 +29,7 @@ from simulation2HTMLplots import *
 # SUB MAIN #
 ############
 def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str,
-                        assemblathon:str, flagstat:str, bam:str, candidat:str,
+                        assemblathon:str, flagstat:str, bam:str, candidat:str, split:str,
                         output:str, prefix:str, force:bool, threads:int ) :
     output_path = output + "/report"
     if prefix:
@@ -238,44 +238,40 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
    #     html += get_html_bam(df_mapping_bam)
         
    
+    html += get_html_results()
 
-    ## SPLITREADSEARCH STAT
-    #df_split=parse_split(split.name)
-    #html += get_html_split(df_split)
-
+    ## SPLITREADSEARCH STAT    # 21102 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_split_alignments.txt
+    if split:
+        df_split=parse_split(split.name)
+        global_stat_split = dict()
+        global_stat_split["0Mean split length"] = df_split['split_length'].mean()
+        global_stat_split["1Number of split reads by split border"] = df_split.shape[0]   #df_split['split_borders'].value_counts()
+        c = 2
+        for k, v in (df_split.split_borders.value_counts()).items() :
+            global_stat_split[str(c)+k] = v
+            c+=1
+        html += get_html_split_descr(global_stat_split, df_split['split_length'])
+       
     # Candidats statistics
     if candidat:
         df_candidat = parse_candidat(candidat.name)
-        #print('candidat head :' , df_candidat)
+        print('candidat :' , df_candidat.head(5))
         global_stat_candidat = dict()
-        global_stat_candidat["0Number of candidats"] = df_candidat.shape[0]
-        global_stat_candidat["1Mean length"] = 0
-        nbPASS = 0
+        global_stat_candidat["0Mean length"] = 0
+        #nbPASS = 0
         for i,row in df_candidat.iterrows():
-            global_stat_candidat["1Mean length"] += row['end'] - row['start'] + 1
-            if "PASS" in row['filter']:
-                nbPASS += 1
-        global_stat_candidat["1Mean length"] /= (global_stat_candidat["0Number of candidats"])
-        global_stat_candidat["1Mean length"] = round(global_stat_candidat["1Mean length"], 2)
-        global_stat_candidat["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
-        global_stat_candidat["3Number of canonic junction"] = nbPASS
-        html += get_html_candidat_descr(global_stat_candidat, df_candidat[df_candidat['filter'] == 'PASS'])
-
-        # Compare nb candidats / nb candidat PASS / nb splice events in df_mapping_bam
-        global_comparison_candidats_introns = dict()
-        #nb_splice_events=df_mapping_bam['split_length'].isna().sum()
-        nb_splice_events='42'
-        #global_comparison_candidats_introns["0Number of reads splitted"]=df_mapping_bam.shape[0] - nb_splice_events
-        global_comparison_candidats_introns["0Number of reads splitted"]='42'
-        global_comparison_candidats_introns["1Number of candidats with a canonic junction"]=nbPASS
-        # pourcent_splice_events=(nb_splice_events*100)/(df_mapping_bam.shape[0])
-        # global_comparison_candidats_introns["2Pourcentage of splice events / reads"]=pourcent_splice_events
-        # pourcent_PASS=(nbPASS*100)/(df_candidat.shape[0])
-        # global_comparison_candidats_introns["3Pourcentage of candidats with a canonic junction / all candidats"]=pourcent_PASS
-        # pourcent_PASS_reads=(nbPASS*100)/(df_mapping_bam.shape[0])
-        # global_comparison_candidats_introns["4Pourcentage of candidats with a canonic junction / reads"]=pourcent_PASS_reads
-        
-        html += get_html_candidat_comp(global_comparison_candidats_introns)
+            global_stat_candidat["0Mean length"] += row['end'] - row['start'] + 1
+            #if "PASS" in row['filter']:
+            #    nbPASS += 1
+        global_stat_candidat["0Mean length"] /= (df_candidat.shape[0])
+        global_stat_candidat["0Mean length"] = round(global_stat_candidat["0Mean length"], 2)
+        global_stat_candidat["1Mean depth"]= round(df_candidat['depth'].mean(), 2)
+        global_stat_candidat["2Number of contigs with feature(s) & Junctions list"] = df_candidat.shape[0]
+        c = 3
+        for k, v in (df_candidat.split_borders.value_counts()).items() :
+            global_stat_candidat[str(c)+k] = v
+            c+=1
+        html += get_html_candidat_descr(global_stat_candidat, df_candidat)  # df_candidat[df_candidat['filter'] == 'PASS']
 
     
     #Compare assemblathon files
@@ -317,6 +313,7 @@ if __name__ == '__main__' :
     parser.add_argument('--assemblathon', type=argparse.FileType('r'), required=False, dest='assemblathon') 
     parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranks')
     parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
+    parser.add_argument('-s','--split', type=argparse.FileType('r'), required=False, dest='split')
     parser.add_argument('-o','--output', type=str, required=True, dest='output')
     parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
     parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads')
