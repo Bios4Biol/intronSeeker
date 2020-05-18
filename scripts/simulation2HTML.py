@@ -250,7 +250,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         for k, v in (df_split.split_borders.value_counts()).items() :
             global_stat_split[str(c)+k] = v
             c+=1
-        html += get_html_split_descr(global_stat_split, df_split['split_length'])
+        html += get_html_split_descr(global_stat_split)
        
     # Candidats statistics
     if candidat:
@@ -258,20 +258,31 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         print('candidat :' , df_candidat.head(5))
         global_stat_candidat = dict()
         global_stat_candidat["0Mean length"] = 0
-        #nbPASS = 0
         for i,row in df_candidat.iterrows():
             global_stat_candidat["0Mean length"] += row['end'] - row['start'] + 1
-            #if "PASS" in row['filter']:
-            #    nbPASS += 1
         global_stat_candidat["0Mean length"] /= (df_candidat.shape[0])
         global_stat_candidat["0Mean length"] = round(global_stat_candidat["0Mean length"], 2)
         global_stat_candidat["1Mean depth"]= round(df_candidat['depth'].mean(), 2)
-        global_stat_candidat["2Number of contigs with feature(s) & Junctions list"] = df_candidat.shape[0]
+        global_stat_candidat["2Number of contigs with feature(s) & Filter"] = df_candidat.shape[0]
         c = 3
-        for k, v in (df_candidat.split_borders.value_counts()).items() :
+        #for k, v in (df_candidat.split_borders.value_counts()).items() :
+        for k, v in (df_candidat['filter'].value_counts()).items() :
             global_stat_candidat[str(c)+k] = v
             c+=1
-        html += get_html_candidat_descr(global_stat_candidat, df_candidat)  # df_candidat[df_candidat['filter'] == 'PASS']
+
+        # Comparison between candidats and features from GTF file
+        nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, noCanonical=candidatsVsFeatures(df_candidat, df_features)
+
+        global_stat_candidat_vs_gtf = dict()
+        global_stat_candidat_vs_gtf["0Number of candidats"] = df_candidat.shape[0]
+        global_stat_candidat_vs_gtf["1Number of features"] = df_features.shape[0]
+        global_stat_candidat_vs_gtf["2Number of candidats including features (same start/end)"] = nbSameStartEnd
+        global_stat_candidat_vs_gtf["3Candidats not found in GTF"]=df_candidat.shape[0]- nbTotCandidatsIncludingFeatures
+        global_stat_candidat_vs_gtf["4Candidats length > max len (80 by default)"]=nbLen
+        global_stat_candidat_vs_gtf["5Candidats depth < min depth (1 by default) "]= minDepth
+        global_stat_candidat_vs_gtf["6Features without canonical borders (SS, neither CT_AC nor GT_AG)"]=noCanonical
+
+        html += get_html_candidat_descr(global_stat_candidat, df_candidat, global_stat_candidat_vs_gtf)  # df_candidat[df_candidat['filter'] == 'PASS']
 
     
     #Compare assemblathon files

@@ -211,7 +211,14 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Candidats statistics
 			    	</a>
-			    </li>'''
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#compCandidatsFeatures">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Comparison candidats features
+			    	</a>
+			    </li>
+                '''
     if assemblathon:
         r += '''                 
                 <li class="nav-item" style="padding-left:10px">
@@ -411,7 +418,7 @@ def get_html_results():
     return r   
 
 # Plots split detection stats   
-def get_html_split_descr(global_stat_split:dict, df_split:dict):
+def get_html_split_descr(global_stat_split:dict):
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
@@ -419,19 +426,13 @@ def get_html_split_descr(global_stat_split:dict, df_split:dict):
                 <span class="anchor" id="splitstat"></span>
 '''+dict_to_table(global_stat_split,2,True)+ '''
             </div>
-        <div class="mt-4 mr-0 pl-0 col-md-8">
-                <h5>Splits length distribution</h5>
-                <span class="anchor" id="contigs_len_dist"></span>
-'''  '''
-            </div> 
         </div>  
 '''
 
-    return r  
-# +plot_hist_split_length(df_split['split_length'])+    
+    return r
 
 # Plots candidats stats   
-def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
+def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict, global_stat_candidat_vs_gtf:dict):
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
@@ -445,6 +446,13 @@ def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
 '''+plot_hist_candidats_depth(df_candidat['depth'])+'''
             </div>
         </div>  
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Comparison between features in GTF and candidats list</h5>
+                <span class="anchor" id="compCandidatsFeatures"></span>
+'''+dict_to_table(global_stat_candidat_vs_gtf,-1,True)+'''
+            </div>
+        </div>
 '''
 
     return r   

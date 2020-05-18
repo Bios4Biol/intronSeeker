@@ -137,10 +137,42 @@ def parse_control_introns(introns_coord_file) :
     
 # Return panda which contains candidats desc 
 def parse_candidat(candidat) :
-    t = pd.read_table(candidat, usecols=[0,2,3,4,5,6], names=['ID', 'start', 'end', 'depth','split_borders', 'filter'],  header=0)   #header=0 to remove commented header
-    print(type(t))
-    print(t.dtypes)
-    return t.set_index('ID')
+    t = pd.read_table(candidat, usecols=[0,1,2,3,4,5,6], names=['ID', 'reference', 'start', 'end', 'depth','split_borders', 'filter'],  header=0)   #header=0 to remove commented header
+    t['key'] = t['ID']
+    return t.set_index('key')
+
+# Return comparison between dataframes df_candidat and df_features
+def candidatsVsFeatures(df_candidat, df_features):
+    # Join candidat and features dataframe
+    df_candidat = df_candidat.join(df_features,  lsuffix='_candidat', rsuffix='_features')
+   
+    # Total number of candidats including features
+    nbTotCandidatsIncludingFeatures = df_candidat.shape[0]
+    print('nbTotCandidatsIncludingFeatures', nbTotCandidatsIncludingFeatures)
+
+    # Number of features with the same start and end than candidats
+    conditionStartEnd = ((df_candidat['start_candidat'] == df_candidat['start_features']) & (df_candidat['end_candidat'] == df_candidat['end_features']))
+    nbSameStartEnd=len(df_candidat.loc[conditionStartEnd]) - 1 # -1 for header
+    #df_candidat['nbSameStartEnd'] = np.where(ConditionStartEnd , '1', np.nan)
+    print('nbSameStartEnd',nbSameStartEnd)
+   
+    # Features length >= 80 (default value in Split Read Search)
+    condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= 80)
+    nbLen   = len(df_candidat.loc[condLen]) 
+    print('nbLen',nbLen)
+
+    # Features with depth inf or equals to 1 (value by default)
+    condDepth = (df_candidat['depth'] <= 1)
+    minDepth = len(df_candidat.loc[condDepth])
+    print('minDepth',minDepth)
+    
+
+    # Number of features without canonical junctions
+    condNoCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
+    noCanonical = len(df_candidat.loc[condNoCanonical])
+    print('noCanonical',noCanonical)
+    
+    return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, noCanonical
 
 # Return panda which contains split desc 
 def parse_split(split):
