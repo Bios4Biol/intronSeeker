@@ -148,59 +148,32 @@ def candidatsVsFeatures(df_candidat, df_features):
    
     # Total number of candidats including features
     nbTotCandidatsIncludingFeatures = df_candidat.shape[0]
-    print('nbTotCandidatsIncludingFeatures', nbTotCandidatsIncludingFeatures)
 
     # Number of features with the same start and end than candidats
     conditionStartEnd = ((df_candidat['start_candidat'] == df_candidat['start_features']) & (df_candidat['end_candidat'] == df_candidat['end_features']))
     nbSameStartEnd=len(df_candidat.loc[conditionStartEnd]) - 1 # -1 for header
-    #df_candidat['nbSameStartEnd'] = np.where(ConditionStartEnd , '1', np.nan)
-    print('nbSameStartEnd',nbSameStartEnd)
    
     # Features length >= 80 (default value in Split Read Search)
     condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= 80)
     nbLen   = len(df_candidat.loc[condLen]) 
-    print('nbLen',nbLen)
 
     # Features with depth inf or equals to 1 (value by default)
     condDepth = (df_candidat['depth'] <= 1)
-    minDepth = len(df_candidat.loc[condDepth])
-    print('minDepth',minDepth)
-    
+    minDepth = len(df_candidat.loc[condDepth])   
 
     # Number of features without canonical junctions
     condNoCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
     noCanonical = len(df_candidat.loc[condNoCanonical])
-    print('noCanonical',noCanonical)
     
     return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, noCanonical
 
 # Return panda which contains split desc 
 def parse_split(split):
     t = pd.read_table(split, usecols=[0,1,4,5,6], names=['reference', 'read', 'split_length', 'split_borders', 'strand'],  header=0)
-    print(t.head(5))
     return t.set_index('read')
 
 
-# Return int : nbreads, mapped, paired, proper
-def parse_flagstat2(flagstat) :
-    with open(flagstat) as f:
-        mylist = [line.rstrip('\n') for line in f]
-        for i in range(0, 12):
-            line=mylist[i]
-            #pos1 = line.find('\D\s')
-            pos2 = line.find('+')  
-            if "QC-passed reads" in line:
-                nbreads=line[0:pos2]
-            if "mapped (" in line:
-                mapped=line[0:pos2]
-            if "paired in sequencing" in line:
-                paired=line[0:pos2]
-            if "properly paired" in line:
-                proper=line[0:pos2]
-    return nbreads, mapped, paired, proper
-
-
-
+# Return dataframe with flagstat stats
 def parse_flagstat(filename : str , lib_size : int, name : str) :
     flagstat = OrderedDict({})
     with open(filename,"r") as f :
@@ -261,14 +234,9 @@ def compute_tr_length(df_mfasta, df_features) :
 
 
 def compute_pos_on_mfasta(df_features, df_mfasta) :
-    #print(df_mfasta.at[df_features.contig,"short_length"]) #608
     pos_on_contig = df_features.start/df_mfasta.at[df_features.contig,"short_length"]*100
-    #print('pos_on_contig',pos_on_contig) #pos_on_contig 42.26973684210527
     c_seq = str(df_mfasta.at[df_features.contig,'sequence'])
-    #print('c_seq',c_seq)
-    #c_seq TCAGGGCTCGAATAAACAGGCAAGCGGCTCGTAGATGGTGCTATCTTAACAACAAGGAAACGGCCCTGGATCGCCAGTTATACAAGGCGGAG...
     flanks = str(c_seq[df_features.start:df_features.start+2])+"_"+str(c_seq[df_features.end-2:df_features.end])
-    #print('flanks',flanks) #flanks CT_AC
     
     return pd.Series([flanks,pos_on_contig],index=["flanks","pos_on_contig"])
         
@@ -297,134 +265,6 @@ def parse_assemblathon(filename : str, name : str ) :
     with open(filename,"r") as f :
         assemblathon = { re.split("\s\s+",line.strip(),1)[0] : re.split("\s\s+",line.strip(),1)[1] for line in f if parsing_test(re.split("\s\s+",line.strip(),1))}
     return pd.DataFrame(data=assemblathon.values(),index=assemblathon.keys(),columns=[name])    
-
-# # Parse Alignment BAM files
-# def parse_BAM(BamPath:str):    
-#     bamfile = pysam.AlignmentFile(BamPath, "rb")
-#     alignments = [{
-#         'query_name' : record.query_name,
-#         'reference_name' : record.reference_name,
-#         'reference_start' : record.reference_start,
-#         'reference_end' : record.reference_end,
-#         'cigartuples' : record.cigartuples,
-#         'is_secondary' : record.is_secondary,
-#         'is_supplementary' : record.is_supplementary,
-#         'mapping_quality' : record.mapping_quality
-#         } for record in bamfile.fetch(until_eof=True)]   
-    
-#     return alignments
-
-# def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
-#     """
-#     Write the intron extract from cigar line in file_r
-
-#     :param reference: reference sequence to extract flanking sequence of split read
-#     :param cigar_list: list of tuple (equal to the cigar line)
-#     :param start: beginning of the read alignment
-#     :param ref_name: reference name on which the read is aligned
-#     :param read_name: read name
-#     :return:
-#     """
-#     values = [1, 0, 1, 1, 0]  # [M, I, D, N, S]
-#     limit_from_start = [0, 0]
-#     i = 0
-#     cigar_tuple = cigar_list[i]
-#     # if there is a split, calculate its position based on cigar line tuple
-#     while cigar_tuple[0] != 3:
-#         limit_from_start[0] += values[cigar_tuple[0]] * cigar_tuple[1]
-#         i += 1
-#         cigar_tuple = cigar_list[i]
-#     # enf of the split, equal to the number of 'N'
-#     limit_from_start[1] = cigar_tuple[1]
-#     split_start = start + limit_from_start[0]
-#     split_end = start + limit_from_start[0] + limit_from_start[1]
-#     length = limit_from_start[1]
-#     flank_left = ref_seq[split_start: split_start + 2]
-#     flank_right = ref_seq[split_end - 2: split_end]
-#     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
-#                     index = ["start_split","end_split","split_length","split_flanks"])
-
-# #return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
-# def process_bam(alignments, df_mfasta, df_features, df_library):
-#     """
-#     For an alignment file, list all split reads.
-
-#     :param fastafilename: reference fasta file
-#     :param bamfilename: AlignmentFile object with all reads alignment information
-#     :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
-#     """
-#     print("Enter process bam")
-#     rows = []
-#     for record in alignments :
-#         begin = pd.Series([
-#             record['query_name'],                        # ID of the read
-#             record['reference_name'],                    # ID of the contig where the read is mapped
-#             record['reference_start'],                   # Start of the alignment on the contig
-#             record['reference_end'],                     # End of the alignment on the contig1
-#             df_library.at[record['query_name'],"covering"], # Bool if the read normally covers an intron (i.e. should be split)
-#             record['cigartuples'] is not None,           # Bool if the read is mapped
-#             not record['reference_name'] == df_library.at[record['query_name'],"contig"],  # Bool if the read is mapped on right contig
-#             (record['cigartuples'] is not None) and ('(3,' in str(record['cigartuples'])), # Bool if the read is split by aligner
-#             record['is_secondary'],
-#             record['is_supplementary'],
-#             record['mapping_quality']]
-#             ,
-#             index = ["read","contig","align_start","align_end",'covering','mapped',"mismapped",'split','second','suppl','score']
-#         )
-        
-#         if record['cigartuples'] is not None and '(3,' in str(record['cigartuples']) :
-#             row = begin.append(limit_from_cigar(
-#                 record['cigartuples'], 
-#                 record['reference_start'], 
-#                 str(df_mfasta.at[record['reference_name'],"sequence"])
-#             ))
-#             introns_to_check = df_features.loc[lambda df : df.contig == record['reference_name'],:]
-#             for limits in zip(introns_to_check["start"],introns_to_check["end"]) :
-#                 row["missplit"] = not (limits[0]-row.start_split in range(-3,4) and limits[1]-row.end_split in range(-3,4))
-#         else :
-#             row = begin.append(pd.Series([None,None,None,None,None],
-#                                          index=["start_split","end_split","split_length","split_flanks","missplit"]))
-#         rows.append(row)
-    
-#     return pd.DataFrame(rows)
-
-# def compute_pos_on_read(cov_lect,intron_start):
-#     if not cov_lect.complement :
-#         return (intron_start - cov_lect.start)/(cov_lect.end-cov_lect.start)*100
-#     else :
-#         return (cov_lect.end - intron_start)/(cov_lect.end-cov_lect.start)*100
-
-# # Return df_cov_lect, a new Dataframe which contains reads from df_library if INTRON cov (lecture,
-# # contig, start, end, complement) join with 3 news columns:
-# #   "covering"      : one for the intron covering reads (True/False)
-# #   "intron (name)" : another for the covered intron id (if True) 
-# #   "pos_on_read"   : intron insertion position in read (if True - in term of read length percentage)
-# def process_intron(df_features,df_library) :
-#     df_cov_lect = pd.DataFrame(df_library.loc[lambda df : 
-#                          (df.contig+'.modif'== str(df_features.contig))
-#                          & (df_features.start > df.start)
-#                          & (df_features.start < df.end)
-#                           ])
-#     if df_cov_lect.shape[0] > 0 :
-#         df_cov_lect['covering'] = True
-#         df_cov_lect['intron'] = df_features.name
-#         df_cov_lect['pos_on_read'] = df_cov_lect.apply(
-#                 compute_pos_on_read,
-#                 axis=1,
-#                 intron_start=df_features.start
-#                 )             
-#     return df_cov_lect
-
-# # Return DataFrame Reads
-# def prlz_process_intron(df_features,df_library) :
-#     df_reads = pd.concat(
-#         df_features.apply(
-#             process_intron,
-#             axis=1,
-#             df_library=df_library
-#             ).values
-#         )   
-#     return df_reads
 
 # Return int formatted by 3 numbers. Example : 1 234 instead of 1234
 def split_int(number, separator=' ', count=3):

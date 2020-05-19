@@ -5,10 +5,6 @@ from simulation2HTMLparse import *
 from simulation2HTMLplots import *
 
 
-# https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css                             : scripts/css/dataTables.bootstrap4.min.css
-# https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css  : scripts/css/open-iconic-bootstrap.min.css
-# https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css                            : scripts/css/bootstrap.min.css
-
 def get_html_header():
     return '''
 <!doctype html>
@@ -98,9 +94,6 @@ def get_html_header():
     <title>IntronSeeker simulation report</title>
   </head>
 '''
-
-# https://cdn.plot.ly/plotly-latest.min.js  :  scripts/js/plotly-latest.min.js
-
 
 # icons : https://useiconic.com/open/
 def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
@@ -389,23 +382,6 @@ def get_html_table_descr(global_stats_table):
 '''
     return r
 
-## Plot mapping statistics
-#def get_html_bam(df_mapping_bam:dict):
-#    r = '''
-#        <div class="d-flex">    
-#            <div class="mt-4 mr-0 pl-0 col-md-12">
-#                <h5>Mapping and covering statistics</h5>
-#                <span class="anchor" id="mapping_stats"></span>
-#''' + plot_covering_reads(df_mapping_bam) + '''
-#            </div>
-#        </div>
-#'''
-#    return r
-# + plot_dist_split_len(df_mapping_bam) +
-# + plot_splice_event_position(df_mapping_bam) +
-# + plot_splice_event_vs_align_start(df_mapping_bam) +
-
-
 # Results
 def get_html_results():
     r = '''
@@ -493,12 +469,6 @@ def get_html_footer():
   </body>
 </html>
 '''
-# https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js         : scripts/js/bootstrap.min.js
-# https://code.jquery.com/jquery-3.2.1.slim.min.js                            : scripts/js/jquery-3.2.1.slim.min.js
-# https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js   : scripts/js/popper.min.js
-# https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js              : scripts/js/jquery.dataTables.min.js
-# https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js          : scripts/js/dataTables.bootstrap4.min.js
-
 
 # Return HTML table from dict
 # Param 1 : dict (key, val)

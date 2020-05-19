@@ -15,10 +15,6 @@ from simulation2HTMLparse import *
 from simulation2HTMLtags import *
 from simulation2HTMLplots import *
 
-
-
-
-#step 1  full random simulation : intronSeeker fullRandomSimulation -r -o FRS/ 
 #source activate ISeeker_environment;
 #cd scripts/; 
 # python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -b /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.bam -s  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_split_alignments.txt  --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
@@ -145,30 +141,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         c+=1
 
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
-  
-    '''
-    #https://stackoverflow.com/questions/45759966/counting-unique-values-in-a-column-in-pandas-dataframe-like-in-qlik
-    print('6Number of features in GTF:', df_features['contig'].nunique())
-    print('5Number of distinct features in GTF:', df_features['feature'].nunique())
-    #ou
-    df2=df_features.groupby('feature')['contig'].nunique()
-    print('**Number of distinct features in GTF:', df2.count())
-    #Replace nb_ctg_by_feature ?   # Number of ctg by feature from all GTF lines (Ex: "Exon" see in X ctg, "Intron" see in Y ctg, ...)
-    #https://stackoverflow.com/questions/38309729/count-unique-values-with-pandas-per-groups/38309823
-    #https://www.shanelynn.ie/summarising-aggregation-and-grouping-data-in-python-pandas/
-    #print('**TEST**Number of sequences by feature type (1):', df_features.groupby('feature')['contig'].count())  #series
-    print('**TEST**Number of sequences by feature type (2):', df_features.groupby('feature')[['contig']].nunique())  #panda dataframe
-    print('**TEST**Number of sequences by feature type (2bis):', df_features.groupby('contig')[['feature']].nunique())  
-    #print('**TEST**Number of sequences by feature type (4):', df_features.groupby('feature', as_index=False).agg({"contig": "count"})) 
-    
-    #df_features.insert(1, 'nbfeature', 1)
-    #print ('new df_features', df_features)
-    #pddf=df_features.groupby(['feature','contig'])['nbfeature'].nunique()
-    #print('**TEST**Number of sequences by feature type (5):', pddf)
-    #df_features = df_features.drop(columns='nbfeature')
-    print('**Number of sequences by feature type: (6)', (df_features.groupby('feature')['contig'].nunique()).values) # type ; pandas.core.series.Series
-    print('**Number of sequences by feature type (7):', (df_features.groupby('feature')['contig'].nunique()).index) 
-    '''
 
     # READS STAT
     # Global stat
@@ -179,7 +151,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_fastq["1Mean coverage"] += row['end'] - row['start'] + 1
     global_stat_fastq["1Mean coverage"] /= (global_stat["1Contig FASTA - Mean seq. length"] * global_stat["0Contig FASTA - Number of seq."])
     global_stat_fastq["1Mean coverage"] = round(global_stat_fastq["1Mean coverage"], 2)
-    #to remove ?
     global_stat_fastq["2Min reads length"] = df_features['length'].min()
     global_stat_fastq["3Max reads length"] = df_features['length'].max()
     global_stat_fastq["4Mean reads length"] = round(df_features['length'].mean())
@@ -221,31 +192,15 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_flagstat["3Singletons"] = singletons
 
         html += get_html_flagstat_descr(global_stat_flagstat)
-    
-   ##MAPPING : Counting table and barplots of mapped covering reads' main characteristics
-   # if bam:
-   #     bam_file=bam.name
-   #     # Add three columns on df_library : 
-   #     # 1 - one for the intron covering reads (True/False) :   covering  : True/False 
-   #     # 2 - another for the covered intron id (if True)  intron : SEQUENCE685.modif|556|897
-   #     # 3 - and the last for the intron insertion position in read (if True - in term of read length percentage) : pos_on_read : 98.019802
-   #     df_cov=prlz_process_intron(df_features, df_library)
-   #     df_library = pd.concat([df_library, df_cov], axis=1, sort=False)
-   #     df_library = df_library.loc[:,~df_library.columns.duplicated()]
-   #     df_library.loc[lambda df : df.covering != True, "covering"] = False
-   #     df_mapping_bam=process_bam(parse_BAM(bam_file), df_mfasta, df_features, df_library)
-   #     df_mapping_bam['align_length'] = df_mapping_bam['align_end'].subtract(df_mapping_bam['align_start'], fill_value=0)
-   #     html += get_html_bam(df_mapping_bam)
-        
    
     html += get_html_results()
 
-    ## SPLITREADSEARCH STAT    # 21102 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_split_alignments.txt
+    ## SPLITREADSEARCH STAT
     if split:
         df_split=parse_split(split.name)
         global_stat_split = dict()
         global_stat_split["0Mean split length"] = df_split['split_length'].mean()
-        global_stat_split["1Number of split reads by split border"] = df_split.shape[0]   #df_split['split_borders'].value_counts()
+        global_stat_split["1Number of split reads by split border"] = df_split.shape[0]
         c = 2
         for k, v in (df_split.split_borders.value_counts()).items() :
             global_stat_split[str(c)+k] = v
@@ -265,7 +220,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_candidat["1Mean depth"]= round(df_candidat['depth'].mean(), 2)
         global_stat_candidat["2Number of contigs with feature(s) & Filter"] = df_candidat.shape[0]
         c = 3
-        #for k, v in (df_candidat.split_borders.value_counts()).items() :
         for k, v in (df_candidat['filter'].value_counts()).items() :
             global_stat_candidat[str(c)+k] = v
             c+=1
@@ -282,16 +236,13 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_candidat_vs_gtf["5Candidats depth < min depth (1 by default) "]= minDepth
         global_stat_candidat_vs_gtf["6Features without canonical borders (SS, neither CT_AC nor GT_AG)"]=noCanonical
 
-        html += get_html_candidat_descr(global_stat_candidat, df_candidat, global_stat_candidat_vs_gtf)  # df_candidat[df_candidat['filter'] == 'PASS']
+        html += get_html_candidat_descr(global_stat_candidat, df_candidat, global_stat_candidat_vs_gtf)
 
     
     #Compare assemblathon files
     if assemblathon:
         df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
-        #print('df_assemblathon_all', df_assemblathon_all)
         global_stat_assemblathon = dict()
-        print(df_assemblathon_all.shape[0])#lignes 
-        print(df_assemblathon_all.shape[1])#colonnes 
         global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
         global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
         global_stat_assemblathon["2Longest contig"]            = df_assemblathon_all.iloc[2,0]
