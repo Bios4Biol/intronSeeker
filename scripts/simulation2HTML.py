@@ -271,7 +271,6 @@ if __name__ == '__main__' :
     parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1')
     parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
     parser.add_argument('--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat')
-    parser.add_argument('-b','--bam', type=argparse.FileType('r'), required=False, dest='bam')
     parser.add_argument('--assemblathon', type=argparse.FileType('r'), required=False, dest='assemblathon') 
     parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranks')
     parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
