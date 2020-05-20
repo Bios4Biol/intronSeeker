@@ -172,62 +172,27 @@ def parse_split(split):
     t = pd.read_table(split, usecols=[0,1,4,5,6], names=['reference', 'read', 'split_length', 'split_borders', 'strand'],  header=0)
     return t.set_index('read')
 
-
-# Return dataframe with flagstat stats
-def parse_flagstat(filename : str , lib_size : int, name : str) :
-    flagstat = OrderedDict({})
-    with open(filename,"r") as f :
-        
-        first = f.readline().split(" ",3)
-        if int(first[2]) == 0 :
-            qc_failed = False
-            flagstat["Total count"] = int(first[0])
-        else :
-            qc_failed = True
-            flagstat["Total count"] = [int(first[0]),int(first[2])]
-            
-        items_of_interest=["secondary",
-                           "supplementary",
-                           "duplicates",
-                           "mapped",
-                           "properly paired",
-                           "singletons",
-                           "with mate mapped to a different chr"]
-        
-        for ligne in f :
-            values = ligne.rstrip().split(" ",3)
-            if not qc_failed and not int(values[0]) == 0 :
-                item = values[-1].split(" (")[0]
-                if item in items_of_interest :
-                    if item in ["mapped","properly paired","singletons"] :
-                        flagstat[item] = "{value} ({percentage}%)".format(
-                            value=values[0],
-                            percentage=round((int(values[0])/(lib_size+flagstat["secondary"]))*100,2))
-                    else :
-                        flagstat[item] = int(values[0])
-                    
-            elif qc_failed and (not int(values[0]) == 0 or not int(values[2]) == 0) :
-                item = values[-1].split(" (")[0]
-                if item in items_of_interest :
-                    if item in ["mapped","properly paired","singletons"] :
-                        flagstat[item] = [
-                            "{value} ({percentage}%)".format(
-                                value=values[0],
-                                percentage=round((int(values[0])/(lib_size+flagstat["secondary"]))*100,2)
-                            ),
-                            "{value} ({percentage}%)".format(
-                                value=values[2],
-                                percentage=round((int(values[2])/(lib_size+flagstat["secondary"]))*100,2)
-                            )]
-                    else :
-                        flagstat[item] = [int(values[0]),int(values[2])]
-            if item == "with mate mapped to a different chr" :
-                break
-        if not qc_failed :
-            return pd.DataFrame.from_dict(flagstat,"index",columns=[name])
-        else :
-            return pd.DataFrame.from_dict(flagstat,"index",columns=pd.MultiIndex.from_tuples([(name,"QC-passed"),(name,"QC-failed")]))
-
+# Return int : nbreads, mapped, paired, proper
+def parse_flagstat(flagstat) :
+    with open(flagstat) as f:
+        mylist = [line.rstrip('\n') for line in f]
+        for i in range(0, 12):
+            line=mylist[i]
+            #pos1 = line.find('\D\s')
+            pos2 = line.find('+')  
+            if "QC-passed reads" in line:
+                nbreads=line[0:pos2]
+            if "mapped (" in line:
+                mapped=line[0:pos2]
+            if "paired in sequencing" in line:
+                paired=line[0:pos2]
+            if "properly paired" in line:
+                proper=line[0:pos2]
+            if "secondary" in line:
+                secondary=line[0:pos2]
+            if "singletons (" in line:
+                singletons=line[0:pos2]   
+    return nbreads, mapped, paired, proper, secondary, singletons
 
 def compute_tr_length(df_mfasta, df_features) :
     return df_mfasta.length - df_features.loc[lambda df : df.contig == df_mfasta.name,"length" ].sum()

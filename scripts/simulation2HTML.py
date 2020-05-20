@@ -176,16 +176,11 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     ## ALIGNMENT STATS
     if flagstat:
-        df_flag = parse_flagstat(flagstat_file, len(df_library), "file1")
-        print('flagstat',df_flag.head(5))
-        secondary   = df_flag.iloc[1,0]
-        mapped      = df_flag.iloc[2,0]
-        prop_paired = df_flag.iloc[3,0]
-        singletons  = df_flag.iloc[4,0]
-       
+        nbreads, mapped, paired, proper, secondary, singletons=parse_flagstat(flagstat_file)
+
         global_stat_flagstat = dict()
         global_stat_flagstat["0Number of mapped"] = mapped
-        global_stat_flagstat["1Number of properly paired reads"] = prop_paired
+        global_stat_flagstat["1Number of properly paired reads"] = proper
         global_stat_flagstat["2Secondary"] = secondary
         global_stat_flagstat["3Singletons"] = singletons
 
