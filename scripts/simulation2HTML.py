@@ -200,7 +200,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
             global_stat_split[str(c)+k] = v
             c+=1
         html += get_html_split_descr(global_stat_split)
-       
+
     # Candidats statistics
     if candidat:
         df_candidat = parse_candidat(candidat.name)

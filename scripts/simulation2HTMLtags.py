@@ -492,35 +492,3 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool):
         c += 1
     table += "</tbody></table>"
     return table
-
-# Return HTML table from dict
-# Param 1 : dict (key, val)
-# Param 2 : int for which line number first col (key) will be right align
-# Param 3 : bool to remove first char of the key (used to sort by key)
-def dict2_to_table(d1 : dict, d2:dict, i : int, rmfirstchar : bool):
-    table = '''
-            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
-        	    <tbody>
-'''
-    c = 0
-    c2 = 0
-    for k, v in sorted(d1.items(), key=lambda t: t[0]):
-        table += "<tr><td class='valn"
-        if(c >= i & i!=-1):
-            table += " text-right"
-        if(rmfirstchar):
-            table += "'>" + k[1:] + "</td><td class='valn text-right'>" + str(v) + "</td></tr>"
-        else:
-            table += "'>" + k + "</td><td class='valn text-right'>" + str(v) + "</td></tr>"
-        c += 1
-    for k2, v2 in sorted(d2.items(), key=lambda t: t[0]):
-        table += "<tr><td class='valn"
-        if(c2 >= i & i!=-1):
-            table += " text-right"
-        if(rmfirstchar):
-            table += "'>" + k2[1:] + "</td><td class='valn text-right'>" + str(v2) + "</td></tr>"
-        else:
-            table += "'>" + k2 + "</td><td class='valn text-right'>" + str(v2) + "</td></tr>"
-        c2 += 1    
-    table += "</tbody></table>"
-    return table
