@@ -400,7 +400,7 @@ def get_html_split_descr(df_splitRead:dict):
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Split reads</h5>
                 <span class="anchor" id="splitstat"></span>
-''' + df_to_table(df_splitRead, 2) + '''  
+''' + df_to_table(df_splitRead, 2, True) + '''  
             </div>
         </div>  
 '''
@@ -493,14 +493,14 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool):
     table += "</tbody></table>"
     return table
 
-def df_to_table(df : dict , i : int):
+def df_to_table(df : dict, i : int, changeTextSide : bool):
     table = '''
             <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
         	    <tbody>
 '''
     j = 0
     for row in df.itertuples():
-        if(j >= i):
+        if(j >= i & changeTextSide):
             table += "<tr><td class='valn text-right'>" + str(row.titles) + "</td><td class='valn text-right'>" + str(split_int(round(row.values))) + "</td></tr>"
         else:
             table += "<tr><td class='valn text-left'>" + str(row.titles) + "</td><td class='valn text-right'>" + str(split_int(round(row.values))) + "</td></tr>"
