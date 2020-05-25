@@ -394,18 +394,18 @@ def get_html_results():
     return r   
 
 # Plots split detection stats   
-def get_html_split_descr(global_stat_split:dict):
+def get_html_split_descr(df_splitRead:dict):
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Split reads</h5>
                 <span class="anchor" id="splitstat"></span>
-'''+dict_to_table(global_stat_split,2,True)+ '''
+''' + df_to_table(df_splitRead) + '''  
             </div>
         </div>  
 '''
 
-    return r
+    return r   
 
 # Plots candidats stats   
 def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict, global_stat_candidat_vs_gtf:dict):
@@ -486,9 +486,22 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool):
             table += " text-right"
         val=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str(v))   # Remove (nb%) in val    
         if(rmfirstchar):
-            table += "'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(val)), ' ') + "</td></tr>"
+            table += "'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(val)), ' ') + "</td></tr>"   
         else:
             table += "'>" + k + "</td><td class='valn text-right'>" + split_int(round(float(val)), ' ') + "</td></tr>"
         c += 1
+    table += "</tbody></table>"
+    return table
+
+def df_to_table(df : dict):
+    table = '''
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+'''
+    for row in df.itertuples():
+        print(row.titles)
+        print(row.values)
+        table += "<tr><td class='valn'>" + str(row.titles) + "</td><td class='valn text-right'>" + str(split_int(round(row.values))) + "</td></tr>"
+    
     table += "</tbody></table>"
     return table

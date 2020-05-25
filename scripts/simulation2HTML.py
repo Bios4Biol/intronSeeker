@@ -188,18 +188,37 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
    
     html += get_html_results()
 
+    # ## SPLITREADSEARCH STAT
+    # if split:
+    #     df_split=parse_split(split.name)
+    #     global_stat_split = dict()
+    #     global_stat_split["0Mean split length"] = df_split['split_length'].mean()
+    #     global_stat_split["1Number of split reads by split border"] = df_split.shape[0]
+    #     c = 2
+    #     #for k, v in (df_split.split_borders.value_counts()).items() :
+    #     for k, v in (df_split['split_borders'].value_counts()).items() :
+    #         global_stat_split[str(c)+" - "+k] = v
+    #         print('tab string c',str(c))
+    #         print('tab k', k)
+    #         print('tab v', v)
+    #         c+=1
+    #     html += get_html_split_descr(global_stat_split)
+ 
     ## SPLITREADSEARCH STAT
     if split:
-        df_split=parse_split(split.name)
-        global_stat_split = dict()
-        global_stat_split["0Mean split length"] = df_split['split_length'].mean()
-        global_stat_split["1Number of split reads by split border"] = df_split.shape[0]
+        df_split=parse_split(split.name)   
+        meanSplit=df_split['split_length'].mean()
+        nbSplit=df_split.shape[0]
+        data = {'titles': ['Mean split length', 'Number of split reads by split border'], 'values': [meanSplit, nbSplit] }
+        df_splitRead = pd.DataFrame(data, columns = ['titles', 'values'])
         c = 2
-        #for k, v in (df_split.split_borders.value_counts()).items() :
         for k, v in (df_split['split_borders'].value_counts()).items() :
-            global_stat_split[str(c)+k] = v
+            new_row = {'titles':k, 'values':v}
+            #append row to the dataframe
+            df_splitRead = df_splitRead.append(new_row, ignore_index=True)
             c+=1
-        html += get_html_split_descr(global_stat_split)
+        
+        html += get_html_split_descr(df_splitRead)
 
     # Candidats statistics
     if candidat:
