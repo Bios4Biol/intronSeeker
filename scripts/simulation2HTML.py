@@ -211,12 +211,10 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         nbSplit=df_split.shape[0]
         data = {'titles': ['Mean split length', 'Number of split reads by split border'], 'values': [meanSplit, nbSplit] }
         df_splitRead = pd.DataFrame(data, columns = ['titles', 'values'])
-        c = 2
         for k, v in (df_split['split_borders'].value_counts()).items() :
             new_row = {'titles':k, 'values':v}
             #append row to the dataframe
             df_splitRead = df_splitRead.append(new_row, ignore_index=True)
-            c+=1
         
         html += get_html_split_descr(df_splitRead)
 
