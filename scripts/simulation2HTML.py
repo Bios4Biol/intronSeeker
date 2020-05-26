@@ -211,10 +211,33 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         nbSplit=df_split.shape[0]
         data = {'titles': ['Mean split length', 'Number of intron reads by split border'], 'values': [meanSplit, nbSplit] }
         df_splitRead = pd.DataFrame(data, columns = ['titles', 'values'])
+        n = 0
+        nbOtherJunctions = 0
+        nbCanonic        = 0
+        nbNonCanonic     = 0
+        # and k != "GT_AG" and k != "CT_AC" and k != "GC_AG" and k != "AT_AC"
+        df_split.sort_values(by=['split_borders'])
         for k, v in (df_split['split_borders'].value_counts()).items() :
-            new_row = {'titles':k, 'values':v}
-            #append row to the dataframe
-            df_splitRead = df_splitRead.append(new_row, ignore_index=True)
+            if k == "GT_AG" or k == "CT_AC":
+                nbCanonic += v
+            elif k == "GC_AG" or k == "AT_AC":
+                nbNonCanonic += v       
+            else:
+                if n <= 11:
+                    row_top_10 = {'titles':k, 'values':v}
+                    df_splitRead = df_splitRead.append(row_top_10, ignore_index=True)
+                else:
+                    nbOtherJunctions += v
+            n += 1
+            
+        row_canonic    = {'titles':"Canonical junction (GT_AG or CT_AC)", 'values':nbCanonic}
+        row_no_canonic = {'titles':"No canonical junction (GC_AG or AT_AC)", 'values':nbNonCanonic}
+        row_others     = {'titles':"Other junctions", 'values': nbOtherJunctions}
+            
+        #append rows to df_splitRead dataframe
+        df_splitRead = df_splitRead.append(row_canonic, ignore_index=True)
+        df_splitRead = df_splitRead.append(row_no_canonic, ignore_index=True)
+        df_splitRead = df_splitRead.append(row_others, ignore_index=True)
         
         html += get_html_split_descr(df_splitRead)
 
