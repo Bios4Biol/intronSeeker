@@ -207,10 +207,11 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     ## SPLITREADSEARCH STAT
     if split:
         df_split=parse_split(split.name)   
-        meanSplit=df_split['split_length'].mean()
-        nbSplit=df_split.shape[0]
-        data = {'titles': ['Mean split length', 'Number of intron reads by split border'], 'values': [meanSplit, nbSplit] }
-        df_splitRead = pd.DataFrame(data, columns = ['titles', 'values'])
+        meanSplit =df_split['split_length'].mean()
+        nbSplit   =df_split.shape[0]
+        data      = {'titles': ['Mean split length', 'Number of intron reads by split border'], 'values': [meanSplit, nbSplit] }
+        df_splitRead    = pd.DataFrame(data, columns = ['titles', 'values'])
+        df_splitRead_10 = pd.DataFrame(columns = ['titles', 'values'])
         n = 0
         nbOtherJunctions = 0
         nbCanonic        = 0
@@ -225,18 +226,19 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
             else:
                 if n <= 11:
                     row_top_10 = {'titles':k, 'values':v}
-                    df_splitRead = df_splitRead.append(row_top_10, ignore_index=True)
+                    df_splitRead_10 = df_splitRead_10.append(row_top_10, ignore_index=True)
                 else:
                     nbOtherJunctions += v
             n += 1
             
         row_canonic    = {'titles':"Canonical junction (GT_AG or CT_AC)", 'values':nbCanonic}
-        row_no_canonic = {'titles':"No canonical junction (GC_AG or AT_AC)", 'values':nbNonCanonic}
+        row_no_canonic = {'titles':"Non canonical junction (GC_AG or AT_AC)", 'values':nbNonCanonic}
         row_others     = {'titles':"Other junctions", 'values': nbOtherJunctions}
             
         #append rows to df_splitRead dataframe
         df_splitRead = df_splitRead.append(row_canonic, ignore_index=True)
         df_splitRead = df_splitRead.append(row_no_canonic, ignore_index=True)
+        df_splitRead = df_splitRead.append(df_splitRead_10)
         df_splitRead = df_splitRead.append(row_others, ignore_index=True)
         
         html += get_html_split_descr(df_splitRead)
