@@ -202,13 +202,13 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#candidatstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Candidats statistics
+				    	Detected introns statistics
 			    	</a>
 			    </li>
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#compCandidatsFeatures">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Comparison candidats features
+				    	Comparison detected introns / features
 			    	</a>
 			    </li>
                 '''
@@ -398,7 +398,7 @@ def get_html_split_descr(df_splitRead:dict):
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Split reads</h5>
+            <h5>Intron reads</h5>
                 <span class="anchor" id="splitstat"></span>
 ''' + df_to_table(df_splitRead, 2, True) + '''  
             </div>
@@ -412,19 +412,19 @@ def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict, global_
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Candidats</h5>
+            <h5>Detected introns</h5>
                 <span class="anchor" id="candidatstat"></span>
 '''+dict_to_table(global_stat_candidat,3,True)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-8">
-                <h5>Candidats depth distribution</h5>
+                <h5>Detected introns depth distribution</h5>
                 <span class="anchor" id="contigs_len_dist"></span>
 '''+plot_hist_candidats_depth(df_candidat['depth'])+'''
             </div>
         </div>  
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Comparison between features in GTF and candidats list</h5>
+            <h5>Comparison between features in GTF and detected introns list</h5>
                 <span class="anchor" id="compCandidatsFeatures"></span>
 '''+dict_to_table(global_stat_candidat_vs_gtf,-1,True)+'''
             </div>

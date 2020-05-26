@@ -209,7 +209,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         df_split=parse_split(split.name)   
         meanSplit=df_split['split_length'].mean()
         nbSplit=df_split.shape[0]
-        data = {'titles': ['Mean split length', 'Number of split reads by split border'], 'values': [meanSplit, nbSplit] }
+        data = {'titles': ['Mean split length', 'Number of intron reads by split border'], 'values': [meanSplit, nbSplit] }
         df_splitRead = pd.DataFrame(data, columns = ['titles', 'values'])
         for k, v in (df_split['split_borders'].value_counts()).items() :
             new_row = {'titles':k, 'values':v}
@@ -239,12 +239,12 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, noCanonical=candidatsVsFeatures(df_candidat, df_features)
 
         global_stat_candidat_vs_gtf = dict()
-        global_stat_candidat_vs_gtf["0Number of candidats"] = df_candidat.shape[0]
+        global_stat_candidat_vs_gtf["0Number of detected introns"] = df_candidat.shape[0]
         global_stat_candidat_vs_gtf["1Number of features"] = df_features.shape[0]
-        global_stat_candidat_vs_gtf["2Number of candidats including features (same start/end)"] = nbSameStartEnd
-        global_stat_candidat_vs_gtf["3Candidats not found in GTF"]=df_candidat.shape[0]- nbTotCandidatsIncludingFeatures
-        global_stat_candidat_vs_gtf["4Candidats length > max len (80 by default)"]=nbLen
-        global_stat_candidat_vs_gtf["5Candidats depth < min depth (1 by default) "]= minDepth
+        global_stat_candidat_vs_gtf["2Number of detected introns corresponding features (same start/end)"] = nbSameStartEnd
+        global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]=df_candidat.shape[0]- nbTotCandidatsIncludingFeatures
+        global_stat_candidat_vs_gtf["4Detected introns length > max len (80 by default)"]=nbLen
+        global_stat_candidat_vs_gtf["5Detected introns depth <= min depth (1 by default) "]= minDepth
         global_stat_candidat_vs_gtf["6Features without canonical borders (SS, neither CT_AC nor GT_AG)"]=noCanonical
 
         html += get_html_candidat_descr(global_stat_candidat, df_candidat, global_stat_candidat_vs_gtf)

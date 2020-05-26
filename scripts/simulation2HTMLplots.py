@@ -56,10 +56,10 @@ def plot_hist_candidats_depth(candidatsDepth):
     data = [candidats]
     layout = go.Layout(
          xaxis=dict(
-            title='Candidats depth'
+            title='Detected introns depth'
         ),
         yaxis=dict(
-            title='Number of candidats'
+            title='Number of detected introns'
         )
     )
     fig = go.Figure(data=data, layout=layout)
