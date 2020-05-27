@@ -220,7 +220,13 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
 				    	Intron insertion
 			    	</a>
 			    </li>'''    
-    r +='''            
+    r +='''      
+                <li class="nav-item">
+                    <a class="nav-link" href="#precision">
+                        <span class="oi oi-circle-check" aria-hidden="true"></span>
+                        Precision, recall & F1 score
+                    </a>
+                </li> 
                 <li class="nav-item">
                     <a class="nav-link" href="#glossary">
                         <span class="oi oi-question-mark" aria-hidden="true"></span>
@@ -273,19 +279,19 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
                 <h5>Contigs statistics</h5>
                 <span id="gstat" class="oi oi-question-mark" aria-hidden="true" title="Number of features in GTF: Number of distinct features from all GTF lines"></span>
                 
-'''+dict_to_table(global_stat,7,True)+'''
+'''+dict_to_table(global_stat,7,True, False)+'''
             </div>   
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Number of sequences by feature type</h5>
                 <span class="oi oi-question-mark" aria-hidden="true" title="Number of ctg by feature from all GTF lines (Ex: 'Exon' see in X ctg, 'Intron' see in Y ctg, ...)"></span>
                 <span class="anchor" id="nb_ctg_by_feature"></span>
-'''+dict_to_table(nb_ctg_by_feature,-1,False)+'''
+'''+dict_to_table(nb_ctg_by_feature,-1,False, False)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Number of sequences with same feature(s)</h5>
                 <span class="oi oi-question-mark" aria-hidden="true" title="Number of features profiles by ctg (Ex: '1 Exon & 2 Intron' see in X ctg, '3 Introns' see in Y ctg , ...) "></span>
                 <span class="anchor" id="nb_ctg_by_feature"></span>
-'''+dict_to_table(ctg_descr,-1,False)+'''
+'''+dict_to_table(ctg_descr,-1,False, False)+'''
             </div>
         </div>
 '''
@@ -338,7 +344,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
             <div class="mt-4 mr-4 pl-0 col-md-4">
                 <h5>Global statistics</h5>
                 <span class="anchor" id="readgstat"></span>
-'''+dict_to_table(global_stat_fastq,-1,True)+'''
+'''+dict_to_table(global_stat_fastq,-1,True, False)+'''
             </div>
         </div>  
 '''
@@ -352,7 +358,7 @@ def get_html_flagstat_descr(global_stat_flagstat:dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-'''+ dict_to_table(global_stat_flagstat, -1,True) +'''
+'''+ dict_to_table(global_stat_flagstat, -1,True, False) +'''
             </div>
         </div>
 '''
@@ -364,7 +370,7 @@ def get_html_assemblathon_descr(global_stat_assemblathon:dict):
             <div class="mt-4 mr-4 pl-0 col-md-4">
             <h5>Assemblathon statistics</h5>
                 <span class="anchor" id="assemblystat"></span>
-'''+dict_to_table(global_stat_assemblathon,-1,True)+'''
+'''+dict_to_table(global_stat_assemblathon,-1,True, False)+'''
             </div>
         </div>
 '''
@@ -376,7 +382,7 @@ def get_html_table_descr(global_stats_table):
             <div class="mt-4 mr-4 pl-0 col-md-4">
             <h5>TO COMPLETE</h5>
                 <span class="anchor" id="assemblystat"></span>
-'''+dict_to_table(global_stats_table,-1,True)+'''
+'''+dict_to_table(global_stats_table,-1,True, False)+'''
             </div>
         </div>
 '''
@@ -414,7 +420,7 @@ def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict, global_
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Detected introns</h5>
                 <span class="anchor" id="candidatstat"></span>
-'''+dict_to_table(global_stat_candidat,3,True)+'''
+'''+dict_to_table(global_stat_candidat,3,True, False)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-8">
                 <h5>Detected introns depth distribution</h5>
@@ -426,12 +432,35 @@ def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict, global_
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Comparison between features in GTF and detected introns list</h5>
                 <span class="anchor" id="compCandidatsFeatures"></span>
-'''+dict_to_table(global_stat_candidat_vs_gtf,-1,True)+'''
+'''+dict_to_table(global_stat_candidat_vs_gtf,-1,True, False)+'''
             </div>
         </div>
 '''
 
     return r   
+
+# precision, recall and F1 score   
+def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int):
+    r =  '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Precision, recall and F1 score</h1>
+                <span class="anchor" id="precision"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Confusion matrix</h5>
+                <span class="anchor" id="precision"></span>
+'''+dict_to_table_3col(TP, TN, FP, FN)+'''
+            </div>
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Precision, Recall and F1 score</h5>
+                <span class="anchor" id="precision"></span>
+'''+dict_to_table(global_stat_precision,-1,True, True)+'''
+            </div>
+        </div>  
+'''
+
+    return r       
 
 
 # Define all term used in this simulation report
@@ -474,25 +503,47 @@ def get_html_footer():
 # Param 1 : dict (key, val)
 # Param 2 : int for which line number first col (key) will be right align
 # Param 3 : bool to remove first char of the key (used to sort by key)
-def dict_to_table(d : dict, i : int, rmfirstchar : bool):
+def dict_to_table(d : dict, i : int, rmfirstchar : bool, decimals : bool):
     table = '''
             <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
         	    <tbody>
-'''
+''' 
     c = 0
     for k, v in sorted(d.items(), key=lambda t: t[0]):
         table += "<tr><td class='valn"
         if(c >= i & i!=-1):
             table += " text-right"
         val=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str(v))   # Remove (nb%) in val    
-        if(rmfirstchar):
-            table += "'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(val)), ' ') + "</td></tr>"   
+        if decimals:
+            values= str(round(v, 2))
         else:
-            table += "'>" + k + "</td><td class='valn text-right'>" + split_int(round(float(val)), ' ') + "</td></tr>"
+            values= split_int(round(float(val)), ' ')   
+        if(rmfirstchar):
+            table += "'>" + k[1:] + "</td><td class='valn text-right'>" + values + "</td></tr>"   
+        else:
+            table += "'>" + k + "</td><td class='valn text-right'>" + values + "</td></tr>"
         c += 1
     table += "</tbody></table>"
     return table
 
+# Return HTML table from dict (as dict_to_table function) but with 3 columns instead of 2
+# Param 1 : dict (key, val)
+def dict_to_table_3col(TP: int, TN: int, FP: int, FN:int):
+    table = '''
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+'''
+    table += "<tr> <td></td><td class='valn text-center'>Not found</td><td class='valn text-center'>Found</td></tr>"
+    table += "<tr><td class='valn text-center'>Undetectable</td><td class='valn text-center'>" + str(FN) + "</td><td class='valn text-center'>" + str(FP) + "</td><td class='valn text-right'>Actual detectable</td></tr>"  
+    table += "<tr><td class='valn text-center'>Detectable</td><td class='valn text-center'>" + str(TN) + "</td><td class='valn text-center'>" + str(TP) + "</td><td class='valn text-right'>"+str(TN+TP)+"</td></tr>"  
+    table += "<tr><td></td><td class='valn text-right'>Total detectable found</td><td class='valn text-center'>" + str(TP+FP) + "</td></tr>"  
+    table += "</tbody></table>"
+    return table
+
+# Return HTML table from dataframe
+# Param 1 : dict (key, val)
+# Param 2 : int for which line number first col (key) will be right align
+# Param 3 : bool to remove first char of the key (used to sort by key)
 def df_to_table(df : dict, i : int, changeTextSide : bool):
     table = '''
             <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">

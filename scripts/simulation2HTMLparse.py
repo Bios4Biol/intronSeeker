@@ -159,13 +159,13 @@ def candidatsVsFeatures(df_candidat, df_features):
 
     # Features with depth inf or equals to 1 (value by default)
     condDepth = (df_candidat['depth'] <= 1)
-    minDepth = len(df_candidat.loc[condDepth])   
+    minDepth  = len(df_candidat.loc[condDepth]) 
 
     # Number of features without canonical junctions
-    condNoCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
-    noCanonical = len(df_candidat.loc[condNoCanonical])
+    condNonCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
+    nonCanonical = len(df_candidat.loc[condNonCanonical])
     
-    return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, noCanonical
+    return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, nonCanonical
 
 # Return panda which contains split desc 
 def parse_split(split):

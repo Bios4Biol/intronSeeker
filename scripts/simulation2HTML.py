@@ -181,8 +181,9 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_flagstat = dict()
         global_stat_flagstat["0Number of mapped"] = mapped
         global_stat_flagstat["1Number of properly paired reads"] = proper
-        global_stat_flagstat["2Secondary"] = secondary
-        global_stat_flagstat["3Singletons"] = singletons
+        global_stat_flagstat["2Number of unmapped reads (nb QC passed - nb mapped)"] = int(nbreads) - int(mapped)
+        global_stat_flagstat["3Secondary"] = secondary
+        global_stat_flagstat["4Singletons"] = singletons
 
         html += get_html_flagstat_descr(global_stat_flagstat)
    
@@ -261,16 +262,16 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
             c+=1
 
         # Comparison between candidats and features from GTF file
-        nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, noCanonical=candidatsVsFeatures(df_candidat, df_features)
+        nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features)
 
         global_stat_candidat_vs_gtf = dict()
-        global_stat_candidat_vs_gtf["0Number of detected introns"] = df_candidat.shape[0]
-        global_stat_candidat_vs_gtf["1Number of features"] = df_features.shape[0]
+        global_stat_candidat_vs_gtf["0Number of detected introns"]          = df_candidat.shape[0]
+        global_stat_candidat_vs_gtf["1Number of features"]                  = df_features.shape[0]
         global_stat_candidat_vs_gtf["2Number of detected introns corresponding features (same start/end)"] = nbSameStartEnd
-        global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]=df_candidat.shape[0]- nbTotCandidatsIncludingFeatures
-        global_stat_candidat_vs_gtf["4Detected introns length > max len (80 by default)"]=nbLen
+        global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]   =df_candidat.shape[0]- nbTotCandidatsIncludingFeatures
+        global_stat_candidat_vs_gtf["4Detected introns length >= max len (80 by default)"]=nbLen
         global_stat_candidat_vs_gtf["5Detected introns depth <= min depth (1 by default) "]= minDepth
-        global_stat_candidat_vs_gtf["6Features without canonical borders (SS, neither CT_AC nor GT_AG)"]=noCanonical
+        global_stat_candidat_vs_gtf["7Features without canonical borders (SS, neither CT_AC nor GT_AG)"]=nonCanonical
 
         html += get_html_candidat_descr(global_stat_candidat, df_candidat, global_stat_candidat_vs_gtf)
 
@@ -288,7 +289,34 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
         global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
         html += get_html_assemblathon_descr(global_stat_assemblathon)    
-             
+
+    # Precision, recall and F1 score
+    ##  les "features" qui ont assez de lectures les couvrant pour être trouvées. Il n'y que celles-ci qui pourront être vues comme T (True).
+    ##  = ??  Nb candidats PASS (nbSameStartEnd)
+    # TP = nombre de "features" détectables et trouvées (assez de profondeur et bonnes bornes). 
+    # TP = nb PASS
+    TP = nbSameStartEnd
+    # TN = nombre de "features" détectables non couvertes par des lectures et/ou couvertes par un nombre de lectures après alignement sont sous le seuil de profondeur (alors que dans la simulation c'était le cas)
+    # nb features - nb PASS
+    TN =  df_features.shape[0] - nbSameStartEnd
+    # FP = nombre de zones hors "feature" ou "features" indétectables avec une couverture insuffisante
+    # nb candidats - nb PASS
+    FP = df_candidat.shape[0] - nbSameStartEnd
+    # FN = nombre de zones hors "feature" ou "features" indétectables trouvées (passant le seuil de profondeur)
+    # nb candidat - nb features
+    FN = df_candidat.shape[0] - df_features.shape[0]
+
+
+
+    global_stat_precision= dict()
+    global_stat_precision["0Precision"] = TP/(FP+TP)
+    global_stat_precision["1Recall"]    = TP/(TN+TP)
+    global_stat_precision["2F1 score"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
+
+    html += get_html_precision(global_stat_precision, TP, TN, FP, FN)
+
+
+
     # GLOSSARY
     html += get_html_glossary()
 
