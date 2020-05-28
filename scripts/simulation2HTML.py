@@ -210,7 +210,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         df_split=parse_split(split.name)   
         meanSplit =df_split['split_length'].mean()
         nbSplit   =df_split.shape[0]
-        data      = {'titles': ['Mean split length', 'Number of intron reads by split border'], 'values': [meanSplit, nbSplit] }
+        data      = {'titles': ['Mean length of potential retained introns', 'Number of reads overlapping potential retained introns'], 'values': [meanSplit, nbSplit] }
         df_splitRead    = pd.DataFrame(data, columns = ['titles', 'values'])
         df_splitRead_10 = pd.DataFrame(columns = ['titles', 'values'])
         n = 0
@@ -249,14 +249,15 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         df_candidat = parse_candidat(candidat.name)
         print('candidat :' , df_candidat.head(5))
         global_stat_candidat = dict()
-        global_stat_candidat["0Mean length"] = 0
+        global_stat_candidat["0Number"] = df_candidat.shape[0]
+        global_stat_candidat["1Mean length"] = 0
         for i,row in df_candidat.iterrows():
-            global_stat_candidat["0Mean length"] += row['end'] - row['start'] + 1
-        global_stat_candidat["0Mean length"] /= (df_candidat.shape[0])
-        global_stat_candidat["0Mean length"] = round(global_stat_candidat["0Mean length"], 2)
-        global_stat_candidat["1Mean depth"]= round(df_candidat['depth'].mean(), 2)
-        global_stat_candidat["2Number of contigs with feature(s) & Filter"] = df_candidat.shape[0]
-        c = 3
+            global_stat_candidat["1Mean length"] += row['end'] - row['start'] + 1
+        global_stat_candidat["1Mean length"] /= (df_candidat.shape[0])
+        global_stat_candidat["1Mean length"] = round(global_stat_candidat["1Mean length"], 2)
+        global_stat_candidat["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
+        global_stat_candidat["3Number by category"] = ''
+        c = 4
         for k, v in (df_candidat['filter'].value_counts()).items() :
             global_stat_candidat[str(c)+k] = v
             c+=1
@@ -291,6 +292,11 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         html += get_html_assemblathon_descr(global_stat_assemblathon)    
 
     # Precision, recall and F1 score
+    # TP is the number of detectable and found features (int value)
+    # TN is the number of detectable and not found features (int value)
+    # FP is the number of undetectable and found features (int value)
+    # FN is the number of undetectable and not found features (int value)
+
     ##  les "features" qui ont assez de lectures les couvrant pour être trouvées. Il n'y que celles-ci qui pourront être vues comme T (True).
     ##  = ??  Nb candidats PASS (nbSameStartEnd)
     # TP = nombre de "features" détectables et trouvées (assez de profondeur et bonnes bornes). 

@@ -194,7 +194,7 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#splitstat">
 				    	<span class="oi oi-graph" aria-hidden="true"></span>
-				    	Split detection
+				    	Intron reads
 			    	</a>
 			    </li>'''  
     if candidat:
@@ -503,6 +503,7 @@ def get_html_footer():
 # Param 1 : dict (key, val)
 # Param 2 : int for which line number first col (key) will be right align
 # Param 3 : bool to remove first char of the key (used to sort by key)
+# Param 4 : bool to choose if number are printed as formated int by split_int function (decimals=False) or float (decimals=True)
 def dict_to_table(d : dict, i : int, rmfirstchar : bool, decimals : bool):
     table = '''
             <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
@@ -527,7 +528,10 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool, decimals : bool):
     return table
 
 # Return HTML table from dict (as dict_to_table function) but with 3 columns instead of 2
-# Param 1 : dict (key, val)
+# Param 1 : TP is the number of detectable and found features (int value)
+# Param 2 : TN is the number of detectable and not found features (int value)
+# Param 3 : FP is the number of undetectable and found features (int value)
+# Param 4 : FN is the number of undetectable and not found features (int value)
 def dict_to_table_3col(TP: int, TN: int, FP: int, FN:int):
     table = '''
             <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
@@ -543,7 +547,7 @@ def dict_to_table_3col(TP: int, TN: int, FP: int, FN:int):
 # Return HTML table from dataframe
 # Param 1 : dict (key, val)
 # Param 2 : int for which line number first col (key) will be right align
-# Param 3 : bool to remove first char of the key (used to sort by key)
+# Param 3 : bool to change text side in cells' tab
 def df_to_table(df : dict, i : int, changeTextSide : bool):
     table = '''
             <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
