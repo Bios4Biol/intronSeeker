@@ -406,12 +406,13 @@ def get_html_split_descr(df_splitRead:dict):
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Intron reads</h5>
                 <span class="anchor" id="splitstat"></span>
-''' + df_to_table(df_splitRead, 2, True) + '''  
+''' +  dict_to_table(df_splitRead, 3, True, False) + '''  
             </div>
         </div>  
 '''
 
     return r   
+    #  df_to_table(df_splitRead, 2, True)
 
 # Plots candidats stats   
 def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict, global_stat_candidat_vs_gtf:dict):

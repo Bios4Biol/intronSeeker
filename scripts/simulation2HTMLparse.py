@@ -142,6 +142,12 @@ def parse_candidat(candidat) :
     return t.set_index('key')
 
 # Return comparison between dataframes df_candidat and df_features
+# Return 5 stats:
+# nbTotCandidatsIncludingFeatures : Total number of candidats including features
+# nbSameStartEnd : Number of features with the same start and end than candidats
+# nbLen : Features length >= 80 (default value in Split Read Search)
+# minDepth : Features with depth inf or equals to 1 (value by default)
+# nonCanonical : Number of features without canonical junctions
 def candidatsVsFeatures(df_candidat, df_features):
     # Join candidat and features dataframe
     df_candidat = df_candidat.join(df_features,  lsuffix='_candidat', rsuffix='_features')

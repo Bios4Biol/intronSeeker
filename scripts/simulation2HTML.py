@@ -189,65 +189,77 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
    
     html += get_html_results()
 
-    # ## SPLITREADSEARCH STAT
-    # if split:
-    #     df_split=parse_split(split.name)
-    #     global_stat_split = dict()
-    #     global_stat_split["0Mean split length"] = df_split['split_length'].mean()
-    #     global_stat_split["1Number of split reads by split border"] = df_split.shape[0]
-    #     c = 2
-    #     #for k, v in (df_split.split_borders.value_counts()).items() :
-    #     for k, v in (df_split['split_borders'].value_counts()).items() :
-    #         global_stat_split[str(c)+" - "+k] = v
-    #         print('tab string c',str(c))
-    #         print('tab k', k)
-    #         print('tab v', v)
-    #         c+=1
-    #     html += get_html_split_descr(global_stat_split)
- 
     ## SPLITREADSEARCH STAT
+    # if split:
+    #     df_split=parse_split(split.name)   
+    #     meanSplit =df_split['split_length'].mean()
+    #     nbSplit   =df_split.shape[0]
+    #     data      = {'titles': ['Number of reads overlapping potential retained introns', 'Mean length of potential retained introns'], 'values': [nbSplit, meanSplit] }
+    #     df_splitRead    = pd.DataFrame(data, columns = ['titles', 'values'])
+    #     df_splitRead_10 = pd.DataFrame(columns = ['titles', 'values'])
+    #     n = 0
+    #     nbOtherJunctions = 0
+    #     nbCanonic        = 0
+    #     top10            = 0
+    #     # and k != "GT_AG" and k != "CT_AC" and k != "GC_AG" and k != "AT_AC"
+    #     df_split.sort_values(by=['split_borders'])
+    #     for k, v in (df_split['split_borders'].value_counts()).items() :
+    #         if k == "GT_AG" or k == "CT_AC":
+    #             nbCanonic += v
+    #         # elif k == "GC_AG" or k == "AT_AC":
+    #         #     nbNonCanonic += v       
+    #         else:
+    #             if n <= 11:
+    #                 row_top_10 = {'titles':k, 'values':v}
+    #                 top10 += v
+    #                 df_splitRead_10 = df_splitRead_10.append(row_top_10, ignore_index=True)
+    #             else:
+    #                 nbOtherJunctions += v
+    #         n += 1
+            
+    #     row_canonic    = {'titles':"Canonical junction (GT_AG or CT_AC)", 'values':nbCanonic}
+    #     row_no_canonic = {'titles':"Non canonical junction", 'values':top10+nbOtherJunctions}
+    #     row_others     = {'titles':"Other junctions", 'values': nbOtherJunctions}
+            
+    #     #append rows to df_splitRead dataframe
+    #     df_splitRead = df_splitRead.append(row_canonic, ignore_index=True)
+    #     df_splitRead = df_splitRead.append(row_no_canonic, ignore_index=True)
+    #     df_splitRead = df_splitRead.append(df_splitRead_10)
+    #     df_splitRead = df_splitRead.append(row_others, ignore_index=True)
+        
+    #     html += get_html_split_descr(df_splitRead)
+
+
+     ## SPLITREADSEARCH STAT
     if split:
         df_split=parse_split(split.name)   
-        meanSplit =df_split['split_length'].mean()
-        nbSplit   =df_split.shape[0]
-        data      = {'titles': ['Mean length of potential retained introns', 'Number of reads overlapping potential retained introns'], 'values': [meanSplit, nbSplit] }
-        df_splitRead    = pd.DataFrame(data, columns = ['titles', 'values'])
-        df_splitRead_10 = pd.DataFrame(columns = ['titles', 'values'])
-        n = 0
-        nbOtherJunctions = 0
+        global_stat_split = dict()
+        global_stat_split["0Number of reads overlapping potential retained introns"]= df_split.shape[0]
+        global_stat_split["1Mean length of potential retained introns"]= df_split['split_length'].mean()
         nbCanonic        = 0
-        nbNonCanonic     = 0
-        # and k != "GT_AG" and k != "CT_AC" and k != "GC_AG" and k != "AT_AC"
         df_split.sort_values(by=['split_borders'])
         for k, v in (df_split['split_borders'].value_counts()).items() :
             if k == "GT_AG" or k == "CT_AC":
                 nbCanonic += v
-            elif k == "GC_AG" or k == "AT_AC":
-                nbNonCanonic += v       
-            else:
+        global_stat_split["2Canonical junction (GT_AG or CT_AC)"]= nbCanonic
+        c = 3
+        n = 0
+        nbOtherJunctions = 0
+        for k, v in (df_split['split_borders'].value_counts()).items() :
                 if n <= 11:
                     row_top_10 = {'titles':k, 'values':v}
-                    df_splitRead_10 = df_splitRead_10.append(row_top_10, ignore_index=True)
+                    global_stat_split[str(c)+k] = v
                 else:
                     nbOtherJunctions += v
-            n += 1
-            
-        row_canonic    = {'titles':"Canonical junction (GT_AG or CT_AC)", 'values':nbCanonic}
-        row_no_canonic = {'titles':"Non canonical junction (GC_AG or AT_AC)", 'values':nbNonCanonic}
-        row_others     = {'titles':"Other junctions", 'values': nbOtherJunctions}
-            
-        #append rows to df_splitRead dataframe
-        df_splitRead = df_splitRead.append(row_canonic, ignore_index=True)
-        df_splitRead = df_splitRead.append(row_no_canonic, ignore_index=True)
-        df_splitRead = df_splitRead.append(df_splitRead_10)
-        df_splitRead = df_splitRead.append(row_others, ignore_index=True)
-        
-        html += get_html_split_descr(df_splitRead)
+        n += 1
+        global_stat_split[str(c)+"Other junctions"] = nbOtherJunctions
+        c+=1
+
+        html += get_html_split_descr(global_stat_split)    
 
     # Candidats statistics
     if candidat:
         df_candidat = parse_candidat(candidat.name)
-        print('candidat :' , df_candidat.head(5))
         global_stat_candidat = dict()
         global_stat_candidat["0Number"] = df_candidat.shape[0]
         global_stat_candidat["1Mean length"] = 0
@@ -256,7 +268,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_candidat["1Mean length"] /= (df_candidat.shape[0])
         global_stat_candidat["1Mean length"] = round(global_stat_candidat["1Mean length"], 2)
         global_stat_candidat["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
-        global_stat_candidat["3Number by category"] = ''
+        global_stat_candidat["3Number by category"]= df_candidat.shape[0]  #if case 3 empty : KeyError: '3Number by category'
         c = 4
         for k, v in (df_candidat['filter'].value_counts()).items() :
             global_stat_candidat[str(c)+k] = v
@@ -269,7 +281,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_candidat_vs_gtf["0Number of detected introns"]          = df_candidat.shape[0]
         global_stat_candidat_vs_gtf["1Number of features"]                  = df_features.shape[0]
         global_stat_candidat_vs_gtf["2Number of detected introns corresponding features (same start/end)"] = nbSameStartEnd
-        global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]   =df_candidat.shape[0]- nbTotCandidatsIncludingFeatures
+        global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]   = df_candidat.shape[0]- nbTotCandidatsIncludingFeatures
         global_stat_candidat_vs_gtf["4Detected introns length >= max len (80 by default)"]=nbLen
         global_stat_candidat_vs_gtf["5Detected introns depth <= min depth (1 by default) "]= minDepth
         global_stat_candidat_vs_gtf["7Features without canonical borders (SS, neither CT_AC nor GT_AG)"]=nonCanonical
