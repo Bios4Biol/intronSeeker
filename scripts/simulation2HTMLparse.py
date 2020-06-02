@@ -165,7 +165,7 @@ def parse_candidat(candidat) :
 # nbLen : Features length >= 80 (default value in Split Read Search)
 # minDepth : Features with depth inf or equals to 1 (value by default)
 # nonCanonical : Number of features without canonical junctions
-def candidatsVsFeatures(df_candidat, df_features):
+def candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen):
     # Join candidat and features dataframe
     df_candidat = df_candidat.join(df_features,  lsuffix='_candidat', rsuffix='_features')
    
@@ -175,20 +175,32 @@ def candidatsVsFeatures(df_candidat, df_features):
     # Number of features with the same start and end than candidats
     conditionStartEnd = ((df_candidat['start_candidat'] == df_candidat['start_features']) & (df_candidat['end_candidat'] == df_candidat['end_features']))
     nbSameStartEnd=len(df_candidat.loc[conditionStartEnd]) - 1 # -1 for header
+    # Other conditions with detected intron overlap feature
+    #leftOverlap : CandidatStart >= featureStart and candidatStop >= featureStop
+    conditionLeftOverlap = ((df_candidat['start_candidat'] >= df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
+    nbLeftOverlap=len(df_candidat.loc[conditionLeftOverlap]) - 1 # -1 for header
+    #rightOverlap : CandidatStop >= featureStop and CandidatStart > featureStart
+    conditionRightOverlap = ((df_candidat['start_candidat'] > df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
+    nbRightOverlap=len(df_candidat.loc[conditionRightOverlap]) - 1 # -1 for header
+    #maxOverlap : CandidatStart <= featureStart and CandidatStop >= featuresStop
+    conditionMaxOverlap = ((df_candidat['start_candidat'] <= df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
+    nbMaxOverlap=len(df_candidat.loc[conditionMaxOverlap]) - 1 # -1 for header
+
+    nbOverlap = nbSameStartEnd + nbLeftOverlap + nbRightOverlap + nbMaxOverlap
    
-    # Features length >= 80 (default value in Split Read Search)
-    condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= 80)
+    # Features length >= maxlen (max len value in Split Read Search)
+    condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= float(maxlen))
     nbLen   = len(df_candidat.loc[condLen]) 
 
-    # Features with depth inf or equals to 1 (value by default)
-    condDepth = (df_candidat['depth'] <= 1)
-    minDepth  = len(df_candidat.loc[condDepth]) 
+    # Features with depth inf or equals to mindepth (value in Split Read Search)
+    condDepth = (df_candidat['depth'] <= int(mindepth))
+    minimumDepth  = len(df_candidat.loc[condDepth]) 
 
     # Number of features without canonical junctions
     condNonCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
     nonCanonical = len(df_candidat.loc[condNonCanonical])
     
-    return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, nonCanonical
+    return nbTotCandidatsIncludingFeatures, nbOverlap, nbLen, minimumDepth, nonCanonical
 
 # Return panda which contains split desc 
 def parse_split(split):

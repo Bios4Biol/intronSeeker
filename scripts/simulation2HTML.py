@@ -87,7 +87,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     print('mfasta head :' , df_mfasta.head(5))
     print('library head :' , df_library.head(5))
     print('features head :', df_features.head(5))
-    df_features.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_features.csv')
+    
 
     # HEADER
     html = get_html_header()
@@ -190,47 +190,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
    
     html += get_html_results()
 
-    ## SPLITREADSEARCH STAT
-    # if split:
-    #     df_split=parse_split(split.name)   
-    #     meanSplit =df_split['split_length'].mean()
-    #     nbSplit   =df_split.shape[0]
-    #     data      = {'titles': ['Number of reads overlapping potential retained introns', 'Mean length of potential retained introns'], 'values': [nbSplit, meanSplit] }
-    #     df_splitRead    = pd.DataFrame(data, columns = ['titles', 'values'])
-    #     df_splitRead_10 = pd.DataFrame(columns = ['titles', 'values'])
-    #     n = 0
-    #     nbOtherJunctions = 0
-    #     nbCanonic        = 0
-    #     top10            = 0
-    #     # and k != "GT_AG" and k != "CT_AC" and k != "GC_AG" and k != "AT_AC"
-    #     df_split.sort_values(by=['split_borders'])
-    #     for k, v in (df_split['split_borders'].value_counts()).items() :
-    #         if k == "GT_AG" or k == "CT_AC":
-    #             nbCanonic += v
-    #         # elif k == "GC_AG" or k == "AT_AC":
-    #         #     nbNonCanonic += v       
-    #         else:
-    #             if n <= 11:
-    #                 row_top_10 = {'titles':k, 'values':v}
-    #                 top10 += v
-    #                 df_splitRead_10 = df_splitRead_10.append(row_top_10, ignore_index=True)
-    #             else:
-    #                 nbOtherJunctions += v
-    #         n += 1
-            
-    #     row_canonic    = {'titles':"Canonical junction (GT_AG or CT_AC)", 'values':nbCanonic}
-    #     row_no_canonic = {'titles':"Non canonical junction", 'values':top10+nbOtherJunctions}
-    #     row_others     = {'titles':"Other junctions", 'values': nbOtherJunctions}
-            
-    #     #append rows to df_splitRead dataframe
-    #     df_splitRead = df_splitRead.append(row_canonic, ignore_index=True)
-    #     df_splitRead = df_splitRead.append(row_no_canonic, ignore_index=True)
-    #     df_splitRead = df_splitRead.append(df_splitRead_10)
-    #     df_splitRead = df_splitRead.append(row_others, ignore_index=True)
-        
-    #     html += get_html_split_descr(df_splitRead)
-
-
      ## SPLITREADSEARCH STAT
     if split:
         df_split=parse_split(split.name)   
@@ -276,20 +235,19 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
             c+=1
 
         # Comparison between candidats and features from GTF file
-        nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features)
+        nbTotCandidatsIncludingFeatures, nbOverlap, nbLen, minimumDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen)
 
         global_stat_candidat_vs_gtf = dict()
         global_stat_candidat_vs_gtf["0Number of detected introns"]          = global_stat_candidat["0Number"]
         global_stat_candidat_vs_gtf["1Number of features"]                  = df_features.shape[0]
-        global_stat_candidat_vs_gtf["2Number of detected introns corresponding features (same start/end)"] = nbSameStartEnd
+        global_stat_candidat_vs_gtf["2Number of detected introns corresponding features (Overlaps)"] = nbOverlap
         global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]   = global_stat_candidat["0Number"]- nbTotCandidatsIncludingFeatures
         global_stat_candidat_vs_gtf["4Detected introns length >= max len ("+ mindepth +")"]=nbLen
-        global_stat_candidat_vs_gtf["5Detected introns depth <= min depth ("+ maxlen +") "]= minDepth
+        global_stat_candidat_vs_gtf["5Detected introns depth <= min depth ("+ maxlen +") "]= minimumDepth
         global_stat_candidat_vs_gtf["7Features without canonical borders (SS, neither CT_AC nor GT_AG)"]=nonCanonical
 
         html += get_html_candidat_descr(global_stat_candidat, df_candidat)
 
-    
     #Compare assemblathon files
     if assemblathon:
         df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
@@ -311,16 +269,14 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # FN is the number of undetectable and not found features (int value)
 
     ##  les "features" qui ont assez de lectures les couvrant pour être trouvées. Il n'y que celles-ci qui pourront être vues comme T (True).
-    ##  = ??  Nb candidats PASS (nbSameStartEnd)
     # TP = nombre de "features" détectables et trouvées (assez de profondeur et bonnes bornes). 
-    # TP = nb PASS
-    TP = nbSameStartEnd
+    TP = nbOverlap
     # TN = nombre de "features" détectables non couvertes par des lectures et/ou couvertes par un nombre de lectures après alignement sont sous le seuil de profondeur (alors que dans la simulation c'était le cas)
     # nb features - nb PASS
-    TN =  df_features.shape[0] - nbSameStartEnd
+    TN =  df_features.shape[0] - nbOverlap
     # FP = nombre de zones hors "feature" ou "features" indétectables avec une couverture insuffisante
     # nb candidats - nb PASS
-    FP = df_candidat.shape[0] - nbSameStartEnd
+    FP = df_candidat.shape[0] - nbOverlap
     # FN = nombre de zones hors "feature" ou "features" indétectables trouvées (passant le seuil de profondeur)
     # nb candidat - nb features
     FN = df_candidat.shape[0] - df_features.shape[0]
