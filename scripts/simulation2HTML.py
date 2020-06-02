@@ -87,6 +87,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     print('mfasta head :' , df_mfasta.head(5))
     print('library head :' , df_library.head(5))
     print('features head :', df_features.head(5))
+    df_features.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/toto_features.csv')
 
     # HEADER
     html = get_html_header()
@@ -259,16 +260,16 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     # Candidats statistics
     if candidat:
-        df_candidat = parse_candidat(candidat.name)
+        df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
         global_stat_candidat = dict()
         global_stat_candidat["0Number"] = df_candidat.shape[0]
         global_stat_candidat["1Mean length"] = 0
         for i,row in df_candidat.iterrows():
             global_stat_candidat["1Mean length"] += row['end'] - row['start'] + 1
-        global_stat_candidat["1Mean length"] /= (df_candidat.shape[0])
+        global_stat_candidat["1Mean length"] /= (global_stat_candidat["0Number"])
         global_stat_candidat["1Mean length"] = round(global_stat_candidat["1Mean length"], 2)
         global_stat_candidat["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
-        global_stat_candidat["3Number by category"]= df_candidat.shape[0]  #if case 3 empty : KeyError: '3Number by category'
+        global_stat_candidat["3Number by category"]= global_stat_candidat["0Number"]  #if case 3 empty : KeyError: '3Number by category'
         c = 4
         for k, v in (df_candidat['filter'].value_counts()).items() :
             global_stat_candidat[str(c)+k] = v
@@ -278,15 +279,15 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features)
 
         global_stat_candidat_vs_gtf = dict()
-        global_stat_candidat_vs_gtf["0Number of detected introns"]          = df_candidat.shape[0]
+        global_stat_candidat_vs_gtf["0Number of detected introns"]          = global_stat_candidat["0Number"]
         global_stat_candidat_vs_gtf["1Number of features"]                  = df_features.shape[0]
         global_stat_candidat_vs_gtf["2Number of detected introns corresponding features (same start/end)"] = nbSameStartEnd
-        global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]   = df_candidat.shape[0]- nbTotCandidatsIncludingFeatures
-        global_stat_candidat_vs_gtf["4Detected introns length >= max len (80 by default)"]=nbLen
-        global_stat_candidat_vs_gtf["5Detected introns depth <= min depth (1 by default) "]= minDepth
+        global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]   = global_stat_candidat["0Number"]- nbTotCandidatsIncludingFeatures
+        global_stat_candidat_vs_gtf["4Detected introns length >= max len ("+ mindepth +")"]=nbLen
+        global_stat_candidat_vs_gtf["5Detected introns depth <= min depth ("+ maxlen +") "]= minDepth
         global_stat_candidat_vs_gtf["7Features without canonical borders (SS, neither CT_AC nor GT_AG)"]=nonCanonical
 
-        html += get_html_candidat_descr(global_stat_candidat, df_candidat, global_stat_candidat_vs_gtf)
+        html += get_html_candidat_descr(global_stat_candidat, df_candidat)
 
     
     #Compare assemblathon files
@@ -331,7 +332,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     global_stat_precision["1Recall"]    = TP/(TN+TP)
     global_stat_precision["2F1 score"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
 
-    html += get_html_precision(global_stat_precision, TP, TN, FP, FN)
+    html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf)
 
 
 

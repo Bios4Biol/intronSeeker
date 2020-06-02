@@ -198,8 +198,8 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
     assemblathon_name = output_path + "_" + os.path.splitext(os.path.basename(fastafile.name))[0] + '_assemblathon.txt'
     with open(assemblathon_name,'w') as assemblathon :
-        sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
-        #sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
+        #sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
+        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
     
     ref_id_list   = [x.split("\t")[0] for x in pysam.idxstats(bamfile.name).split("\n")[:-2]]
     
@@ -232,9 +232,11 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     header_cand = ["#ID"] + list(candidates.columns.values)
     candidates.reset_index().to_csv(output_path+'_candidates.txt', header=header_cand, sep='\t', index=False)
 
-    f = open(output_path+'_candidates.txt', 'r+')
-    f.write('##mindepth: ' + str(mindepth) + '\n')
-    f.write('##maxlen: ' + str(maxlen) + '\n')
+    with open(output_path+'_candidates.txt', "r+") as f:
+        old = f.read() # read everything in the file
+        f.seek(0) # rewind
+        f.write('##mindepth:' + str(mindepth) + '\n') # write the new line before
+        f.write('##maxlen:' + str(maxlen) + '\n' + old) # write the new line before
     f.close()
 
 #########################

@@ -205,12 +205,6 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
 				    	Detected introns statistics
 			    	</a>
 			    </li>
-                <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#compCandidatsFeatures">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Comparison detected introns / features
-			    	</a>
-			    </li>
                 '''
     if assemblathon:
         r += '''                 
@@ -224,7 +218,7 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
                 <li class="nav-item">
                     <a class="nav-link" href="#precision">
                         <span class="oi oi-circle-check" aria-hidden="true"></span>
-                        Precision, recall & F1 score
+                        Analysis introns detectability
                     </a>
                 </li> 
                 <li class="nav-item">
@@ -415,7 +409,7 @@ def get_html_split_descr(df_splitRead:dict):
     #  df_to_table(df_splitRead, 2, True)
 
 # Plots candidats stats   
-def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict, global_stat_candidat_vs_gtf:dict):
+def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
@@ -429,23 +423,24 @@ def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict, global_
 '''+plot_hist_candidats_depth(df_candidat['depth'])+'''
             </div>
         </div>  
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Comparison between features in GTF and detected introns list</h5>
-                <span class="anchor" id="compCandidatsFeatures"></span>
-'''+dict_to_table(global_stat_candidat_vs_gtf,-1,True, False)+'''
-            </div>
-        </div>
+
 '''
 
     return r   
 
 # precision, recall and F1 score   
-def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int):
+def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int, global_stat_candidat_vs_gtf:dict):
     r =  '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Precision, recall and F1 score</h1>
+            <h1 class="h4">Analysis introns detectability</h1>
                 <span class="anchor" id="precision"></span>
+        </div>
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Comparison between features in GTF and detected introns list</h5>
+                <span class="anchor" id="precision"></span>
+'''+dict_to_table(global_stat_candidat_vs_gtf,-1,True, False)+'''
+            </div>
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
@@ -454,7 +449,7 @@ def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:in
 '''+dict_to_table_3col(TP, TN, FP, FN)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Precision, Recall and F1 score</h5>
+            <h5>Precision, recall and F1 score</h5>
                 <span class="anchor" id="precision"></span>
 '''+dict_to_table(global_stat_precision,-1,True, True)+'''
             </div>

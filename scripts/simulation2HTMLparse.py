@@ -135,11 +135,28 @@ def parse_control_introns(introns_coord_file) :
     table['intron'] = table.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
     return table.set_index('intron')    
     
-# Return panda which contains candidats desc 
+# Return :
+# panda which contains candidats desc 
+# mindepth (int)
+# maxlen (int)
 def parse_candidat(candidat) :
-    t = pd.read_table(candidat, usecols=[0,1,2,3,4,5,6], names=['ID', 'reference', 'start', 'end', 'depth','split_borders', 'filter'],  header=0)   #header=0 to remove commented header
+    mindepth  =0 # Extract min depth from candidates.txt file
+    maxlen    =0 # Extract max len from candidates.txt file
+    skip_rows =0 # Remove commented first 2 lines with mindepth and maxlen
+    with open(candidat,"r") as fi:
+        for ln in fi:
+            if ln.startswith("##mindepth:"):
+                mindepth=re.sub(r'([a-zA-Z0-9_]*:)', r" ", ln[2:])  #Extract value after mindepth
+            if ln.startswith("##maxlen:"):
+                maxlen=re.sub(r'([a-zA-Z0-9_]*:)', r" ", ln[2:])  #Extract value after maxlen
+            if ln.startswith("#"):
+                skip_rows += 1
+            else:
+                break
+
+    t = pd.read_table(candidat, usecols=[0,1,2,3,4,5,6], names=['ID', 'reference', 'start', 'end', 'depth','split_borders', 'filter'], skiprows=skip_rows)   #header=0 to remove commented header
     t['key'] = t['ID']
-    return t.set_index('key')
+    return t.set_index('key'), mindepth, maxlen
 
 # Return comparison between dataframes df_candidat and df_features
 # Return 5 stats:
