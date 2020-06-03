@@ -180,9 +180,9 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     :param basename: prefix for the name of output files 
     :return: nothing
     """
-    output_path = output + "/srs";
+    output_path = output + "/srs"
     if prefix:
-        output_path += "_" + prefix;
+        output_path += "_" + prefix
     
     # Create output dir if not exist
     if not os.path.exists(output) :
@@ -198,8 +198,8 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
     assemblathon_name = output_path + "_" + os.path.splitext(os.path.basename(fastafile.name))[0] + '_assemblathon.txt'
     with open(assemblathon_name,'w') as assemblathon :
-        sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
-        #sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
+        #sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
+        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
     
     ref_id_list   = [x.split("\t")[0] for x in pysam.idxstats(bamfile.name).split("\n")[:-2]]
     
@@ -229,14 +229,11 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     header_sa[0] = '#'+header_sa[0]
     split_alignments.to_csv(output_path+'_split_alignments.txt',header=header_sa,sep='\t',index=False)
     
+    f = open(output_path+'_candidates.txt', 'a')
+    f.write('##mindepth:' + str(mindepth) + '\n')
+    f.write('##maxlen:'   + str(maxlen) + '\n') 
     header_cand = ["#ID"] + list(candidates.columns.values)
-    candidates.reset_index().to_csv(output_path+'_candidates.txt', header=header_cand, sep='\t', index=False)
-
-    with open(output_path+'_candidates.txt', "r+") as f:
-        old = f.read() # read everything in the file
-        f.seek(0) # rewind
-        f.write('##mindepth:' + str(mindepth) + '\n') # write the new line before
-        f.write('##maxlen:' + str(maxlen) + '\n' + old) # write the new line before
+    candidates.reset_index().to_csv(f, header=header_cand, sep='\t', index=False)
     f.close()
 
 #########################

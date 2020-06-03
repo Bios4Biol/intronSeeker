@@ -225,7 +225,7 @@ def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
     """    
     output_path = output + "/sr"
     if prefix:
-        output_path += "_" + prefix;
+        output_path += "_" + prefix
 
     # Create output dir if not exist
     if not os.path.exists(output) :

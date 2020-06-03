@@ -202,7 +202,7 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#candidatstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Detected introns statistics
+				    	Detected introns
 			    	</a>
 			    </li>
                 '''
@@ -400,7 +400,7 @@ def get_html_split_descr(df_splitRead:dict):
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Intron reads</h5>
                 <span class="anchor" id="splitstat"></span>
-''' +  dict_to_table(df_splitRead, 3, True, False) + '''  
+''' +  dict_to_table(df_splitRead, 2, True, False) + '''  
             </div>
         </div>  
 '''

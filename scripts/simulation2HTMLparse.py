@@ -140,20 +140,20 @@ def parse_control_introns(introns_coord_file) :
 # mindepth (int)
 # maxlen (int)
 def parse_candidat(candidat) :
-    mindepth  =0 # Extract min depth from candidates.txt file
-    maxlen    =0 # Extract max len from candidates.txt file
-    skip_rows =0 # Remove commented first 2 lines with mindepth and maxlen
+    mindepth  = 0 # Extract min depth from candidates.txt file
+    maxlen    = 0 # Extract max len from candidates.txt file
+    skip_rows = 0 # Remove commented first 2 lines with mindepth and maxlen
     with open(candidat,"r") as fi:
         for ln in fi:
             if ln.startswith("##mindepth:"):
-                mindepth=re.sub(r'([a-zA-Z0-9_]*:)', r" ", ln[2:])  #Extract value after mindepth
-            if ln.startswith("##maxlen:"):
-                maxlen=re.sub(r'([a-zA-Z0-9_]*:)', r" ", ln[2:])  #Extract value after maxlen
+                mindepth=ln.split(":")[1].rstrip()
+            elif ln.startswith("##maxlen:"):
+                maxlen=ln.split(":")[1].rstrip()
             if ln.startswith("#"):
                 skip_rows += 1
             else:
                 break
-
+    
     t = pd.read_table(candidat, usecols=[0,1,2,3,4,5,6], names=['ID', 'reference', 'start', 'end', 'depth','split_borders', 'filter'], skiprows=skip_rows)   #header=0 to remove commented header
     t['key'] = t['ID']
     return t.set_index('key'), mindepth, maxlen
