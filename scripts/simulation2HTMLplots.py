@@ -51,6 +51,10 @@ def plot_hist_candidats_depth(candidatsDepth):
     candidats = go.Histogram(
         x=candidatsDepth,
         name='Candidats',
+        xbins=dict( # bins used for histogram
+        start=1,
+        size=1
+        ),
         opacity=0.85
     )
     data = [candidats]
