@@ -15,6 +15,7 @@ from simulation2HTMLparse import *
 from simulation2HTMLtags import *
 from simulation2HTMLplots import *
 
+
 #source activate ISeeker_environment;
 #cd scripts/; 
 # python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -s  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_split_alignments.txt  --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
@@ -44,6 +45,8 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         except FileExistsError as e :
             print('\nError: output file already exists.\n')
             exit(1)
+
+    print("Output dir and report html")        
 
 	### MEMO 
 	# fasta  = sequences used to generate reads
@@ -83,11 +86,11 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         )
     )
 
-    print('fasta head :' , df_fasta.head(5))
-    print('mfasta head :' , df_mfasta.head(5))
-    print('library head :' , df_library.head(5))
-    print('features head :', df_features.head(5))
-    
+    print('fasta head :' , df_fasta.head(5), '\n\n')
+    print('mfasta head :' , df_mfasta.head(5), '\n\n')
+    print('library head :' , df_library.head(5), '\n\n')
+    print('features head :', df_features.head(5), '\n\n')
+    print("Build pandas dataframes")  
 
     # HEADER
     html = get_html_header()
@@ -122,6 +125,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
    
     # INPUT FILES
     html += get_html_inputfiles(inputfiles)
+    print("List input files")
 
     # SEQUENCE STAT
     # Global stat
@@ -140,6 +144,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         c+=1
 
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
+    print("Global statistics")
 
     # READS STAT
     # Global stat
@@ -155,6 +160,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     global_stat_fastq["4Mean reads length"] = round(df_features['length'].mean())
       
     html += get_html_reads_descr(global_stat_fastq)
+    print("Reads statistics")
 
     # ABUNDANCE number of reads by contig
     # Build a dataframe with:
@@ -174,6 +180,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     df_fasta = df_fasta.assign(norm=df_tmp['norm'].values)
     del df_tmp
     html += get_html_abundance(df_fasta)
+    print("Abundance")
 
     ## ALIGNMENT STATS
     if flagstat:
@@ -189,10 +196,12 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         html += get_html_flagstat_descr(global_stat_flagstat)
    
     html += get_html_results()
+    print("Mapping statistics")
 
      ## SPLITREADSEARCH STAT
     if split:
         df_split=parse_split(split.name)   
+        print('df_split', df_split, '\n\n')
         global_stat_split = dict()
         global_stat_split["0Number of reads overlapping potential retained introns"]= df_split.shape[0]
         global_stat_split["1Mean length of potential retained introns"]= df_split['split_length'].mean()
@@ -214,11 +223,13 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_split[str(c)+"Other junctions"] = nbOtherJunctions
         global_stat_split[str(c+1)+"Canonical junction (GT_AG or CT_AC)"] = nbCanonic
         
-        html += get_html_split_descr(global_stat_split)    
+        html += get_html_split_descr(global_stat_split)   
+        print("Intron reads") 
 
     # Candidat statistics - detected introns
     if candidat:
         df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
+        print('df_candidat', df_candidat, '\n\n')
         global_stat_candidat = dict()
         global_stat_candidat["0Number"] = df_candidat.shape[0]
         global_stat_candidat["1Mean length"] = 0
@@ -246,10 +257,12 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         # global_stat_candidat_vs_gtf["7Number of features without canonical borders (SS, neither CT_AC nor GT_AG)"]=nonCanonical
 
         html += get_html_candidat_descr(global_stat_candidat, df_candidat)
+    print("Detected introns statistics and histogram")
 
     # Assemblathon files
     if assemblathon:
         df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
+        print('df_assemblathon', df_assemblathon_all, '\n\n')
         global_stat_assemblathon = dict()
         global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
         global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
@@ -260,6 +273,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
         global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
         html += get_html_assemblathon_descr(global_stat_assemblathon)    
+    print("Assemblathon statistics")
 
     # Precision, recall and F1 score
     # TP is the number of detectable and found features (int value)
@@ -295,7 +309,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf)
 
-
+    print("Detectability statistics")
 
     # GLOSSARY
     html += get_html_glossary()
@@ -306,6 +320,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     with open(output_file, "w") as f:
         f.write(html)
+
 
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser(add_help=False)

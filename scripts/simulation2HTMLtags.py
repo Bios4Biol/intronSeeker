@@ -436,7 +436,7 @@ def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:in
                 <span class="anchor" id="precision"></span>
         </div>
         <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <div class="mt-4 mr-0 pl-0 col-md-6">
             <h5>Comparison between features in GTF and detected introns list</h5>
                 <span class="anchor" id="precision"></span>
 '''+dict_to_table(global_stat_candidat_vs_gtf,-1,True, False)+'''
