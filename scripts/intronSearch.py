@@ -198,8 +198,8 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
     assemblathon_name = output_path + "_" + os.path.splitext(os.path.basename(fastafile.name))[0] + '_assemblathon.txt'
     with open(assemblathon_name,'w') as assemblathon :
-        #sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
-        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
+        sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
+        #sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
     
     ref_id_list   = [x.split("\t")[0] for x in pysam.idxstats(bamfile.name).split("\n")[:-2]]
     
