@@ -230,6 +230,14 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     if candidat:
         df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
         print('df_candidat', df_candidat, '\n\n')
+
+         # Definition dict
+        definitions = dict()
+        definitions['DP']   = "Number of detected introns depth <= min depth ("+ str(mindepth) +")"
+        definitions['LEN']  = "Number of detected introns length >= max len ("+ str(maxlen) +")"
+        definitions['SS']   = "Number of features without canonical borders (neither CT_AC nor GT_AG)"
+        definitions['PASS'] = "Number of features with canonical borders (CT_AC or GT_AG)"
+        
         global_stat_candidat = dict()
         global_stat_candidat["0Number"] = df_candidat.shape[0]
         global_stat_candidat["1Mean length"] = 0
@@ -241,8 +249,11 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_candidat["3Number by category"]= global_stat_candidat["0Number"]
         c = 4
         for k, v in (df_candidat['filter'].value_counts()).items() :
-            global_stat_candidat[str(c)+k] = v
-            c+=1
+            for key, value in definitions.items():
+                if k == key:
+                    global_stat_candidat[str(c)+k+":"+value] = v
+                    c+=1
+
 
         # Comparison between candidats and features from GTF file
         nbTotCandidatsIncludingFeatures, nbOverlap, nbLen, minimumDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen)
@@ -252,9 +263,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_candidat_vs_gtf["1Number of features"]                  = df_features.shape[0]
         global_stat_candidat_vs_gtf["2Number of detected introns corresponding features (Overlaps)"] = nbOverlap
         global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]   = global_stat_candidat["0Number"]- nbTotCandidatsIncludingFeatures
-        # global_stat_candidat_vs_gtf["4Number of detected introns length >= max len ("+ str(maxlen) +")"]=nbLen
-        # global_stat_candidat_vs_gtf["5Number of detected introns depth <= min depth ("+ str(mindepth) +") "]= minimumDepth
-        # global_stat_candidat_vs_gtf["7Number of features without canonical borders (SS, neither CT_AC nor GT_AG)"]=nonCanonical
+        
 
         html += get_html_candidat_descr(global_stat_candidat, df_candidat)
     print("Detected introns statistics and histogram")
