@@ -166,8 +166,12 @@ def parse_candidat(candidat) :
 # minDepth : Features with depth inf or equals to 1 (value by default)
 # nonCanonical : Number of features without canonical junctions
 def candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen):
+    df_candidat.to_csv('/home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-C/sample1/am/TOTO_df_candidat.csv')
+    df_features.to_csv('/home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-C/sample1/am/TOTO_df_features.csv')
+
     # Join candidat and features dataframe
     df_candidat = df_candidat.join(df_features,  lsuffix='_candidat', rsuffix='_features')
+    df_candidat.to_csv('/home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-C/sample1/am/TOTO_df_candidat_JOIN_features.csv')
    
     # Total number of candidats including features
     nbTotCandidatsIncludingFeatures = df_candidat.shape[0]
@@ -187,7 +191,7 @@ def candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen):
     nbMaxOverlap=len(df_candidat.loc[conditionMaxOverlap]) - 1 # -1 for header
 
     nbOverlap = nbSameStartEnd + nbLeftOverlap + nbRightOverlap + nbMaxOverlap
-   
+
     # Features length >= maxlen (max len value in Split Read Search)
     condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= float(maxlen))
     nbLen   = len(df_candidat.loc[condLen]) 

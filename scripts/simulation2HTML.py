@@ -242,8 +242,8 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat_candidat_vs_gtf["1Number of features"]                  = df_features.shape[0]
         global_stat_candidat_vs_gtf["2Number of detected introns corresponding features (Overlaps)"] = nbOverlap
         global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]   = global_stat_candidat["0Number"]- nbTotCandidatsIncludingFeatures
-        global_stat_candidat_vs_gtf["4Detected introns length >= max len ("+ mindepth +")"]=nbLen
-        global_stat_candidat_vs_gtf["5Detected introns depth <= min depth ("+ maxlen +") "]= minimumDepth
+        global_stat_candidat_vs_gtf["4Detected introns length >= max len ("+ str(mindepth) +")"]=nbLen
+        global_stat_candidat_vs_gtf["5Detected introns depth <= min depth ("+ str(maxlen) +") "]= minimumDepth
         global_stat_candidat_vs_gtf["7Features without canonical borders (SS, neither CT_AC nor GT_AG)"]=nonCanonical
 
         html += get_html_candidat_descr(global_stat_candidat, df_candidat)
@@ -270,13 +270,16 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     ##  les "features" qui ont assez de lectures les couvrant pour être trouvées. Il n'y que celles-ci qui pourront être vues comme T (True).
     # TP = nombre de "features" détectables et trouvées (assez de profondeur et bonnes bornes). 
-    TP = nbOverlap
+    #TP = nbOverlap - nonCanonical - minimumDepth
+    TP = nbTotCandidatsIncludingFeatures
     # TN = nombre de "features" détectables non couvertes par des lectures et/ou couvertes par un nombre de lectures après alignement sont sous le seuil de profondeur (alors que dans la simulation c'était le cas)
-    # nb features - nb PASS
-    TN =  df_features.shape[0] - nbOverlap
+    # PROFONDEUR (DEP)
+    #TN =  nbOverlap - df_features.shape[0]
+    TN =  minimumDepth
     # FP = nombre de zones hors "feature" ou "features" indétectables avec une couverture insuffisante
-    # nb candidats - nb PASS
-    FP = df_candidat.shape[0] - nbOverlap
+    # COUVERTURE (LEN)
+    #FP = nbOverlap - df_candidat.shape[0]
+    FP = nbOverlap - nbLen
     # FN = nombre de zones hors "feature" ou "features" indétectables trouvées (passant le seuil de profondeur)
     # nb candidat - nb features
     FN = df_candidat.shape[0] - df_features.shape[0]
@@ -284,9 +287,12 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
 
     global_stat_precision= dict()
-    global_stat_precision["0Precision"] = TP/(FP+TP)
-    global_stat_precision["1Recall"]    = TP/(TN+TP)
-    global_stat_precision["2F1 score"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
+    precision = TP/(FP+TP)
+    global_stat_precision["0Precision (between 0 - 1)"]= precision
+    recall = TP/(TN+TP)
+    global_stat_precision["1Recall or sensitivity (0.0 for no recall, 1.0 for full or perfect recall)"] = recall
+    #global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
+    global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
 
     html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf)
 
