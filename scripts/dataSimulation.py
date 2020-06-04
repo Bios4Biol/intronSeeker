@@ -223,6 +223,7 @@ def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
     :param pref: prefix of the output files
     :return:
     """    
+    print('OUTPUT 1 in grinder function', output)
     output_path = output + "/sr"
     if prefix:
         output_path += "_" + prefix
@@ -237,7 +238,9 @@ def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
         except FileExistsError as e :
             print('\nError: output file(s) already exists.\n')
             exit(1)
-    
+    print('OUTPUT 2 in grinder function', output)
+    print('grinder OUPUT PATH', output_path)
+    print('os grinder')
     os.system("grinder -rf {input_file} -pf {profile_file} -bn {output_file} > {log}".format(
         input_file=rf.name, profile_file=pf.name, output_file=output_path, log=output_path + ".log"
         ))

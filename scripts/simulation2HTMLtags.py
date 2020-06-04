@@ -409,13 +409,20 @@ def get_html_split_descr(df_splitRead:dict):
     #  df_to_table(df_splitRead, 2, True)
 
 # Plots candidats stats   
-def get_html_candidat_descr(global_stat_candidat:dict, df_candidat:dict):
+def get_html_candidat_descr(global_stat_detected_introns:dict, global_stat_filtred_detected_introns:dict, df_candidat:dict):
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Detected introns</h5>
                 <span class="anchor" id="candidatstat"></span>
-'''+dict_to_table(global_stat_candidat,3,True, False)+'''
+'''+dict_to_table(global_stat_detected_introns,-1,True, False)+'''
+            </div>
+        </div>   
+        <div class="d-flex"> 
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Filtred detected introns</h5>
+                <span class="anchor" id="candidatstat"></span>
+'''+dict_to_table(global_stat_filtred_detected_introns,-1,True, False)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-8">
                 <h5>Detected introns depth distribution</h5>

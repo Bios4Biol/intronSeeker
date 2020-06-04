@@ -271,37 +271,39 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         definitions['SS']   = "Number of features without canonical borders (neither CT_AC nor GT_AG)"
         definitions['PASS'] = "Number of features with canonical borders (CT_AC or GT_AG) and ...."
         
-        global_stat_candidat = dict()
-        global_stat_candidat["0Number"] = df_candidat.shape[0]
-        global_stat_candidat["1Mean length"] = 0
+        global_stat_detected_introns = dict()
+        global_stat_detected_introns["0Number"] = df_candidat.shape[0]
+        global_stat_detected_introns["1Mean length"] = 0
         for i,row in df_candidat.iterrows():
-            global_stat_candidat["1Mean length"] += row['end'] - row['start'] + 1
-        global_stat_candidat["1Mean length"] /= (global_stat_candidat["0Number"])
-        global_stat_candidat["1Mean length"] = round(global_stat_candidat["1Mean length"], 2)
-        global_stat_candidat["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
-        global_stat_candidat["3Number by category"]= global_stat_candidat["0Number"]
-        c = 4
+            global_stat_detected_introns["1Mean length"] += row['end'] - row['start'] + 1
+        global_stat_detected_introns["1Mean length"] /= (global_stat_detected_introns["0Number"])
+        global_stat_detected_introns["1Mean length"] = round(global_stat_detected_introns["1Mean length"], 2)
+        global_stat_detected_introns["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
+
+
+        global_stat_filtred_detected_introns = dict()
+        c = 0
         for k, v in (df_candidat['filter'].value_counts()).items() :
             for key, value in definitions.items():
                 if k == key:
-                    global_stat_candidat[str(c)+k+"("+value+")"] = v
+                    global_stat_filtred_detected_introns[str(c)+k+" ("+value+")"] = v
                     c+=1
 
 
         # Comparison between candidats and features from GTF file
-        nbTotCandidatsIncludingFeatures, nbOverlap, nbLen, minimumDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen)
+        nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minimumDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen)
 
         global_stat_candidat_vs_gtf = dict()
-        global_stat_candidat_vs_gtf["0Number of detected introns"] = global_stat_candidat["0Number"]
+        global_stat_candidat_vs_gtf["0Number of detected introns"] = global_stat_detected_introns["0Number"]
         c = 1
         for k, v in (df_features.feature.value_counts()).items() :
             global_stat_candidat_vs_gtf[str(c)+'Number of '+k+ ' in GTF'] = v
             c+=1
-        global_stat_candidat_vs_gtf[str(c+1)+"Number of detected introns corresponding features (Overlaps)"] = nbOverlap
-        global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]   = global_stat_candidat["0Number"]- nbTotCandidatsIncludingFeatures
+        global_stat_candidat_vs_gtf[str(c+1)+"Number of detected introns corresponding features (Overlaps)"] = nbSameStartEnd
+        global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]   = global_stat_detected_introns["0Number"]- nbTotCandidatsIncludingFeatures
         
 
-        html += get_html_candidat_descr(global_stat_candidat, df_candidat)
+        html += get_html_candidat_descr(global_stat_detected_introns, global_stat_filtred_detected_introns, df_candidat)
         print("Detected introns statistics and histogram")
         print("CPU time = %f" %(time.process_time()-tmps7))
         print("Performance counter = %f\n" %(time.perf_counter()-tmps7c))
@@ -332,7 +334,8 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # TN is the number of detectable and not found features (int value)
     # FP is the number of undetectable and found features (int value)
     # FN is the number of undetectable and not found features (int value)
-
+    
+    # https://fr.wikipedia.org/wiki/Pr%C3%A9cision_et_rappel"
     ##  les "features" qui ont assez de lectures les couvrant pour être trouvées. Il n'y que celles-ci qui pourront être vues comme T (True).
     # TP = nombre de "features" détectables et trouvées (assez de profondeur et bonnes bornes). 
     #TP = nbOverlap - nonCanonical - minimumDepth
@@ -344,7 +347,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # FP = nombre de zones hors "feature" ou "features" indétectables avec une couverture insuffisante
     # COUVERTURE (LEN)
     #FP = nbOverlap - df_candidat.shape[0]
-    FP = nbOverlap - nbLen
+    FP = nbSameStartEnd
     # FN = nombre de zones hors "feature" ou "features" indétectables trouvées (passant le seuil de profondeur)
     # nb candidat - nb features
     FN = df_candidat.shape[0] - df_features.shape[0]

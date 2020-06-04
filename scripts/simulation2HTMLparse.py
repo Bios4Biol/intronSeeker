@@ -179,18 +179,18 @@ def candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen):
     # Number of features with the same start and end than candidats
     conditionStartEnd = ((df_candidat['start_candidat'] == df_candidat['start_features']) & (df_candidat['end_candidat'] == df_candidat['end_features']))
     nbSameStartEnd=len(df_candidat.loc[conditionStartEnd]) - 1 # -1 for header
-    # Other conditions with detected intron overlap feature
-    #leftOverlap : CandidatStart >= featureStart and candidatStop >= featureStop
-    conditionLeftOverlap = ((df_candidat['start_candidat'] >= df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
-    nbLeftOverlap=len(df_candidat.loc[conditionLeftOverlap]) - 1 # -1 for header
-    #rightOverlap : CandidatStop >= featureStop and CandidatStart > featureStart
-    conditionRightOverlap = ((df_candidat['start_candidat'] > df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
-    nbRightOverlap=len(df_candidat.loc[conditionRightOverlap]) - 1 # -1 for header
-    #maxOverlap : CandidatStart <= featureStart and CandidatStop >= featuresStop
-    conditionMaxOverlap = ((df_candidat['start_candidat'] <= df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
-    nbMaxOverlap=len(df_candidat.loc[conditionMaxOverlap]) - 1 # -1 for header
+    # # Other conditions with detected intron overlap feature
+    # #leftOverlap : CandidatStart >= featureStart and candidatStop >= featureStop
+    # conditionLeftOverlap = ((df_candidat['start_candidat'] >= df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
+    # nbLeftOverlap=len(df_candidat.loc[conditionLeftOverlap]) - 1 # -1 for header
+    # #rightOverlap : CandidatStop >= featureStop and CandidatStart > featureStart
+    # conditionRightOverlap = ((df_candidat['start_candidat'] > df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
+    # nbRightOverlap=len(df_candidat.loc[conditionRightOverlap]) - 1 # -1 for header
+    # #maxOverlap : CandidatStart <= featureStart and CandidatStop >= featuresStop
+    # conditionMaxOverlap = ((df_candidat['start_candidat'] <= df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
+    # nbMaxOverlap=len(df_candidat.loc[conditionMaxOverlap]) - 1 # -1 for header
 
-    nbOverlap = nbSameStartEnd + nbLeftOverlap + nbRightOverlap + nbMaxOverlap
+    # nbOverlap = nbSameStartEnd + nbLeftOverlap + nbRightOverlap + nbMaxOverlap
 
     # Features length >= maxlen (max len value in Split Read Search)
     condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= float(maxlen))
@@ -204,7 +204,7 @@ def candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen):
     condNonCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
     nonCanonical = len(df_candidat.loc[condNonCanonical])
     
-    return nbTotCandidatsIncludingFeatures, nbOverlap, nbLen, minimumDepth, nonCanonical
+    return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minimumDepth, nonCanonical
 
 # Return panda which contains split desc 
 def parse_split(split):
