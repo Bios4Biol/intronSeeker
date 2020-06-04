@@ -99,10 +99,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         )
     )
 
-    print('fasta head :' , df_fasta.head(5), '\n\n')
-    print('mfasta head :' , df_mfasta.head(5), '\n\n')
-    print('library head :' , df_library.head(5), '\n\n')
-    print('features head :', df_features.head(5), '\n\n')
     print("Build pandas dataframes")  
     print("CPU time = %f" %(time.process_time()-tmps1))
     print("Performance counter = %f\n" %(time.perf_counter()-tmps1c))
@@ -235,7 +231,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     ## SPLITREADSEARCH STAT
     if split:
         df_split=parse_split(split.name)   
-        print('df_split', df_split, '\n\n')
         global_stat_split = dict()
         global_stat_split["0Number of reads overlapping potential retained introns"]= df_split.shape[0]
         global_stat_split["1Mean length of potential retained introns"]= df_split['split_length'].mean()
@@ -268,7 +263,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # Candidat statistics - detected introns
     if candidat:
         df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
-        print('df_candidat', df_candidat, '\n\n')
 
          # Definition dict
         definitions = dict()
@@ -298,10 +292,13 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         nbTotCandidatsIncludingFeatures, nbOverlap, nbLen, minimumDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen)
 
         global_stat_candidat_vs_gtf = dict()
-        global_stat_candidat_vs_gtf["0Number of detected introns"]          = global_stat_candidat["0Number"]
-        global_stat_candidat_vs_gtf["1Number of features"]                  = df_features.shape[0]
-        global_stat_candidat_vs_gtf["2Number of detected introns corresponding features (Overlaps)"] = nbOverlap
-        global_stat_candidat_vs_gtf["3Detected introns not found in GTF"]   = global_stat_candidat["0Number"]- nbTotCandidatsIncludingFeatures
+        global_stat_candidat_vs_gtf["0Number of detected introns"] = global_stat_candidat["0Number"]
+        c = 1
+        for k, v in (df_features.feature.value_counts()).items() :
+            global_stat_candidat_vs_gtf[str(c)+'Number of '+k+ ' in GTF'] = v
+            c+=1
+        global_stat_candidat_vs_gtf[str(c+1)+"Number of detected introns corresponding features (Overlaps)"] = nbOverlap
+        global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]   = global_stat_candidat["0Number"]- nbTotCandidatsIncludingFeatures
         
 
         html += get_html_candidat_descr(global_stat_candidat, df_candidat)
@@ -314,7 +311,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # Assemblathon files
     if assemblathon:
         df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
-        print('df_assemblathon', df_assemblathon_all, '\n\n')
         global_stat_assemblathon = dict()
         global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
         global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
@@ -353,8 +349,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # nb candidat - nb features
     FN = df_candidat.shape[0] - df_features.shape[0]
 
-
-
     global_stat_precision= dict()
     precision = TP/(FP+TP)
     global_stat_precision["0Precision (between 0 - 1)"]= precision
@@ -380,6 +374,18 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     with open(output_file, "w") as f:
         f.write(html)
+
+    print('DATAFRAMES:\n\n')
+    print('fasta head :' , df_fasta.head(5), '\n\n')
+    print('mfasta head :' , df_mfasta.head(5), '\n\n')
+    print('library head :' , df_library.head(5), '\n\n')
+    print('features head :', df_features.head(5), '\n\n')
+    if split:
+        print('df_split', df_split, '\n\n')
+    if candidat:
+        print('df_candidat', df_candidat, '\n\n')
+    if assemblathon:
+        print('df_assemblathon', df_assemblathon_all, '\n\n')
 
 
 if __name__ == '__main__' :
