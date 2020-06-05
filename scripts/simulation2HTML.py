@@ -10,6 +10,7 @@ import pickle
 import glob
 import time
 import configparser # To parse parameters file
+import subprocess as sp # To run subprocess
 import concurrent.futures as prl # For Split read signal analysis
 from itertools import repeat     # For Split read signal analysis
 # Import all functions from internal modules
@@ -29,23 +30,22 @@ threads      = config.get('MANDATORY','t')
 r2           = config.get('OPTIONNAL','R2')
 flagstat     = config.get('OPTIONNAL','flagstat')
 ranks        = config.get('OPTIONNAL','ranks')
-assemblathon = config.get('OPTIONNAL','assemblathon')
 candidat     = config.get('OPTIONNAL','candidat')
 split        = config.get('OPTIONNAL','split')
 prefix       = config.get('OPTIONNAL','prefix')
 force        = config.get('OPTIONNAL','force')
 
-#source activate ISeeker_environment;
-#cd scripts/; 
-# python3 simulation2HTML.py -m /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.fa -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -g /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs-modified.gtf -o /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML -p test1 -F  -1 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R1.fastq.gz -2 /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_R2.fastq.gz --flagstat /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sr_ranks.txt -s  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_split_alignments.txt  --assemblathon /home/smaman/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+# source activate ISeeker_environment;
+# cd scripts/; 
+# python3 simulation2HTML.py parameters
 # scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
-# See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_test1_simulation.html
+# See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_FRS_CASA_sample1_n1000_r_STAR_simulation.html
 
 ############
 # SUB MAIN #
 ############
 def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str,
-                        assemblathon:str, flagstat:str, candidat:str, split:str,
+                        flagstat:str, candidat:str, split:str,
                         output:str, prefix:str, force:bool, threads:int ) :
     
     #Return the value (in fractional seconds) of the sum of the system and user CPU time of the current process. 
@@ -142,16 +142,17 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     if flagstat :
         flagstat_file = flagstat
         inputfiles.append("Flagstat#" + os.path.basename(flagstat_file))
-    assemblathon_file=""    
-    if assemblathon:
-        assemblathon_file=assemblathon
-        inputfiles.append("Assemblathon#" + os.path.basename(assemblathon))
+    # assemblathon_fasta=""    
+    # if assemblathon:
+    #     assemblathon_fasta=assemblathon
+    #     inputfiles.append("Assemblathon#" + os.path.basename(assemblathon_fasta))
     candidat_file=""    
     if candidat:
         candidat_file=candidat
         inputfiles.append("Candidat#" + os.path.basename(candidat))
 
-    html += get_html_body1(flagstat_file, candidat_file, assemblathon_file)
+    # html += get_html_body1(flagstat_file, candidat_file, assemblathon_fasta)
+    html += get_html_body1(flagstat_file, candidat_file)
 
    
     # INPUT FILES
@@ -175,6 +176,45 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         c+=1
 
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf, df_features['pos_on_contig'], df_fasta, df_mfasta)
+
+
+    # Assemblathon on fasta files
+    # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
+    assemblathon_fasta_name = output_path + "_" + os.path.splitext(os.path.basename(fasta))[0] + '_assemblathon.txt'
+    assemblathon_mfasta_name = output_path + "_" + os.path.splitext(os.path.basename(mfasta))[0] + '_assemblathon.txt'
+    print("Output assemblathon files")        
+    
+    with open(assemblathon_fasta_name,'w') as assemblathon_fasta :
+        #sp.run(['assemblathon_stats.pl',fasta],stdout=assemblathon_fasta)
+        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta],stdout=assemblathon_fasta)
+
+    with open(assemblathon_mfasta_name,'w') as assemblathon_mfasta :
+        #sp.run(['assemblathon_stats.pl',fasta],stdout=assemblathon_mfasta)
+        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta],stdout=assemblathon_mfasta)    
+    
+    # Assemblathon files
+    if assemblathon_fasta:
+        df_assemblathon_fasta = parse_assemblathon(assemblathon_fasta, "title")
+        # global_stat_assemblathon = dict()
+        # global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_fasta.iloc[0,0]
+        # global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_fasta.iloc[1,0]
+        # global_stat_assemblathon["2Longest contig"]            = df_assemblathon_fasta.iloc[2,0]
+        # global_stat_assemblathon["3Shortest contiged"]         = df_assemblathon_fasta.iloc[3,0]
+        # nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_fasta.iloc[4,0])
+        # global_stat_assemblathon["4Number of contigs > 1K nt"] = nbLongContigs
+        # global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_fasta.iloc[5,0]
+        # global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_fasta.iloc[6,0]
+        # html += get_html_assemblathon_descr(global_stat_assemblathon)    
+        print("Assemblathon statistics")
+
+# Contig FASTA - Number of seq.	1 000  // df_assemblathon_fasta.iloc[0,0]  
+# Contig FASTA - Mean seq. length	874  //       df_assemblathon_fasta.iloc[0,0] / df_assemblathon_fasta.iloc[1,0]
+# Contig FASTA with feature(s) - Number of seq.	1 000 //  df_assemblathon_mfasta.iloc[0,0]
+# Contig FASTA with feature(s) - Mean seq. length	1 120 //   df_assemblathon_mfasta.iloc[0,0] / df_assemblathon_mfasta.iloc[1,0]
+# Number of modified sequences	500           / 0
+# Number of distinct features in GTF	1         / 0
+# Number of features in GTF                      / 0
+
     print("Global statistics")
     print("CPU time = %f" %(time.process_time()-tmps2))
     print("Performance counter = %f\n" %(time.perf_counter()-tmps2c))
@@ -200,6 +240,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     print("Performance counter = %f\n" %(time.perf_counter()-tmps3c))
     tmps4=time.process_time()
     tmps4c=time.perf_counter() 
+
 
     # ABUNDANCE number of reads by contig
     # Build a dataframe with:
@@ -272,10 +313,10 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         
         html += get_html_split_descr(global_stat_split)   
         print("Intron reads") 
-        print("CPU time = %f" %(time.process_time()-tmps6))
-        print("Performance counter = %f\n" %(time.perf_counter()-tmps6c))
-        tmps7=time.process_time()
-        tmps7c=time.perf_counter() 
+    print("CPU time = %f" %(time.process_time()-tmps6))
+    print("Performance counter = %f\n" %(time.perf_counter()-tmps6c))
+    tmps7=time.process_time()
+    tmps7c=time.perf_counter() 
 
 
     # Candidat statistics - detected introns
@@ -323,30 +364,12 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
         html += get_html_candidat_descr(global_stat_detected_introns, global_stat_filtred_detected_introns, df_candidat)
         print("Detected introns statistics and histogram")
-        print("CPU time = %f" %(time.process_time()-tmps7))
-        print("Performance counter = %f\n" %(time.perf_counter()-tmps7c))
-        tmps8=time.process_time()
-        tmps8c=time.perf_counter() 
+    print("CPU time = %f" %(time.process_time()-tmps7))
+    print("Performance counter = %f\n" %(time.perf_counter()-tmps7c))
+    tmps8=time.process_time()
+    tmps8c=time.perf_counter() 
 
-    # Assemblathon files
-    if assemblathon:
-        df_assemblathon_all = parse_assemblathon(assemblathon_file, "title")
-        global_stat_assemblathon = dict()
-        global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_all.iloc[0,0]
-        global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_all.iloc[1,0]
-        global_stat_assemblathon["2Longest contig"]            = df_assemblathon_all.iloc[2,0]
-        global_stat_assemblathon["3Shortest contiged"]         = df_assemblathon_all.iloc[3,0]
-        nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_all.iloc[4,0])
-        global_stat_assemblathon["4Number of contigs > 1K nt"] = nbLongContigs
-        global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_all.iloc[5,0]
-        global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_all.iloc[6,0]
-        html += get_html_assemblathon_descr(global_stat_assemblathon)    
-        print("Assemblathon statistics")
-        print("CPU time = %f" %(time.process_time()-tmps8))
-        print("Performance counter = %f\n" %(time.perf_counter()-tmps8c))
-        tmps9=time.process_time()
-        tmps9c=time.perf_counter() 
-
+    
     # Precision, recall and F1 score
     # TP is the number of detectable and found features (int value)
     # TN is the number of detectable and not found features (int value)
@@ -381,10 +404,10 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf)
 
     print("Detectability statistics")
-    print("CPU time = %f" %(time.process_time()-tmps9))
-    print("Performance counter = %f\n" %(time.perf_counter()-tmps9c))
-    tmps10=time.process_time()
-    tmps10c=time.perf_counter() 
+    print("CPU time = %f" %(time.process_time()-tmps8))
+    print("Performance counter = %f\n" %(time.perf_counter()-tmps8c))
+    tmps9=time.process_time()
+    tmps9c=time.perf_counter() 
 
     # GLOSSARY
     html += get_html_glossary()
@@ -405,8 +428,10 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         print('df_split', df_split, '\n\n')
     if candidat:
         print('df_candidat', df_candidat, '\n\n')
-    if assemblathon:
-        print('df_assemblathon', df_assemblathon_all, '\n\n')
+    if assemblathon_fasta:
+        print('df_assemblathon_fasta', df_assemblathon_fasta, '\n\n')
+    if assemblathon_mfasta:
+        print('df_assemblathon_mfasta', df_assemblathon_mfasta, '\n\n')    
 
 
 if __name__ == '__main__' :
@@ -430,5 +455,5 @@ if __name__ == '__main__' :
     
     # simulationReport(**args)
     simulationReport(fasta, mfasta, gtf, r1, r2, ranks,
-                        assemblathon, flagstat, candidat, split,
+                        flagstat, candidat, split,
                         output, prefix, force, threads)

@@ -179,18 +179,6 @@ def candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen):
     # Number of features with the same start and end than candidats
     conditionStartEnd = ((df_candidat['start_candidat'] == df_candidat['start_features']) & (df_candidat['end_candidat'] == df_candidat['end_features']))
     nbSameStartEnd=len(df_candidat.loc[conditionStartEnd]) - 1 # -1 for header
-    # # Other conditions with detected intron overlap feature
-    # #leftOverlap : CandidatStart >= featureStart and candidatStop >= featureStop
-    # conditionLeftOverlap = ((df_candidat['start_candidat'] >= df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
-    # nbLeftOverlap=len(df_candidat.loc[conditionLeftOverlap]) - 1 # -1 for header
-    # #rightOverlap : CandidatStop >= featureStop and CandidatStart > featureStart
-    # conditionRightOverlap = ((df_candidat['start_candidat'] > df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
-    # nbRightOverlap=len(df_candidat.loc[conditionRightOverlap]) - 1 # -1 for header
-    # #maxOverlap : CandidatStart <= featureStart and CandidatStop >= featuresStop
-    # conditionMaxOverlap = ((df_candidat['start_candidat'] <= df_candidat['start_features']) & (df_candidat['end_candidat'] >= df_candidat['end_features']))
-    # nbMaxOverlap=len(df_candidat.loc[conditionMaxOverlap]) - 1 # -1 for header
-
-    # nbOverlap = nbSameStartEnd + nbLeftOverlap + nbRightOverlap + nbMaxOverlap
 
     # Features length >= maxlen (max len value in Split Read Search)
     condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= float(maxlen))
@@ -265,8 +253,8 @@ def parsing_test(items) :
         return False
 
 # Parse assemblathon files to compare assembly with Assemblathon.pl statistics
-def parse_assemblathon(filename : str, name : str ) :
-    with open(filename,"r") as f :
+def parse_assemblathon(file: str, name : str ) :
+    with open(file.name,"r") as f :
         assemblathon = { re.split("\s\s+",line.strip(),1)[0] : re.split("\s\s+",line.strip(),1)[1] for line in f if parsing_test(re.split("\s\s+",line.strip(),1))}
     return pd.DataFrame(data=assemblathon.values(),index=assemblathon.keys(),columns=[name])    
 

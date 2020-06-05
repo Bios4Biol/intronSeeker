@@ -96,7 +96,7 @@ def get_html_header():
 '''
 
 # icons : https://useiconic.com/open/
-def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
+def get_html_body1(flagstat="", bam="", candidat=""):
     r = '''
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
@@ -156,18 +156,24 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
 				        Introns positions
 				    </a>
 			    </li>  
-			  <li class="nav-item">
-				<a class="nav-link" href="#read-descr">
-				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
-					Reads
-				</a>
-			  </li>
-			  <li class="nav-item" style="padding-left:10px">
+			    <li class="nav-item">
+				    <a class="nav-link" href="#read-descr">
+				        <span class="oi oi-collapse-up" aria-hidden="true"></span>
+					    Reads
+				    </a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#readgstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Global statistics
 			    	</a>
-			    </li>   
+			    </li>                
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#assemblystat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Reads with intron insertion
+			    	</a>
+			    </li>    
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#abundstat">
 				    	<span class="oi oi-graph" aria-hidden="true"></span>
@@ -206,14 +212,6 @@ def get_html_body1(flagstat="", bam="", candidat="", assemblathon=""):
 			    	</a>
 			    </li>
                 '''
-    if assemblathon:
-        r += '''                 
-                <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#assemblystat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Intron insertion
-			    	</a>
-			    </li>'''    
     r +='''      
                 <li class="nav-item">
                     <a class="nav-link" href="#precision">
