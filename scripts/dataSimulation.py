@@ -123,7 +123,7 @@ def full_random_simulation(nb:int, maxi:int, mini:int, half:bool, lower:int, upp
     
     # Create output dir if not exist
     if not os.path.exists(output) :
-        os.mkdir(output)
+        os.makedirs(output)
     if not force:
         try :
             if os.path.exists(output_path + "_contigs.fa") or os.path.exists(output_path + "_contigs-modified.fa") or os.path.exists(output_path + "_modifications.txt") :
@@ -223,14 +223,13 @@ def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
     :param pref: prefix of the output files
     :return:
     """    
-    print('OUTPUT 1 in grinder function', output)
     output_path = output + "/sr"
     if prefix:
         output_path += "_" + prefix
 
     # Create output dir if not exist
     if not os.path.exists(output) :
-        os.mkdir(output)
+        os.makedirs(output)
     if not force:
         try :
             if os.path.exists(output_path + "_ranks.txt") or os.path.exists(output_path + "_R1.fastq.gz") or os.path.exists(output_path + "_R2.fastq.gz") :
@@ -238,9 +237,7 @@ def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
         except FileExistsError as e :
             print('\nError: output file(s) already exists.\n')
             exit(1)
-    print('OUTPUT 2 in grinder function', output)
-    print('grinder OUPUT PATH', output_path)
-    print('os grinder')
+
     os.system("grinder -rf {input_file} -pf {profile_file} -bn {output_file} > {log}".format(
         input_file=rf.name, profile_file=pf.name, output_file=output_path, log=output_path + ".log"
         ))
@@ -758,7 +755,7 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, outp
     
     # Create output dir if not exist
     if not os.path.exists(output) :
-        os.mkdir(output)
+        os.makedirs(output)
     if not force:
         try :
             if os.path.exists(output_path + "_transcripts-modified.fa") or os.path.exists(output_path + "_transcripts.fa") or os.path.exists(output_path + "_transcripts-modified.gtf") or  os.path.exists(output_path + "_transcripts-mix-state.fa"):

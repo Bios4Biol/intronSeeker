@@ -304,7 +304,7 @@ if __name__ == '__main__' :
     print("Res dir creation")
     results_dir = config["Global"]["env_dir"]
     if not os.path.exists(results_dir) :
-        os.mkdir(results_dir)
+        os.makedirs(results_dir)
         
     args_dicts = [config[analysis] for analysis in config['Global']['analysis'].split(',')]
     alignment_analysis(args_dicts[int(sys.argv[-1])])

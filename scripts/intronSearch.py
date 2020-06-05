@@ -186,7 +186,7 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     
     # Create output dir if not exist
     if not os.path.exists(output) :
-        os.mkdir(output)
+        os.makedirs(output)
     if not force:
         try :
             if os.path.exists(output_path + "_candidates.txt") or os.path.exists(output_path + "_split_alignments.txt") :
@@ -198,8 +198,8 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
     assemblathon_name = output_path + "_" + os.path.splitext(os.path.basename(fastafile.name))[0] + '_assemblathon.txt'
     with open(assemblathon_name,'w') as assemblathon :
-        #sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
-        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
+        sp.run(['assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
+        #sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fastafile.name],stdout=assemblathon)
     
     ref_id_list   = [x.split("\t")[0] for x in pysam.idxstats(bamfile.name).split("\n")[:-2]]
     
@@ -276,7 +276,7 @@ def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
     
     # Create output dir if not exist
     if not os.path.exists(output) :
-        os.mkdir(output)
+        os.makedirs(output)
     if not force:
         try :
             if os.path.exists(output_path + '_trimmed.fa'):
@@ -348,7 +348,7 @@ def analyzeORF(reference, cand_file, output, force, prefix, no_refine, rm) :
     
     # Create output dir if not exist
     if not os.path.exists(output) :
-        os.mkdir(output)
+        os.makedirs(output)
     if not force:
         try :
             if os.path.exists(output_path + '.txt'):
@@ -478,7 +478,7 @@ def searchProtein(fasta : str, dbprotein : str, output : str, threads : int, rm 
     :param rm : Boolean which rules the temporary files erasure.
     """
     outdir = output + "_protein" ;
-    os.system("mkdir " + outdir) ;
+    os.system("makedirs " + outdir) ;
     path_to_output = outdir + "/" + output ;
     
     runDiamond(fasta, dbprotein, path_to_output, threads) ;
