@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 
 import os
-import configparser
+import argparse
+import configparser # To parse parameters file
 import numpy as np  # For Split read signal analysis
 import pandas as pd
-import argparse
 import pysam   # To generate a dataframe from a BAM : pysam and pickle
 import pickle
 import glob
 import time
-import configparser # To parse parameters file
 import subprocess as sp # To run subprocess
 import concurrent.futures as prl # For Split read signal analysis
 from itertools import repeat     # For Split read signal analysis
@@ -18,22 +17,22 @@ from simulation2HTMLparse import *
 from simulation2HTMLtags import *
 from simulation2HTMLplots import *
 
-config = configparser.RawConfigParser() # On créé un nouvel objet "config"
-config.read('parameters') # On lit le fichier de paramètres
-# Récupération des parametres dans des variables
-fasta        = config.get('MANDATORY','fasta')
-mfasta       = config.get('MANDATORY','mfasta')
-gtf          = config.get('MANDATORY','gtf')
-r1           = config.get('MANDATORY','R1')
-output       = config.get('MANDATORY','output')
-threads      = config.get('MANDATORY','t')
-r2           = config.get('OPTIONNAL','R2')
-flagstat     = config.get('OPTIONNAL','flagstat')
-ranks        = config.get('OPTIONNAL','ranks')
-candidat     = config.get('OPTIONNAL','candidat')
-split        = config.get('OPTIONNAL','split')
-prefix       = config.get('OPTIONNAL','prefix')
-force        = config.get('OPTIONNAL','force')
+# config = configparser.RawConfigParser() # On créé un nouvel objet "config"
+# config.read('parameters') # On lit le fichier de paramètres
+# # Récupération des parametres dans des variables
+# fasta        = config.get('MANDATORY','fasta')
+# mfasta       = config.get('MANDATORY','mfasta')
+# gtf          = config.get('MANDATORY','gtf')
+# r1           = config.get('MANDATORY','R1')
+# output       = config.get('MANDATORY','output')
+# threads      = config.get('MANDATORY','t')
+# r2           = config.get('OPTIONNAL','R2')
+# flagstat     = config.get('OPTIONNAL','flagstat')
+# ranks        = config.get('OPTIONNAL','ranks')
+# candidat     = config.get('OPTIONNAL','candidat')
+# split        = config.get('OPTIONNAL','split')
+# prefix       = config.get('OPTIONNAL','prefix')
+# force        = config.get('OPTIONNAL','force')
 
 # source activate ISeeker_environment;
 # cd scripts/; 
@@ -142,10 +141,6 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     if flagstat :
         flagstat_file = flagstat
         inputfiles.append("Flagstat#" + os.path.basename(flagstat_file))
-    # assemblathon_fasta=""    
-    # if assemblathon:
-    #     assemblathon_fasta=assemblathon
-    #     inputfiles.append("Assemblathon#" + os.path.basename(assemblathon_fasta))
     candidat_file=""    
     if candidat:
         candidat_file=candidat
@@ -435,6 +430,37 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
 
 if __name__ == '__main__' :
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--config_file', help='config file')
+    args, left_argv = parser.parse_known_args()
+    if args.config_file:
+        with open(args.config_file, 'r') as f:
+            config = configparser.ConfigParser()
+            config.read([args.config_file])
+
+    parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=False, dest='fasta')
+    parser.add_argument('-m','--modifiedfasta', type=argparse.FileType('r'), required=False, dest='mfasta')
+    parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=False, dest='gtf')
+    parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=False, dest='r1')
+    parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
+    parser.add_argument('--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat')
+    parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranks')
+    parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
+    parser.add_argument('-s','--split', type=argparse.FileType('r'), required=False, dest='split')
+    parser.add_argument('-o','--output', type=str, required=False, dest='output')
+    parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
+    parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads')
+    parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
+
+    for k, v in config.items("Defaults"):
+        parser.parse_args([str(k), str(v)], args)
+
+    parser.parse_args(left_argv, args)
+    print(args)
+    args = vars(parser.parse_args(left_argv, args))
+
+    simulationReport(**args)
+
     # parser = argparse.ArgumentParser(add_help=False)
     # parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta')
     # parser.add_argument('-m','--modifiedfasta', type=argparse.FileType('r'), required=True, dest='mfasta')
@@ -454,6 +480,6 @@ if __name__ == '__main__' :
     # args = vars(parser.parse_args())
     
     # simulationReport(**args)
-    simulationReport(fasta, mfasta, gtf, r1, r2, ranks,
-                        flagstat, candidat, split,
-                        output, prefix, force, threads)
+    # simulationReport(fasta, mfasta, gtf, r1, r2, ranks,
+    #                     flagstat, candidat, split,
+    #                     output, prefix, force, threads)
