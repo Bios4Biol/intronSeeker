@@ -9,6 +9,7 @@ import pysam   # To generate a dataframe from a BAM : pysam and pickle
 import pickle
 import glob
 import time
+import configparser # To parse parameters file
 import concurrent.futures as prl # For Split read signal analysis
 from itertools import repeat     # For Split read signal analysis
 # Import all functions from internal modules
@@ -16,6 +17,23 @@ from simulation2HTMLparse import *
 from simulation2HTMLtags import *
 from simulation2HTMLplots import *
 
+config = configparser.RawConfigParser() # On créé un nouvel objet "config"
+config.read('parameters') # On lit le fichier de paramètres
+# Récupération des parametres dans des variables
+fasta        = config.get('MANDATORY','fasta')
+mfasta       = config.get('MANDATORY','mfasta')
+gtf          = config.get('MANDATORY','gtf')
+r1           = config.get('MANDATORY','R1')
+output       = config.get('MANDATORY','output')
+threads      = config.get('MANDATORY','t')
+r2           = config.get('OPTIONNAL','R2')
+flagstat     = config.get('OPTIONNAL','flagstat')
+ranks        = config.get('OPTIONNAL','ranks')
+assemblathon = config.get('OPTIONNAL','assemblathon')
+candidat     = config.get('OPTIONNAL','candidat')
+split        = config.get('OPTIONNAL','split')
+prefix       = config.get('OPTIONNAL','prefix')
+force        = config.get('OPTIONNAL','force')
 
 #source activate ISeeker_environment;
 #cd scripts/; 
@@ -47,7 +65,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     # Create output dir if not exist
     if not os.path.exists(output) :
-        os.mkdir(output)
+        os.makedirs(output)
     
     # Output path filename report html
     output_file = output_path + "_simulation.html"
@@ -71,15 +89,15 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # df_library  : pandas.DataFrame where each line is a read description from R1 (& R2) fastq file(s)
     # df_features : pandas.DataFrame where each line is a simulated features description 
     # df_candidat : pandas.DataFrame where each line is a candidat description
-    df_fasta  = parse_fasta(fasta.name, False)
-    df_mfasta = parse_fasta(mfasta.name, True)
+    df_fasta  = parse_fasta(fasta, False)
+    df_mfasta = parse_fasta(mfasta, True)
 
     if r2 :
-        df_library = parse_library(r1.name, r2.name)
+        df_library = parse_library(r1, r2)
     else :
-        df_library = parse_library(r1.name)
+        df_library = parse_library(r1)
 
-    df_features = parse_gtf(gtf.name)
+    df_features = parse_gtf(gtf)
 
     # Add a column to df_fasta with the "fasta" length (without any simulated features)
     df_mfasta["short_length"] = df_mfasta.apply(
@@ -109,29 +127,29 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     html = get_html_header()
     
     inputfiles = [
-        "Contig FASTA#" + os.path.basename(fasta.name),
-        "Contig FASTA with feature(s)#" + os.path.basename(mfasta.name),
-        "GTF of contig with feature(s)#" + os.path.basename(gtf.name),
-        "Read1 FASTQ#" + os.path.basename(r1.name)
+        "Contig FASTA#" + os.path.basename(fasta),
+        "Contig FASTA with feature(s)#" + os.path.basename(mfasta),
+        "GTF of contig with feature(s)#" + os.path.basename(gtf),
+        "Read1 FASTQ#" + os.path.basename(r1)
     ]
     if r2:
-        inputfiles.append("Read2 FASTQ#" + os.path.basename(r2.name))
+        inputfiles.append("Read2 FASTQ#" + os.path.basename(r2))
     ranks_file=""    
     if ranks:
-        ranks_file=ranks.name
-        inputfiles.append("Ranks#" + os.path.basename(ranks.name))
+        ranks_file=ranks
+        inputfiles.append("Ranks#" + os.path.basename(ranks))
     flagstat_file = ""
     if flagstat :
-        flagstat_file = flagstat.name
+        flagstat_file = flagstat
         inputfiles.append("Flagstat#" + os.path.basename(flagstat_file))
     assemblathon_file=""    
     if assemblathon:
-        assemblathon_file=assemblathon.name
-        inputfiles.append("Assemblathon#" + os.path.basename(assemblathon.name))
+        assemblathon_file=assemblathon
+        inputfiles.append("Assemblathon#" + os.path.basename(assemblathon))
     candidat_file=""    
     if candidat:
-        candidat_file=candidat.name
-        inputfiles.append("Candidat#" + os.path.basename(candidat.name))
+        candidat_file=candidat
+        inputfiles.append("Candidat#" + os.path.basename(candidat))
 
     html += get_html_body1(flagstat_file, candidat_file, assemblathon_file)
 
@@ -142,7 +160,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     # SEQUENCE STAT
     # Global stat
-    nb_distinct_features, nb_ctg_by_feature, ctg_descr = stat_from_gtf(gtf.name)
+    nb_distinct_features, nb_ctg_by_feature, ctg_descr = stat_from_gtf(gtf)
     global_stat = dict()
     global_stat["0Contig FASTA - Number of seq."]            = df_fasta.shape[0]
     global_stat["1Contig FASTA - Mean seq. length"]          = int(df_fasta['length'].mean())
@@ -156,7 +174,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat[str(c)+k] = v
         c+=1
 
-    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
+    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf, df_features['pos_on_contig'], df_fasta, df_mfasta)
     print("Global statistics")
     print("CPU time = %f" %(time.process_time()-tmps2))
     print("Performance counter = %f\n" %(time.perf_counter()-tmps2c))
@@ -230,7 +248,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     ## SPLITREADSEARCH STAT
     if split:
-        df_split=parse_split(split.name)   
+        df_split=parse_split(split)   
         global_stat_split = dict()
         global_stat_split["0Number of reads overlapping potential retained introns"]= df_split.shape[0]
         global_stat_split["1Mean length of potential retained introns"]= df_split['split_length'].mean()
@@ -262,7 +280,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     # Candidat statistics - detected introns
     if candidat:
-        df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
+        df_candidat, mindepth, maxlen = parse_candidat(candidat)
 
          # Definition dict
         definitions = dict()
@@ -392,22 +410,25 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
 
 if __name__ == '__main__' :
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta')
-    parser.add_argument('-m','--modifiedfasta', type=argparse.FileType('r'), required=True, dest='mfasta')
-    parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=True, dest='gtf')
-    parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1')
-    parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
-    parser.add_argument('--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat')
-    parser.add_argument('--assemblathon', type=argparse.FileType('r'), required=False, dest='assemblathon') 
-    parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranks')
-    parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
-    parser.add_argument('-s','--split', type=argparse.FileType('r'), required=False, dest='split')
-    parser.add_argument('-o','--output', type=str, required=True, dest='output')
-    parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
-    parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads')
-    parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
+    # parser = argparse.ArgumentParser(add_help=False)
+    # parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta')
+    # parser.add_argument('-m','--modifiedfasta', type=argparse.FileType('r'), required=True, dest='mfasta')
+    # parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=True, dest='gtf')
+    # parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1')
+    # parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
+    # parser.add_argument('--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat')
+    # parser.add_argument('--assemblathon', type=argparse.FileType('r'), required=False, dest='assemblathon') 
+    # parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranks')
+    # parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
+    # parser.add_argument('-s','--split', type=argparse.FileType('r'), required=False, dest='split')
+    # parser.add_argument('-o','--output', type=str, required=True, dest='output')
+    # parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
+    # parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads')
+    # parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
 
-    args = vars(parser.parse_args())
+    # args = vars(parser.parse_args())
     
-    simulationReport(**args)
+    # simulationReport(**args)
+    simulationReport(fasta, mfasta, gtf, r1, r2, ranks,
+                        assemblathon, flagstat, candidat, split,
+                        output, prefix, force, threads)
