@@ -37,7 +37,7 @@ from simulation2HTMLplots import *
 
 # source activate ISeeker_environment;
 # cd scripts/; 
-# python3 simulation2HTML.py --config_file parameters.config -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -F
+# python3 simulation2HTML.py --config_file parameters.config -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -F -p "FRS_CASA_sample1_n1000_r_STAR"
 # scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 # See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_FRS_CASA_sample1_n1000_r_STAR_simulation.html
 
@@ -174,9 +174,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
     assemblathon_fasta_name = output_path + "_" + os.path.splitext(os.path.basename(fasta.name))[0] + '_assemblathon.txt'
   
-    
     with open(assemblathon_fasta_name,'w') as assemblathon_fasta :
-        #sp.run(['assemblathon_stats.pl',fasta],stdout=assemblathon_fasta)
+        #sp.run(['bin/assemblathon_stats.pl',fasta],stdout=assemblathon_fasta)
         #process=sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta.name],stdout=sp.PIPE)
         proc=sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta.name],stdout=assemblathon_fasta)
         #assemblathon_fasta = process.stdout
@@ -482,7 +481,6 @@ if __name__ == '__main__' :
         #parser.parse_args([str(k), str(v)], args)
         config_args={str(k): str(v)} 
         parser.set_defaults(**config_args)
-        
         print('OPTIONNAL config_args : ',config_args)     
 
     # override with command line arguments when provided
