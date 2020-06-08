@@ -139,6 +139,12 @@ def get_html_body1(flagstat="", bam="", candidat=""):
 			    	</a>
 			    </li>
                 <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr_assemblathon_fasta">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Assemblathon(s)
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#contigs_len_dist">
 				        <span class="oi oi-bar-chart" aria-hidden="true"></span>
 				        Contigs len. distribution
@@ -260,7 +266,7 @@ def get_html_inputfiles(files:dict):
     return r
 
 
-def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict, df_fasta:dict, df_mfasta:dict):
+def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict, df_fasta:dict, df_mfasta:dict, global_stat_assemblathon_fasta:dict, global_stat_assemblathon_mfasta:" "):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Contigs</h1>
@@ -286,6 +292,21 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 '''+dict_to_table(ctg_descr,-1,False, False)+'''
             </div>
         </div>
+         <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+                <h5>Assemblathon statistics on FASTA</h5>
+                <span class="anchor" id="ref-descr_assemblathon_fasta"></span>
+'''+dict_to_table(global_stat_assemblathon_fasta,-1,True, False)+'''
+            </div> '''
+    if global_stat_assemblathon_mfasta:
+        r += '''          
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+                <h5>Assemblathon statistics on Contig FASTA with feature(s)</h5>
+                <span class="anchor" id="ref-descr_assemblathon_fasta"></span>
+'''+dict_to_table(global_stat_assemblathon_mfasta,-1,True, False)+'''
+            </div> '''
+    r += '''          
+        </div>    
 '''
 
     # Len dist for gtf

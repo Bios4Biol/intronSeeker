@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import os
-import argparse
+import argparse 
+from argparse import ArgumentParser
 import configparser # To parse parameters file
 import numpy as np  # For Split read signal analysis
 import pandas as pd
@@ -36,7 +37,7 @@ from simulation2HTMLplots import *
 
 # source activate ISeeker_environment;
 # cd scripts/; 
-# python3 simulation2HTML.py parameters
+# python3 simulation2HTML.py --config_file parameters.config -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -F
 # scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 # See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_FRS_CASA_sample1_n1000_r_STAR_simulation.html
 
@@ -169,51 +170,57 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat[str(c)+k] = v
         c+=1
 
-    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
-
-
     # Assemblathon on fasta files
     # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
     assemblathon_fasta_name = output_path + "_" + os.path.splitext(os.path.basename(fasta.name))[0] + '_assemblathon.txt'
-    assemblathon_mfasta_name = output_path + "_" + os.path.splitext(os.path.basename(mfasta.name))[0] + '_assemblathon.txt'
-    print("Output assemblathon files", assemblathon_fasta_name)        
+  
     
     with open(assemblathon_fasta_name,'w') as assemblathon_fasta :
         #sp.run(['assemblathon_stats.pl',fasta],stdout=assemblathon_fasta)
-        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta.name],stdout=assemblathon_fasta)
-
-    with open(assemblathon_mfasta_name,'w') as assemblathon_mfasta :
-        #sp.run(['assemblathon_stats.pl',fasta],stdout=assemblathon_mfasta)
-        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta.name],stdout=assemblathon_mfasta)    
-    
-    # Assemblathon files
-    if assemblathon_fasta:
+        #process=sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta.name],stdout=sp.PIPE)
+        proc=sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta.name],stdout=assemblathon_fasta)
+        #assemblathon_fasta = process.stdout
         df_assemblathon_fasta = parse_assemblathon(assemblathon_fasta, "title")
-        # global_stat_assemblathon = dict()
-        # global_stat_assemblathon["0Number of contigs"]         = df_assemblathon_fasta.iloc[0,0]
-        # global_stat_assemblathon["1Total size of contigs"]     = df_assemblathon_fasta.iloc[1,0]
-        # global_stat_assemblathon["2Longest contig"]            = df_assemblathon_fasta.iloc[2,0]
-        # global_stat_assemblathon["3Shortest contiged"]         = df_assemblathon_fasta.iloc[3,0]
-        # nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_fasta.iloc[4,0])
-        # global_stat_assemblathon["4Number of contigs > 1K nt"] = nbLongContigs
-        # global_stat_assemblathon["5N50 contig length"]         = df_assemblathon_fasta.iloc[5,0]
-        # global_stat_assemblathon["6L50 contig count"]          = df_assemblathon_fasta.iloc[6,0]
-        # html += get_html_assemblathon_descr(global_stat_assemblathon)    
-        print("Assemblathon statistics")
+        global_stat_assemblathon_fasta = dict()
+        global_stat_assemblathon_fasta["0Number of contigs"]         = df_assemblathon_fasta.iloc[0,0]
+        global_stat_assemblathon_fasta["1Mean contigs length"]       = int(df_assemblathon_fasta.iloc[1,0]) / int(df_assemblathon_fasta.iloc[0,0] )
+        global_stat_assemblathon_fasta["2Total size of contigs"]     = df_assemblathon_fasta.iloc[1,0]
+        global_stat_assemblathon_fasta["3Longest contig"]            = df_assemblathon_fasta.iloc[2,0]
+        global_stat_assemblathon_fasta["4Shortest contiged"]         = df_assemblathon_fasta.iloc[3,0]
+        nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_fasta.iloc[4,0])
+        global_stat_assemblathon_fasta["5Number of contigs > 1K nt"] = nbLongContigs
+        global_stat_assemblathon_fasta["6N50 contig length"]         = df_assemblathon_fasta.iloc[5,0]
+        global_stat_assemblathon_fasta["7L50 contig count"]          = df_assemblathon_fasta.iloc[6,0]
 
-# Contig FASTA - Number of seq.	1 000  // df_assemblathon_fasta.iloc[0,0]  
-# Contig FASTA - Mean seq. length	874  //       df_assemblathon_fasta.iloc[0,0] / df_assemblathon_fasta.iloc[1,0]
-# Contig FASTA with feature(s) - Number of seq.	1 000 //  df_assemblathon_mfasta.iloc[0,0]
-# Contig FASTA with feature(s) - Mean seq. length	1 120 //   df_assemblathon_mfasta.iloc[0,0] / df_assemblathon_mfasta.iloc[1,0]
-# Number of modified sequences	500           / 0
-# Number of distinct features in GTF	1         / 0
-# Number of features in GTF                      / 0
+    if mfasta:
+        assemblathon_mfasta_name = output_path + "_" + os.path.splitext(os.path.basename(mfasta.name))[0] + '_assemblathon.txt'
+        with open(assemblathon_mfasta_name,'w') as assemblathon_mfasta :
+            #sp.run(['assemblathon_stats.pl',fasta],stdout=assemblathon_mfasta)
+            #sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta.name],stdout=sp.PIPE)   
+            sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta.name],stdout=assemblathon_mfasta)   
+            #assemblathon_mfasta = proc.stdout.read()
+            df_assemblathon_mfasta = parse_assemblathon(assemblathon_mfasta, "title")
+            global_stat_assemblathon_mfasta = dict()
+            global_stat_assemblathon_mfasta["0Number of contigs"]         = df_assemblathon_mfasta.iloc[0,0]
+            global_stat_assemblathon_mfasta["1Mean contigs length"]       = int(df_assemblathon_mfasta.iloc[1,0]) / int(df_assemblathon_mfasta.iloc[0,0])
+            global_stat_assemblathon_mfasta["2Total size of contigs"]     = df_assemblathon_mfasta.iloc[1,0]
+            global_stat_assemblathon_mfasta["3Longest contig"]            = df_assemblathon_mfasta.iloc[2,0]
+            global_stat_assemblathon_mfasta["4Shortest contiged"]         = df_assemblathon_mfasta.iloc[3,0]
+            nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_mfasta.iloc[4,0])
+            global_stat_assemblathon_mfasta["5Number of contigs > 1K nt"] = nbLongContigs
+            global_stat_assemblathon_mfasta["6N50 contig length"]         = df_assemblathon_mfasta.iloc[5,0]
+            global_stat_assemblathon_mfasta["7L50 contig count"]          = df_assemblathon_mfasta.iloc[6,0]
+    
 
     print("Global statistics")
     print("CPU time = %f" %(time.process_time()-tmps2))
     print("Performance counter = %f\n" %(time.perf_counter()-tmps2c))
     tmps3=time.process_time()
     tmps3c=time.perf_counter() 
+
+
+    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta)
+
 
     # READS STAT
     # Global stat
@@ -424,8 +431,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         print('df_candidat', df_candidat, '\n\n')
     if assemblathon_fasta:
         print('df_assemblathon_fasta', df_assemblathon_fasta, '\n\n')
-    # if assemblathon_mfasta:
-    #     print('df_assemblathon_mfasta', df_assemblathon_mfasta, '\n\n')    
+    if assemblathon_mfasta:
+        print('df_assemblathon_mfasta', df_assemblathon_mfasta, '\n\n')    
 
 
 if __name__ == '__main__' :
@@ -436,8 +443,8 @@ if __name__ == '__main__' :
         with open(args.config_file, 'r') as f:
             config = configparser.ConfigParser()
             config.read([args.config_file])
-            print([args.config_file])
-
+    
+    parser = ArgumentParser()
     parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=False, dest='fasta')
     parser.add_argument('-m','--modifiedfasta', type=argparse.FileType('r'), required=False, dest='mfasta')
     parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=False, dest='gtf')
@@ -452,11 +459,35 @@ if __name__ == '__main__' :
     parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads')
     parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
 
-    for k, v in config.items("Defaults"):
-        parser.parse_args([str(k), str(v)], args)
 
-    parser.parse_args(left_argv, args)
-    print(args)
+    n=0
+    for k, v in config.items("Defaults"):
+        #parser.parse_args([str(k), str(v)], args)
+        config_args={str(k): str(v)} 
+        # https://stackoverflow.com/questions/47892580/python-argparse-required-arguments-from-configuration-file-dict
+        # use values from configuration file by default
+        parser.set_defaults(**config_args)
+        # Reset `required` attribute when provided from config file
+        for action in parser._actions:
+            if action.dest in config_args:
+                action.required = False
+        print('REQUIRED config_args : ',config_args)
+        n += 1
+
+    if n < 6:   
+        print('6 required arguments are mandatory')
+        exit(1)    
+
+    for k, v in config.items("Optionnal"):
+        #parser.parse_args([str(k), str(v)], args)
+        config_args={str(k): str(v)} 
+        parser.set_defaults(**config_args)
+        
+        print('OPTIONNAL config_args : ',config_args)     
+
+    # override with command line arguments when provided
     args = vars(parser.parse_args(left_argv, args))
+
+    print(args)
 
     simulationReport(**args)
