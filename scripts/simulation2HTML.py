@@ -43,7 +43,7 @@ from simulation2HTMLplots import *
 ############
 # SUB MAIN #
 ############
-def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str,
+def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str,
                         flagstat:str, candidat:str, split:str,
                         output:str, prefix:str, force:bool, threads:int ) :
     
@@ -88,15 +88,15 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # df_library  : pandas.DataFrame where each line is a read description from R1 (& R2) fastq file(s)
     # df_features : pandas.DataFrame where each line is a simulated features description 
     # df_candidat : pandas.DataFrame where each line is a candidat description
-    df_fasta  = parse_fasta(fasta, False)
-    df_mfasta = parse_fasta(mfasta, True)
+    df_fasta  = parse_fasta(fasta.name, False)
+    df_mfasta = parse_fasta(mfasta.name, True)
 
     if r2 :
-        df_library = parse_library(r1, r2)
+        df_library = parse_library(r1.name, r2.name)
     else :
-        df_library = parse_library(r1)
+        df_library = parse_library(r1.name)
 
-    df_features = parse_gtf(gtf)
+    df_features = parse_gtf(gtf.name)
 
     # Add a column to df_fasta with the "fasta" length (without any simulated features)
     df_mfasta["short_length"] = df_mfasta.apply(
@@ -126,27 +126,26 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     html = get_html_header()
     
     inputfiles = [
-        "Contig FASTA#" + os.path.basename(fasta),
-        "Contig FASTA with feature(s)#" + os.path.basename(mfasta),
-        "GTF of contig with feature(s)#" + os.path.basename(gtf),
-        "Read1 FASTQ#" + os.path.basename(r1)
+        "Contig FASTA#" + os.path.basename(fasta.name),
+        "Contig FASTA with feature(s)#" + os.path.basename(mfasta.name),
+        "GTF of contig with feature(s)#" + os.path.basename(gtf.name),
+        "Read1 FASTQ#" + os.path.basename(r1.name)
     ]
     if r2:
-        inputfiles.append("Read2 FASTQ#" + os.path.basename(r2))
+        inputfiles.append("Read2 FASTQ#" + os.path.basename(r2.name))
     ranks_file=""    
     if ranks:
-        ranks_file=ranks
-        inputfiles.append("Ranks#" + os.path.basename(ranks))
+        ranks_file=ranks.name
+        inputfiles.append("Ranks#" + os.path.basename(ranks.name))
     flagstat_file = ""
     if flagstat :
-        flagstat_file = flagstat
+        flagstat_file = flagstat.name
         inputfiles.append("Flagstat#" + os.path.basename(flagstat_file))
     candidat_file=""    
     if candidat:
-        candidat_file=candidat
-        inputfiles.append("Candidat#" + os.path.basename(candidat))
+        candidat_file=candidat.name
+        inputfiles.append("Candidat#" + os.path.basename(candidat.name))
 
-    # html += get_html_body1(flagstat_file, candidat_file, assemblathon_fasta)
     html += get_html_body1(flagstat_file, candidat_file)
 
    
@@ -156,7 +155,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     # SEQUENCE STAT
     # Global stat
-    nb_distinct_features, nb_ctg_by_feature, ctg_descr = stat_from_gtf(gtf)
+    nb_distinct_features, nb_ctg_by_feature, ctg_descr = stat_from_gtf(gtf.name)
     global_stat = dict()
     global_stat["0Contig FASTA - Number of seq."]            = df_fasta.shape[0]
     global_stat["1Contig FASTA - Mean seq. length"]          = int(df_fasta['length'].mean())
@@ -170,22 +169,22 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         global_stat[str(c)+k] = v
         c+=1
 
-    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf, df_features['pos_on_contig'], df_fasta, df_mfasta)
+    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta)
 
 
     # Assemblathon on fasta files
     # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
-    assemblathon_fasta_name = output_path + "_" + os.path.splitext(os.path.basename(fasta))[0] + '_assemblathon.txt'
-    assemblathon_mfasta_name = output_path + "_" + os.path.splitext(os.path.basename(mfasta))[0] + '_assemblathon.txt'
-    print("Output assemblathon files")        
+    assemblathon_fasta_name = output_path + "_" + os.path.splitext(os.path.basename(fasta.name))[0] + '_assemblathon.txt'
+    assemblathon_mfasta_name = output_path + "_" + os.path.splitext(os.path.basename(mfasta.name))[0] + '_assemblathon.txt'
+    print("Output assemblathon files", assemblathon_fasta_name)        
     
     with open(assemblathon_fasta_name,'w') as assemblathon_fasta :
         #sp.run(['assemblathon_stats.pl',fasta],stdout=assemblathon_fasta)
-        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta],stdout=assemblathon_fasta)
+        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta.name],stdout=assemblathon_fasta)
 
     with open(assemblathon_mfasta_name,'w') as assemblathon_mfasta :
         #sp.run(['assemblathon_stats.pl',fasta],stdout=assemblathon_mfasta)
-        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta],stdout=assemblathon_mfasta)    
+        sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta.name],stdout=assemblathon_mfasta)    
     
     # Assemblathon files
     if assemblathon_fasta:
@@ -284,7 +283,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     ## SPLITREADSEARCH STAT
     if split:
-        df_split=parse_split(split)   
+        df_split=parse_split(split.name)   
         global_stat_split = dict()
         global_stat_split["0Number of reads overlapping potential retained introns"]= df_split.shape[0]
         global_stat_split["1Mean length of potential retained introns"]= df_split['split_length'].mean()
@@ -316,7 +315,7 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
 
     # Candidat statistics - detected introns
     if candidat:
-        df_candidat, mindepth, maxlen = parse_candidat(candidat)
+        df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
 
          # Definition dict
         definitions = dict()
@@ -374,29 +373,29 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
     # https://fr.wikipedia.org/wiki/Pr%C3%A9cision_et_rappel"
     ##  les "features" qui ont assez de lectures les couvrant pour être trouvées. Il n'y que celles-ci qui pourront être vues comme T (True).
     # TP = nombre de "features" détectables et trouvées (assez de profondeur et bonnes bornes). 
-    #TP = nbOverlap - nonCanonical - minimumDepth
-    TP = nbTotCandidatsIncludingFeatures
+    #TP = nbTotCandidatsIncludingFeatures
+    TP = 42
     # TN = nombre de "features" détectables non couvertes par des lectures et/ou couvertes par un nombre de lectures après alignement sont sous le seuil de profondeur (alors que dans la simulation c'était le cas)
     # PROFONDEUR (DEP)
-    #TN =  nbOverlap - df_features.shape[0]
-    TN =  minimumDepth
+    #TN =  minimumDepth
+    TN = 42
     # FP = nombre de zones hors "feature" ou "features" indétectables avec une couverture insuffisante
     # COUVERTURE (LEN)
-    #FP = nbOverlap - df_candidat.shape[0]
-    FP = nbSameStartEnd
+    #FP = nbSameStartEnd
+    FP = 42
     # FN = nombre de zones hors "feature" ou "features" indétectables trouvées (passant le seuil de profondeur)
-    # nb candidat - nb features
-    FN = df_candidat.shape[0] - df_features.shape[0]
+    # df_candidat.shape[0] - df_features.shape[0]
+    FN = 42
 
-    global_stat_precision= dict()
-    precision = TP/(FP+TP)
-    global_stat_precision["0Precision (between 0 - 1)"]= precision
-    recall = TP/(TN+TP)
-    global_stat_precision["1Recall or sensitivity (0.0 for no recall, 1.0 for full or perfect recall)"] = recall
-    #global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
-    global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
+    # global_stat_precision= dict()
+    # precision = TP/(FP+TP)
+    # global_stat_precision["0Precision (between 0 - 1)"]= precision
+    # recall = TP/(TN+TP)
+    # global_stat_precision["1Recall or sensitivity (0.0 for no recall, 1.0 for full or perfect recall)"] = recall
+    # #global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
+    # global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
 
-    html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf)
+    # html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf)
 
     print("Detectability statistics")
     print("CPU time = %f" %(time.process_time()-tmps8))
@@ -425,8 +424,8 @@ def simulationReport(   fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:st
         print('df_candidat', df_candidat, '\n\n')
     if assemblathon_fasta:
         print('df_assemblathon_fasta', df_assemblathon_fasta, '\n\n')
-    if assemblathon_mfasta:
-        print('df_assemblathon_mfasta', df_assemblathon_mfasta, '\n\n')    
+    # if assemblathon_mfasta:
+    #     print('df_assemblathon_mfasta', df_assemblathon_mfasta, '\n\n')    
 
 
 if __name__ == '__main__' :
@@ -437,6 +436,7 @@ if __name__ == '__main__' :
         with open(args.config_file, 'r') as f:
             config = configparser.ConfigParser()
             config.read([args.config_file])
+            print([args.config_file])
 
     parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=False, dest='fasta')
     parser.add_argument('-m','--modifiedfasta', type=argparse.FileType('r'), required=False, dest='mfasta')
@@ -460,26 +460,3 @@ if __name__ == '__main__' :
     args = vars(parser.parse_args(left_argv, args))
 
     simulationReport(**args)
-
-    # parser = argparse.ArgumentParser(add_help=False)
-    # parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta')
-    # parser.add_argument('-m','--modifiedfasta', type=argparse.FileType('r'), required=True, dest='mfasta')
-    # parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=True, dest='gtf')
-    # parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1')
-    # parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
-    # parser.add_argument('--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat')
-    # parser.add_argument('--assemblathon', type=argparse.FileType('r'), required=False, dest='assemblathon') 
-    # parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranks')
-    # parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
-    # parser.add_argument('-s','--split', type=argparse.FileType('r'), required=False, dest='split')
-    # parser.add_argument('-o','--output', type=str, required=True, dest='output')
-    # parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
-    # parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads')
-    # parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
-
-    # args = vars(parser.parse_args())
-    
-    # simulationReport(**args)
-    # simulationReport(fasta, mfasta, gtf, r1, r2, ranks,
-    #                     flagstat, candidat, split,
-    #                     output, prefix, force, threads)
