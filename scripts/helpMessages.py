@@ -645,9 +645,13 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-rF] [-l,-H INT] [-p STR
     print(cw.fill(
 'Maximal length of random contigs [1500].'
     ))
-    print('   -r/--random-part INT',end='')
+    print('   -r/--random-part INT\t',end='')
     print(cw.fill(
-'\tInsert intron in all or a part (percent) of the simulated contigs [100].'
+'Insert  intron  in all  or a part  (percentage)  of  the simulated contigs [100].'
+    ))
+    print('   --mix/--mix-state\t',end='')
+    print(cw.fill(
+'Boolean which rules  if the generated contigs (input  of simulateReads) is mixed i.e. if the library contains the transcript in two state when a intron is retained  or an exon is spliced.'
     ))
     print('   -l/--lower-intron-len INT',end='')
     print(cw.fill(

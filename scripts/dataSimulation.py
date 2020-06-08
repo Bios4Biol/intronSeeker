@@ -88,7 +88,7 @@ def insert_intron(contig_seq : str, lower : int, upper: int,):
     intron_end = insert_pos+rand_length+4
     return new_seq, insert_pos, intron_end
 
-def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, upper:int, prefix:str, output:str, force:bool) :
+def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, upper:int, prefix:str, output:str, force:bool, mix: bool) :
     """
     Simulate a set of nb contigs (with entirely random sequence) with random length beetween [mini,maxi].
     In each contig, an intron with a random length beetween [lower,upper] is randomly inserted. 
@@ -111,6 +111,8 @@ def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, uppe
     :type upper: int
     :param output: Basename of the two output files
     :type output: str
+    :param mix: Boolean which rules if a mixed library is generated.
+    :type mix: bool
     
     :Example:
     >>> full_random_simulation(10,150,1000,False,150,1000,"FullRandomSimulation") # doctest: +SKIP
@@ -186,6 +188,8 @@ def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, uppe
             reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
         else:
             reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0]+".modif",description=description))
+            if mix :
+                reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
      
         if distrib[c] :
             r = "+"
