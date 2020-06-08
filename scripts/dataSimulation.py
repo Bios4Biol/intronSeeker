@@ -88,11 +88,11 @@ def insert_intron(contig_seq : str, lower : int, upper: int,):
     intron_end = insert_pos+rand_length+4
     return new_seq, insert_pos, intron_end
 
-def full_random_simulation(nb:int, maxi:int, mini:int, half:bool, lower:int, upper:int, prefix:str, output:str, force:bool) :
+def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, upper:int, prefix:str, output:str, force:bool) :
     """
     Simulate a set of nb contigs (with entirely random sequence) with random length beetween [mini,maxi].
     In each contig, an intron with a random length beetween [lower,upper] is randomly inserted. 
-    If half is True, only a random half of simulated contigs have a intron insertion.  
+    If part isn't 100%, only a random part of simulated contigs have a intron insertion.  
     Write the results in two files : 
         - output_contigs.fa : FASTA of the simulated contigs
         - output_introns.txt : Tabulate-separated values which define introns (contig,start,end,reverse) 
@@ -103,8 +103,8 @@ def full_random_simulation(nb:int, maxi:int, mini:int, half:bool, lower:int, upp
     :type maxi: int
     :param mini: Minimum length of contigs
     :type mini: int
-    :param half: Boolean which rules if the intron insertion is performed on a random half of the contigs
-    :type half: bool
+    :param print: int the intron insertion is performed only on radom part% of the contigs
+    :type part: int
     :param lower: Minimum length of inserted introns
     :type lower: int
     :param upper: Maximum length of inserted introns
@@ -146,13 +146,10 @@ def full_random_simulation(nb:int, maxi:int, mini:int, half:bool, lower:int, upp
         lower= U
     
     # Define the distribution of the intron insertion among the contigs
-    # Two cases : all the contigs are modified or only a random half 
-    if half :
-        distrib = [0]*int(nb/2)
-        distrib.extend([1]*(nb-len(distrib)))
-        random.shuffle(distrib)
-    else :
-        distrib = [1]*nb
+    # Two cases : all the contigs are modified or only a random part 
+    distrib = [1]*int(nb*part/100)
+    distrib.extend([0]*(nb-len(distrib)))
+    random.shuffle(distrib)
     
     #Generate the contigs
     reference_contigs_set = []

@@ -645,9 +645,9 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-rF] [-l,-H INT] [-p STR
     print(cw.fill(
 'Maximal length of random contigs [1500].'
     ))
-    print('   -r/--random-half',end='')
+    print('   -r/--random-part INT',end='')
     print(cw.fill(
-'\tInsert intron in random half of the simulated contigs.'
+'\tInsert intron in all or a part (percent) of the simulated contigs [100].'
     ))
     print('   -l/--lower-intron-len INT',end='')
     print(cw.fill(

@@ -95,7 +95,7 @@ def parse_arguments() :
     parser_frs.add_argument('-n','--nb_contigs', type=int, default=2000, dest='nb')
     parser_frs.add_argument('-m','--min-contig-len', type=int, default=250, dest='mini')
     parser_frs.add_argument('-M','--max-contig-len', type=int, default=1500, dest='maxi')
-    parser_frs.add_argument('-r','--random-half', default=False, action='store_true',dest='half')
+    parser_frs.add_argument('-r','--random-part', type=int, default=100, dest='part')
     parser_frs.add_argument('-l', '--lower-intron-len',  type=int, default=250, dest='lower')
     parser_frs.add_argument('-H', '--higher-intron-len', type=int, default=750, dest='upper')
     parser_frs.add_argument('-o', '--outputDir', type=str, required=True, dest='output')
