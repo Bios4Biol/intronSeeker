@@ -3,6 +3,7 @@
 # Internal modules
 from simulation2HTMLparse import *
 from simulation2HTMLplots import *
+from collections import defaultdict
 
 
 def get_html_header():
@@ -294,18 +295,10 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
         </div>
          <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Assemblathon statistics on FASTA</h5>
+                <h5>Assemblathon statistics</h5>
                 <span class="anchor" id="ref-descr_assemblathon_fasta"></span>
-'''+dict_to_table(global_stat_assemblathon_fasta,-1,True, False)+'''
-            </div> '''
-    if global_stat_assemblathon_mfasta:
-        r += '''          
-            <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Assemblathon statistics on Contig FASTA with feature(s)</h5>
-                <span class="anchor" id="ref-descr_assemblathon_fasta"></span>
-'''+dict_to_table(global_stat_assemblathon_mfasta,-1,True, False)+'''
-            </div> '''
-    r += '''          
+'''+dict_to_table_multi_col(global_stat_assemblathon_fasta,global_stat_assemblathon_mfasta)+'''
+            </div>          
         </div>    
 '''
 
@@ -377,18 +370,6 @@ def get_html_flagstat_descr(global_stat_flagstat:dict):
 '''
     return r
    
-def get_html_assemblathon_descr(global_stat_assemblathon:dict):
-    r = '''
-		<div class="d-flex">
-            <div class="mt-4 mr-4 pl-0 col-md-4">
-            <h5>Assemblathon statistics</h5>
-                <span class="anchor" id="assemblystat"></span>
-'''+dict_to_table(global_stat_assemblathon,-1,True, False)+'''
-            </div>
-        </div>
-'''
-    return r
-
 def get_html_table_descr(global_stats_table):
     r = '''
 		<div class="d-flex">
@@ -548,6 +529,50 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool, decimals : bool):
         c += 1
     table += "</tbody></table>"
     return table
+
+def dict_to_table_multi_col(d1 : dict, d2 ="", d3=""):
+    table = '''
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+''' 
+    c  = 0
+    c2 = 0
+    c3 = 0
+    table1 =""
+    table2 =""
+    table3 =""
+    if d1:
+        for k, v in sorted(d1.items(), key=lambda t: t[0]):
+            table1 += "<tr><td class='valn text-right'></td><td>Contig FASTA</td></tr>"   
+            table1 += "<tr><td class='valn text-right'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(v)), ' ')  + "</td></tr>"        
+            c += 1
+    if d1 and d2:
+        table1 = ""
+        table2 += "<tr><td></td><td>Contig FASTA</td><td>Contig FASTA with feature(s)</td></tr>"
+        dd = defaultdict(list)
+        for d in (d1, d2): # you can list as many input dicts as you want here
+            for key, value in d.items():
+                dd[key].append(value)
+        for k, v in sorted(dd.items(), key=lambda t: t[0]):
+            table2 += "<tr><td class='valn text-right'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(v[0])), ' ') + "</td><td class='valn text-right'>" + split_int(round(float(v[1])), ' ') + "</td></tr>"    
+            c2 += 1
+    if d3:  
+        table1=""
+        table2=""
+        table3 += "<tr><td class='valn text-right'></td><td>Contig FASTA</td><td>Contig FASTA with feature's)</td><td>Introns contig FASTA</td></tr>"    
+        dd2 = defaultdict(list)
+        for d in (d1, d2, d3):
+            for key, value in d.items():
+                dd2[key].append(value)
+        print('dd2',dd2)        
+        for k, v in sorted(dd2.items(), key=lambda t: t[0]):
+            table3 += "<tr><td class='valn text-right'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(v[0])  + "</td><td class='valn text-right'>" + split_int(v[1]) + "</td><td class='valn text-right'>" + split_int(v[2]) + "</td></tr>"    
+            c3 += 1
+    table += table1
+    table += table2
+    table += table3    
+    table += "</tbody></table>"
+    return table    
 
 # Return HTML table from dict (as dict_to_table function) but with 3 columns instead of 2
 # Param 1 : TP is the number of detectable and found features (int value)

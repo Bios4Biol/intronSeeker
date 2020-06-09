@@ -175,14 +175,15 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     assemblathon_fasta_name = output_path + "_" + os.path.splitext(os.path.basename(fasta.name))[0] + '_assemblathon.txt'
   
     with open(assemblathon_fasta_name,'w') as assemblathon_fasta :
-        #sp.run(['bin/assemblathon_stats.pl',fasta],stdout=assemblathon_fasta)
-        #process=sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta.name],stdout=sp.PIPE)
+        
         proc=sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta.name],stdout=assemblathon_fasta)
-        #assemblathon_fasta = process.stdout
         df_assemblathon_fasta = parse_assemblathon(assemblathon_fasta, "title")
+        
+        # df_assemblathon_fasta = parse_assemblathon2(assemblathon_fasta, "title", fasta.name)
         global_stat_assemblathon_fasta = dict()
         global_stat_assemblathon_fasta["0Number of contigs"]         = df_assemblathon_fasta.iloc[0,0]
-        global_stat_assemblathon_fasta["1Mean contigs length"]       = int(df_assemblathon_fasta.iloc[1,0]) / int(df_assemblathon_fasta.iloc[0,0] )
+        mean = int(df_assemblathon_fasta.iloc[1,0]) / int(df_assemblathon_fasta.iloc[0,0])
+        global_stat_assemblathon_fasta["1Mean contigs length"]       = round(int(mean), 0)
         global_stat_assemblathon_fasta["2Total size of contigs"]     = df_assemblathon_fasta.iloc[1,0]
         global_stat_assemblathon_fasta["3Longest contig"]            = df_assemblathon_fasta.iloc[2,0]
         global_stat_assemblathon_fasta["4Shortest contiged"]         = df_assemblathon_fasta.iloc[3,0]
@@ -209,7 +210,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             global_stat_assemblathon_mfasta["5Number of contigs > 1K nt"] = nbLongContigs
             global_stat_assemblathon_mfasta["6N50 contig length"]         = df_assemblathon_mfasta.iloc[5,0]
             global_stat_assemblathon_mfasta["7L50 contig count"]          = df_assemblathon_mfasta.iloc[6,0]
-    
 
     print("Global statistics")
     print("CPU time = %f" %(time.process_time()-tmps2))

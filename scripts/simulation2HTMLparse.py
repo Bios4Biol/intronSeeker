@@ -3,10 +3,12 @@
 import numpy as np
 import pandas as pd
 import pysam   # To generate a dataframe from a BAM : pysam and pickle
+import subprocess as sp # To run subprocess
 import re      # To work on regular expression
 import gzip    # To open gzip files R1 R2
 from collections import OrderedDict   # To parse flagstat
 from Bio import SeqIO   # To parse fasta file
+
 
 
 
@@ -257,6 +259,18 @@ def parse_assemblathon(file: str, name : str ) :
     with open(file.name,"r") as f :
         assemblathon = { re.split("\s\s+",line.strip(),1)[0] : re.split("\s\s+",line.strip(),1)[1] for line in f if parsing_test(re.split("\s\s+",line.strip(),1))}
     return pd.DataFrame(data=assemblathon.values(),index=assemblathon.keys(),columns=[name])    
+
+# def parse_assemblathon2(file: str, name : str, fasta : str ) :
+#     command ='/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl '+ fasta
+#     popen = sp.Popen(command, stdout = sp.PIPE, shell = True, encoding = 'utf8')
+#     reader = outFile.reader(popen.stdout, delimiter = '\t')
+#     for line in reader:
+#                 assemblathon = { re.split("\s\s+",line.strip(),1)[0] : re.split("\s\s+",line.strip(),1)[1] for line in f if parsing_test(re.split("\s\s+",line.strip(),1))}
+#                 popen.wait()
+#     if popen.returncode != 0:
+#         raise RuntimeError('Error')
+#     return pd.DataFrame(data=assemblathon.values(),index=assemblathon.keys(),columns=[name])           
+
 
 # Return int formatted by 3 numbers. Example : 1 234 instead of 1234
 def split_int(number, separator=' ', count=3):
