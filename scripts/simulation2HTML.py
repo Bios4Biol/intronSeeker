@@ -171,45 +171,45 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         c+=1
 
     # Assemblathon on fasta files
-    # The assemblathon ouput will be named with the basename of the fasta file + '_saaemblathon.txt' as suffix
-    assemblathon_fasta_name = output_path + "_" + os.path.splitext(os.path.basename(fasta.name))[0] + '_assemblathon.txt'
-  
-    with open(assemblathon_fasta_name,'w') as assemblathon_fasta :
-        
-        proc=sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',fasta.name],stdout=assemblathon_fasta)
-        df_assemblathon_fasta = parse_assemblathon(assemblathon_fasta, "title")
-        
-        # df_assemblathon_fasta = parse_assemblathon2(assemblathon_fasta, "title", fasta.name)
-        global_stat_assemblathon_fasta = dict()
-        global_stat_assemblathon_fasta["0Number of contigs"]         = df_assemblathon_fasta.iloc[0,0]
-        mean = int(df_assemblathon_fasta.iloc[1,0]) / int(df_assemblathon_fasta.iloc[0,0])
-        global_stat_assemblathon_fasta["1Mean contigs length"]       = round(int(mean), 0)
-        global_stat_assemblathon_fasta["2Total size of contigs"]     = df_assemblathon_fasta.iloc[1,0]
-        global_stat_assemblathon_fasta["3Longest contig"]            = df_assemblathon_fasta.iloc[2,0]
-        global_stat_assemblathon_fasta["4Shortest contiged"]         = df_assemblathon_fasta.iloc[3,0]
-        nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_fasta.iloc[4,0])
-        global_stat_assemblathon_fasta["5Number of contigs > 1K nt"] = nbLongContigs
-        global_stat_assemblathon_fasta["6N50 contig length"]         = df_assemblathon_fasta.iloc[5,0]
-        global_stat_assemblathon_fasta["7L50 contig count"]          = df_assemblathon_fasta.iloc[6,0]
+            
+    nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = assemblathon_stats(fasta.name)
+    global_stat_assemblathon_fasta = dict()
+    global_stat_assemblathon_fasta["0Number of contigs"]         = nbContigs
+    global_stat_assemblathon_fasta["1Mean contigs length"]       = round(meanContigSize, 0)
+    global_stat_assemblathon_fasta["2Total size of contigs"]     = totContigSize
+    global_stat_assemblathon_fasta["3Longest contig"]            = longestContig
+    global_stat_assemblathon_fasta["4Shortest contiged"]         = shortestContig
+    global_stat_assemblathon_fasta["5Number of contigs > 1K nt"] = nbContigsSup1K
+    global_stat_assemblathon_fasta["6N50 contig length"]         = n50
+    global_stat_assemblathon_fasta["7L50 contig count"]          = l50
 
     if mfasta:
-        assemblathon_mfasta_name = output_path + "_" + os.path.splitext(os.path.basename(mfasta.name))[0] + '_assemblathon.txt'
-        with open(assemblathon_mfasta_name,'w') as assemblathon_mfasta :
-            #sp.run(['assemblathon_stats.pl',fasta],stdout=assemblathon_mfasta)
-            #sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta.name],stdout=sp.PIPE)   
-            sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta.name],stdout=assemblathon_mfasta)   
-            #assemblathon_mfasta = proc.stdout.read()
-            df_assemblathon_mfasta = parse_assemblathon(assemblathon_mfasta, "title")
-            global_stat_assemblathon_mfasta = dict()
-            global_stat_assemblathon_mfasta["0Number of contigs"]         = df_assemblathon_mfasta.iloc[0,0]
-            global_stat_assemblathon_mfasta["1Mean contigs length"]       = int(df_assemblathon_mfasta.iloc[1,0]) / int(df_assemblathon_mfasta.iloc[0,0])
-            global_stat_assemblathon_mfasta["2Total size of contigs"]     = df_assemblathon_mfasta.iloc[1,0]
-            global_stat_assemblathon_mfasta["3Longest contig"]            = df_assemblathon_mfasta.iloc[2,0]
-            global_stat_assemblathon_mfasta["4Shortest contiged"]         = df_assemblathon_mfasta.iloc[3,0]
-            nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_mfasta.iloc[4,0])
-            global_stat_assemblathon_mfasta["5Number of contigs > 1K nt"] = nbLongContigs
-            global_stat_assemblathon_mfasta["6N50 contig length"]         = df_assemblathon_mfasta.iloc[5,0]
-            global_stat_assemblathon_mfasta["7L50 contig count"]          = df_assemblathon_mfasta.iloc[6,0]
+        nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = assemblathon_stats(mfasta.name)
+        global_stat_assemblathon_mfasta = dict()
+        global_stat_assemblathon_mfasta["0Number of contigs"]         = nbContigs
+        global_stat_assemblathon_mfasta["1Mean contigs length"]       = round(meanContigSize, 0)
+        global_stat_assemblathon_mfasta["2Total size of contigs"]     = totContigSize
+        global_stat_assemblathon_mfasta["3Longest contig"]            = longestContig
+        global_stat_assemblathon_mfasta["4Shortest contiged"]         = shortestContig
+        global_stat_assemblathon_mfasta["5Number of contigs > 1K nt"] = nbContigsSup1K
+        global_stat_assemblathon_mfasta["6N50 contig length"]         = n50
+        global_stat_assemblathon_mfasta["7L50 contig count"]          = l50
+
+    # if mfasta:
+    #     assemblathon_mfasta_name = output_path + "_" + os.path.splitext(os.path.basename(mfasta.name))[0] + '_assemblathon.txt'
+    #     with open(assemblathon_mfasta_name,'w') as assemblathon_mfasta :
+    #         sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta.name],stdout=assemblathon_mfasta)   
+    #         df_assemblathon_mfasta = parse_assemblathon(assemblathon_mfasta, "title")
+    #         global_stat_assemblathon_mfasta = dict()
+    #         global_stat_assemblathon_mfasta["0Number of contigs"]         = df_assemblathon_mfasta.iloc[0,0]
+    #         global_stat_assemblathon_mfasta["1Mean contigs length"]       = int(df_assemblathon_mfasta.iloc[1,0]) / int(df_assemblathon_mfasta.iloc[0,0])
+    #         global_stat_assemblathon_mfasta["2Total size of contigs"]     = df_assemblathon_mfasta.iloc[1,0]
+    #         global_stat_assemblathon_mfasta["3Longest contig"]            = df_assemblathon_mfasta.iloc[2,0]
+    #         global_stat_assemblathon_mfasta["4Shortest contiged"]         = df_assemblathon_mfasta.iloc[3,0]
+    #         nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_mfasta.iloc[4,0])
+    #         global_stat_assemblathon_mfasta["5Number of contigs > 1K nt"] = nbLongContigs
+    #         global_stat_assemblathon_mfasta["6N50 contig length"]         = df_assemblathon_mfasta.iloc[5,0]
+    #         global_stat_assemblathon_mfasta["7L50 contig count"]          = df_assemblathon_mfasta.iloc[6,0]
 
     print("Global statistics")
     print("CPU time = %f" %(time.process_time()-tmps2))
@@ -369,6 +369,10 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     tmps8=time.process_time()
     tmps8c=time.perf_counter() 
 
+
+    
+    # df_cov_lect =  process_intron(df_features,df_library)
+    # print('df_cov_lect', df_cov_lect)
     
     # Precision, recall and F1 score
     # TP is the number of detectable and found features (int value)
@@ -428,10 +432,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         print('df_split', df_split, '\n\n')
     if candidat:
         print('df_candidat', df_candidat, '\n\n')
-    if assemblathon_fasta:
-        print('df_assemblathon_fasta', df_assemblathon_fasta, '\n\n')
-    if assemblathon_mfasta:
-        print('df_assemblathon_mfasta', df_assemblathon_mfasta, '\n\n')    
 
 
 if __name__ == '__main__' :

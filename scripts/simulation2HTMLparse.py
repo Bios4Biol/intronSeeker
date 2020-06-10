@@ -254,22 +254,43 @@ def parsing_test(items) :
     else :
         return False
 
-# Parse assemblathon files to compare assembly with Assemblathon.pl statistics
-def parse_assemblathon(file: str, name : str ) :
-    with open(file.name,"r") as f :
-        assemblathon = { re.split("\s\s+",line.strip(),1)[0] : re.split("\s\s+",line.strip(),1)[1] for line in f if parsing_test(re.split("\s\s+",line.strip(),1))}
-    return pd.DataFrame(data=assemblathon.values(),index=assemblathon.keys(),columns=[name])    
+def assemblathon_stats(fasta : str ) :
+    command ='/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl '+ fasta  #TODO: modif sp run perl path
+    #command ='assemblathon_stats.pl '+ fasta  #TODO: modif sp run perl path : /bin/sh: assemblathon_stats.pl : commande introuvable
+    popen = sp.Popen(command, stdout = sp.PIPE, shell = True, encoding = 'utf8')
+    reader = popen.stdout.read()
+    nbContigs=0
+    totContigSize=0
+    longestContig=0
+    shortestContig=0
+    nbContigsSup1K=0
+    n50=0
+    l50=0
+    meanContigSize=0
+    res = [x.strip() for x in reader.split('\n')]
+    for i in res:
+        if "Number of contigs       " in  i:
+            nbContigs=int(i.split("       ")[1].rstrip())
+        elif "Total size of contigs    " in i:
+            totContigSize=int(i.split("    ")[1].rstrip())
+        elif "Longest contig" in i:
+            longestContig=int(i.split("       ")[1].rstrip())
+        elif "Shortest contig" in i:
+            shortestContig=int(i.split("        ")[1].rstrip())
+        elif "Number of contigs > 1K nt        " in i:  
+            nbContigsSup1Ktmp=i.split("        ")[1].rstrip()
+            nbContigsSup1K=int(re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", nbContigsSup1Ktmp))
+        elif "N50 contig length" in i:             
+            n50=int(i.split("       ")[1].rstrip())
+        elif "L50 contig count" in i:      
+            l50=int(i.split("        ")[1].rstrip())
+        elif "Mean contig size" in i:               
+            meanContigSize=int(i.split("       ")[1].rstrip())
+        popen.wait()
+    if popen.returncode != 0:
+        raise RuntimeError('Error')
 
-# def parse_assemblathon2(file: str, name : str, fasta : str ) :
-#     command ='/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl '+ fasta
-#     popen = sp.Popen(command, stdout = sp.PIPE, shell = True, encoding = 'utf8')
-#     reader = outFile.reader(popen.stdout, delimiter = '\t')
-#     for line in reader:
-#                 assemblathon = { re.split("\s\s+",line.strip(),1)[0] : re.split("\s\s+",line.strip(),1)[1] for line in f if parsing_test(re.split("\s\s+",line.strip(),1))}
-#                 popen.wait()
-#     if popen.returncode != 0:
-#         raise RuntimeError('Error')
-#     return pd.DataFrame(data=assemblathon.values(),index=assemblathon.keys(),columns=[name])           
+    return nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize
 
 
 # Return int formatted by 3 numbers. Example : 1 234 instead of 1234
@@ -281,3 +302,43 @@ def split_int(number, separator=' ', count=3):
 # Return string split by 3 characters
 def split(str, num):
     return [ str[start:start+num] for start in range(0, len(str), num) ]
+
+def process_intron(df_features : dict, df_library: dict): 
+    
+    # df_cov_lect = pd.DataFrame(df_library.loc[lambda df : 
+    #                     (df_library.contig+'.modif'== str(df_features.contig))
+    #                     & (df_features.start > df.start)
+    #                     & (df_features.start < df.end)
+    #                     ])
+
+
+    # Add one column in df_feature with nb reads overlapping each intron/feature
+#     library head :              contig  start  end  complement
+# lecture                                    
+# 80032/1   SEQUENCE1      0  101       False
+# 110561/1  SEQUENCE1      0  101       False
+# 119188/1  SEQUENCE1      0  101       False
+# 105463/2  SEQUENCE1      0  101       False
+# 122895/1  SEQUENCE1      2  103       False 
+
+
+# features head :                                     contig          feature  start   end  length flanks  pos_on_contig
+# features                                                                                              
+# SEQUENCE1.modif|635|962    SEQUENCE1.modif  retained_intron    635   962     327  GT_AG      63.310070
+# SEQUENCE2.modif|941|1318   SEQUENCE2.modif  retained_intron    941  1318     377  GT_AG      76.317924
+
+   
+    df_cov_lect = pd.DataFrame()
+    print('df_library[contig].contig+.modif', df_library['contig']+'.modif')
+    print('str(df_features.contig)', str(df_features['contig']))
+    nbReads=0
+ 
+    if (df_library['contig']+'.modif'== str(df_features['contig']))  & (df_features['start'] > df_library['start']) & (df_features['start']<  df_library['end']):
+        df_cov_lect['contig']   = str(df_features['contig'])
+        df_cov_lect['covering'] = True
+        df_cov_lect['nbReads'] = nbReads
+        nbReads += 1
+
+        print ('cccccccccccccc',df_cov_lect)
+
+    return df_cov_lect
