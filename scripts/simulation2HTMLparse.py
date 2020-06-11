@@ -235,6 +235,7 @@ def compute_pos_on_mfasta(df_features, df_mfasta) :
     return pd.Series([flanks,pos_on_contig],index=["flanks","pos_on_contig"])
         
 # Parse ranks file
+# Return ranks dataframe
 def parse_rank_file(rank_file) :
     with open(rank_file,"r") as rf :
         for line in rf.read().rstrip().split("\n") :
@@ -246,15 +247,17 @@ def parse_rank_file(rank_file) :
                 ranks.append(line.split("\t"))
     return pd.DataFrame(data=ranks, columns=names).set_index(names[1]).sort_index()
 
-#Useful functions :
-def parsing_test(items) :
-    items_of_interest = ["Number of contigs","Total size of contigs","Longest contig","Shortest contig","Number of contigs > 1K nt","N50 contig length","L50 contig count"]
-    if len(items) == 2 and items[0] in items_of_interest :
-        return True
-    else :
-        return False
-
-def assemblathon_stats(fasta : str ) :
+# Run assemblathon_stats.pl script then
+# Return statistics (INT format) from assemblathon file(s) :
+# nbContigs      : Number of contigs
+# totContigSize  : Total size of contigs
+# longestContig  : Longest contig
+# shortestContig : Shortest contig
+# nbContigsSup1K : Number of contigs > 1K nt
+# n50            : N50 contig length
+# l50            : L50 contig count
+# meanContigSize : Mean contig size
+def run_assemblathon(fasta : str ) :
     command ='/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl '+ fasta  #TODO: modif sp run perl path
     #command ='assemblathon_stats.pl '+ fasta  #TODO: modif sp run perl path : /bin/sh: assemblathon_stats.pl : commande introuvable
     popen = sp.Popen(command, stdout = sp.PIPE, shell = True, encoding = 'utf8')
@@ -303,42 +306,59 @@ def split_int(number, separator=' ', count=3):
 def split(str, num):
     return [ str[start:start+num] for start in range(0, len(str), num) ]
 
+
+# Process df_features and df_library dataframes
+# Return number of dectable introns (INT)
+# https://stackoverflow.com/questions/23508351/how-to-do-a-conditional-join-in-python-pandas  
 def process_intron(df_features : dict, df_library: dict): 
-    
-    # df_cov_lect = pd.DataFrame(df_library.loc[lambda df : 
-    #                     (df_library.contig+'.modif'== str(df_features.contig))
-    #                     & (df_features.start > df.start)
-    #                     & (df_features.start < df.end)
-    #                     ])
-
-
+  
     # Add one column in df_feature with nb reads overlapping each intron/feature
-#     library head :              contig  start  end  complement
-# lecture                                    
-# 80032/1   SEQUENCE1      0  101       False
-# 110561/1  SEQUENCE1      0  101       False
-# 119188/1  SEQUENCE1      0  101       False
-# 105463/2  SEQUENCE1      0  101       False
-# 122895/1  SEQUENCE1      2  103       False 
+    
+    #     library head :              contig  start  end  complement
+    # lecture                                    
+    # 80032/1   SEQUENCE1      0  101       False
+    # 110561/1  SEQUENCE1      0  101       False
+    # 119188/1  SEQUENCE1      0  101       False
+    # 105463/2  SEQUENCE1      0  101       False
+    # 122895/1  SEQUENCE1      2  103       False 
 
+    # features head :                                     contig          feature  start   end  length flanks  pos_on_contig
+    # features                                                                                              
+    # SEQUENCE1.modif|635|962    SEQUENCE1.modif  retained_intron    635   962     327  GT_AG      63.310070
+    # SEQUENCE2.modif|941|1318   SEQUENCE2.modif  retained_intron    941  1318     377  GT_AG      76.317924
+    
+    
+    # Add a new column in df_library with SEQ.modif
+    df_library.columns = ['old_contig','start','end','complement']
+    df_library['contig'] = (df_library['old_contig']+'.modif')
+    # Select only columns we need
+    df_library = df_library[['contig', 'old_contig','start', 'end']]
+    df_features = df_features[['contig', 'feature', 'start', 'end']]
 
-# features head :                                     contig          feature  start   end  length flanks  pos_on_contig
-# features                                                                                              
-# SEQUENCE1.modif|635|962    SEQUENCE1.modif  retained_intron    635   962     327  GT_AG      63.310070
-# SEQUENCE2.modif|941|1318   SEQUENCE2.modif  retained_intron    941  1318     377  GT_AG      76.317924
+    # Merge 
+    df_cov_lect = df_library.merge(df_features,on='contig', suffixes=('_lect', '_features'))
+    print('df_cov_lect', df_cov_lect) 
+    # df_cov_lect                    contig   old_contig  start_lect  end_lect          feature  start_features  end_features
+    # 0         SEQUENCE1.modif    SEQUENCE1           0       101  retained_intron             635           962
+    # 1         SEQUENCE1.modif    SEQUENCE1           0       101  retained_intron             635           962
+    # 2         SEQUENCE1.modif    SEQUENCE1           0       101  retained_intron             635           962
+    # 3         SEQUENCE1.modif    SEQUENCE1           0       101  retained_intron             635           962
+    # 4         SEQUENCE1.modif    SEQUENCE1           2       103  retained_intron             635           962
+    # ...                   ...          ...         ...       ...              ...             ...           ...
+    # 208693  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
+    # 208694  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
+    # 208695  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
+    # 208696  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
+    # 208697  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
+    
+    # And then select based on if overlapping
+    df_cov_lect = df_cov_lect[((df_cov_lect.start_features > df_cov_lect.start_lect)  & (df_cov_lect.start_features < df_cov_lect.end_lect))]
 
-   
-    df_cov_lect = pd.DataFrame()
-    print('df_library[contig].contig+.modif', df_library['contig']+'.modif')
-    print('str(df_features.contig)', str(df_features['contig']))
-    nbReads=0
- 
-    if (df_library['contig']+'.modif'== str(df_features['contig']))  & (df_features['start'] > df_library['start']) & (df_features['start']<  df_library['end']):
-        df_cov_lect['contig']   = str(df_features['contig'])
-        df_cov_lect['covering'] = True
-        df_cov_lect['nbReads'] = nbReads
-        nbReads += 1
+    # if ((df_cov_lect.start_features > df_cov_lect.start_lect)  & (df_cov_lect.start_features < df_cov_lect.end_lect)):
+    #     df_cov_lect['covering'] = True
+    print('df_cov_lect', df_cov_lect)   
 
-        print ('cccccccccccccc',df_cov_lect)
-
-    return df_cov_lect
+    # Compute number of reads overlapping each feature sums by grouping on feature and on overlapping
+    detectableIntrons = (df_cov_lect.groupby(['contig','old_contig']).sum()).shape[0]         
+  
+    return detectableIntrons

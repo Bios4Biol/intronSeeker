@@ -18,22 +18,6 @@ from simulation2HTMLparse import *
 from simulation2HTMLtags import *
 from simulation2HTMLplots import *
 
-# config = configparser.RawConfigParser() # On créé un nouvel objet "config"
-# config.read('parameters') # On lit le fichier de paramètres
-# # Récupération des parametres dans des variables
-# fasta        = config.get('MANDATORY','fasta')
-# mfasta       = config.get('MANDATORY','mfasta')
-# gtf          = config.get('MANDATORY','gtf')
-# r1           = config.get('MANDATORY','R1')
-# output       = config.get('MANDATORY','output')
-# threads      = config.get('MANDATORY','t')
-# r2           = config.get('OPTIONNAL','R2')
-# flagstat     = config.get('OPTIONNAL','flagstat')
-# ranks        = config.get('OPTIONNAL','ranks')
-# candidat     = config.get('OPTIONNAL','candidat')
-# split        = config.get('OPTIONNAL','split')
-# prefix       = config.get('OPTIONNAL','prefix')
-# force        = config.get('OPTIONNAL','force')
 
 # source activate ISeeker_environment;
 # cd scripts/; 
@@ -172,7 +156,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
     # Assemblathon on fasta files
             
-    nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = assemblathon_stats(fasta.name)
+    nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = run_assemblathon(fasta.name)
     global_stat_assemblathon_fasta = dict()
     global_stat_assemblathon_fasta["0Number of contigs"]         = nbContigs
     global_stat_assemblathon_fasta["1Mean contigs length"]       = round(meanContigSize, 0)
@@ -184,7 +168,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     global_stat_assemblathon_fasta["7L50 contig count"]          = l50
 
     if mfasta:
-        nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = assemblathon_stats(mfasta.name)
+        nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = run_assemblathon(mfasta.name)
         global_stat_assemblathon_mfasta = dict()
         global_stat_assemblathon_mfasta["0Number of contigs"]         = nbContigs
         global_stat_assemblathon_mfasta["1Mean contigs length"]       = round(meanContigSize, 0)
@@ -339,13 +323,21 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_detected_introns["1Mean length"] = round(global_stat_detected_introns["1Mean length"], 2)
         global_stat_detected_introns["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
 
-
+        nbPASS        = 0
+        nbPASSdepLEN  = 0
+        nbDepLenOK    = 0
         global_stat_filtred_detected_introns = dict()
         c = 0
         for k, v in (df_candidat['filter'].value_counts()).items() :
             for key, value in definitions.items():
                 if k == key:
-                    global_stat_filtred_detected_introns[str(c)+k+" ("+value+")"] = v
+                    global_stat_filtred_detected_introns[str(c)+k+" ("+value+")"] = v 
+                    if k == 'PASS':
+                        nbPASS = v
+                    if k == 'DP' or  k == 'LEN' or k == 'PASS':
+                        nbPASSdepLEN = v    
+                    if k != 'DP' or  k != 'LEN':
+                        nbDepLenOK = v    
                     c+=1
 
 
@@ -358,7 +350,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         for k, v in (df_features.feature.value_counts()).items() :
             global_stat_candidat_vs_gtf[str(c)+'Number of '+k+ ' in GTF'] = v
             c+=1
-        global_stat_candidat_vs_gtf[str(c+1)+"Number of detected introns corresponding features (Overlaps)"] = nbSameStartEnd
+        # Add nb reads overlapping each feature in df_cov_lect
+        detectableIntrons =  process_intron(df_features,df_library)  #TODO
+        global_stat_candidat_vs_gtf[str(c+1)+"Number of detected introns corresponding features (Overlaps)"] = detectableIntrons
         global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]   = global_stat_detected_introns["0Number"]- nbTotCandidatsIncludingFeatures
         
 
@@ -368,12 +362,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     print("Performance counter = %f\n" %(time.perf_counter()-tmps7c))
     tmps8=time.process_time()
     tmps8c=time.perf_counter() 
-
-
-    
-    # df_cov_lect =  process_intron(df_features,df_library)
-    # print('df_cov_lect', df_cov_lect)
-    
+      
     # Precision, recall and F1 score
     # TP is the number of detectable and found features (int value)
     # TN is the number of detectable and not found features (int value)
@@ -381,31 +370,24 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # FN is the number of undetectable and not found features (int value)
     
     # https://fr.wikipedia.org/wiki/Pr%C3%A9cision_et_rappel"
-    ##  les "features" qui ont assez de lectures les couvrant pour être trouvées. Il n'y que celles-ci qui pourront être vues comme T (True).
-    # TP = nombre de "features" détectables et trouvées (assez de profondeur et bonnes bornes). 
-    #TP = nbTotCandidatsIncludingFeatures
-    TP = 42
-    # TN = nombre de "features" détectables non couvertes par des lectures et/ou couvertes par un nombre de lectures après alignement sont sous le seuil de profondeur (alors que dans la simulation c'était le cas)
-    # PROFONDEUR (DEP)
-    #TN =  minimumDepth
-    TN = 42
-    # FP = nombre de zones hors "feature" ou "features" indétectables avec une couverture insuffisante
-    # COUVERTURE (LEN)
-    #FP = nbSameStartEnd
-    FP = 42
-    # FN = nombre de zones hors "feature" ou "features" indétectables trouvées (passant le seuil de profondeur)
-    # df_candidat.shape[0] - df_features.shape[0]
-    FN = 42
+    TP = nbPASSdepLEN
+    detectedIntrons= df_candidat.shape[0]
+    #TN = (detectedIntrons - nbPASS) - n
+    TN = detectableIntrons - nbPASSdepLEN
+    FP = nbPASS - TP
+    #FN = (detectedIntrons - nbPASS) - TN
+    FN = TN - (detectedIntrons-nbPASS)
 
-    # global_stat_precision= dict()
-    # precision = TP/(FP+TP)
-    # global_stat_precision["0Precision (between 0 - 1)"]= precision
-    # recall = TP/(TN+TP)
-    # global_stat_precision["1Recall or sensitivity (0.0 for no recall, 1.0 for full or perfect recall)"] = recall
-    # #global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
-    # global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
 
-    # html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf)
+    global_stat_precision= dict()
+    precision = TP/(FP+TP)
+    global_stat_precision["0Precision (between 0 - 1)"]= precision
+    recall = TP/(TN+TP)
+    global_stat_precision["1Recall or sensitivity (0.0 for no recall, 1.0 for full or perfect recall)"] = recall
+    #global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
+    global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
+
+    html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf)
 
     print("Detectability statistics")
     print("CPU time = %f" %(time.process_time()-tmps8))
