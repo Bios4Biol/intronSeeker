@@ -207,7 +207,7 @@ def get_html_body1(flagstat="", bam="", candidat=""):
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#splitstat">
 				    	<span class="oi oi-graph" aria-hidden="true"></span>
-				    	Intron reads
+				    	Split intron
 			    	</a>
 			    </li>'''  
     if candidat:
@@ -398,7 +398,7 @@ def get_html_split_descr(df_splitRead:dict):
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Intron reads</h5>
+            <h5>Split intron</h5>
                 <span class="anchor" id="splitstat"></span>
 ''' +  dict_to_table(df_splitRead, 2, True, False) + '''  
             </div>

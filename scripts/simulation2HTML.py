@@ -337,7 +337,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                     if k == 'DP' or  k == 'LEN' or k == 'PASS':
                         nbPASSdepLEN = v    
                     if k != 'DP' or  k != 'LEN':
-                        nbDepLenOK = v    
+                        nbDepLenOK = v     
                     c+=1
 
 
@@ -352,7 +352,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             c+=1
         # Add nb reads overlapping each feature in df_cov_lect
         detectableIntrons =  process_intron(df_features,df_library)  #TODO
-        global_stat_candidat_vs_gtf[str(c+1)+"Number of detected introns corresponding features (Overlaps)"] = detectableIntrons
+        global_stat_candidat_vs_gtf[str(c+1)+"Number of split reads"] = detectableIntrons
         global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]   = global_stat_detected_introns["0Number"]- nbTotCandidatsIncludingFeatures
         
 
@@ -376,7 +376,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     TN = detectableIntrons - nbPASSdepLEN
     FP = nbPASS - TP
     #FN = (detectedIntrons - nbPASS) - TN
-    FN = TN - (detectedIntrons-nbPASS)
+    FN = (detectedIntrons-nbPASS)
 
 
     global_stat_precision= dict()
