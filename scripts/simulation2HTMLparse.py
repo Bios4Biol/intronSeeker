@@ -341,10 +341,9 @@ def process_intron(df_features : dict, df_library: dict, df_candidat:dict, meanC
     # SEQUENCE763.modif|356|790	104
     # SEQUENCE245.modif|88|643	103
 
-
     #https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html
     df_detectables = pd.merge(df_detectables, df_candidat, on='ID', suffixes=('_lect', '_candidat'))
-    TP=df_detectables.shape[0]  #TD = features strictly identical between df_candidat and df_detectables
+    TP=df_detectables.shape[0]  #TP = features strictly identical between df_candidat and df_detectables
     condNoPASS = (df_detectables['filter'] != 'PASS')
     detectablePreditNeg=len(df_detectables.loc[condNoPASS])
          

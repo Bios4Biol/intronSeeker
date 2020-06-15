@@ -21,8 +21,8 @@ from simulation2HTMLplots import *
 
 # source activate ISeeker_environment;
 # cd scripts/; 
-# python3 simulation2HTML.py --config_file parameters.config -f /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/frs_sample1_contigs.fa -F -p "FRS_CASA_sample1_n1000_r_STAR"
-# scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
+# python3 simulation2HTML.py --config_file parameters.config -F 
+# scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*FRS_CASA_sample1_n1000_r_STAR*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 # See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_FRS_CASA_sample1_n1000_r_STAR_simulation.html
 
 ############
@@ -31,17 +31,6 @@ from simulation2HTMLplots import *
 def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str,
                         flagstat:str, candidat:str, split:str,
                         output:str, prefix:str, force:bool, threads:int ) :
-    
-    #Return the value (in fractional seconds) of the sum of the system and user CPU time of the current process. 
-    #It does not include time elapsed during sleep. 
-    #It is process-wide by definition. 
-    #The reference point of the returned value is undefined, 
-    #so that only the difference between the results of consecutive calls is valid.
-    tmps1=time.process_time()
-    
-    #Return the value (in fractional seconds) of a performance counter
-    #Only the difference between the results of consecutive calls is valid.
-    tmps1c=time.perf_counter() 
 
     output_path = output + "/report"
     if prefix:
@@ -102,10 +91,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     )
 
     print("Build pandas dataframes")  
-    print("CPU time = %f" %(time.process_time()-tmps1))
-    print("Performance counter = %f\n" %(time.perf_counter()-tmps1c))
-    tmps2=time.process_time()
-    tmps2c=time.perf_counter() 
 
     # HEADER
     html = get_html_header()
@@ -154,8 +139,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat[str(c)+k] = v
         c+=1
 
-    # Assemblathon on fasta files
-            
+    # ASSEMBLATHON on fasta files        
     nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = run_assemblathon(fasta.name)
     global_stat_assemblathon_fasta = dict()
     global_stat_assemblathon_fasta["0Number of contigs"]         = nbContigs
@@ -179,33 +163,10 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_assemblathon_mfasta["6N50 contig length"]         = n50
         global_stat_assemblathon_mfasta["7L50 contig count"]          = l50
 
-    # if mfasta:
-    #     assemblathon_mfasta_name = output_path + "_" + os.path.splitext(os.path.basename(mfasta.name))[0] + '_assemblathon.txt'
-    #     with open(assemblathon_mfasta_name,'w') as assemblathon_mfasta :
-    #         sp.run(['/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl',mfasta.name],stdout=assemblathon_mfasta)   
-    #         df_assemblathon_mfasta = parse_assemblathon(assemblathon_mfasta, "title")
-    #         global_stat_assemblathon_mfasta = dict()
-    #         global_stat_assemblathon_mfasta["0Number of contigs"]         = df_assemblathon_mfasta.iloc[0,0]
-    #         global_stat_assemblathon_mfasta["1Mean contigs length"]       = int(df_assemblathon_mfasta.iloc[1,0]) / int(df_assemblathon_mfasta.iloc[0,0])
-    #         global_stat_assemblathon_mfasta["2Total size of contigs"]     = df_assemblathon_mfasta.iloc[1,0]
-    #         global_stat_assemblathon_mfasta["3Longest contig"]            = df_assemblathon_mfasta.iloc[2,0]
-    #         global_stat_assemblathon_mfasta["4Shortest contiged"]         = df_assemblathon_mfasta.iloc[3,0]
-    #         nbLongContigs=re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", df_assemblathon_mfasta.iloc[4,0])
-    #         global_stat_assemblathon_mfasta["5Number of contigs > 1K nt"] = nbLongContigs
-    #         global_stat_assemblathon_mfasta["6N50 contig length"]         = df_assemblathon_mfasta.iloc[5,0]
-    #         global_stat_assemblathon_mfasta["7L50 contig count"]          = df_assemblathon_mfasta.iloc[6,0]
-
-    print("Global statistics")
-    print("CPU time = %f" %(time.process_time()-tmps2))
-    print("Performance counter = %f\n" %(time.perf_counter()-tmps2c))
-    tmps3=time.process_time()
-    tmps3c=time.perf_counter() 
-
-
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta)
+    print("Global statistics")
 
-
-    # READS STAT
+    # READS STAT 
     # Global stat
     global_stat_fastq = dict()
     global_stat_fastq["0Number of reads"] = df_library['contig'].count()
@@ -221,11 +182,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
       
     html += get_html_reads_descr(global_stat_fastq)
     print("Reads statistics")
-    print("CPU time = %f" %(time.process_time()-tmps3))
-    print("Performance counter = %f\n" %(time.perf_counter()-tmps3c))
-    tmps4=time.process_time()
-    tmps4c=time.perf_counter() 
-
 
     # ABUNDANCE number of reads by contig
     # Build a dataframe with:
@@ -246,11 +202,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     del df_tmp
     html += get_html_abundance(df_fasta)
     print("Abundance")
-    print("CPU time = %f" %(time.process_time()-tmps4))
-    print("Performance counter = %f\n" %(time.perf_counter()-tmps4c))
-    tmps5=time.process_time()
-    tmps5c=time.perf_counter() 
-
+   
     ## ALIGNMENT STATS
     if flagstat:
         nbreads, mapped, paired, proper, secondary, singletons=parse_flagstat(flagstat_file)
@@ -266,12 +218,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
    
     html += get_html_results()
     print("Mapping statistics")
-    print("CPU time = %f" %(time.process_time()-tmps5))
-    print("Performance counter = %f\n" %(time.perf_counter()-tmps5c))
-    tmps6=time.process_time()
-    tmps6c=time.perf_counter() 
-
-
+   
     ## SPLITREADSEARCH STAT
     if split:
         df_split=parse_split(split.name)   
@@ -298,13 +245,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         
         html += get_html_split_descr(global_stat_split)   
         print("Intron reads") 
-    print("CPU time = %f" %(time.process_time()-tmps6))
-    print("Performance counter = %f\n" %(time.perf_counter()-tmps6c))
-    tmps7=time.process_time()
-    tmps7c=time.perf_counter() 
 
-
-    # Candidat statistics - detected introns
+    ## CANDIDATS statistics - detected introns
     if candidat:
         df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
 
@@ -343,8 +285,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
 
         # Comparison between candidats and features from GTF file
-        # nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minimumDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen)
-
         global_stat_candidat_vs_gtf = dict()
         global_stat_candidat_vs_gtf["0Number of detected introns"] = global_stat_detected_introns["0Number"]
         c = 1
@@ -353,26 +293,19 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             c+=1
         # Add nb reads overlapping each feature in df_cov_lect
         detectableIntrons, TP, detectablePreditNeg, nbFeaturesWithoutReads, nbIntronsWithReadsBelowCov =  process_intron(df_features,df_library, df_candidat, meanCoverage)
-        global_stat_candidat_vs_gtf[str(c+1)+"Number of split reads"] = detectableIntrons
-        # global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]   = global_stat_detected_introns["0Number"]- nbTotCandidatsIncludingFeatures
-        global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]   = global_stat_detected_introns["0Number"]- df_candidat.shape[0]
-        global_stat_candidat_vs_gtf[str(c+3)+"Number of features without read"]     = nbFeaturesWithoutReads
+        global_stat_candidat_vs_gtf[str(c+1)+"Number of split reads"]                            = detectableIntrons
+        global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]                = global_stat_detected_introns["0Number"]- df_candidat.shape[0]
+        global_stat_candidat_vs_gtf[str(c+3)+"Number of features without read"]                  = nbFeaturesWithoutReads
         global_stat_candidat_vs_gtf[str(c+4)+"Number of introns with reads below coverage"]      = nbIntronsWithReadsBelowCov
 
         html += get_html_candidat_descr(global_stat_detected_introns, global_stat_filtred_detected_introns, df_candidat)
         print("Detected introns statistics and histogram")
-   
-    print("CPU time = %f" %(time.process_time()-tmps7))
-    print("Performance counter = %f\n" %(time.perf_counter()-tmps7c))
-    tmps8=time.process_time()
-    tmps8c=time.perf_counter() 
       
     # Precision, recall and F1 score
-    # TP is the number of detectable and found features (int value)
-    # TN is the number of detectable and not found features (int value)
-    # FP is the number of undetectable and found features (int value)
-    # FN is the number of undetectable and not found features (int value)    
-    # https://fr.wikipedia.org/wiki/Pr%C3%A9cision_et_rappel"
+    #  TP is the number of detectable and found features (int value)
+    #  TN is the number of detectable and not found features (int value)
+    #  FP is the number of undetectable and found features (int value)
+    #  FN is the number of undetectable and not found features (int value)    
     FP=nbPASS - TP                       #nbPASS = predits positives
     TN=nbPASSdepLEN-detectablePreditNeg  #nbPASSdepLEN = predits negatives
     FN=nbPASSdepLEN-TN
@@ -382,16 +315,10 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     global_stat_precision["0Precision (between 0 - 1)"]= precision
     recall = TP/(TN+TP)
     global_stat_precision["1Recall or sensitivity (0.0 for no recall, 1.0 for full or perfect recall)"] = recall
-    #global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
     global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
 
     html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf, meanCoverage)
-
     print("Detectability statistics")
-    print("CPU time = %f" %(time.process_time()-tmps8))
-    print("Performance counter = %f\n" %(time.perf_counter()-tmps8c))
-    tmps9=time.process_time()
-    tmps9c=time.perf_counter() 
 
     # GLOSSARY
     html += get_html_glossary()
