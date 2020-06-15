@@ -160,42 +160,6 @@ def parse_candidat(candidat) :
     t['key'] = t['ID']
     return t.set_index('key'), mindepth, maxlen
 
-# # Return comparison between dataframes df_candidat and df_features
-# # Return 5 stats:
-# # nbTotCandidatsIncludingFeatures : Total number of candidats including features
-# # nbSameStartEnd : Number of features with the same start and end than candidats
-# # nbLen : Features length >= 80 (default value in Split Read Search)
-# # minDepth : Features with depth inf or equals to 1 (value by default)
-# # nonCanonical : Number of features without canonical junctions
-# def candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen):
-#     df_candidat.to_csv('/home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-C/sample1/am/TOTO_df_candidat.csv')
-#     df_features.to_csv('/home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-C/sample1/am/TOTO_df_features.csv')
-
-#     # Join candidat and features dataframe
-#     df_candidat = df_candidat.join(df_features,  lsuffix='_candidat', rsuffix='_features')
-#     df_candidat.to_csv('/home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-C/sample1/am/TOTO_df_candidat_JOIN_features.csv')
-   
-#     # Total number of candidats including features
-#     nbTotCandidatsIncludingFeatures = df_candidat.shape[0]
-
-#     # Number of features with the same start and end than candidats
-#     conditionStartEnd = ((df_candidat['start_candidat'] == df_candidat['start_features']) & (df_candidat['end_candidat'] == df_candidat['end_features']))
-#     nbSameStartEnd=len(df_candidat.loc[conditionStartEnd]) - 1 # -1 for header
-
-#     # Features length >= maxlen (max len value in Split Read Search)
-#     condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= float(maxlen))
-#     nbLen   = len(df_candidat.loc[condLen]) 
-
-#     # Features with depth inf or equals to mindepth (value in Split Read Search)
-#     condDepth = (df_candidat['depth'] <= int(mindepth))
-#     minimumDepth  = len(df_candidat.loc[condDepth]) 
-
-#     # Number of features without canonical junctions
-#     condNonCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
-#     nonCanonical = len(df_candidat.loc[condNonCanonical])
-    
-#     return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minimumDepth, nonCanonical
-
 # Return panda which contains split desc 
 def parse_split(split):
     t = pd.read_table(split, usecols=[0,1,4,5,6], names=['reference', 'read', 'split_length', 'split_borders', 'strand'],  header=0)
@@ -309,15 +273,17 @@ def split(str, num):
 
 # Process df_features (dict), df_library (dict) and meanCoverage (int)
 # Return :
-# detectableIntrons (int)   : Number of dectable introns.
-# TD (int) True Detectable  : Number of same features found in candidats dataframe and df_cov_lect dataframe.
-# detectablePreditNeg (int) : Number of detectable introns predits negatives.
+# detectableIntrons (int)            : Number of dectable introns.
+# TD - True Detectable (int)         : Number of same features found in candidats dataframe and df_cov_lect dataframe.
+# detectablePreditNeg (int)          : Number of detectable introns predits negatives.
+# nbFeaturesWithoutReads (int)       : Number of features covered by no read.
+# nbIntronsWithReadsBelowCov (int)   : Number of reads below coverage
 # https://stackoverflow.com/questions/23508351/how-to-do-a-conditional-join-in-python-pandas  
 def process_intron(df_features : dict, df_library: dict, df_candidat:dict, meanCoverage:int): 
   
     # Add one column in df_feature with nb reads overlapping each intron/feature
     
-    #     library head :              contig  start  end  complement
+    # library head :              contig  start  end  complement
     # lecture                                    
     # 80032/1   SEQUENCE1      0  101       False
     # 110561/1  SEQUENCE1      0  101       False 
@@ -354,11 +320,27 @@ def process_intron(df_features : dict, df_library: dict, df_candidat:dict, meanC
     df_coverage = (df_cov_lect['ID'].value_counts()).to_frame()
     df_coverage.columns = ['coverage']
     df_coverage.index.name='ID'
+    # ID	coverage
+    # SEQUENCE564.modif|98|408	114
+    # SEQUENCE703.modif|442|829	107
+    # SEQUENCE763.modif|356|790	104
   
     # Filter on mean coverage 
-    cond=(df_coverage['coverage'] > meanCoverage)
+    cond = (df_coverage['coverage'] > meanCoverage)
     detectableIntrons  = len(df_coverage.loc[cond]) 
+    
+    nbFeaturesWithoutReads = df_features.shape[0]- df_coverage.shape[0] # le nombre de "features" qui ne sont pas couvertes par des lectures 
+    
+    condBelowCov = (df_coverage['coverage'] <= meanCoverage)  # nombre de "features" qui sont couvertes par un nombre de lectures sous le seuil de profondeur.
+    nbIntronsWithReadsBelowCov = len(df_coverage.loc[condBelowCov])
+    
     df_detectables=df_coverage.loc[cond] # Dataframe of detectables introns
+    # ID	coverage
+    # SEQUENCE564.modif|98|408	114
+    # SEQUENCE703.modif|442|829	107
+    # SEQUENCE763.modif|356|790	104
+    # SEQUENCE245.modif|88|643	103
+
 
     #https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html
     df_detectables = pd.merge(df_detectables, df_candidat, on='ID', suffixes=('_lect', '_candidat'))
@@ -366,4 +348,4 @@ def process_intron(df_features : dict, df_library: dict, df_candidat:dict, meanC
     condNoPASS = (df_detectables['filter'] != 'PASS')
     detectablePreditNeg=len(df_detectables.loc[condNoPASS])
          
-    return detectableIntrons, TP, detectablePreditNeg
+    return detectableIntrons, TP, detectablePreditNeg, nbFeaturesWithoutReads, nbIntronsWithReadsBelowCov
