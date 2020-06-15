@@ -193,7 +193,7 @@ def get_html_body1(flagstat="", bam="", candidat=""):
                 <li class="nav-item">
 				   <a class="nav-link" href="#features-descr">
 				        <span class="oi oi-folder" aria-hidden="true"></span>
-					    Feature(s) extraction results
+					    Intron extraction results
 				   </a>
 			    </li>'''
     if split:
@@ -210,6 +210,12 @@ def get_html_body1(flagstat="", bam="", candidat=""):
 				    <a class="nav-link" href="#candidatstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Detected introns
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#filtered_detected_introns">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Filtered detected introns
 			    	</a>
 			    </li>
                 '''
@@ -269,26 +275,62 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
         </div>
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Contigs statistics</h5>
-                <span id="gstat" class="oi oi-question-mark" aria-hidden="true" title="Number of features in GTF: Number of distinct features from all GTF lines"></span>
-                
+                <div class="d-flex">
+                    <div>
+                        <h5 id="ref-descr">Contigs statistics</h5>
+                    </div>
+                    <div class="ml-2">
+                        <span
+                            class="badge badge-pill badge-dark"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            title="<p nowrap><b>Number of features in GTF</b>: total number of features from GTF file</p><p nowrap><b>Number of distinct features in GTF</b>: number of distinct features from all GTF lines</p>">
+                            <span class="oi oi-info" ></span>
+                        </span>
+                    </div>
+                </div>               
 '''+dict_to_table(global_stat,7,True, False)+'''
             </div>   
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Number of sequences by feature type</h5>
-                <span class="oi oi-question-mark" aria-hidden="true" title="Number of ctg by feature from all GTF lines (Ex: 'Exon' see in X ctg, 'Intron' see in Y ctg, ...)"></span>
-                <span class="anchor" id="nb_ctg_by_feature"></span>
+                <div class="d-flex">
+                    <div>
+                        <h5 id="nb_ctg_by_feature">Number of sequences by feature type</h5>
+                    </div>
+                    <div class="ml-2">
+                        <span
+                            class="badge badge-pill badge-dark"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            title="<p nowrap><b>Number of ctg by feature from all GTF lines </b> (Ex: 'Exon' see in X ctg, 'Intron' see in Y ctg, ...)</p>">
+                            <span class="oi oi-info"></span>
+                        </span>
+                    </div>
+                </div>
 '''+dict_to_table(nb_ctg_by_feature,-1,False, False)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
-                <h5>Number of sequences with same feature(s)</h5>
-                <span class="oi oi-question-mark" aria-hidden="true" title="Number of features profiles by ctg (Ex: '1 Exon & 2 Intron' see in X ctg, '3 Introns' see in Y ctg , ...) "></span>
-                <span class="anchor" id="nb_ctg_by_same_feature"></span>
+               <div class="d-flex">
+                    <div>
+                        <h5 id="nb_ctg_by_same_feature">Number of sequences with same feature(s)</h5>
+                    </div>
+                    <div class="ml-2">
+                        <span
+                            class="badge badge-pill badge-dark"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            title="<p nowrap><b>Number of features profiles by ctg </b>(Ex: '1 Exon & 2 Intron' see in X ctg, '3 Introns' see in Y ctg , ...)</p>">
+                            <span class="oi oi-info"></span>
+                        </span>
+                    </div>
+                </div>
 '''+dict_to_table(ctg_descr,-1,False, False)+'''
             </div>
         </div>
-         <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-4">
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-6">
                 <h5>Assemblathon statistics</h5>
                 <span class="anchor" id="ref-descr_assemblathon_fasta"></span>
 '''+dict_to_table_multi_col(global_stat_assemblathon_fasta,global_stat_assemblathon_mfasta)+'''
@@ -380,7 +422,7 @@ def get_html_table_descr(global_stats_table):
 def get_html_results():
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Feature(s) extraction results</h1>
+            <h1 class="h4">Introns extraction results</h1>
                 <span class="anchor" id="features-descr"></span>
         </div>
 '''
@@ -414,13 +456,13 @@ def get_html_candidat_descr(global_stat_detected_introns:dict, global_stat_filtr
         </div>   
         <div class="d-flex"> 
             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Filtred detected introns</h5>
-                <span class="anchor" id="candidatstat"></span>
+            <h5>Filtered detected introns</h5>
+                <span class="anchor" id="filtered_detected_introns"></span>
 '''+dict_to_table(global_stat_filtred_detected_introns,-1,True, False)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-8">
                 <h5>Detected introns depth distribution</h5>
-                <span class="anchor" id="contigs_len_dist"></span>
+                <span class="anchor" id="filtered_detected_introns"></span>
 '''+plot_hist_candidats_depth(df_candidat['depth'])+'''
             </div>
         </div>  
@@ -433,7 +475,7 @@ def get_html_candidat_descr(global_stat_detected_introns:dict, global_stat_filtr
 def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int, global_stat_candidat_vs_gtf:dict, meanCoverage:int):
     r =  '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Analysis introns detectability</h1>
+            <h1 class="h4">Specificity and sensibility</h1>
                 <span class="anchor" id="precision"></span>
         </div>
         <div class="d-flex">
@@ -492,6 +534,11 @@ def get_html_footer():
     <!-- Datatable -->
     <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" language="javascript">
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
   </body>
 </html>
 '''
@@ -537,30 +584,30 @@ def dict_to_table_multi_col(d1 : dict, d2 ="", d3=""):
     table3 =""
     if d1:
         for k, v in sorted(d1.items(), key=lambda t: t[0]):
-            table1 += "<tr><td class='valn text-right'></td><td>Contig FASTA</td></tr>"   
-            table1 += "<tr><td class='valn text-right'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(v)), ' ')  + "</td></tr>"        
+            table1 += "<tr><td class='valn text-center'></td><td>Contig FASTA</td></tr>"   
+            table1 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(v)), ' ')  + "</td></tr>"        
             c += 1
     if d1 and d2:
         table1 = ""
-        table2 += "<tr><td></td><td>Contig FASTA</td><td>Contig FASTA with feature(s)</td></tr>"
+        table2 += "<tr><td></td><td class='valn text-center'>Contig FASTA</td><td class='valn text-center'>Contig FASTA with feature(s)</td></tr>"
         dd = defaultdict(list)
         for d in (d1, d2): # you can list as many input dicts as you want here
             for key, value in d.items():
                 dd[key].append(value)
         for k, v in sorted(dd.items(), key=lambda t: t[0]):
-            table2 += "<tr><td class='valn text-right'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(v[0])), ' ') + "</td><td class='valn text-right'>" + split_int(round(float(v[1])), ' ') + "</td></tr>"    
+            table2 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(v[0])), ' ') + "</td><td class='valn text-right'>" + split_int(round(float(v[1])), ' ') + "</td></tr>"    
             c2 += 1
     if d3:  
         table1=""
         table2=""
-        table3 += "<tr><td class='valn text-right'></td><td>Contig FASTA</td><td>Contig FASTA with feature's)</td><td>Introns contig FASTA</td></tr>"    
+        table3 += "<tr><td class='valn text-right'></td><td class='valn text-center'>Contig FASTA</td><td class='valn text-center'>Contig FASTA with feature's)</td><td class='valn text-center'>Introns contig FASTA</td></tr>"    
         dd2 = defaultdict(list)
         for d in (d1, d2, d3):
             for key, value in d.items():
                 dd2[key].append(value)
         print('dd2',dd2)        
         for k, v in sorted(dd2.items(), key=lambda t: t[0]):
-            table3 += "<tr><td class='valn text-right'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(v[0])  + "</td><td class='valn text-right'>" + split_int(v[1]) + "</td><td class='valn text-right'>" + split_int(v[2]) + "</td></tr>"    
+            table3 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(v[0])  + "</td><td class='valn text-right'>" + split_int(v[1]) + "</td><td class='valn text-right'>" + split_int(v[2]) + "</td></tr>"    
             c3 += 1
     table += table1
     table += table2

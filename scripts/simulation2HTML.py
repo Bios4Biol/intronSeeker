@@ -21,7 +21,7 @@ from simulation2HTMLplots import *
 
 # source activate ISeeker_environment;
 # cd scripts/; 
-# python3 simulation2HTML.py --config_file parameters.config -F 
+# python3 simulation2HTML.py --config_file ../config/simulation2HTML_example.cfg -F 
 # scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*FRS_CASA_sample1_n1000_r_STAR*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 # See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_FRS_CASA_sample1_n1000_r_STAR_simulation.html
 
@@ -223,8 +223,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     if split:
         df_split=parse_split(split.name)   
         global_stat_split = dict()
-        global_stat_split["0Number of reads overlapping potential retained introns"]= df_split.shape[0]
-        global_stat_split["1Mean length of potential retained introns"]= df_split['split_length'].mean()
+        global_stat_split["0Number of reads overlapping introns"]= df_split.shape[0]
+        global_stat_split["1Mean length of introns"]= df_split['split_length'].mean()
 
         nbCanonic = 0
         nbOtherJunctions = 0
@@ -252,10 +252,10 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
          # Definition dict
         definitions = dict()
-        definitions['DP']   = "Number of detected introns depth <= min depth ("+ str(mindepth) +")"
-        definitions['LEN']  = "Number of detected introns length >= max len ("+ str(maxlen) +")"
-        definitions['SS']   = "Number of features without canonical borders (neither CT_AC nor GT_AG)"
-        definitions['PASS'] = "Number of features with canonical borders (CT_AC or GT_AG) and ...."
+        definitions['DP']   = "Filtered introns because of depth (<= "+ str(mindepth)+ ")"
+        definitions['LEN']  = "Filtered introns beacause of length >= "+ str(maxlen)+ ")"    
+        definitions['SS']   = "Non canonical introns (neither CT_AC nor GT_AG)"
+        definitions['PASS'] = "Retained introns"
         
         global_stat_detected_introns = dict()
         global_stat_detected_introns["0Number"] = df_candidat.shape[0]
@@ -274,7 +274,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         for k, v in (df_candidat['filter'].value_counts()).items() :
             for key, value in definitions.items():
                 if k == key:
-                    global_stat_filtred_detected_introns[str(c)+k+" ("+value+")"] = v 
+                    global_stat_filtred_detected_introns[str(c)+" "+value] = v 
                     if k == 'PASS':
                         nbPASS = v
                     if k == 'DP' or  k == 'LEN' or k == 'PASS':
@@ -293,10 +293,10 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             c+=1
         # Add nb reads overlapping each feature in df_cov_lect
         detectableIntrons, TP, detectablePreditNeg, nbFeaturesWithoutReads, nbIntronsWithReadsBelowCov =  process_intron(df_features,df_library, df_candidat, meanCoverage)
-        global_stat_candidat_vs_gtf[str(c+1)+"Number of split reads"]                            = detectableIntrons
+        global_stat_candidat_vs_gtf[str(c+1)+"Number of introns with split reads"]               = detectableIntrons
         global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]                = global_stat_detected_introns["0Number"]- df_candidat.shape[0]
         global_stat_candidat_vs_gtf[str(c+3)+"Number of features without read"]                  = nbFeaturesWithoutReads
-        global_stat_candidat_vs_gtf[str(c+4)+"Number of introns with reads below coverage"]      = nbIntronsWithReadsBelowCov
+        global_stat_candidat_vs_gtf[str(c+4)+"Number of introns with reads below depth"]         = nbIntronsWithReadsBelowCov
 
         html += get_html_candidat_descr(global_stat_detected_introns, global_stat_filtred_detected_introns, df_candidat)
         print("Detected introns statistics and histogram")
@@ -309,6 +309,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     FP=nbPASS - TP                       #nbPASS = predits positives
     TN=nbPASSdepLEN-detectablePreditNeg  #nbPASSdepLEN = predits negatives
     FN=nbPASSdepLEN-TN
+
 
     global_stat_precision= dict()
     precision = TP/(FP+TP)
@@ -343,7 +344,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('--config_file', help='config file')
+    parser.add_argument('--config_file')
     args, left_argv = parser.parse_known_args()
     if args.config_file:
         with open(args.config_file, 'r') as f:
@@ -351,44 +352,35 @@ if __name__ == '__main__' :
             config.read([args.config_file])
     
     parser = ArgumentParser()
-    parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=False, dest='fasta')
-    parser.add_argument('-m','--modifiedfasta', type=argparse.FileType('r'), required=False, dest='mfasta')
-    parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=False, dest='gtf')
-    parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=False, dest='r1')
-    parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2')
-    parser.add_argument('--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat')
-    parser.add_argument('-r','--ranksfile', type=argparse.FileType('r'), required=False, dest='ranks')
-    parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat')
-    parser.add_argument('-s','--split', type=argparse.FileType('r'), required=False, dest='split')
-    parser.add_argument('-o','--output', type=str, required=False, dest='output')
-    parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
-    parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads')
-    parser.add_argument('-F', '--force', action='store_true', default=False, dest='force')
+    parser.add_argument('--config-file', type=argparse.FileType('r'), required=False, help="Provide a config file")
+    parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta', help="Path to the reference FASTA file.")
+    parser.add_argument('-m','--modified-fasta', type=argparse.FileType('r'), required=True, dest='mfasta', help="Path to the modified FASTA file.")
+    parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=True, dest='gtf', help="GTF filename which contains the genome annotation.")
+    parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1', help="Name of the  FASTQ  file  which  contains  the  single-end   reads library. If paired-end, filename of #1 reads mates")
+    parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2', help="Only for a paired-end library, filename of #2 reads mates.")
+    parser.add_argument('--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat', help="Path to flagstat file.")
+    parser.add_argument('-r','--ranks', type=argparse.FileType('r'), required=False, dest='ranks', help="Path to ranks file.")
+    parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat', help="Path to candidat file.")
+    parser.add_argument('-s','--split', type=argparse.FileType('r'), required=False, dest='split', help="Path to split file.")
+    parser.add_argument('-o','--output', type=str, required=True, dest='output', help="Output dir name.")
+    parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix', help="Prefix for output files name.")
+    parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads', help="Number of threads [1]")
+    parser.add_argument('-F', '--force', action='store_true', default=False, dest='force', help="Force to overwrite output files.")
 
-
-    n=0
-    for k, v in config.items("Defaults"):
-        #parser.parse_args([str(k), str(v)], args)
-        config_args={str(k): str(v)} 
-        # https://stackoverflow.com/questions/47892580/python-argparse-required-arguments-from-configuration-file-dict
-        # use values from configuration file by default
-        parser.set_defaults(**config_args)
-        # Reset `required` attribute when provided from config file
-        for action in parser._actions:
-            if action.dest in config_args:
-                action.required = False
-        print('REQUIRED config_args : ',config_args)
-        n += 1
-
-    if n < 6:   
-        print('6 required arguments are mandatory')
-        exit(1)    
-
-    for k, v in config.items("Optionnal"):
-        #parser.parse_args([str(k), str(v)], args)
-        config_args={str(k): str(v)} 
-        parser.set_defaults(**config_args)
-        print('OPTIONNAL config_args : ',config_args)     
+    try:
+        config
+    except NameError:
+        pass
+    else:
+        for k, v in config.items("Defaults"):
+            config_args={str(k): str(v)} 
+            # https://stackoverflow.com/questions/47892580/python-argparse-required-arguments-from-configuration-file-dict
+            # use values from configuration file by default
+            parser.set_defaults(**config_args)
+            # Reset `required` attribute when provided from config file
+            for action in parser._actions:
+                if action.dest in config_args:
+                    action.required = False
 
     # override with command line arguments when provided
     args = vars(parser.parse_args(left_argv, args))
