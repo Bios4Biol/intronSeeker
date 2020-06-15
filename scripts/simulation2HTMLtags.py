@@ -134,7 +134,7 @@ def get_html_body1(flagstat="", bam="", candidat=""):
 			    	</a>
 			    </li>
 			    <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#ctg_descr">
+				    <a class="nav-link" href="#nb_ctg_by_same_feature">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Nb. of seq. with same features
 			    	</a>
@@ -174,13 +174,7 @@ def get_html_body1(flagstat="", bam="", candidat=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Global statistics
 			    	</a>
-			    </li>                
-                <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#assemblystat">
-				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Reads with intron insertion
-			    	</a>
-			    </li>    
+			    </li>
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#abundstat">
 				    	<span class="oi oi-graph" aria-hidden="true"></span>
@@ -289,7 +283,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <h5>Number of sequences with same feature(s)</h5>
                 <span class="oi oi-question-mark" aria-hidden="true" title="Number of features profiles by ctg (Ex: '1 Exon & 2 Intron' see in X ctg, '3 Introns' see in Y ctg , ...) "></span>
-                <span class="anchor" id="nb_ctg_by_feature"></span>
+                <span class="anchor" id="nb_ctg_by_same_feature"></span>
 '''+dict_to_table(ctg_descr,-1,False, False)+'''
             </div>
         </div>
@@ -436,7 +430,7 @@ def get_html_candidat_descr(global_stat_detected_introns:dict, global_stat_filtr
     return r   
 
 # precision, recall and F1 score   
-def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int, global_stat_candidat_vs_gtf:dict):
+def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int, global_stat_candidat_vs_gtf:dict, meanCoverage:int):
     r =  '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Analysis introns detectability</h1>
@@ -451,7 +445,7 @@ def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:in
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Confusion matrix</h5>
+            <h5>Confusion matrix for mean coverage = ''' + str(meanCoverage) + '''</h5>
                 <span class="anchor" id="precision"></span>
 '''+dict_to_table_3col(TP, TN, FP, FN)+'''
             </div>

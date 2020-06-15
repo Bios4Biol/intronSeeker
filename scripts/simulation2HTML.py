@@ -213,7 +213,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     for i,row in df_library.iterrows():
         global_stat_fastq["1Mean coverage"] += row['end'] - row['start'] + 1
     global_stat_fastq["1Mean coverage"] /= (global_stat["1Contig FASTA - Mean seq. length"] * global_stat["0Contig FASTA - Number of seq."])
-    global_stat_fastq["1Mean coverage"] = round(global_stat_fastq["1Mean coverage"], 2)
+    meanCoverage = round(global_stat_fastq["1Mean coverage"], 2)
+    global_stat_fastq["1Mean coverage"] = meanCoverage
     global_stat_fastq["2Min reads length"] = df_features['length'].min()
     global_stat_fastq["3Max reads length"] = df_features['length'].max()
     global_stat_fastq["4Mean reads length"] = round(df_features['length'].mean())
@@ -351,7 +352,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             global_stat_candidat_vs_gtf[str(c)+'Number of '+k+ ' in GTF'] = v
             c+=1
         # Add nb reads overlapping each feature in df_cov_lect
-        detectableIntrons, TP, detectablePreditNeg =  process_intron(df_features,df_library, df_candidat)  #TODO
+        detectableIntrons, TP, detectablePreditNeg =  process_intron(df_features,df_library, df_candidat, meanCoverage)
         global_stat_candidat_vs_gtf[str(c+1)+"Number of split reads"] = detectableIntrons
         # global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]   = global_stat_detected_introns["0Number"]- nbTotCandidatsIncludingFeatures
         global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]   = global_stat_detected_introns["0Number"]- df_candidat.shape[0]
@@ -359,6 +360,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
         html += get_html_candidat_descr(global_stat_detected_introns, global_stat_filtred_detected_introns, df_candidat)
         print("Detected introns statistics and histogram")
+   
     print("CPU time = %f" %(time.process_time()-tmps7))
     print("Performance counter = %f\n" %(time.perf_counter()-tmps7c))
     tmps8=time.process_time()
@@ -368,13 +370,11 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # TP is the number of detectable and found features (int value)
     # TN is the number of detectable and not found features (int value)
     # FP is the number of undetectable and found features (int value)
-    # FN is the number of undetectable and not found features (int value)
-    
+    # FN is the number of undetectable and not found features (int value)    
     # https://fr.wikipedia.org/wiki/Pr%C3%A9cision_et_rappel"
     FP=nbPASS - TP                       #nbPASS = predits positives
     TN=nbPASSdepLEN-detectablePreditNeg  #nbPASSdepLEN = predits negatives
     FN=nbPASSdepLEN-TN
-
 
     global_stat_precision= dict()
     precision = TP/(FP+TP)
@@ -384,7 +384,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     #global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((global_stat_precision["0Precision"]*global_stat_precision["1Recall"])/(global_stat_precision["0Precision"]+global_stat_precision["1Recall"]))
     global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
 
-    html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf)
+    html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf, meanCoverage)
 
     print("Detectability statistics")
     print("CPU time = %f" %(time.process_time()-tmps8))

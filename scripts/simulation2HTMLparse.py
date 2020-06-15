@@ -307,27 +307,25 @@ def split(str, num):
     return [ str[start:start+num] for start in range(0, len(str), num) ]
 
 
-# Process df_features and df_library dataframes
-# Return number of dectable introns (INT)
-# and TD (INT) True Detectable : same features found in candidats dataframe and df_cov_lect dataframe
+# Process df_features (dict), df_library (dict) and meanCoverage (int)
+# Return :
+# detectableIntrons (int)   : Number of dectable introns.
+# TD (int) True Detectable  : Number of same features found in candidats dataframe and df_cov_lect dataframe.
+# detectablePreditNeg (int) : Number of detectable introns predits negatives.
 # https://stackoverflow.com/questions/23508351/how-to-do-a-conditional-join-in-python-pandas  
-def process_intron(df_features : dict, df_library: dict, df_candidat:dict): 
+def process_intron(df_features : dict, df_library: dict, df_candidat:dict, meanCoverage:int): 
   
     # Add one column in df_feature with nb reads overlapping each intron/feature
     
     #     library head :              contig  start  end  complement
     # lecture                                    
     # 80032/1   SEQUENCE1      0  101       False
-    # 110561/1  SEQUENCE1      0  101       False
-    # 119188/1  SEQUENCE1      0  101       False
-    # 105463/2  SEQUENCE1      0  101       False
-    # 122895/1  SEQUENCE1      2  103       False 
+    # 110561/1  SEQUENCE1      0  101       False 
 
     # features head :                                     contig          feature  start   end  length flanks  pos_on_contig
     # features                                                                                              
     # SEQUENCE1.modif|635|962    SEQUENCE1.modif  retained_intron    635   962     327  GT_AG      63.310070
     # SEQUENCE2.modif|941|1318   SEQUENCE2.modif  retained_intron    941  1318     377  GT_AG      76.317924
-    
     
     # Add a new column in df_library with SEQ.modif
     df_library.columns = ['old_contig','start','end','complement']
@@ -338,52 +336,34 @@ def process_intron(df_features : dict, df_library: dict, df_candidat:dict):
 
     # Merge 
     df_cov_lect = df_library.merge(df_features,on='contig', suffixes=('_lect', '_features'))
-    print('df_cov_lect', df_cov_lect) 
     # df_cov_lect                    contig   old_contig  start_lect  end_lect          feature  start_features  end_features
     # 0         SEQUENCE1.modif    SEQUENCE1           0       101  retained_intron             635           962
     # 1         SEQUENCE1.modif    SEQUENCE1           0       101  retained_intron             635           962
-    # 2         SEQUENCE1.modif    SEQUENCE1           0       101  retained_intron             635           962
-    # 3         SEQUENCE1.modif    SEQUENCE1           0       101  retained_intron             635           962
-    # 4         SEQUENCE1.modif    SEQUENCE1           2       103  retained_intron             635           962
     # ...                   ...          ...         ...       ...              ...             ...           ...
-    # 208693  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
-    # 208694  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
-    # 208695  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
     # 208696  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
     # 208697  SEQUENCE999.modif  SEQUENCE999         328       429  retained_intron             290          1017
     
-    # And then select based on if overlapping
+    # And then select overlapping reads only
     df_cov_lect = df_cov_lect[((df_cov_lect.start_features > df_cov_lect.start_lect)  & (df_cov_lect.start_features < df_cov_lect.end_lect))]
     # 	contig	old_contig	start_lect	end_lect	feature	start_features	end_features
     # 333	SEQUENCE1.modif	SEQUENCE1	536	637	retained_intron	635	962
     # 334	SEQUENCE1.modif	SEQUENCE1	537	638	retained_intron	635	962
-    # 335	SEQUENCE1.modif	SEQUENCE1	537	638	retained_intron	635	962
-    # 336	SEQUENCE1.modif	SEQUENCE1	540	641	retained_intron	635	962
-    # 337	SEQUENCE1.modif	SEQUENCE1	544	645	retained_intron	635	962
- 
-    # Calcul nb reads by contig ==> filter with mean coverage (50)
-    # group row by contig in order to count nb reads by contig = coverage
-    # Add ID like df_candidat dataframe
-    df_cov_lect['ID'] = df_cov_lect.apply(lambda df : "|".join([df.contig,str(df.start_features),str(df.end_features)]),axis=1)  
 
-    # convert Serie (df_cov_lect['contig'].value_counts()) to frame
+    # group row by contig in order to count nb reads by contig, filter with mean coverage.
+    df_cov_lect['ID'] = df_cov_lect.apply(lambda df : "|".join([df.contig,str(df.start_features),str(df.end_features)]),axis=1)  # Add ID like df_candidat dataframe
     df_coverage = (df_cov_lect['ID'].value_counts()).to_frame()
     df_coverage.columns = ['coverage']
     df_coverage.index.name='ID'
   
-    # Filter on mean coverage #TODO : recup mean coverage as a variable
-    cond=(df_coverage['coverage'] > 50)
+    # Filter on mean coverage 
+    cond=(df_coverage['coverage'] > meanCoverage)
     detectableIntrons  = len(df_coverage.loc[cond]) 
-    # Dataframe of detectables introns    
-    df_detectables=df_coverage.loc[cond]
+    df_detectables=df_coverage.loc[cond] # Dataframe of detectables introns
 
     #https://pandas.pydata.org/pandas-docs/stable/user_guide/merging.html
     df_detectables = pd.merge(df_detectables, df_candidat, on='ID', suffixes=('_lect', '_candidat'))
-    print('df_detectables', df_detectables)
-    df_detectables.to_csv('/home/Sarah/Documents/TOTO_detectables.csv')
-    TP=df_detectables.shape[0]  #TD = features strictement identiques entre la liste des candidats et df_detectables
+    TP=df_detectables.shape[0]  #TD = features strictly identical between df_candidat and df_detectables
     condNoPASS = (df_detectables['filter'] != 'PASS')
     detectablePreditNeg=len(df_detectables.loc[condNoPASS])
-    print('detectablePreditNeg', detectablePreditNeg)
          
     return detectableIntrons, TP, detectablePreditNeg
