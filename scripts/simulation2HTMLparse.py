@@ -268,31 +268,16 @@ def split_int(number, separator=' ', count=3):
 def split(str, num):
     return [ str[start:start+num] for start in range(0, len(str), num) ]
 
-# Return comparison between dataframes df_candidat and df_features
-def candidatsVsFeatures(df_candidat:dict, df_features:dict, mindepth:int, maxlen:int):
-    # Join candidat and features dataframe
-    df_candidat = df_candidat.join(df_features,  lsuffix='_candidat', rsuffix='_features')
-   
-    # Total number of candidats including features
-    nbTotCandidatsIncludingFeatures = df_candidat.shape[0]
+# Add DP to df_features using df_library
+def compute_dp(df_features, df_library) :
+    ref = df_features['contig'].replace('.modif','')
+    return len(df_library.loc[lambda df : (df['contig'] == ref) & (df_features['start'] > df['start']) & (df_features['start'] < df['end'])])
 
-    # Number of features with the same start and end than candidats
-    conditionStartEnd = ((df_candidat['start_candidat'] == df_candidat['start_features']) & (df_candidat['end_candidat'] == df_candidat['end_features']))
-    nbSameStartEnd=len(df_candidat.loc[conditionStartEnd]) - 1 # -1 for header
-   
-    # Features length >= 80 (default value in Split Read Search)
-    condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= int(maxlen))
-    nbLen   = len(df_candidat.loc[condLen]) 
+# Add contig length to df_features using df_fasta
+def compute_len(df_features, df_fasta) :
+    ref = df_features['contig'].replace('.modif','')
+    return (df_fasta.loc[ref, 'length'])
 
-    # Features with depth inf or equals to 1 (value by default)
-    condDepth = (df_candidat['depth'] <= int(mindepth))
-    minDepth = len(df_candidat.loc[condDepth])   
-
-    # Number of features without canonical junctions
-    condNoCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
-    noCanonical = len(df_candidat.loc[condNoCanonical])
-    
-    return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, noCanonical
 
 # Process df_features (dict), df_library (dict) and meanCoverage (int)
 # Return :
@@ -346,7 +331,7 @@ def process_intron(df_features : dict, df_library: dict, df_candidat:dict,meanCo
     # ID	coverage
     # SEQUENCE564.modif|98|408	114
     # SEQUENCE703.modif|442|829	107
-    # SEQUENCE763.modif|356|790	104
+    # SEQUENCE763.modif|356|790	104print()
   
     # Filter on mean coverage 
     cond = (df_coverage['coverage'] > meanCoverage)
@@ -371,3 +356,31 @@ def process_intron(df_features : dict, df_library: dict, df_candidat:dict,meanCo
     detectablePreditNeg=len(df_detectables.loc[condNoPASS])
          
     return detectableIntrons, TP, detectablePreditNeg, nbFeaturesWithoutReads, nbIntronsWithReadsBelowCov
+
+
+
+# Return comparison between dataframes df_candidat and df_features
+def candidatsVsFeatures(df_candidat:dict, df_features:dict, mindepth:int, maxlen:int):
+    # Join candidat and features dataframe
+    df_candidat = df_candidat.join(df_features,  lsuffix='_candidat', rsuffix='_features')
+   
+    # Total number of candidats including features
+    nbTotCandidatsIncludingFeatures = df_candidat.shape[0]
+
+    # Number of features with the same start and end than candidats
+    conditionStartEnd = ((df_candidat['start_candidat'] == df_candidat['start_features']) & (df_candidat['end_candidat'] == df_candidat['end_features']))
+    nbSameStartEnd=len(df_candidat.loc[conditionStartEnd]) - 1 # -1 for header
+   
+    # Features length >= 80 (default value in Split Read Search)
+    condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= int(maxlen))
+    nbLen   = len(df_candidat.loc[condLen]) 
+
+    # Features with depth inf or equals to 1 (value by default)
+    condDepth = (df_candidat['depth'] <= int(mindepth))
+    minDepth = len(df_candidat.loc[condDepth])   
+
+    # Number of features without canonical junctions
+    condNoCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
+    noCanonical = len(df_candidat.loc[condNoCanonical])
+    
+    return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, noCanonical

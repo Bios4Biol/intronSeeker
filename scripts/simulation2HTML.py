@@ -170,22 +170,22 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta)
     print("Global statistics")
 
-    # READS STAT 
-    # Global stat
-    global_stat_fastq = dict()
-    global_stat_fastq["0Number of reads"] = df_library['contig'].count()
-    global_stat_fastq["1Mean coverage"] = 0
-    for i,row in df_library.iterrows():
-        global_stat_fastq["1Mean coverage"] += row['end'] - row['start'] + 1
-    global_stat_fastq["1Mean coverage"] /= (global_stat["1Contig FASTA - Mean seq. length"] * global_stat["0Contig FASTA - Number of seq."])
-    meanCoverage = round(global_stat_fastq["1Mean coverage"], 2)
-    global_stat_fastq["1Mean coverage"] = meanCoverage
-    global_stat_fastq["2Min reads length"] = df_features['length'].min()  #TODO
-    global_stat_fastq["3Max reads length"] = df_features['length'].max()
-    global_stat_fastq["4Mean reads length"] = round(df_features['length'].mean())
+    # # READS STAT    TODO : à remettre
+    # # Global stat
+    # global_stat_fastq = dict()
+    # global_stat_fastq["0Number of reads"] = df_library['contig'].count()
+    # global_stat_fastq["1Mean coverage"] = 0
+    # for i,row in df_library.iterrows():
+    #     global_stat_fastq["1Mean coverage"] += row['end'] - row['start'] + 1
+    # global_stat_fastq["1Mean coverage"] /= (global_stat["1Contig FASTA - Mean seq. length"] * global_stat["0Contig FASTA - Number of seq."])
+    # meanCoverage = round(global_stat_fastq["1Mean coverage"], 2)
+    # global_stat_fastq["1Mean coverage"] = meanCoverage
+    # global_stat_fastq["2Min reads length"] = df_features['length'].min()  #TODO
+    # global_stat_fastq["3Max reads length"] = df_features['length'].max()
+    # global_stat_fastq["4Mean reads length"] = round(df_features['length'].mean())
       
-    html += get_html_reads_descr(global_stat_fastq)
-    print("Reads statistics")
+    # html += get_html_reads_descr(global_stat_fastq) 
+    # print("Reads statistics")
 
     # ABUNDANCE number of reads by contig
     # Build a dataframe with:
@@ -204,7 +204,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         columns = ['norm'])
     df_fasta = df_fasta.assign(norm=df_tmp['norm'].values)
     del df_tmp
-    html += get_html_abundance(df_fasta)
+    #html += get_html_abundance(df_fasta)  TODO : a remettre
     print("Abundance")
    
     ## ALIGNMENT STATS
@@ -257,9 +257,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
          # Definition dict
         definitions = dict()
         definitions['DP']   = "Filtered because of depth (<= "+ str(mindepth)+ ")"
-        definitions['LEN']  = "Filtered beacause of length (>= "+ str(maxlen)+ "%)"    
+        definitions['LEN']  = "Filtered because of length (>= "+ str(maxlen)+ "%)"    
         definitions['SS']   = "Filtered because of non canonical junction (neither CT_AC nor GT_AG)"
-        definitions['PASS'] = "Retained introns"
+        definitions['PASS'] = "Retained"
         
         global_stat_detected_introns = dict()
         global_stat_detected_introns["0Number"] = df_candidat.shape[0]
@@ -270,16 +270,75 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_detected_introns["1Mean length"] = round(global_stat_detected_introns["1Mean length"], 2)
         global_stat_detected_introns["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
 
-        nbPASS = 0
-        global_stat_filtred_detected_introns = dict()
-        c = 0
-        for k, v in (df_candidat['filter'].value_counts()).items() :
-            for key, value in definitions.items():
-                if k == key:
-                    global_stat_filtred_detected_introns[str(c)+" "+value] = v 
-                    if k == 'PASS':
-                        nbPASS = v
-                    c+=1
+        # fonction html pour les détectés
+        # # qui fera tableau et graph
+
+        global_stat_filtred_detected_introns = dict()  ##TODO  filtred / filtered
+        global_stat_filtred_detected_introns["0" + definitions['PASS']] = 0
+        global_stat_filtred_detected_introns["1" + definitions['DP']]   = 0
+        global_stat_filtred_detected_introns["2" + definitions['LEN']]  = 0
+        global_stat_filtred_detected_introns["3" + definitions['SS']]   = 0
+        
+        for i, v in (df_candidat['filter'].items()) :
+            if "PASS" in v:
+                global_stat_filtred_detected_introns["0" + definitions['PASS']] += 1
+            if "DP" in v:
+                global_stat_filtred_detected_introns["1" + definitions['DP']]   += 1
+            if "LEN" in v:
+                global_stat_filtred_detected_introns["2" + definitions['LEN']]  += 1
+            if "SS" in v:
+                global_stat_filtred_detected_introns["3" + definitions['SS']]   += 1
+
+        # fonction html pour les filtrés
+        #html += get_html_detected(global_stat_filtred_detected_introns)   
+
+     
+        ###
+        # TODO gestion rapport cadre simulation ou vraie vie
+        # if ? simulation ?
+        ###
+        
+        # Tableau features detectable
+        # 1 nombre de features 
+        # 2 nombre de features retenus
+        # 3 .... nombre de features filtrées because of
+        # Add a column to df_features with the DP (using df_library)
+        df_features["DP"] = df_features.apply(
+            compute_dp,
+            axis = 1,
+            df_library=df_library
+        )
+        
+        # Add a column to df_features with the lenght of the corresponding contig (using df_fasta)
+        df_features["ctg_length"] = df_features.apply(
+            compute_len,
+            axis = 1,
+            df_fasta=df_fasta
+        )
+
+        global_stat_detectable_features = dict()
+        global_stat_detectable_features["0Number of features"] = df_features.shape[0]
+        global_stat_detectable_features["1" + definitions['PASS']] = 0
+        global_stat_detectable_features["2" + definitions['DP']]   = 0
+        global_stat_detectable_features["3" + definitions['LEN']]  = 0
+        global_stat_detectable_features["4" + definitions['SS']]   = 0
+        
+        for index, row in df_features.iterrows():
+            PASS = True
+            if ('CT_AC' not in row['flanks'] or 'GT_AG' not in row['flanks']) :
+                global_stat_detectable_features["4" + definitions['SS']] += 1
+                PASS = False 
+            if (((row['end'] - row['start'] + 1) / row['ctg_length']) >= int(maxlen)):
+                global_stat_detectable_features["3" + definitions['LEN']] += 1
+                PASS = False
+            if (row['DP'] <= mindepth):
+                global_stat_detectable_features["2" + definitions['DP']] += 1
+                PASS = False
+            if PASS:
+               global_stat_detectable_features["1" + definitions['PASS']] += 1     
+ 
+        html += get_html_detectable_features(global_stat_detectable_features)
+        # fonction gethtml_detectablefeatures (dict detectablefeatures)
 
         # Comparison between candidats and features from GTF file
         nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minimumDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen)
