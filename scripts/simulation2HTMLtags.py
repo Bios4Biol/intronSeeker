@@ -97,7 +97,7 @@ def get_html_header():
 '''
 
 # icons : https://useiconic.com/open/
-def get_html_body1(flagstat="", bam="", candidat=""):
+def get_html_body1(flagstat="", split="", candidat=""):
     r = '''
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">

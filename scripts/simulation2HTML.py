@@ -111,12 +111,16 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     if flagstat :
         flagstat_file = flagstat.name
         inputfiles.append("Flagstat#" + os.path.basename(flagstat_file))
+    split_file=""    
+    if split:
+        split_file=split.name
+        inputfiles.append("Split#" + os.path.basename(split.name))
     candidat_file=""    
     if candidat:
         candidat_file=candidat.name
         inputfiles.append("Candidat#" + os.path.basename(candidat.name))
 
-    html += get_html_body1(flagstat_file, candidat_file)
+    html += get_html_body1(flagstat_file, split_file, candidat_file)
 
    
     # INPUT FILES
@@ -253,8 +257,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
          # Definition dict
         definitions = dict()
         definitions['DP']   = "Filtered because of depth (<= "+ str(mindepth)+ ")"
-        definitions['LEN']  = "Filtered beacause of length >= "+ str(maxlen)+ ")"    
-        definitions['SS']   = "Filtered  because of non canonical introns (neither CT_AC nor GT_AG)"
+        definitions['LEN']  = "Filtered beacause of length (>= "+ str(maxlen)+ "%)"    
+        definitions['SS']   = "Filtered because of non canonical junction (neither CT_AC nor GT_AG)"
         definitions['PASS'] = "Retained introns"
         
         global_stat_detected_introns = dict()
@@ -264,11 +268,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             global_stat_detected_introns["1Mean length"] += row['end'] - row['start'] + 1
         global_stat_detected_introns["1Mean length"] /= (global_stat_detected_introns["0Number"])
         global_stat_detected_introns["1Mean length"] = round(global_stat_detected_introns["1Mean length"], 2)
-        global_stat_detected_introns["2Mean depth of all candidats"]= round(df_candidat['depth'].mean(), 2)
+        global_stat_detected_introns["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
 
-        nbPASS        = 0
-        nbPASSdepLEN  = 0
-        nbDepLenOK    = 0
+        nbPASS = 0
         global_stat_filtred_detected_introns = dict()
         c = 0
         for k, v in (df_candidat['filter'].value_counts()).items() :
@@ -277,10 +279,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                     global_stat_filtred_detected_introns[str(c)+" "+value] = v 
                     if k == 'PASS':
                         nbPASS = v
-                    if k == 'DP' or  k == 'LEN' or k == 'PASS':
-                        nbPASSdepLEN = v    
-                    if k != 'DP' or  k != 'LEN':
-                        nbDepLenOK = v     
                     c+=1
 
         # Comparison between candidats and features from GTF file
@@ -317,8 +315,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     #  FP is the number of undetectable and found features (int value)
     #  FN is the number of undetectable and not found features (int value)    
     FP=nbPASS - TP                       #nbPASS = predits positives
-    TN=nbPASSdepLEN-detectablePreditNeg  #nbPASSdepLEN = predits negatives
-    FN=nbPASSdepLEN-TN
+    TN=42  #nbPASSdepLEN = predits negatives
+    FN=42 #nbPASSdepLEN-TN
 
 
     global_stat_precision= dict()
