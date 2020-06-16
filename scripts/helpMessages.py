@@ -385,7 +385,7 @@ Performs  the split read  signal  extraction  from  an   alignment (BAM File)  b
     ))
     print('   -t/--threads INT',end='')
     print(cw.fill(
-'Number of alignment threads to launch [1].'
+'Number of threads [1].'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(

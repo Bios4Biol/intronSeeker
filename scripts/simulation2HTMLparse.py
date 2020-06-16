@@ -222,9 +222,7 @@ def parse_rank_file(rank_file) :
 # l50            : L50 contig count
 # meanContigSize : Mean contig size
 def run_assemblathon(fasta : str ) :
-    command ='/home/Sarah/Documents/PROJETS/INTRONSEEKER/DATATEST/intronSeeker/bin/assemblathon_stats.pl '+ fasta  #TODO: modif sp run perl path
-    #command ='assemblathon_stats.pl '+ fasta  #TODO: modif sp run perl path : /bin/sh: assemblathon_stats.pl : commande introuvable
-    popen = sp.Popen(command, stdout = sp.PIPE, shell = True, encoding = 'utf8')
+    popen = sp.Popen('assemblathon_stats.pl '+ fasta, stdout = sp.PIPE, shell = True, encoding = 'utf8')
     reader = popen.stdout.read()
     nbContigs=0
     totContigSize=0
@@ -255,7 +253,7 @@ def run_assemblathon(fasta : str ) :
             meanContigSize=int(i.split("       ")[1].rstrip())
         popen.wait()
     if popen.returncode != 0:
-        raise RuntimeError('Error')
+        raise RuntimeError('Error: Assemblathon output is empty.')
 
     return nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize
 
@@ -279,7 +277,7 @@ def split(str, num):
 # nbFeaturesWithoutReads (int)       : Number of features covered by no read.
 # nbIntronsWithReadsBelowCov (int)   : Number of reads below coverage
 # https://stackoverflow.com/questions/23508351/how-to-do-a-conditional-join-in-python-pandas  
-def process_intron(df_features : dict, df_library: dict, df_candidat:dict, meanCoverage:int): 
+def process_intron(df_features : dict, df_library: dict, df_candidat:dict,meanCoverage :int): 
   
     # Add one column in df_feature with nb reads overlapping each intron/feature
     

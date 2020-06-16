@@ -76,7 +76,7 @@ FRS_CAS-B/ Coverage impact
 
 ##### Test several coverages
 
-For sample 1 (only), without -r fullRandomSimulation option (1 contig = 1 intron) nor -n, run several tests with covage 3, 6, 9, 12, 15, 18, 21 :
+For sample 1 (only), without -r fullRandomSimulation option (1 contig = 1 intron) nor -n, run several tests with coverage 3, 6, 9, 12, 15, 18, 21 :
 Remarque : Without fullRandomSimulation -n option because we add -cf 3 in grinder config file.
 
 ```diff
