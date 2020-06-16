@@ -176,7 +176,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     global_stat_fastq["1Mean coverage"] /= (global_stat["1Contig FASTA - Mean seq. length"] * global_stat["0Contig FASTA - Number of seq."])
     meanCoverage = round(global_stat_fastq["1Mean coverage"], 2)
     global_stat_fastq["1Mean coverage"] = meanCoverage
-    global_stat_fastq["2Min reads length"] = df_features['length'].min()
+    global_stat_fastq["2Min reads length"] = df_features['length'].min()  #TODO
     global_stat_fastq["3Max reads length"] = df_features['length'].max()
     global_stat_fastq["4Mean reads length"] = round(df_features['length'].mean())
       
@@ -252,9 +252,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
          # Definition dict
         definitions = dict()
-        definitions['DP']   = "Filtered introns because of depth (<= "+ str(mindepth)+ ")"
-        definitions['LEN']  = "Filtered introns beacause of length >= "+ str(maxlen)+ ")"    
-        definitions['SS']   = "Non canonical introns (neither CT_AC nor GT_AG)"
+        definitions['DP']   = "Filtered because of depth (<= "+ str(mindepth)+ ")"
+        definitions['LEN']  = "Filtered beacause of length >= "+ str(maxlen)+ ")"    
+        definitions['SS']   = "Filtered  because of non canonical introns (neither CT_AC nor GT_AG)"
         definitions['PASS'] = "Retained introns"
         
         global_stat_detected_introns = dict()
@@ -264,7 +264,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             global_stat_detected_introns["1Mean length"] += row['end'] - row['start'] + 1
         global_stat_detected_introns["1Mean length"] /= (global_stat_detected_introns["0Number"])
         global_stat_detected_introns["1Mean length"] = round(global_stat_detected_introns["1Mean length"], 2)
-        global_stat_detected_introns["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
+        global_stat_detected_introns["2Mean depth of all candidats"]= round(df_candidat['depth'].mean(), 2)
 
         nbPASS        = 0
         nbPASSdepLEN  = 0
@@ -283,20 +283,30 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                         nbDepLenOK = v     
                     c+=1
 
+        # Comparison between candidats and features from GTF file
+        nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minimumDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen)
 
         # Comparison between candidats and features from GTF file
         global_stat_candidat_vs_gtf = dict()
         global_stat_candidat_vs_gtf["0Number of detected introns"] = global_stat_detected_introns["0Number"]
-        c = 1
+        c = 0
         for k, v in (df_features.feature.value_counts()).items() :
             global_stat_candidat_vs_gtf[str(c)+'Number of '+k+ ' in GTF'] = v
             c+=1
         # Add nb reads overlapping each feature in df_cov_lect
         detectableIntrons, TP, detectablePreditNeg, nbFeaturesWithoutReads, nbIntronsWithReadsBelowCov =  process_intron(df_features,df_library, df_candidat, meanCoverage)
-        global_stat_candidat_vs_gtf[str(c+1)+"Number of introns with split reads"]               = detectableIntrons
-        global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]                = global_stat_detected_introns["0Number"]- df_candidat.shape[0]
-        global_stat_candidat_vs_gtf[str(c+3)+"Number of features without read"]                  = nbFeaturesWithoutReads
-        global_stat_candidat_vs_gtf[str(c+4)+"Number of introns with reads below depth"]         = nbIntronsWithReadsBelowCov
+        global_stat_candidat_vs_gtf[str(c+1)+"Number of introns with split reads"]                    = detectableIntrons
+        global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]                     =  df_candidat.shape[0] - df_features.shape[0]
+        global_stat_candidat_vs_gtf[str(c+3)+"Number of features without read"]                       = nbFeaturesWithoutReads
+        
+        
+        global_stat_candidat_vs_features=dict()
+        global_stat_candidat_vs_features["0Number of introns with reads below depth"]              = nbIntronsWithReadsBelowCov
+        global_stat_candidat_vs_features["1Total number of candidats including features"]          = nbTotCandidatsIncludingFeatures
+        global_stat_candidat_vs_features["2Number of features with same start end than candidats"] = nbSameStartEnd
+        global_stat_candidat_vs_features["3Number of features length >="+str(maxlen)]              = nbLen
+        global_stat_candidat_vs_features["4Number of features with depth <= "+str(mindepth)]       = minimumDepth
+        global_stat_candidat_vs_features["5Number of features without canonical junctions"]        = nonCanonical
 
         html += get_html_candidat_descr(global_stat_detected_introns, global_stat_filtred_detected_introns, df_candidat)
         print("Detected introns statistics and histogram")
@@ -318,7 +328,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     global_stat_precision["1Recall or sensitivity (0.0 for no recall, 1.0 for full or perfect recall)"] = recall
     global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
 
-    html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf, meanCoverage)
+    html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf, global_stat_candidat_vs_features, meanCoverage)
     print("Detectability statistics")
 
     # GLOSSARY

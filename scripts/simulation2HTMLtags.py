@@ -124,17 +124,17 @@ def get_html_body1(flagstat="", bam="", candidat=""):
 			    <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#gstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Global statistics
+				    	Contigs statistics
 			    	</a>
 			    </li>
 			    <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#nb_ctg_by_feature">
+				    <a class="nav-link" href="#ref-descr">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Nb. of seq. by feature type
 			    	</a>
 			    </li>
 			    <li class="nav-item" style="padding-left:10px">
-				    <a class="nav-link" href="#nb_ctg_by_same_feature">
+				    <a class="nav-link" href="#ref-descr">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Nb. of seq. with same features
 			    	</a>
@@ -172,7 +172,7 @@ def get_html_body1(flagstat="", bam="", candidat=""):
 			    <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#readgstat">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
-				    	Global statistics
+				    	Reads statistics
 			    	</a>
 			    </li>
                 <li class="nav-item" style="padding-left:10px">
@@ -201,9 +201,9 @@ def get_html_body1(flagstat="", bam="", candidat=""):
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#splitstat">
 				    	<span class="oi oi-graph" aria-hidden="true"></span>
-				    	Split intron
+				    	Split reads
 			    	</a>
-			    </li>'''  
+			    </li>'''                         
     if candidat:
         r += '''             
                 <li class="nav-item" style="padding-left:10px">
@@ -223,9 +223,33 @@ def get_html_body1(flagstat="", bam="", candidat=""):
                 <li class="nav-item">
                     <a class="nav-link" href="#precision">
                         <span class="oi oi-circle-check" aria-hidden="true"></span>
-                        Analysis introns detectability
+                        Comparison features / detected introns
                     </a>
                 </li> 
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#precision">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	GTF vs detected introns
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#precision">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Filtered features
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#precision">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Confusion matrix
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#precision">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Precision, recall & F1 score
+			    	</a>
+			    </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#glossary">
                         <span class="oi oi-question-mark" aria-hidden="true"></span>
@@ -277,7 +301,8 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <div class="d-flex">
                     <div>
-                        <h5 id="ref-descr">Contigs statistics</h5>
+                        <h5>Contigs statistics</h5>
+                        <span class="anchor" id="ref-descr"></span>
                     </div>
                     <div class="ml-2">
                         <span
@@ -295,7 +320,8 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <div class="d-flex">
                     <div>
-                        <h5 id="nb_ctg_by_feature">Number of sequences by feature type</h5>
+                        <h5>Number of sequences by feature type</h5>
+                        <span class="anchor" id="ref-descr"></span>
                     </div>
                     <div class="ml-2">
                         <span
@@ -313,7 +339,8 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
             <div class="mt-4 mr-0 pl-0 col-md-4">
                <div class="d-flex">
                     <div>
-                        <h5 id="nb_ctg_by_same_feature">Number of sequences with same feature(s)</h5>
+                        <h5>Number of sequences with same feature(s)</h5>
+                        <span class="anchor" id="ref-descr"></span>
                     </div>
                     <div class="ml-2">
                         <span
@@ -384,7 +411,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-4 pl-0 col-md-4">
-                <h5>Global statistics</h5>
+                <h5>Reads statistics</h5>
                 <span class="anchor" id="readgstat"></span>
 '''+dict_to_table(global_stat_fastq,-1,True, False)+'''
             </div>
@@ -422,7 +449,7 @@ def get_html_table_descr(global_stats_table):
 def get_html_results():
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Introns extraction results</h1>
+            <h1 class="h4">Intron extraction results</h1>
                 <span class="anchor" id="features-descr"></span>
         </div>
 '''
@@ -434,7 +461,7 @@ def get_html_split_descr(df_splitRead:dict):
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Split intron</h5>
+            <h5>Split reads</h5>
                 <span class="anchor" id="splitstat"></span>
 ''' +  dict_to_table(df_splitRead, 2, True, False) + '''  
             </div>
@@ -472,17 +499,24 @@ def get_html_candidat_descr(global_stat_detected_introns:dict, global_stat_filtr
     return r   
 
 # precision, recall and F1 score   
-def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int, global_stat_candidat_vs_gtf:dict, meanCoverage:int):
+def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int, global_stat_candidat_vs_gtf:dict, global_stat_candidat_vs_features:dict, meanCoverage:int):
     r =  '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
-            <h1 class="h4">Specificity and sensibility</h1>
+            <h1 class="h4">Comparison between features and detected introns, specificity and sensibility</h1>
                 <span class="anchor" id="precision"></span>
         </div>
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-6">
-            <h5>Comparison between features in GTF and detected introns list</h5>
+            <h5>Comparison between features in GTF and detected introns</h5>
                 <span class="anchor" id="precision"></span>
 '''+dict_to_table(global_stat_candidat_vs_gtf,-1,True, False)+'''
+            </div>
+        </div>
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-6">
+            <h5>Filtered features</h5>
+                <span class="anchor" id="precision"></span>
+'''+dict_to_table(global_stat_candidat_vs_features,-1,True, False)+'''
             </div>
         </div>
 		<div class="d-flex">
@@ -584,30 +618,29 @@ def dict_to_table_multi_col(d1 : dict, d2 ="", d3=""):
     table3 =""
     if d1:
         for k, v in sorted(d1.items(), key=lambda t: t[0]):
-            table1 += "<tr><td class='valn text-center'></td><td>Contig FASTA</td></tr>"   
-            table1 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(v)), ' ')  + "</td></tr>"        
+            table1 += "<tr><td class='valn text-center'></td><td class='col-md-3'>Contig FASTA</td></tr>"   
+            table1 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right' class='col-md-3'>" + split_int(round(float(v)), ' ')  + "</td></tr>"        
             c += 1
     if d1 and d2:
         table1 = ""
-        table2 += "<tr><td></td><td class='valn text-center'>Contig FASTA</td><td class='valn text-center'>Contig FASTA with feature(s)</td></tr>"
+        table2 += "<tr><td></td><td class='valn text-center' class='col-md-3'>Contig FASTA</td><td class='valn text-center' class='col-md-3'>Contig FASTA with feature(s)</td></tr>"
         dd = defaultdict(list)
         for d in (d1, d2): # you can list as many input dicts as you want here
             for key, value in d.items():
                 dd[key].append(value)
         for k, v in sorted(dd.items(), key=lambda t: t[0]):
-            table2 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(round(float(v[0])), ' ') + "</td><td class='valn text-right'>" + split_int(round(float(v[1])), ' ') + "</td></tr>"    
+            table2 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right' class='col-md-3'>" + split_int(round(float(v[0])), ' ') + "</td><td class='valn text-right' class='col-md-3'>" + split_int(round(float(v[1])), ' ') + "</td></tr>"    
             c2 += 1
     if d3:  
-        table1=""
-        table2=""
-        table3 += "<tr><td class='valn text-right'></td><td class='valn text-center'>Contig FASTA</td><td class='valn text-center'>Contig FASTA with feature's)</td><td class='valn text-center'>Introns contig FASTA</td></tr>"    
+        table1 = ""
+        table2 = ""
+        table3 += "<tr><td class='valn text-right'></td><td class='valn text-center'>Contig FASTA</td><td class='valn text-center' class='col-md-3'>Contig FASTA with feature's)</td><td class='valn text-center' class='col-md-3'>Introns contig FASTA</td></tr>"    
         dd2 = defaultdict(list)
         for d in (d1, d2, d3):
             for key, value in d.items():
                 dd2[key].append(value)
-        print('dd2',dd2)        
         for k, v in sorted(dd2.items(), key=lambda t: t[0]):
-            table3 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(v[0])  + "</td><td class='valn text-right'>" + split_int(v[1]) + "</td><td class='valn text-right'>" + split_int(v[2]) + "</td></tr>"    
+            table3 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(v[0])  + "</td><td class='valn text-right' class='col-md-3'>" + split_int(v[1]) + "</td><td class='valn text-right' class='col-md-3'>" + split_int(v[2]) + "</td></tr>"    
             c3 += 1
     table += table1
     table += table2

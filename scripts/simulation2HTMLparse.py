@@ -268,6 +268,31 @@ def split_int(number, separator=' ', count=3):
 def split(str, num):
     return [ str[start:start+num] for start in range(0, len(str), num) ]
 
+# Return comparison between dataframes df_candidat and df_features
+def candidatsVsFeatures(df_candidat:dict, df_features:dict, mindepth:int, maxlen:int):
+    # Join candidat and features dataframe
+    df_candidat = df_candidat.join(df_features,  lsuffix='_candidat', rsuffix='_features')
+   
+    # Total number of candidats including features
+    nbTotCandidatsIncludingFeatures = df_candidat.shape[0]
+
+    # Number of features with the same start and end than candidats
+    conditionStartEnd = ((df_candidat['start_candidat'] == df_candidat['start_features']) & (df_candidat['end_candidat'] == df_candidat['end_features']))
+    nbSameStartEnd=len(df_candidat.loc[conditionStartEnd]) - 1 # -1 for header
+   
+    # Features length >= 80 (default value in Split Read Search)
+    condLen = ((((df_candidat['start_features'] - df_candidat['end_features'])/df_candidat['length'])*100) >= int(maxlen))
+    nbLen   = len(df_candidat.loc[condLen]) 
+
+    # Features with depth inf or equals to 1 (value by default)
+    condDepth = (df_candidat['depth'] <= int(mindepth))
+    minDepth = len(df_candidat.loc[condDepth])   
+
+    # Number of features without canonical junctions
+    condNoCanonical = ((df_candidat['split_borders'] != 'CT_AC') & (df_candidat['split_borders'] != 'GT_AG'))
+    noCanonical = len(df_candidat.loc[condNoCanonical])
+    
+    return nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minDepth, noCanonical
 
 # Process df_features (dict), df_library (dict) and meanCoverage (int)
 # Return :
