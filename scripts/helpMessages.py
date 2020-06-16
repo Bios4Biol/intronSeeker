@@ -3,7 +3,7 @@
 import textwrap
 import os
 
-# Metadata readable in intronSeeker/config/intronSeeker.properties
+# Metadata
 __author__    = "Lasguignes E., Oudin F., Cabanettes F., Klopp C."
 __copyright__ = "Copyright (C) 2019 INRA"
 __license__   = "GNU General Public License"
