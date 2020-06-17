@@ -258,134 +258,161 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         definitions = dict()
         definitions['DP']   = "Filtered because of depth (<= "+ str(mindepth)+ ")"
         definitions['LEN']  = "Filtered because of length (>= "+ str(maxlen)+ "%)"    
-        definitions['SS']   = "Filtered because of non canonical junction (neither CT_AC nor GT_AG)"
-        definitions['PASS'] = "Retained"
+        definitions['SS']   = "Filtered because of non canonical junction"
+        definitions['PASS'] = "Number"
         
+        # Detected introns (stat table and depth distribution)
         global_stat_detected_introns = dict()
         global_stat_detected_introns["0Number"] = df_candidat.shape[0]
-        global_stat_detected_introns["1Mean length"] = 0
+        global_stat_detected_introns["1Min length"]  = df_candidat.iloc[0]['end'] - df_candidat.iloc[0]['start'] + 1 
+        global_stat_detected_introns["2Max length"]  = 0
+        global_stat_detected_introns["3Mean length"] = 0
         for i,row in df_candidat.iterrows():
-            global_stat_detected_introns["1Mean length"] += row['end'] - row['start'] + 1
-        global_stat_detected_introns["1Mean length"] /= (global_stat_detected_introns["0Number"])
-        global_stat_detected_introns["1Mean length"] = round(global_stat_detected_introns["1Mean length"], 2)
-        global_stat_detected_introns["2Mean depth"]= round(df_candidat['depth'].mean(), 2)
+            l = row['end'] - row['start'] + 1
+            global_stat_detected_introns["1Min length"] = min(l, global_stat_detected_introns["1Min length"])
+            global_stat_detected_introns["2Max length"] = max(l, global_stat_detected_introns["2Max length"])
+            global_stat_detected_introns["3Mean length"] += row['end'] - row['start'] + 1
+        global_stat_detected_introns["3Mean length"] /= (global_stat_detected_introns["0Number"])
+        global_stat_detected_introns["3Mean length"] = round(global_stat_detected_introns["3Mean length"], 2)
+        global_stat_detected_introns["4Min depth"]  = df_candidat['depth'].min()
+        global_stat_detected_introns["5Max depth"]  = df_candidat['depth'].max()
+        global_stat_detected_introns["6Mean depth"]  = round(df_candidat['depth'].mean(), 2)
+        html += get_html_detected(global_stat_detected_introns, df_candidat)
 
-        # fonction html pour les détectés
-        # # qui fera tableau et graph
-
-        global_stat_filtred_detected_introns = dict()  ##TODO  filtred / filtered
-        global_stat_filtred_detected_introns["0" + definitions['PASS']] = 0
-        global_stat_filtred_detected_introns["1" + definitions['DP']]   = 0
-        global_stat_filtred_detected_introns["2" + definitions['LEN']]  = 0
-        global_stat_filtred_detected_introns["3" + definitions['SS']]   = 0
-        
+        # Filtered detected introns
+        global_stat_f_detected_introns = dict()
+        global_stat_f_detected_introns["0" + definitions['PASS']] = 0
+        global_stat_f_detected_introns["1" + definitions['DP']]   = 0
+        global_stat_f_detected_introns["2" + definitions['LEN']]  = 0
+        global_stat_f_detected_introns["3" + definitions['SS']]   = 0
+        global_stat_f_detected_introns["4Min length"]  = 99999999
+        global_stat_f_detected_introns["5Max length"]  = 0 
+        global_stat_f_detected_introns["6Mean length"] = 0
+        global_stat_f_detected_introns["7Min depth"]   = 99999999
+        global_stat_f_detected_introns["8Max depth"]   = 0 
+        global_stat_f_detected_introns["9Mean depth"]  = 0
         for i, v in (df_candidat['filter'].items()) :
             if "PASS" in v:
-                global_stat_filtred_detected_introns["0" + definitions['PASS']] += 1
-            if "DP" in v:
-                global_stat_filtred_detected_introns["1" + definitions['DP']]   += 1
-            if "LEN" in v:
-                global_stat_filtred_detected_introns["2" + definitions['LEN']]  += 1
-            if "SS" in v:
-                global_stat_filtred_detected_introns["3" + definitions['SS']]   += 1
-
-        # fonction html pour les filtrés
-        #html += get_html_detected(global_stat_filtred_detected_introns)   
-
+                global_stat_f_detected_introns["0" + definitions['PASS']] += 1
+                l = df_candidat.loc[i]['end'] - df_candidat.loc[i]['start'] + 1
+                global_stat_f_detected_introns["4Min length"] = min(l, global_stat_f_detected_introns["4Min length"])
+                global_stat_f_detected_introns["5Max length"] = max(l, global_stat_f_detected_introns["5Max length"])
+                global_stat_f_detected_introns["6Mean length"]+= l
+                l = df_candidat.loc[i]['depth']
+                global_stat_f_detected_introns["7Min depth"]  = min(l, global_stat_f_detected_introns["7Min depth"])
+                global_stat_f_detected_introns["8Max depth"]  = max(l, global_stat_f_detected_introns["8Max depth"])
+                global_stat_f_detected_introns["9Mean depth"] += l
+            else :
+                if "DP" in v:
+                    global_stat_f_detected_introns["1" + definitions['DP']] += 1
+                if "LEN" in v:
+                        global_stat_f_detected_introns["2" + definitions['LEN']] += 1
+                if "SS" in v:
+                    global_stat_f_detected_introns["3" + definitions['SS']] += 1
+        global_stat_f_detected_introns["6Mean length"] /= round(global_stat_f_detected_introns["0" + definitions['PASS']], 2)
+        global_stat_f_detected_introns["9Mean depth"]  /= round(global_stat_f_detected_introns["0" + definitions['PASS']], 2)
      
-        ###
-        # TODO gestion rapport cadre simulation ou vraie vie
-        # if ? simulation ?
-        ###
-        
-        # Tableau features detectable
-        # 1 nombre de features 
-        # 2 nombre de features retenus
-        # 3 .... nombre de features filtrées because of
-        # Add a column to df_features with the DP (using df_library)
-        df_features["DP"] = df_features.apply(
-            compute_dp,
-            axis = 1,
-            df_library=df_library
-        )
-        
-        # Add a column to df_features with the lenght of the corresponding contig (using df_fasta)
-        df_features["ctg_length"] = df_features.apply(
-            compute_len,
-            axis = 1,
-            df_fasta=df_fasta
-        )
-
-        global_stat_detectable_features = dict()
-        global_stat_detectable_features["0Number of features"] = df_features.shape[0]
-        global_stat_detectable_features["1" + definitions['PASS']] = 0
-        global_stat_detectable_features["2" + definitions['DP']]   = 0
-        global_stat_detectable_features["3" + definitions['LEN']]  = 0
-        global_stat_detectable_features["4" + definitions['SS']]   = 0
-        
-        for index, row in df_features.iterrows():
-            PASS = True
-            if ('CT_AC' not in row['flanks'] or 'GT_AG' not in row['flanks']) :
-                global_stat_detectable_features["4" + definitions['SS']] += 1
-                PASS = False 
-            if (((row['end'] - row['start'] + 1) / row['ctg_length']) >= int(maxlen)):
-                global_stat_detectable_features["3" + definitions['LEN']] += 1
-                PASS = False
-            if (row['DP'] <= mindepth):
-                global_stat_detectable_features["2" + definitions['DP']] += 1
-                PASS = False
-            if PASS:
-               global_stat_detectable_features["1" + definitions['PASS']] += 1     
+        # if simulation ?
+        if mfasta :
+            # Detectable features (filter features because of threshold: mindepth and maxlength)
+            # Add a column to df_features for the DP (using df_library)
+            df_features["depth"] = df_features.apply(
+                compute_dp,
+                axis = 1,
+                df_library=df_library
+            )
+            # Add a column to df_features for the length of the corresponding contig (using df_mfasta)
+            df_features["ctg_length"] = df_features.apply(
+                compute_len,
+                axis = 1,
+                df_mfasta=df_mfasta
+            )
+            global_stat_detectable_features = dict()
+            global_stat_detectable_features["0" + definitions['PASS']] = 0
+            global_stat_detectable_features["1" + definitions['DP']]   = 0
+            global_stat_detectable_features["2" + definitions['LEN']]  = 0
+            global_stat_detectable_features["3" + definitions['SS']]   = 0
+            global_stat_detectable_features["4Min length"]  = 99999999
+            global_stat_detectable_features["5Max length"]  = 0 
+            global_stat_detectable_features["6Mean length"] = 0
+            global_stat_detectable_features["7Min depth"]   = 99999999
+            global_stat_detectable_features["8Max depth"]   = 0 
+            global_stat_detectable_features["9Mean depth"]  = 0
+            for index, row in df_features.iterrows():            
+                PASS = True
+                if (row['flanks'] != 'GT_AG' and row['flanks'] != 'CT_AC'): 
+                    global_stat_detectable_features["3" + definitions['SS']] += 1      
+                    PASS = False 
+                if ((((row['end'] - row['start'] + 1) / row['ctg_length']) * 100) >= int(maxlen)):
+                    global_stat_detectable_features["2" + definitions['LEN']] += 1
+                    PASS = False
+                if (row['depth'] <= int(mindepth)):
+                    global_stat_detectable_features["1" + definitions['DP']] += 1
+                    PASS = False
+                if PASS:
+                    global_stat_detectable_features["0" + definitions['PASS']] += 1
+                    l = row['end'] - row['start'] + 1
+                    global_stat_detectable_features["4Min length"] = min(l, global_stat_detectable_features["4Min length"])
+                    global_stat_detectable_features["5Max length"] = max(l, global_stat_detectable_features["5Max length"])
+                    global_stat_detectable_features["6Mean length"]+= l
+                    l = row['depth']
+                    global_stat_detectable_features["7Min depth"]  = min(l, global_stat_detectable_features["7Min depth"])
+                    global_stat_detectable_features["8Max depth"]  = max(l, global_stat_detectable_features["8Max depth"])
+                    global_stat_detectable_features["9Mean depth"] += l
+            global_stat_detectable_features["6Mean length"] /= round(global_stat_detectable_features["0" + definitions['PASS']], 2)
+            global_stat_detectable_features["9Mean depth"]  /= round(global_stat_detectable_features["0" + definitions['PASS']], 2)
+            html += get_html_candidat(global_stat_f_detected_introns, global_stat_detectable_features)
+        else :
+            html += get_html_candidat(global_stat_f_detected_introns)
  
-        html += get_html_detectable_features(global_stat_detectable_features)
-        # fonction gethtml_detectablefeatures (dict detectablefeatures)
+        # if simulation ?
+        if mfasta:
+            TP = 0
+            FP = 0
+            TN = 0
+            FN = 0
+            for index, row in df_candidat.iterrows():
+                if "PASS" in row['filter']:
+                    ok = len(df_features.loc[lambda df :
+                             (df['contig'] == row['reference']) &
+                             (df['start']  == row['start']) &
+                             (df['end']    == row['end']) &
+                             (df['depth'] > int(mindepth)) &
+                             ((((df['end'] - df['start'] + 1) / df['ctg_length']) * 100) < int(maxlen)) &
+                             (df['flanks'].str.contains('GT_AG|CT_AC'))])   
+                    if ok == 1:
+                        TP += 1         
+                    else:
+                        FP += 1
+                else:
+                    ok = len(df_features.loc[lambda df :
+                             (df['contig'] == row['reference']) &
+                             (df['start']  == row['start']) &
+                             (df['end']    == row['end']) &
+                             (df['depth'] > int(mindepth)) &
+                             ((((df['end'] - df['start'] + 1) / df['ctg_length']) * 100) < int(maxlen)) &
+                             (df['flanks'].str.contains('GT_AG|CT_AC'))])
+                    if ok == 1:
+                        FN += 1
+                    else:
+                        TN += 1
+        print('TP=', TP)
+        print('TN=', TN)
+        print('FP=', FP)
+        print('FN=', FN)
 
-        # Comparison between candidats and features from GTF file
-        nbTotCandidatsIncludingFeatures, nbSameStartEnd, nbLen, minimumDepth, nonCanonical=candidatsVsFeatures(df_candidat, df_features, mindepth, maxlen)
-
-        # Comparison between candidats and features from GTF file
-        global_stat_candidat_vs_gtf = dict()
-        global_stat_candidat_vs_gtf["0Number of detected introns"] = global_stat_detected_introns["0Number"]
-        c = 0
-        for k, v in (df_features.feature.value_counts()).items() :
-            global_stat_candidat_vs_gtf[str(c)+'Number of '+k+ ' in GTF'] = v
-            c+=1
-        # Add nb reads overlapping each feature in df_cov_lect
-        detectableIntrons, TP, detectablePreditNeg, nbFeaturesWithoutReads, nbIntronsWithReadsBelowCov =  process_intron(df_features,df_library, df_candidat, meanCoverage)
-        global_stat_candidat_vs_gtf[str(c+1)+"Number of introns with split reads"]                    = detectableIntrons
-        global_stat_candidat_vs_gtf[str(c+2)+"Detected introns not found in GTF"]                     =  df_candidat.shape[0] - df_features.shape[0]
-        global_stat_candidat_vs_gtf[str(c+3)+"Number of features without read"]                       = nbFeaturesWithoutReads
-        
-        
-        global_stat_candidat_vs_features=dict()
-        global_stat_candidat_vs_features["0Number of introns with reads below depth"]              = nbIntronsWithReadsBelowCov
-        global_stat_candidat_vs_features["1Total number of candidats including features"]          = nbTotCandidatsIncludingFeatures
-        global_stat_candidat_vs_features["2Number of features with same start end than candidats"] = nbSameStartEnd
-        global_stat_candidat_vs_features["3Number of features length >="+str(maxlen)]              = nbLen
-        global_stat_candidat_vs_features["4Number of features with depth <= "+str(mindepth)]       = minimumDepth
-        global_stat_candidat_vs_features["5Number of features without canonical junctions"]        = nonCanonical
-
-        html += get_html_candidat_descr(global_stat_detected_introns, global_stat_filtred_detected_introns, df_candidat)
-        print("Detected introns statistics and histogram")
-      
-    # Precision, recall and F1 score
-    #  TP is the number of detectable and found features (int value)
-    #  TN is the number of detectable and not found features (int value)
-    #  FP is the number of undetectable and found features (int value)
-    #  FN is the number of undetectable and not found features (int value)    
-    FP=nbPASS - TP                       #nbPASS = predits positives
-    TN=42  #nbPASSdepLEN = predits negatives
-    FN=42 #nbPASSdepLEN-TN
-
+        print('Sensibilité=', TP/(TP+FN)) 
+        print('Spécificité=', TN/(TN+FP))  
+            
 
     global_stat_precision= dict()
-    precision = TP/(FP+TP)
+    precision = TN/(TP+FP)
     global_stat_precision["0Precision (between 0 - 1)"]= precision
-    recall = TP/(TN+TP)
-    global_stat_precision["1Recall or sensitivity (0.0 for no recall, 1.0 for full or perfect recall)"] = recall
+    recall = TP/(TP+FN)
+    global_stat_precision["1Recall or sensitivity (0 for no recall, 1 for full or perfect recall)"] = recall
     global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
-
-    html += get_html_precision(global_stat_precision, TP, TN, FP, FN, global_stat_candidat_vs_gtf, global_stat_candidat_vs_features, meanCoverage)
+    
+    html += get_html_precision(global_stat_precision, TP, TN, FP, FN)
     print("Detectability statistics")
 
     # GLOSSARY

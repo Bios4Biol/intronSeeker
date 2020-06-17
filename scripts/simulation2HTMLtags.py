@@ -315,7 +315,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
                         </span>
                     </div>
                 </div>               
-'''+dict_to_table(global_stat,7,True, False)+'''
+'''+dict_to_table(global_stat,7,True)+'''
             </div>   
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <div class="d-flex">
@@ -334,7 +334,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
                         </span>
                     </div>
                 </div>
-'''+dict_to_table(nb_ctg_by_feature,-1,False, False)+'''
+'''+dict_to_table(nb_ctg_by_feature,-1,False)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
                <div class="d-flex">
@@ -353,14 +353,14 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
                         </span>
                     </div>
                 </div>
-'''+dict_to_table(ctg_descr,-1,False, False)+'''
+'''+dict_to_table(ctg_descr,-1,False)+'''
             </div>
         </div>
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-6">
                 <h5>Assemblathon statistics</h5>
                 <span class="anchor" id="ref-descr_assemblathon_fasta"></span>
-'''+dict_to_table_multi_col(global_stat_assemblathon_fasta,global_stat_assemblathon_mfasta)+'''
+'''+dict_to_table_multi_col("Contig FASTA", global_stat_assemblathon_fasta, "Contig FASTA with feature(s)", global_stat_assemblathon_mfasta)+'''
             </div>          
         </div>    
 '''
@@ -404,19 +404,6 @@ def get_html_abundance(df_fasta:dict):
     return r
 
 
-def get_html_detectable_features(global_stat_detectable_features: dict):
-    r = '''
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Filtered features</h5>
-                <span class="anchor" id="filteredfeatures"></span>
-'''+dict_to_table(global_stat_detectable_features, -1, True, False)+'''
-            </div>
-        </div>    
-'''
-    return r
-
-
 def get_html_reads_descr(global_stat_fastq : dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
@@ -427,7 +414,7 @@ def get_html_reads_descr(global_stat_fastq : dict):
             <div class="mt-4 mr-4 pl-0 col-md-4">
                 <h5>Reads statistics</h5>
                 <span class="anchor" id="readgstat"></span>
-'''+dict_to_table(global_stat_fastq,-1,True, False)+'''
+'''+dict_to_table(global_stat_fastq,-1,True)+'''
             </div>
         </div>  
 '''
@@ -441,7 +428,7 @@ def get_html_flagstat_descr(global_stat_flagstat:dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-'''+ dict_to_table(global_stat_flagstat, -1,True, False) +'''
+'''+ dict_to_table(global_stat_flagstat, -1,True) +'''
             </div>
         </div>
 '''
@@ -453,11 +440,12 @@ def get_html_table_descr(global_stats_table):
             <div class="mt-4 mr-4 pl-0 col-md-4">
             <h5>TO COMPLETE</h5>
                 <span class="anchor" id="assemblystat"></span>
-'''+dict_to_table(global_stats_table,-1,True, False)+'''
+'''+dict_to_table(global_stats_table,-1,True)+'''
             </div>
         </div>
 '''
     return r
+
 
 # Results
 def get_html_results():
@@ -467,8 +455,8 @@ def get_html_results():
                 <span class="anchor" id="features-descr"></span>
         </div>
 '''
-
     return r   
+
 
 # Plots split detection stats   
 def get_html_split_descr(df_splitRead:dict):
@@ -477,76 +465,76 @@ def get_html_split_descr(df_splitRead:dict):
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Split reads</h5>
                 <span class="anchor" id="splitstat"></span>
-''' +  dict_to_table(df_splitRead, 2, True, False) + '''  
+''' +  dict_to_table(df_splitRead, 2, True) + '''  
             </div>
         </div>  
 '''
-
     return r   
-    #  df_to_table(df_splitRead, 2, True)
 
-# Plots candidats stats   
-def get_html_candidat_descr(global_stat_detected_introns:dict, global_stat_filtred_detected_introns:dict, df_candidat:dict):
+
+# Plots detected candidats stats : tab and graph
+def get_html_detected(global_stat_detected_introns:dict, df_candidat:dict):
     r =  '''
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Detected introns</h5>
                 <span class="anchor" id="candidatstat"></span>
-'''+dict_to_table(global_stat_detected_introns,-1,True, False)+'''
-            </div>
-        </div>   
-        <div class="d-flex"> 
-            <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Filtered detected introns</h5>
-                <span class="anchor" id="filtered_detected_introns"></span>
-'''+dict_to_table(global_stat_filtred_detected_introns,-1,True, False)+'''
-            </div>
+'''+dict_to_table(global_stat_detected_introns,-1,True)+'''
+            </div>  
             <div class="mt-4 mr-0 pl-0 col-md-8">
                 <h5>Detected introns depth distribution</h5>
-                <span class="anchor" id="filtered_detected_introns"></span>
+                <span class="anchor" id="candidatstat"></span>
 '''+plot_hist_candidats_depth(df_candidat['depth'])+'''
             </div>
         </div>  
 
 '''
-
     return r   
 
+
+# Tab candidat filtered detected candidats (and if simulation detectable features)
+def get_html_candidat(global_stat_f_detected_introns:dict, global_stat_detectable_features=0):
+    r =  '''
+        <div class="d-flex"> 
+            <div class="mt-4 mr-0 pl-0'''
+    if global_stat_detectable_features:
+        r += ''' col-md-8">
+            <h5>Filtered detected introns and filtered features (detectable)</h5>
+                <span class="anchor" id="filtered_detected_introns"></span>'''
+        r += dict_to_table_multi_col("Filtered detected introns", global_stat_f_detected_introns,
+                                     "Filtered features (detectable)", global_stat_detectable_features)
+    else:
+        r += ''' col-md-4">
+            <h5>Filtered detected introns</h5>
+                <span class="anchor" id="filtered_detected_introns"></span>'''
+        r += dict_to_table(global_stat_f_detected_introns, -1, True)
+    r+='''
+            </div>
+        </div>
+'''
+    return r   
+
+
 # precision, recall and F1 score   
-def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int, global_stat_candidat_vs_gtf:dict, global_stat_candidat_vs_features:dict, meanCoverage:int):
+def get_html_precision(global_stat_precision:dict, TP:int, TN:int, FP:int, FN:int):
     r =  '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Comparison between features and detected introns, specificity and sensibility</h1>
                 <span class="anchor" id="precision"></span>
         </div>
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-6">
-            <h5>Comparison between features in GTF and detected introns</h5>
-                <span class="anchor" id="precision"></span>
-'''+dict_to_table(global_stat_candidat_vs_gtf,-1,True, False)+'''
-            </div>
-        </div>
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-6">
-            <h5>Filtered features</h5>
-                <span class="anchor" id="precision"></span>
-'''+dict_to_table(global_stat_candidat_vs_features,-1,True, False)+'''
-            </div>
-        </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Confusion matrix for mean coverage = ''' + str(meanCoverage) + '''</h5>
+            <h5>Confusion matrix</h5>
                 <span class="anchor" id="precision"></span>
 '''+dict_to_table_3col(TP, TN, FP, FN)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Precision, recall and F1 score</h5>
                 <span class="anchor" id="precision"></span>
-'''+dict_to_table(global_stat_precision,-1,True, True)+'''
+'''+dict_to_table(global_stat_precision,-1,True)+'''
             </div>
         </div>  
 '''
-
     return r       
 
 
@@ -565,7 +553,6 @@ def get_html_glossary():
             </div>
         </div>  
 '''
-
     return r    
 
 def get_html_footer():
@@ -595,8 +582,7 @@ def get_html_footer():
 # Param 1 : dict (key, val)
 # Param 2 : int for which line number first col (key) will be right align
 # Param 3 : bool to remove first char of the key (used to sort by key)
-# Param 4 : bool to choose if number are printed as formated int by split_int function (decimals=False) or float (decimals=True)
-def dict_to_table(d : dict, i : int, rmfirstchar : bool, decimals : bool):
+def dict_to_table(d : dict, i : int, rmfirstchar : bool):
     table = '''
             <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
         	    <tbody>
@@ -606,11 +592,8 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool, decimals : bool):
         table += "<tr><td class='valn"
         if(c >= i & i!=-1):
             table += " text-right"
-        val=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str(v))   # Remove (nb%) in val    
-        if decimals:
-            values= str(round(v, 2))
-        else:
-            values= split_int(round(float(val)), ' ')   
+        val = re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str(v))   # Remove (nb%) in val    
+        values = split_int(round(float(val)), ' ')   
         if(rmfirstchar):
             table += "'>" + k[1:] + "</td><td class='valn text-right'>" + values + "</td></tr>"   
         else:
@@ -619,48 +602,33 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool, decimals : bool):
     table += "</tbody></table>"
     return table
 
-def dict_to_table_multi_col(d1 : dict, d2 ="", d3=""):
+
+def dict_to_table_multi_col(col1name:str, d1:dict, col2name="", d2="", col3name="", d3=""):
+    colmd = "width='50%'"
+    if col2name:
+        colmd = "width='33%'"
+    if col3name:
+        colmd = "width='25%'"
     table = '''
             <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
-        	    <tbody>
+        	    <thead>
 ''' 
-    c  = 0
-    c2 = 0
-    c3 = 0
-    table1 =""
-    table2 =""
-    table3 =""
-    if d1:
-        for k, v in sorted(d1.items(), key=lambda t: t[0]):
-            table1 += "<tr><td class='valn text-center'></td><td class='col-md-3'>Contig FASTA</td></tr>"   
-            table1 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right' class='col-md-3'>" + split_int(round(float(v)), ' ')  + "</td></tr>"        
-            c += 1
-    if d1 and d2:
-        table1 = ""
-        table2 += "<tr><td></td><td class='valn text-center' class='col-md-3'>Contig FASTA</td><td class='valn text-center' class='col-md-3'>Contig FASTA with feature(s)</td></tr>"
-        dd = defaultdict(list)
-        for d in (d1, d2): # you can list as many input dicts as you want here
-            for key, value in d.items():
-                dd[key].append(value)
-        for k, v in sorted(dd.items(), key=lambda t: t[0]):
-            table2 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right' class='col-md-3'>" + split_int(round(float(v[0])), ' ') + "</td><td class='valn text-right' class='col-md-3'>" + split_int(round(float(v[1])), ' ') + "</td></tr>"    
-            c2 += 1
-    if d3:  
-        table1 = ""
-        table2 = ""
-        table3 += "<tr><td class='valn text-right'></td><td class='valn text-center'>Contig FASTA</td><td class='valn text-center' class='col-md-3'>Contig FASTA with feature's)</td><td class='valn text-center' class='col-md-3'>Introns contig FASTA</td></tr>"    
-        dd2 = defaultdict(list)
-        for d in (d1, d2, d3):
-            for key, value in d.items():
-                dd2[key].append(value)
-        for k, v in sorted(dd2.items(), key=lambda t: t[0]):
-            table3 += "<tr><td class='valn text-left'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(v[0])  + "</td><td class='valn text-right' class='col-md-3'>" + split_int(v[1]) + "</td><td class='valn text-right' class='col-md-3'>" + split_int(v[2]) + "</td></tr>"    
-            c3 += 1
-    table += table1
-    table += table2
-    table += table3    
-    table += "</tbody></table>"
-    return table    
+    table += "<tr><td " + colmd + "></td><td class='valn text-center' " + colmd + ">" + col1name + "</td>"
+    if col2name:
+        table += "<td class='valn text-center' " + colmd + ">" + col2name + "</td>"
+    if col3name:
+        table += "<td class='valn text-center' " + colmd + ">" + col3name + "</td>"
+    table += "</tr></thead><tbody>"
+    for k, v in sorted(d1.items(), key=lambda t: t[0]):
+        table += "<tr><td class='valn text-left'>" + k[1:] + "</td>"
+        table += "<td class='valn text-right'>" + split_int(round(float(v)), ' ')  + "</td>"
+        if col2name:
+            table += "<td class='valn text-right'>" + split_int(round(float(d2[k])), ' ')  + "</td>"
+        if col3name:
+            table += "<td class='valn text-right'>" + split_int(round(float(d3[k])), ' ')  + "</td>"
+        table += "</tr>"
+    return table + "</tbody></table>"    
+
 
 # Return HTML table from dict (as dict_to_table function) but with 3 columns instead of 2
 # Param 1 : TP is the number of detectable and found features (int value)
