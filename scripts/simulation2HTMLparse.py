@@ -103,23 +103,23 @@ def parse_library(r1, r2=0) :
         for record in SeqIO.parse(file1, "fastq") :
             reference = record.description.split()[1].lstrip("reference=")
             id = record.id
-            start,end,complement =  parse_positions(record.description.split()[2])
-            lectures.append([reference,id,start,end,complement])
+            start,end,complement = parse_positions(record.description.split()[2])
+            lectures.append([reference, id, len(record), start, end, complement])
     if r2 :
         with my_open(r2,"rt") as file2 :
             for record in SeqIO.parse(file2, "fastq") :
                 reference = record.description.split()[1].lstrip("reference=")
                 id = record.id
-                start,end,complement =  parse_positions(record.description.split()[2])
-                lectures.append([reference,id,int(start),int(end),complement])
-    return pd.DataFrame(lectures,columns=["contig","lecture","start","end","complement"]).sort_values(["contig","start","end"]).set_index('lecture') 
+                start,end,complement = parse_positions(record.description.split()[2])
+                lectures.append([reference, id, len(record), start, end, complement])
+    return pd.DataFrame(lectures,columns=["contig","lecture","length","start","end","complement"]).sort_values(["contig","start","end"]).set_index('lecture') 
 
 
 # Return read description (start, end, complement)
 def parse_positions(fastq_pos) :
     pos = fastq_pos.lstrip("position=").split("..")
     complement = ('complement(' in pos[0])
-    start = int(pos[0].lstrip("complement("))-1
+    start = int(pos[0].lstrip("complement("))
     end = int(pos[1].rstrip(")"))
     return start,end,complement
 
@@ -169,23 +169,31 @@ def parse_split(split):
 def parse_flagstat(flagstat) :
     with open(flagstat) as f:
         mylist = [line.rstrip('\n') for line in f]
-        for i in range(0, 12):
-            line=mylist[i]
-            #pos1 = line.find('\D\s')
-            pos2 = line.find('+')  
-            if "QC-passed reads" in line:
-                nbreads=line[0:pos2]
-            if "mapped (" in line:
-                mapped=line[0:pos2]
-            if "paired in sequencing" in line:
-                paired=line[0:pos2]
-            if "properly paired" in line:
-                proper=line[0:pos2]
-            if "secondary" in line:
-                secondary=line[0:pos2]
-            if "singletons (" in line:
-                singletons=line[0:pos2]   
-    return nbreads, mapped, paired, proper, secondary, singletons
+        for line in mylist:
+            v = re.search('^(\d+)', line)
+            if v:   
+                if "QC-passed reads" in line:
+                    nbreads = v.group(1)
+                if "mapped (" in line:
+                    mapped = v.group(1)
+                    v = re.search('mapped \((\d+.\d+)\%', line)
+                    mappercent = 0
+                    if v:
+                        mappercent = v.group(1)
+                if "paired in sequencing" in line:
+                    paired = v.group(1)
+                if "properly paired" in line:
+                    proper = v.group(1)
+                    v = re.search('properly paired \((\d+.\d+)\%', line)
+                    properpercent = 0
+                    if v:
+                        properpercent = v.group(1)
+                if "secondary" in line:
+                    secondary = v.group(1)
+                if "singletons (" in line:
+                    singletons = v.group(1)  
+    return nbreads, mapped, mappercent, paired, proper, properpercent, secondary, singletons
+
 
 def compute_tr_length(df_mfasta, df_features) :
     return df_mfasta.length - df_features.loc[lambda df : df.contig == df_mfasta.name,"length" ].sum()
@@ -258,15 +266,17 @@ def run_assemblathon(fasta : str ) :
     return nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize
 
 
-# Return int formatted by 3 numbers. Example : 1 234 instead of 1234
+# Return str formatted by 3 numbers. Example : 1 234 instead of 1234
+# Not apply for float numbers
 def split_int(number, separator=' ', count=3):
-    return separator.join(
-        [str(number)[::-1][i:i+count] for i in range(0, len(str(number)), count)]
-    )[::-1]
+    l = str(number).find('.')
+    if l == -1:
+        return str(separator.join(
+            [str(number)[::-1][i:i+count] for i in range(0, len(str(number)), count)]
+            )[::-1])
+    else:
+        return str(number)
 
-# Return string split by 3 characters
-def split(str, num):
-    return [ str[start:start+num] for start in range(0, len(str), num) ]
 
 # Add DP to df_features using df_library
 def compute_dp(df_features, df_library) :

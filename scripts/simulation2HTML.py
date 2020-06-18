@@ -50,8 +50,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             print('\nError: output file already exists.\n')
             exit(1)
 
-    print("Output dir and report html")        
-
 	### MEMO 
 	# fasta  = sequences used to generate reads
 	# mfasta = sequences used to align reads
@@ -90,8 +88,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         )
     )
 
-    print("Build pandas dataframes")  
-
     # HEADER
     html = get_html_header()
     
@@ -121,23 +117,21 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         inputfiles.append("Candidat#" + os.path.basename(candidat.name))
 
     html += get_html_body1(flagstat_file, split_file, candidat_file)
-
    
     # INPUT FILES
     html += get_html_inputfiles(inputfiles)
-    print("List input files")
 
     # SEQUENCE STAT
     # Global stat
     nb_distinct_features, nb_ctg_by_feature, ctg_descr = stat_from_gtf(gtf.name)
     global_stat = dict()
-    global_stat["0Contig FASTA - Number of seq."]            = df_fasta.shape[0]
-    global_stat["1Contig FASTA - Mean seq. length"]          = int(df_fasta['length'].mean())
-    global_stat["2Contig FASTA with feature(s) - Number of seq."]   = df_mfasta.shape[0]
-    global_stat["3Contig FASTA with feature(s) - Mean seq. length"] = int(df_mfasta['length'].mean())
-    global_stat["4Number of modified sequences"]           = df_mfasta.loc[df_mfasta.index.str.contains(".modif")].shape[0]
-    global_stat["5Number of distinct features in GTF"]     = df_features.feature.value_counts().shape[0]
-    global_stat["6Number of features in GTF"]              = df_features.shape[0]
+    global_stat["0Contig FASTA - Number of sequences"]  = len(df_fasta.index)
+    global_stat["1Contig FASTA - Mean sequence length"] = int(df_fasta['length'].mean())
+    global_stat["2Contig FASTA with feature(s) - Number of sequences"]  = len(df_mfasta.index)
+    global_stat["3Contig FASTA with feature(s) - Mean sequence length"] = int(df_mfasta['length'].mean())
+    global_stat["4Number of modified sequences"]       = df_mfasta.loc[df_mfasta.index.str.contains(".modif")].shape[0]
+    global_stat["5Number of distinct features in GTF"] = df_features.feature.value_counts().shape[0]
+    global_stat["6Number of features in GTF"]          = len(df_features.index)
     c = 7
     for k, v in (df_features.feature.value_counts()).items() :
         global_stat[str(c)+k] = v
@@ -166,26 +160,19 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_assemblathon_mfasta["5Number of contigs > 1K nt"] = nbContigsSup1K
         global_stat_assemblathon_mfasta["6N50 contig length"]         = n50
         global_stat_assemblathon_mfasta["7L50 contig count"]          = l50
-
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta)
-    print("Global statistics")
 
-    # # READS STAT    TODO : à remettre
-    # # Global stat
-    # global_stat_fastq = dict()
-    # global_stat_fastq["0Number of reads"] = df_library['contig'].count()
-    # global_stat_fastq["1Mean coverage"] = 0
-    # for i,row in df_library.iterrows():
-    #     global_stat_fastq["1Mean coverage"] += row['end'] - row['start'] + 1
-    # global_stat_fastq["1Mean coverage"] /= (global_stat["1Contig FASTA - Mean seq. length"] * global_stat["0Contig FASTA - Number of seq."])
-    # meanCoverage = round(global_stat_fastq["1Mean coverage"], 2)
-    # global_stat_fastq["1Mean coverage"] = meanCoverage
-    # global_stat_fastq["2Min reads length"] = df_features['length'].min()  #TODO
-    # global_stat_fastq["3Max reads length"] = df_features['length'].max()
-    # global_stat_fastq["4Mean reads length"] = round(df_features['length'].mean())
-      
-    # html += get_html_reads_descr(global_stat_fastq) 
-    # print("Reads statistics")
+    # READS STAT
+    # Global stat
+    global_stat_fastq = dict()
+    global_stat_fastq["0Number of reads"]  = len(df_library.index)
+    global_stat_fastq["1Mean coverage"]    = df_library['length'].sum()
+    global_stat_fastq["1Mean coverage"]   /= global_stat["1Contig FASTA - Mean sequence length"] * global_stat["0Contig FASTA - Number of sequences"]
+    global_stat_fastq["1Mean coverage"]    = round(global_stat_fastq["1Mean coverage"], 2)
+    global_stat_fastq["2Min reads length"] = df_library['length'].min()
+    global_stat_fastq["3Max reads length"] = df_library['length'].max()
+    global_stat_fastq["4Mean reads length"]= round(df_library['length'].mean(), 2)
+    html += get_html_reads_descr(global_stat_fastq, df_library) 
 
     # ABUNDANCE number of reads by contig
     # Build a dataframe with:
@@ -204,31 +191,33 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         columns = ['norm'])
     df_fasta = df_fasta.assign(norm=df_tmp['norm'].values)
     del df_tmp
-    #html += get_html_abundance(df_fasta)  TODO : a remettre
-    print("Abundance")
-   
+    if len(df_fasta.index) * 0.2 > 100:
+        html += get_html_abundance(df_fasta.sample(100), "Pourcentage of read abundance for 100 contigs")
+    else:
+        html += get_html_abundance(df_fasta.sample(frac=.2), "Pourcentage of read abundance for 20\% \of the contigs")
+    
     ## ALIGNMENT STATS
     if flagstat:
-        nbreads, mapped, paired, proper, secondary, singletons=parse_flagstat(flagstat_file)
-
+        nbreads, mapped, mappercent, paired, proper, properpercent, secondary, singletons=parse_flagstat(flagstat_file)
         global_stat_flagstat = dict()
-        global_stat_flagstat["0Number of mapped"] = mapped
-        global_stat_flagstat["1Number of properly paired reads"] = proper
-        global_stat_flagstat["2Number of unmapped reads (nb QC passed - nb mapped)"] = int(nbreads) - int(mapped)
-        global_stat_flagstat["3Secondary"] = secondary
-        global_stat_flagstat["4Singletons"] = singletons
-
+        global_stat_flagstat["0Number of reads"] = paired
+        global_stat_flagstat["1Number of lines in the BAM"] = nbreads
+        global_stat_flagstat["2Number of mapped"] = mapped
+        global_stat_flagstat["3Percentage of mapped"] = mappercent
+        global_stat_flagstat["4Number of properly paired"] = proper
+        global_stat_flagstat["5Percentage of properly paired"] = properpercent
+        global_stat_flagstat["6Secondary"] = secondary
+        global_stat_flagstat["7Singletons"] = singletons
         html += get_html_flagstat_descr(global_stat_flagstat)
    
     html += get_html_results()
-    print("Mapping statistics")
    
     ## SPLITREADSEARCH STAT
     if split:
         df_split=parse_split(split.name)   
         global_stat_split = dict()
-        global_stat_split["0Number of reads overlapping introns"]= df_split.shape[0]
-        global_stat_split["1Mean length of introns"]= df_split['split_length'].mean()
+        global_stat_split["0Number of reads overlapping introns"] = len(df_split.index)
+        global_stat_split["1Mean length of introns"] = round(df_split['split_length'].mean(), 2)
 
         nbCanonic = 0
         nbOtherJunctions = 0
@@ -238,7 +227,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         for k, v in (df_split['split_borders'].value_counts()).items() :
             if k == "GT_AG" or k == "CT_AC":
                 nbCanonic += v
-            elif n < 11:
+            elif n < 8:
                 global_stat_split[str(c)+"Junction "+k] = v
                 n += 1
                 c += 1
@@ -248,7 +237,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_split[str(c+1)+"Canonical junction (GT_AG or CT_AC)"] = nbCanonic
         
         html += get_html_split_descr(global_stat_split)   
-        print("Intron reads") 
 
     ## CANDIDATS statistics - detected introns
     if candidat:
@@ -263,7 +251,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         
         # Detected introns (stat table and depth distribution)
         global_stat_detected_introns = dict()
-        global_stat_detected_introns["0Number"] = df_candidat.shape[0]
+        global_stat_detected_introns["0Number"] = len(df_candidat.index)
         global_stat_detected_introns["1Min length"]  = df_candidat.iloc[0]['end'] - df_candidat.iloc[0]['start'] + 1 
         global_stat_detected_introns["2Max length"]  = 0
         global_stat_detected_introns["3Mean length"] = 0
@@ -309,10 +297,12 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                         global_stat_f_detected_introns["2" + definitions['LEN']] += 1
                 if "SS" in v:
                     global_stat_f_detected_introns["3" + definitions['SS']] += 1
-        global_stat_f_detected_introns["6Mean length"] /= round(global_stat_f_detected_introns["0" + definitions['PASS']], 2)
-        global_stat_f_detected_introns["9Mean depth"]  /= round(global_stat_f_detected_introns["0" + definitions['PASS']], 2)
-     
-        # if simulation ?
+        global_stat_f_detected_introns["6Mean length"] /= global_stat_f_detected_introns["0" + definitions['PASS']]
+        global_stat_f_detected_introns["6Mean length"]  = round(global_stat_f_detected_introns["6Mean length"], 2)
+        global_stat_f_detected_introns["9Mean depth"]  /= global_stat_f_detected_introns["0" + definitions['PASS']]
+        global_stat_f_detected_introns["9Mean depth"]   = round(global_stat_f_detected_introns["9Mean depth"], 2)
+
+        # if simulation ?                   
         if mfasta :
             # Detectable features (filter features because of threshold: mindepth and maxlength)
             # Add a column to df_features for the DP (using df_library)
@@ -341,7 +331,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             for index, row in df_features.iterrows():            
                 PASS = True
                 if (row['flanks'] != 'GT_AG' and row['flanks'] != 'CT_AC'): 
-                    global_stat_detectable_features["3" + definitions['SS']] += 1      
+                    global_stat_detectable_features["3" + definitions['SS']] += 1    
                     PASS = False 
                 if ((((row['end'] - row['start'] + 1) / row['ctg_length']) * 100) >= int(maxlen)):
                     global_stat_detectable_features["2" + definitions['LEN']] += 1
@@ -359,18 +349,58 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                     global_stat_detectable_features["7Min depth"]  = min(l, global_stat_detectable_features["7Min depth"])
                     global_stat_detectable_features["8Max depth"]  = max(l, global_stat_detectable_features["8Max depth"])
                     global_stat_detectable_features["9Mean depth"] += l
-            global_stat_detectable_features["6Mean length"] /= round(global_stat_detectable_features["0" + definitions['PASS']], 2)
-            global_stat_detectable_features["9Mean depth"]  /= round(global_stat_detectable_features["0" + definitions['PASS']], 2)
+            global_stat_detectable_features["6Mean length"] /= global_stat_detectable_features["0" + definitions['PASS']]
+            global_stat_detectable_features["6Mean length"] =  round(global_stat_detectable_features["6Mean length"], 2)
+            global_stat_detectable_features["9Mean depth"]  /= global_stat_detectable_features["0" + definitions['PASS']]
+            global_stat_detectable_features["9Mean depth"]  =  round(global_stat_detectable_features["9Mean depth"], 2)
             html += get_html_candidat(global_stat_f_detected_introns, global_stat_detectable_features)
         else :
             html += get_html_candidat(global_stat_f_detected_introns)
  
         # if simulation ?
         if mfasta:
-            TP = 0
-            FP = 0
-            TN = 0
-            FN = 0
+            eval_def = dict()
+            eval_def["TP"] = "TP = Nb. of detected introns &#8745; Nb. of features"
+            eval_def["FP"] = "FP = Nb. of detected introns &#8713; Nb. of features"
+            eval_def["FN"] = "FN = Nb. of features &#8713; Nb. of detected introns"
+            eval_def["Se"] = "Sensibility (Se) = TP / (TP+FN)"
+            eval_def["Sp"] = "Specificity (Sp) = TP / (TP+FP)"
+            eval_def["F1"] = "F1 score = (2*Se*Sp) / (Se+Sp)"
+            
+            eval_stat = dict()
+            eval_stat["0Number of detected introns"] = global_stat_detected_introns["0Number"] 
+            eval_stat["1Number of features"] = global_stat["6Number of features in GTF"] 
+            eval_stat["2"+eval_def["TP"]] = 0
+            eval_stat["3"+eval_def["FP"]] = 0
+            eval_stat["4"+eval_def["FN"]] = 0
+            eval_stat["5"+eval_def["Se"]] = 0
+            eval_stat["6"+eval_def["Sp"]] = 0
+            eval_stat["7"+eval_def["F1"]] = 0
+            for index, row in df_candidat.iterrows():
+                ok = len(df_features.loc[lambda df :
+                            (df['contig'] == row['reference']) &
+                            (df['start']  == row['start']) &
+                            (df['end']    == row['end'])])  
+                if ok == 1:
+                    eval_stat["2"+eval_def["TP"]] += 1         
+                else:
+                    eval_stat["3"+eval_def["FP"]] += 1
+            eval_stat["4"+eval_def["FN"]] = eval_stat["1Number of features"] - eval_stat["2"+eval_def["TP"]]
+            eval_stat["5"+eval_def["Se"]] = eval_stat["2"+eval_def["TP"]] / (eval_stat["2"+eval_def["TP"]] + eval_stat["4"+eval_def["FN"]]) * 100
+            eval_stat["6"+eval_def["Sp"]] = eval_stat["2"+eval_def["TP"]] / (eval_stat["2"+eval_def["TP"]] + eval_stat["3"+eval_def["FP"]]) * 100
+            eval_stat["7"+eval_def["F1"]] = round(2*(eval_stat["5"+eval_def["Se"]]*eval_stat["6"+eval_def["Sp"]])/(eval_stat["5"+eval_def["Se"]]+eval_stat["6"+eval_def["Sp"]]), 2) 
+            eval_stat["5"+eval_def["Se"]] = round(eval_stat["5"+eval_def["Se"]], 2)
+            eval_stat["6"+eval_def["Sp"]] = round(eval_stat["6"+eval_def["Sp"]], 2)
+
+            eval_f_stat = dict()
+            eval_f_stat["0Number of detected introns"] = global_stat_f_detected_introns["0" + definitions['PASS']]
+            eval_f_stat["1Number of features"] = global_stat_detectable_features["0" + definitions['PASS']]
+            eval_f_stat["2"+eval_def["TP"]] = 0
+            eval_f_stat["3"+eval_def["FP"]] = 0
+            eval_f_stat["4"+eval_def["FN"]] = 0
+            eval_f_stat["5"+eval_def["Se"]] = 0
+            eval_f_stat["6"+eval_def["Sp"]] = 0
+            eval_f_stat["7"+eval_def["F1"]] = 0
             for index, row in df_candidat.iterrows():
                 if "PASS" in row['filter']:
                     ok = len(df_features.loc[lambda df :
@@ -381,39 +411,16 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              ((((df['end'] - df['start'] + 1) / df['ctg_length']) * 100) < int(maxlen)) &
                              (df['flanks'].str.contains('GT_AG|CT_AC'))])   
                     if ok == 1:
-                        TP += 1         
+                        eval_f_stat["2"+eval_def["TP"]] += 1         
                     else:
-                        FP += 1
-                else:
-                    ok = len(df_features.loc[lambda df :
-                             (df['contig'] == row['reference']) &
-                             (df['start']  == row['start']) &
-                             (df['end']    == row['end']) &
-                             (df['depth'] > int(mindepth)) &
-                             ((((df['end'] - df['start'] + 1) / df['ctg_length']) * 100) < int(maxlen)) &
-                             (df['flanks'].str.contains('GT_AG|CT_AC'))])
-                    if ok == 1:
-                        FN += 1
-                    else:
-                        TN += 1
-        print('TP=', TP)
-        print('TN=', TN)
-        print('FP=', FP)
-        print('FN=', FN)
-
-        print('Sensibilité=', TP/(TP+FN)) 
-        print('Spécificité=', TN/(TN+FP))  
-            
-
-    global_stat_precision= dict()
-    precision = TN/(TP+FP)
-    global_stat_precision["0Precision (between 0 - 1)"]= precision
-    recall = TP/(TP+FN)
-    global_stat_precision["1Recall or sensitivity (0 for no recall, 1 for full or perfect recall)"] = recall
-    global_stat_precision["2F1 score (1 for a perfect model, 0 for a failed model)"]  = 2*((precision*recall)/(precision+recall))
-    
-    html += get_html_precision(global_stat_precision, TP, TN, FP, FN)
-    print("Detectability statistics")
+                        eval_f_stat["3"+eval_def["FP"]] += 1
+            eval_f_stat["4"+eval_def["FN"]] = eval_f_stat["1Number of features"] - eval_f_stat["2"+eval_def["TP"]]
+            eval_f_stat["5"+eval_def["Se"]] = eval_f_stat["2"+eval_def["TP"]] / (eval_f_stat["2"+eval_def["TP"]] + eval_f_stat["4"+eval_def["FN"]]) * 100
+            eval_f_stat["6"+eval_def["Sp"]] = eval_f_stat["2"+eval_def["TP"]] / (eval_f_stat["2"+eval_def["TP"]] + eval_f_stat["3"+eval_def["FP"]]) * 100
+            eval_f_stat["7"+eval_def["F1"]] = round(2*(eval_f_stat["5"+eval_def["Se"]]*eval_f_stat["6"+eval_def["Sp"]])/(eval_f_stat["5"+eval_def["Se"]]+eval_f_stat["6"+eval_def["Sp"]]), 2) 
+            eval_f_stat["5"+eval_def["Se"]] = round(eval_f_stat["5"+eval_def["Se"]], 2)
+            eval_f_stat["6"+eval_def["Sp"]] = round(eval_f_stat["6"+eval_def["Sp"]], 2)
+            html += get_html_eval(eval_stat, eval_f_stat)
 
     # GLOSSARY
     html += get_html_glossary()
@@ -467,18 +474,15 @@ if __name__ == '__main__' :
         pass
     else:
         for k, v in config.items("Defaults"):
-            config_args={str(k): str(v)} 
-            # https://stackoverflow.com/questions/47892580/python-argparse-required-arguments-from-configuration-file-dict
-            # use values from configuration file by default
+            config_args={str(k): str(v)}
+            # Use values from configuration file by default
             parser.set_defaults(**config_args)
             # Reset `required` attribute when provided from config file
             for action in parser._actions:
                 if action.dest in config_args:
                     action.required = False
 
-    # override with command line arguments when provided
+    # Override with command line arguments when provided
     args = vars(parser.parse_args(left_argv, args))
-
-    print(args)
 
     simulationReport(**args)

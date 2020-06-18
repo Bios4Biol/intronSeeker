@@ -46,24 +46,23 @@ def plot_hist_contigs_len(fastaContigsLen, mFastaContigsLen):
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 
-
-def plot_hist_candidats_depth(candidatsDepth):
-    candidats = go.Histogram(
-        x=candidatsDepth,
-        name='Candidats',
+def plot_hist(values:dict, title:str, xtitle:str, ytitle:str):
+    myhist = go.Histogram(
+        x=values,
+        name=title,
         xbins=dict( # bins used for histogram
         start=1,
         size=1
         ),
         opacity=0.85
     )
-    data = [candidats]
+    data = [myhist]
     layout = go.Layout(
          xaxis=dict(
-            title='Detected introns depth'
+            title=xtitle
         ),
         yaxis=dict(
-            title='Number of detected introns'
+            title=ytitle
         )
     )
     fig = go.Figure(data=data, layout=layout)
@@ -77,6 +76,30 @@ def plot_hist_candidats_depth(candidatsDepth):
         )
     )   
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
+
+# def plot_box(values:dict, title:str, xtitle:str, ytitle:str):
+#     layout = go.Layout(
+#          xaxis=dict(
+#             title=xtitle
+#         ),
+#         yaxis=dict(
+#             title=ytitle
+#         )
+#     )
+#     fig = go.Figure(layout=layout)
+#     fig.add_trace(go.Box(x=values))
+#     fig.update_layout(
+#         margin=go.layout.Margin(
+#             l=50,
+#             r=50,
+#             b=20,
+#             t=30,
+#             pad=0
+#         )
+#     )   
+#     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
+
 
 # Distribution plot
 def plot_dist_features_len(len_by_features, feature_names):
@@ -153,8 +176,9 @@ def plot_abondance_model(df_fasta:dict) :
     )
     fig.update_layout(
         xaxis=dict(title="Contig names"),
-        yaxis=dict(title="Abundance percentage",
-        range=[-0.25,0.5]),
+        yaxis=dict(title="Abundance percentage"#,
+        # range=[-0.25,0.5]
+        ),
         margin=go.layout.Margin(
             l=50,
             r=50,
