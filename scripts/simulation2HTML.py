@@ -191,7 +191,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         columns = ['norm'])
     df_fasta = df_fasta.assign(norm=df_tmp['norm'].values)
     del df_tmp
-    if len(df_fasta.index) * 0.2 > 100:
+    if len(df_index.index) <= 100:
+        html += get_html_abundance(df_fasta.sample, "Pourcentage of read abundance for each contigs")
+    elif len(df_fasta.index) * 0.2 > 100:
         html += get_html_abundance(df_fasta.sample(100), "Pourcentage of read abundance for 100 contigs")
     else:
         html += get_html_abundance(df_fasta.sample(frac=.2), "Pourcentage of read abundance for 20\% \of the contigs")
@@ -360,9 +362,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         # if simulation ?
         if mfasta:
             eval_def = dict()
-            eval_def["TP"] = "TP = Nb. of detected introns &#8745; Nb. of features"
-            eval_def["FP"] = "FP = Nb. of detected introns &#8713; Nb. of features"
-            eval_def["FN"] = "FN = Nb. of features &#8713; Nb. of detected introns"
+            eval_def["TP"] = "TP = Detected introns &#8745; Features"
+            eval_def["FP"] = "FP = Detected introns &#8713; Features"
+            eval_def["FN"] = "FN = Features &#8713; Detected introns"
             eval_def["Se"] = "Sensibility (Se) = TP / (TP+FN)"
             eval_def["Sp"] = "Specificity (Sp) = TP / (TP+FP)"
             eval_def["F1"] = "F1 score = (2*Se*Sp) / (Se+Sp)"
