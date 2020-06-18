@@ -192,11 +192,11 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     df_fasta = df_fasta.assign(norm=df_tmp['norm'].values)
     del df_tmp
     if len(df_index.index) <= 100:
-        html += get_html_abundance(df_fasta.sample, "Pourcentage of read abundance for each contigs")
+        html += get_html_abundance(df_fasta.sample, "Pourcentage of reads abundance for each contigs")
     elif len(df_fasta.index) * 0.2 > 100:
-        html += get_html_abundance(df_fasta.sample(100), "Pourcentage of read abundance for 100 contigs")
+        html += get_html_abundance(df_fasta.sample(100), "Pourcentage of reads abundance for 100 random contigs")
     else:
-        html += get_html_abundance(df_fasta.sample(frac=.2), "Pourcentage of read abundance for 20\% \of the contigs")
+        html += get_html_abundance(df_fasta.sample(frac=.2), "Pourcentage of reads abundance for 20\% \random contigs")
     
     ## ALIGNMENT STATS
     if flagstat:
