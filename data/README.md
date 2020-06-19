@@ -68,7 +68,7 @@ Same command lines for samples 3, 4 and 5.
 For each sample:
 
 ```diff
-python3 simulation2HTML.py -m /path/to/FRS_CAS-A/sample1/frs_sample1_contigs-modified.fa -f /path/to/FRS_CAS-A/sample1/frs_sample1_contigs.fa -g /path/to/CAS-A/sample1/frs_sample1_contigs-modified.gtf -o /path/to/FRS_CAS-A/sample1/HTML -p FRS_CASA_sample1_n1000_r_STAR -F  -1 /path/to/FRS_CAS-A/sample1/sr_R1.fastq.gz -2 /path/to/FRS_CAS-A/sample1/sr_R2.fastq.gz --flagstat /path/to/FRS_CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /path/to/FRS_CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /path/to/FRS_CAS-A/sample1/sr_ranks.txt -s  /path/to/FRS_CAS-A/sample1/sample1_splicing_event_STAR/srs_split_alignments.txt  --assemblathon /path/to/FRS_CAS-A/sample1/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+python3 simulation2HTML.py -m /path/to/FRS_CAS-A/sample1/frs_sample1_contigs-modified.fa -f /path/to/FRS_CAS-A/sample1/frs_sample1_contigs.fa -g /path/to/CAS-A/sample1/frs_sample1_contigs-modified.gtf -o /path/to/FRS_CAS-A/sample1/HTML -p FRS_CASA_sample1_n1000_r_STAR -F  -1 /path/to/FRS_CAS-A/sample1/sr_R1.fastq.gz -2 /path/to/FRS_CAS-A/sample1/sr_R2.fastq.gz --flagstat /path/to/FRS_CAS-A/sample1/STAR_alignment/star.sort.flagstat.txt -c /path/to/FRS_CAS-A/sample1/sample1_splicing_event_STAR/srs_candidates.txt -r /path/to/FRS_CAS-A/sample1/sr_ranks.txt -s  /path/to/FRS_CAS-A/sample1/sample1_splicing_event_STAR/srs_split_alignments.txt -t 6
 ```
 
 FRS_CAS-B/ Coverage impact
@@ -113,7 +113,7 @@ Same command lines for cf 6, 9, 12, 15, 18 and 21.
 For each coverage:
 
 ```diff
-python3 simulation2HTML.py -m /path/to/FRS_CAS-B/sample1/cf3/frs_sample1_contigs-modified.fa -f /path/to/FRS_CAS-B/sample1/cf3/frs_sample1_contigs.fa -g /path/to/FRS_CAS-B/sample1/cf3/frs_sample1_contigs-modified.gtf -o /path/to/FRS_CAS-B/sample1/cf3/HTML -p FRS_CASB_sample1_cf3 -F  -1 /path/to/FRS_CAS-B/sample1/cf3/sr_R1.fastq.gz -2 /path/to/FRS_CAS-B/sample1/cf3/sr_R2.fastq.gz --flagstat /path/to/FRS_CAS-B/sample1/cf3/STAR_alignment/star.sort.flagstat.txt -c /path/to/FRS_CAS-B/sample1/cf3/sample1_splicing_event_STAR/srs_candidates.txt -r /path/to/FRS_CAS-B/sample1/cf3/sr_ranks.txt -s  /path/to/FRS_CAS-B/sample1/cf3/sample1_splicing_event_STAR/srs_split_alignments.txt  --assemblathon /path/to/FRS_CAS-B/sample1/cf3/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+python3 simulation2HTML.py -m /path/to/FRS_CAS-B/sample1/cf3/frs_sample1_contigs-modified.fa -f /path/to/FRS_CAS-B/sample1/cf3/frs_sample1_contigs.fa -g /path/to/FRS_CAS-B/sample1/cf3/frs_sample1_contigs-modified.gtf -o /path/to/FRS_CAS-B/sample1/cf3/HTML -p FRS_CASB_sample1_cf3 -F  -1 /path/to/FRS_CAS-B/sample1/cf3/sr_R1.fastq.gz -2 /path/to/FRS_CAS-B/sample1/cf3/sr_R2.fastq.gz --flagstat /path/to/FRS_CAS-B/sample1/cf3/STAR_alignment/star.sort.flagstat.txt -c /path/to/FRS_CAS-B/sample1/cf3/sample1_splicing_event_STAR/srs_candidates.txt -r /path/to/FRS_CAS-B/sample1/cf3/sr_ranks.txt -s  /path/to/FRS_CAS-B/sample1/cf3/sample1_splicing_event_STAR/srs_split_alignments.txt -t 6
 ```
 
 FRS_CAS-C/ Relative Abundance impact
@@ -147,7 +147,7 @@ FRS_CAS-C/config/grinder_frs_testC-am-uniform.cfg
 ##### IntronSeeker simulation Report 
 
 ```diff
-python3 simulation2HTML.py -m /path/to/FRS_CAS-C/sample1/am/frs_sample1_contigs-modified.fa -f /path/to/FRS_CAS-C/sample1/am/frs_sample1_contigs.fa -g /path/to/FRS_CAS-C/sample1/am/frs_sample1_contigs-modified.gtf -o /path/to/FRS_CAS-C/sample1/am/HTML -p FRS_CASC_sample1_am -F  -1 /path/to/FRS_CAS-C/sample1/am/sr_R1.fastq.gz -2 /path/to/FRS_CAS-C/sample1/am/sr_R2.fastq.gz --flagstat /path/to/FRS_CAS-C/sample1/am/STAR_alignment/star.sort.flagstat.txt -c /path/to/FRS_CAS-C/sample1/am/sample1_splicing_event_STAR/srs_candidates.txt -r /path/to/FRS_CAS-C/sample1/am/sr_ranks.txt -s  /path/to/FRS_CAS-C/sample1/am/sample1_splicing_event_STAR/srs_split_alignments.txt  --assemblathon /path/to/FRS_CAS-C/sample1/am/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+python3 simulation2HTML.py -m /path/to/FRS_CAS-C/sample1/am/frs_sample1_contigs-modified.fa -f /path/to/FRS_CAS-C/sample1/am/frs_sample1_contigs.fa -g /path/to/FRS_CAS-C/sample1/am/frs_sample1_contigs-modified.gtf -o /path/to/FRS_CAS-C/sample1/am/HTML -p FRS_CASC_sample1_am -F  -1 /path/to/FRS_CAS-C/sample1/am/sr_R1.fastq.gz -2 /path/to/FRS_CAS-C/sample1/am/sr_R2.fastq.gz --flagstat /path/to/FRS_CAS-C/sample1/am/STAR_alignment/star.sort.flagstat.txt -c /path/to/FRS_CAS-C/sample1/am/sample1_splicing_event_STAR/srs_candidates.txt -r /path/to/FRS_CAS-C/sample1/am/sr_ranks.txt -s  /path/to/FRS_CAS-C/sample1/am/sample1_splicing_event_STAR/srs_split_alignments.txt -t 6
 ```
 
 ##### Test with relative abundance model powerlaw 0.5
@@ -176,5 +176,5 @@ FRS_CAS-C/config/grinder_frs_testC-pw05.cfg
 ##### IntronSeeker simulation Report 
 
 ```diff
-python3 simulation2HTML.py -m /path/to/FRS_CAS-C/sample1/pw05/frs_sample1_contigs-modified.fa -f /path/to/FRS_CAS-C/sample1/pw05/frs_sample1_contigs.fa -g /path/to/FRS_CAS-C/sample1/pw05/frs_sample1_contigs-modified.gtf -o /path/to/FRS_CAS-C/sample1/pw05/HTML -p FRS_CASC_sample1_pw05 -F  -1 /path/to/FRS_CAS-C/sample1/pw05/sr_R1.fastq.gz -2 /path/to/FRS_CAS-C/sample1/pw05/sr_R2.fastq.gz --flagstat /path/to/FRS_CAS-C/sample1/pw05/STAR_alignment/star.sort.flagstat.txt -c /path/to/FRS_CAS-C/sample1/pw05/sample1_splicing_event_STAR/srs_candidates.txt -r /path/to/FRS_CAS-C/sample1/pw05/sr_ranks.txt -s  /path/to/FRS_CAS-C/sample1/pw05/sample1_splicing_event_STAR/srs_split_alignments.txt  --assemblathon /path/to/FRS_CAS-C/sample1/pw05/sample1_splicing_event_STAR/srs_frs_sample1_contigs-modified_assemblathon.txt -t 6
+python3 simulation2HTML.py -m /path/to/FRS_CAS-C/sample1/pw05/frs_sample1_contigs-modified.fa -f /path/to/FRS_CAS-C/sample1/pw05/frs_sample1_contigs.fa -g /path/to/FRS_CAS-C/sample1/pw05/frs_sample1_contigs-modified.gtf -o /path/to/FRS_CAS-C/sample1/pw05/HTML -p FRS_CASC_sample1_pw05 -F  -1 /path/to/FRS_CAS-C/sample1/pw05/sr_R1.fastq.gz -2 /path/to/FRS_CAS-C/sample1/pw05/sr_R2.fastq.gz --flagstat /path/to/FRS_CAS-C/sample1/pw05/STAR_alignment/star.sort.flagstat.txt -c /path/to/FRS_CAS-C/sample1/pw05/sample1_splicing_event_STAR/srs_candidates.txt -r /path/to/FRS_CAS-C/sample1/pw05/sr_ranks.txt -s  /path/to/FRS_CAS-C/sample1/pw05/sample1_splicing_event_STAR/srs_split_alignments.txt -t 6
 ```
