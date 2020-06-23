@@ -21,7 +21,7 @@ from simulation2HTMLplots import *
 
 # source activate ISeeker_environment;
 # cd scripts/; 
-# python3 simulation2HTML.py --config_file ../config/simulation2HTML_example.cfg -F 
+# python3 simulation2HTML.py -F --config_file ../config/simulation2HTML_example.cfg
 # scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*FRS_CASA_sample1_n1000_r_STAR*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
 # See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_FRS_CASA_sample1_n1000_r_STAR_simulation.html
 
@@ -229,7 +229,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         for k, v in (df_split['split_borders'].value_counts()).items() :
             if k == "GT_AG" or k == "CT_AC":
                 nbCanonic += v
-            elif n < 8:
+            elif n < 6:
                 global_stat_split[str(c)+"Junction "+k] = v
                 n += 1
                 c += 1
@@ -350,7 +350,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                     l = row['depth']
                     global_stat_detectable_features["7Min depth"]  = min(l, global_stat_detectable_features["7Min depth"])
                     global_stat_detectable_features["8Max depth"]  = max(l, global_stat_detectable_features["8Max depth"])
-                    global_stat_detectable_features["9Mean depth"] += l
+                    global_stat_detectable_features["9Mean depth"] += l    
             global_stat_detectable_features["6Mean length"] /= global_stat_detectable_features["0" + definitions['PASS']]
             global_stat_detectable_features["6Mean length"] =  round(global_stat_detectable_features["6Mean length"], 2)
             global_stat_detectable_features["9Mean depth"]  /= global_stat_detectable_features["0" + definitions['PASS']]
