@@ -732,9 +732,9 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, outp
     Simulate a RNA-seq pseudo-assembly from a GTF file with retained introns or spliced exons. This procedure produces 3 files :
         - output_reference.fasta : pseudo-assembly where the contigs have potentially retained introns. 
         - output_library.fasta : pseudo-assembly where the contigs have potentially spliced exons. This file have to be used to generate reads library with simulateReads module
-        - output_Features_of_interest.gtf : gtf which conatains all simulated retained introns and spliced exons.
+        - output_Features_of_interest.gtf : gtf which contains all simulated retained introns and spliced exons.
     To choose the number of pseudo-contigs, you have to use the nb argument. If nb=0, all the transcripts contained in the GTF will be pseudo-transcripted.
-    The mix arguments rules if a mixed library is genrated : by default, the library file contains the shorter contigs (without intron or with spliced exon) compared to reference file ; 
+    The mix arguments rules if a mixed library is generated : by default, the library file contains the shorter contigs (without intron or with spliced exon) compared to reference file ; 
     a mixed library file contains both of the peudo-contig states  :the shorter one (without intron and spliced exon) and the longer on (like in reference file : with retained intron or with all exons).
     The goal is to produce some reads with the intron or the exon (which will not split in the reference/library alignment) and reads without the intron or the exon (which will split during the alignment).
     
