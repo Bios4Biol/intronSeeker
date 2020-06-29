@@ -80,8 +80,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # Add two columns to df_features:
     #  1- the true insertion position of the simulated feature (in term of mfasta length percentage)
     #  2- the borders of the simulated features (in term of nucleotides)
-    df_features.to_csv('/home/smaman/Documents/PROJETS/INTRONSEEKER/TOTO_df_features_Athal.csv')
-    exit()
     df_features = df_features.join(
         other = df_features.apply(
             compute_pos_on_mfasta,

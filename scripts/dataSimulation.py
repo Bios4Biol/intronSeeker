@@ -473,7 +473,7 @@ def parse_gtf_content(gtf_content, choosen, mix):
             del choosen[exons[0][-1]["transcript_id"]]
             exons = []
         if not choosen:
-            break
+            break    
 
     return reference, library, control
 
@@ -675,7 +675,6 @@ def construct_new_transcript(exons, classe):
             list(line)[1:] # We exclude the index value of DataFrame which is stored in the first position of the record
             for line in whole_transcript.loc[lambda df : df.in_transcript == True,"ref":"misc_attr"].to_records() 
             ]
-    
     return ref_t, lib_t, ft_on_t
 
 
