@@ -101,6 +101,14 @@ def parse_fasta(fastafile, save_seq) :
         df.index.name='contig'
     return df
 
+# Return read description (start, end, complement)
+def parse_positions(fastq_pos) :
+    pos = fastq_pos.lstrip("position=").split("..")
+    complement = ('complement(' in pos[0])
+    start = int(pos[0].lstrip("complement("))
+    end = int(pos[1].rstrip(")"))
+    return start,end,complement
+
 
 def parse_library(r1, r2=0) :
     """
