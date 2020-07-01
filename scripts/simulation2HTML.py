@@ -244,6 +244,16 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     if candidat:
         df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
 
+        # Test Sarah
+        overlap = 0
+        for index, row in df_candidat.iterrows():
+            overlapping  = len(df_features.loc[lambda df :
+                (df['contig'] == row['reference']) &
+                (df['start']  > row['start']) &
+                (df['end']    < row['end'])])
+            if overlapping == 1:
+                overlap += 1
+
          # Definition dict
         definitions = dict()
         definitions['DP']   = "Filtered because of depth (<= "+ str(mindepth)+ ")"
@@ -267,6 +277,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_detected_introns["4Min depth"]  = df_candidat['depth'].min()
         global_stat_detected_introns["5Max depth"]  = df_candidat['depth'].max()
         global_stat_detected_introns["6Mean depth"]  = round(df_candidat['depth'].mean(), 2)
+        global_stat_detected_introns["7Number of too complexes introns"]  = overlap
         html += get_html_detected(global_stat_detected_introns, df_candidat)
 
         # Filtered detected introns
