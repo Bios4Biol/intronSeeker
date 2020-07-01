@@ -204,12 +204,12 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_flagstat = dict()
         global_stat_flagstat["0Number of reads"] = paired
         global_stat_flagstat["1Number of lines in the BAM"] = nbreads
-        global_stat_flagstat["2Number of mapped"] = mapped
-        global_stat_flagstat["3Percentage of mapped"] = mappercent
-        global_stat_flagstat["4Number of properly paired"] = proper
-        global_stat_flagstat["5Percentage of properly paired"] = properpercent
-        global_stat_flagstat["6Secondary"] = secondary
-        global_stat_flagstat["7Singletons"] = singletons
+        global_stat_flagstat["2Number of mapped reads"] = mapped
+        global_stat_flagstat["3Percentage of mapped reads"] = mappercent
+        global_stat_flagstat["4Number of properly paired reads"] = proper
+        global_stat_flagstat["5Percentage of properly paired reads"] = properpercent
+        global_stat_flagstat["6Secondary alignments"] = secondary
+        global_stat_flagstat["7Singletons alignements"] = singletons
         html += get_html_flagstat_descr(global_stat_flagstat)
    
     html += get_html_results()
