@@ -338,7 +338,7 @@ def df_ORF(pep_file,candidates) :
     
 def analyzeORF(reference, cand_file, output, force, prefix, no_refine, rm) :
     
-    candidates = pd.read_csv(cand_file.name,sep='\t')
+    candidates = pd.read_csv(cand_file.name,sep='\t',skiprows=2)
     output_path = output + "/orf";
     if prefix:
         output_path += "_" + prefix;
