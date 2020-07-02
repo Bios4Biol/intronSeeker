@@ -500,7 +500,7 @@ def get_html_eval(eval_stat:dict, eval_f_stat:dict):
     '''
     return r
 
-    
+# SARAH / GLOSSAIRE    
 # Define all term used in this simulation report
 def get_html_glossary():
     r = '''

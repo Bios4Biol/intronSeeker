@@ -61,7 +61,13 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # df_features : pandas.DataFrame where each line is a simulated features description 
     # df_candidat : pandas.DataFrame where each line is a candidat description
     df_fasta  = parse_fasta(fasta.name, False)
-    df_mfasta = parse_fasta(mfasta.name, True)
+    # SARAH / CAS REAL
+    if mfasta:
+        df_mfasta = parse_fasta(mfasta.name,True)
+        # # Drop rows without not modified contigs (only sequence.modif)
+        # df_mfasta = df_mfasta[df_mfasta.index.str.contains("modif")]
+    # df_mfasta = parse_fasta(mfasta.name, True)    
+    # SARAH / CAS REAL
 
     if r2 :
         df_library = parse_library(r1.name, r2.name)
@@ -71,22 +77,42 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     df_features = parse_gtf(gtf.name)
 
     # Add a column to df_fasta with the "fasta" length (without any simulated features)
-    df_mfasta["short_length"] = df_mfasta.apply(
-        compute_tr_length,
-        axis = 1,
-        df_features=df_features
-    )
+    # SARAH / CAS REAL
+    if mfasta:
+        df_mfasta["short_length"] = df_mfasta.apply(
+            compute_tr_length,
+            axis = 1,
+            df_features=df_features
+        )
+
+    # df_mfasta["short_length"] = df_mfasta.apply(
+    #     compute_tr_length,
+    #     axis = 1,
+    #     df_features=df_features
+    # )
+    # SARAH / CAS REAL
     
     # Add two columns to df_features:
     #  1- the true insertion position of the simulated feature (in term of mfasta length percentage)
     #  2- the borders of the simulated features (in term of nucleotides)
-    df_features = df_features.join(
-        other = df_features.apply(
-            compute_pos_on_mfasta,
-            axis=1,
-            df_mfasta=df_mfasta
+
+    # SARAH / CAS REAL
+    if mfasta:
+        df_features = df_features.join(
+            other = df_features.apply(
+                compute_pos_on_mfasta,
+                axis=1,
+                df_mfasta=df_mfasta
+            )
         )
-    )
+    # df_features = df_features.join(
+    #     other = df_features.apply(
+    #         compute_pos_on_mfasta,
+    #         axis=1,
+    #         df_mfasta=df_mfasta
+    #     )
+    # )
+    # SARAH / CAS REAL
 
     # HEADER
     html = get_html_header()
@@ -244,7 +270,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     if candidat:
         df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
 
-        # Test Sarah
+        # Test Sarah : Number of too complexes introns
         overlap = 0
         for index, row in df_candidat.iterrows():
             overlapping  = len(df_features.loc[lambda df :
@@ -447,7 +473,11 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
     print('DATAFRAMES:\n\n')
     print('fasta head :' , df_fasta.head(5), '\n\n')
-    print('mfasta head :' , df_mfasta.head(5), '\n\n')
+    # SARAH / CAS REAL
+    if mfasta:
+        print('mfasta head :' , df_mfasta.head(5), '\n\n')    
+    # print('mfasta head :' , df_mfasta.head(5), '\n\n')    
+    # SARAH / CAS REAL
     print('library head :' , df_library.head(5), '\n\n')
     print('features head :', df_features.head(5), '\n\n')
     if split:

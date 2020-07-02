@@ -184,13 +184,21 @@ def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, uppe
         library_contigs_set.append(SeqRecord(library_seq,id=name.split()[0],description="reverse="+str(reverse)))
         
         description = " ".join(["intron_start="+str(intron_start),"intron_end="+str(intron_end),"reverse="+str(reverse)])
+        # if intron_start == None :
+        #     reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
+        # else:
+        #     reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0]+".modif",description=description))
+        #     if mix :
+        #         reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
+     
         if intron_start == None :
             reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
+        elif mix:
+            reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0]+".modif",description=description))
         else:
             reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0]+".modif",description=description))
-            if mix :
-                reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
-     
+                
+
         if distrib[c] :
             r = "+"
             if(reverse) :

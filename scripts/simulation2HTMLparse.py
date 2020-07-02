@@ -133,19 +133,7 @@ def parse_library(r1, r2=0) :
                 start,end,complement = parse_positions(record.description.split()[2])
                 lectures.append([reference, id, len(record), start, end, complement])
     return pd.DataFrame(lectures,columns=["contig","lecture","length","start","end","complement"]).sort_values(["contig","start","end"]).set_index('lecture') 
-
-
-# # Return read description (start, end, complement)
-# def parse_positions(fastq_pos) :
-#     """
-#     not used ?
-#     """
-#     pos = fastq_pos.lstrip("position=").split("..")
-#     complement = ('complement(' in pos[0])
-#     start = int(pos[0].lstrip("complement("))
-#     end = int(pos[1].rstrip(")"))
-#     return start,end,complement
-
+    
 
 def parse_gtf(gtf) :
     """
@@ -187,7 +175,7 @@ def parse_candidat(candidat) :
             else:
                 break
     
-    t = pd.read_table(candidat, usecols=[0,1,2,3,4,5,6], names=['ID', 'reference', 'start', 'end', 'depth','split_borders', 'filter'], skiprows=skip_rows)   #header=0 to remove commented header
+    t = pd.read_table(candidat, usecols=[0,1,2,3,4,5,6], names=['ID', 'reference', 'start', 'end', 'depth','split_borders', 'filter'], skiprows=skip_rows) 
     t['key'] = t['ID']
     return t.set_index('key'), mindepth, maxlen
 
