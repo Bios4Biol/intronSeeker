@@ -179,7 +179,7 @@ def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, uppe
             if intron_start and intron_end :
                 old_start = intron_start
                 intron_start = len(reference_seq)-intron_end
-                intron_end = len(reference_seq)-old_start
+                intron_end   = len(reference_seq)-old_start
 
         library_contigs_set.append(SeqRecord(library_seq,id=name.split()[0],description="reverse="+str(reverse)))
         
@@ -189,7 +189,7 @@ def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, uppe
         else:
             reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0]+".modif",description=description))
             if mix :
-                reference_contigs_set.append(SeqRecord(reference_seq,id=name.split()[0],description=description))
+                reference_contigs_set.append(SeqRecord(library_seq,id=name.split()[0],description="reverse="+str(reverse)))
                 
 
         if distrib[c] :
