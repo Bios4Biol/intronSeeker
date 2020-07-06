@@ -104,7 +104,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 axis=1,
                 df_mfasta=df_mfasta
             )
-        )
+        )    
     # df_features = df_features.join(
     #     other = df_features.apply(
     #         compute_pos_on_mfasta,
@@ -170,7 +170,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     global_stat_assemblathon_fasta["1Mean contigs length"]       = round(meanContigSize, 0)
     global_stat_assemblathon_fasta["2Total size of contigs"]     = totContigSize
     global_stat_assemblathon_fasta["3Longest contig"]            = longestContig
-    global_stat_assemblathon_fasta["4Shortest contiged"]         = shortestContig
+    global_stat_assemblathon_fasta["4Shortest contig"]         = shortestContig
     global_stat_assemblathon_fasta["5Number of contigs > 1K nt"] = nbContigsSup1K
     global_stat_assemblathon_fasta["6N50 contig length"]         = n50
     global_stat_assemblathon_fasta["7L50 contig count"]          = l50
@@ -182,7 +182,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_assemblathon_mfasta["1Mean contigs length"]       = round(meanContigSize, 0)
         global_stat_assemblathon_mfasta["2Total size of contigs"]     = totContigSize
         global_stat_assemblathon_mfasta["3Longest contig"]            = longestContig
-        global_stat_assemblathon_mfasta["4Shortest contiged"]         = shortestContig
+        global_stat_assemblathon_mfasta["4Shortest contig"]         = shortestContig
         global_stat_assemblathon_mfasta["5Number of contigs > 1K nt"] = nbContigsSup1K
         global_stat_assemblathon_mfasta["6N50 contig length"]         = n50
         global_stat_assemblathon_mfasta["7L50 contig count"]          = l50
@@ -200,29 +200,29 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     global_stat_fastq["4Mean reads length"]= round(df_library['length'].mean(), 2)
     html += get_html_reads_descr(global_stat_fastq, df_library) 
 
-    # ABUNDANCE number of reads by contig
-    # Build a dataframe with:
-    #   ctg
-    #   abund_perc => (number of read on this contig / number of reads) * 100
-    #   requested  => if grinder ranks output file is given ...
-    #   norm       => (((number of read on this contig / contig len) * mean len of all contigs) / number of reads) * 100
-    df_tmp = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100, columns = ['abund_perc'])
-    df_fasta = df_fasta.assign(real=df_tmp.abund_perc.values)
-    if ranks:
-        df_tmp = parse_rank_file(ranks_file)
-        df_fasta = df_fasta.assign(rank=df_tmp['rank'].values)
-        df_fasta = df_fasta.assign(waiting=df_tmp.rel_abund_perc.values)
-    df_tmp = pd.DataFrame(
-        (((df_library.groupby('contig').size()/df_fasta['length'])*(df_fasta['length'].mean()))/df_library.shape[0])*100,
-        columns = ['norm'])
-    df_fasta = df_fasta.assign(norm=df_tmp['norm'].values)
-    del df_tmp
-    if len(df_fasta.index) <= 100:
-        html += get_html_abundance(df_fasta.sample, "Pourcentage of reads abundance for each contigs")
-    elif len(df_fasta.index) * 0.2 > 100:
-        html += get_html_abundance(df_fasta.sample(100), "Pourcentage of reads abundance for 100 random contigs")
-    else:
-        html += get_html_abundance(df_fasta.sample(frac=.2), "Pourcentage of reads abundance for 20\% \random contigs")
+    # # ABUNDANCE number of reads by contig
+    # # Build a dataframe with:   
+    # #   ctg
+    # #   abund_perc => (number of read on this contig / number of reads) * 100
+    # #   requested  => if grinder ranks output file is given ...
+    # #   norm       => (((number of read on this contig / contig len) * mean len of all contigs) / number of reads) * 100
+    # df_tmp = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100, columns = ['abund_perc'])
+    # df_fasta = df_fasta.assign(real=df_tmp.abund_perc.values)
+    # if ranks:
+    #     df_tmp = parse_rank_file(ranks_file)
+    #     df_fasta = df_fasta.assign(rank=df_tmp['rank'].values)
+    #     df_fasta = df_fasta.assign(waiting=df_tmp.rel_abund_perc.values)
+    # df_tmp = pd.DataFrame(
+    #     (((df_library.groupby('contig').size()/df_fasta['length'])*(df_fasta['length'].mean()))/df_library.shape[0])*100,
+    #     columns = ['norm'])
+    # df_fasta = df_fasta.assign(norm=df_tmp['norm'].values)
+    # del df_tmp
+    # if len(df_fasta.index) <= 100:
+    #     html += get_html_abundance(df_fasta.sample, "Pourcentage of reads abundance for each contigs")
+    # elif len(df_fasta.index) * 0.2 > 100:
+    #     html += get_html_abundance(df_fasta.sample(100), "Pourcentage of reads abundance for 100 random contigs")
+    # else:
+    #     html += get_html_abundance(df_fasta.sample(frac=.2), "Pourcentage of reads abundance for 20\% \random contigs")
     
     ## ALIGNMENT STATS
     if flagstat:
