@@ -288,28 +288,23 @@ def run_assemblathon(fasta : str ) :
     l50=0
     meanContigSize=0
     res = [x.strip() for x in reader.split('\n')]
-    print("Run Assemblathon:\n")
     for i in res:
         if "Number of contigs  " in  i:
             nbContigs = [int(w) for w in i.split() if w.isdigit()][0]
-            print("Number of contigs:"+nbContigs)
-        elif "Total size of contigs  " in i:
+        elif "Total size of contigs" in i:
             totContigSize = [int(w) for w in i.split() if w.isdigit()][0]
-            print("Total size of contigs:"+totContigSize)
-        elif "Longest contig  " in i:
+        elif "Longest contig" in i:
             longestContig = [int(w) for w in i.split() if w.isdigit()][0]
-            print("Longest contig:"+longestContig)
-        elif "Shortest contig  " in i:
-            shortestContig=int(i.split("        ")[1].rstrip())
-        elif "Number of contigs > 1K nt        " in i:  
-            nbContigsSup1Ktmp=i.split("        ")[1].rstrip()
-            nbContigsSup1K=int(re.sub(r'([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%)', r" ", nbContigsSup1Ktmp))
+        elif "Shortest contig" in i:
+            shortestContig = [int(w) for w in i.split() if w.isdigit()][0]
+        elif "Number of contigs > 1K nt" in i:
+            nbContigsSup1K = [int(w) for w in i.split() if w.isdigit()][0]
         elif "N50 contig length" in i:             
-            n50=int(i.split("       ")[1].rstrip())
+            n50 = [int(w) for w in i.split() if w.isdigit()][0]
         elif "L50 contig count" in i:      
-            l50=int(i.split("        ")[1].rstrip())
+            l50 = [int(w) for w in i.split() if w.isdigit()][0]
         elif "Mean contig size" in i:               
-            meanContigSize=int(i.split("       ")[1].rstrip())
+            meanContigSize = [int(w) for w in i.split() if w.isdigit()][0]
         popen.wait()
     if popen.returncode != 0:
         raise RuntimeError('Error: Assemblathon output is empty.')
