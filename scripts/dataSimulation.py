@@ -2,25 +2,25 @@
 
 # Modules
 try :
-    import gzip ;
-    import os ;
-    import sys ;
-    import subprocess ;
-    import random ;
-    import numpy as np ;
-    import numpy.random as rd ;
-    import configparser ;
-    import re ;
-    import pandas as pd ;
+    import gzip
+    import os
+    import sys
+    import subprocess
+    import random
+    import numpy as np
+    import numpy.random as rd
+    import configparser
+    import re
+    import pandas as pd
     import tempfile as tmp
     import subprocess as sp
-    from Bio.Seq import Seq ;
-    from Bio import SeqIO ;
-    from Bio.SeqRecord import SeqRecord ;
-    from collections import defaultdict ;
+    from Bio.Seq import Seq
+    from Bio import SeqIO
+    from Bio.SeqRecord import SeqRecord
+    from collections import defaultdict
 except ImportError as error :
-    print(error) ;
-    exit(1) ;
+    print(error)
+    exit(1)
 
 from pprint import pprint
 
