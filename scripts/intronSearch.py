@@ -236,7 +236,7 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
 
 def single_trim(candidate, sequences) :
     contig = sequences[candidate.reference]
-    new_seq = contig[0:candidate.start].seq+contig[candidate.end:].seq
+    new_seq = contig[0:candidate.start-1].seq+contig[candidate.end:].seq
     new_record= SeqRecord(
         new_seq,
         id=contig.id+'::'+candidate.ID,
@@ -249,7 +249,7 @@ def multi_trim(candidates,sequences) :
     contig = sequences[candidates.name]
     new_seq = contig.seq
     for i, row in candidates.sort_values('start',ascending=False).iterrows() :
-        new_seq = new_seq[0:row.start]+new_seq[row.end:]
+        new_seq = new_seq[0:row.start-1]+new_seq[row.end:]
     new_record= SeqRecord(
         new_seq,
         id=contig.id+'.trimmed',
