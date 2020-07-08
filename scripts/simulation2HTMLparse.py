@@ -245,7 +245,7 @@ def compute_pos_on_mfasta(df_features, df_mfasta) :
     """
     pos_on_contig = df_features.start/df_mfasta.at[df_features.contig,"short_length"]*100
     c_seq = str(df_mfasta.at[df_features.contig,'sequence'])
-    flanks = str(c_seq[df_features.start:df_features.start+2])+"_"+str(c_seq[df_features.end-2:df_features.end])
+    flanks = str(c_seq[df_features.start-1:df_features.start+1])+"_"+str(c_seq[df_features.end-2:df_features.end])
     
     return pd.Series([flanks,pos_on_contig],index=["flanks","pos_on_contig"])
         
