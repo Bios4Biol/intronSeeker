@@ -60,10 +60,10 @@ def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
         cigar_tuple = cigar_list[i]
     # enf of the split, equal to the number of 'N'
     limit_from_start[1] = cigar_tuple[1]
-    split_start = start + limit_from_start[0]
+    split_start = start + limit_from_start[0] + 1
     split_end = start + limit_from_start[0] + limit_from_start[1]
     length = limit_from_start[1]
-    flank_left = ref_seq[split_start: split_start + 2]
+    flank_left = ref_seq[split_start - 1: split_start + 1]
     flank_right = ref_seq[split_end - 2: split_end]
     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
                     index = ["start_split","end_split","split_length","split_borders"])
@@ -137,7 +137,7 @@ def merge_split(contig_reads,contig_name,contig_seq,contig_len,mindepth,maxlen) 
                     current_end=current.end_split
                     )
                 )
-        left_border  = contig_seq[int(current.start_split): int(current.start_split) + 2]
+        left_border  = contig_seq[int(current.start_split)-1: int(current.start_split) + 1]
         right_border = contig_seq[int(current.end_split) - 2: int(current.end_split)]
         
         #Flag "filter"
@@ -223,7 +223,7 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     header_sa[0] = '#'+header_sa[0]
     split_alignments.to_csv(output_path+'_split_alignments.txt',header=header_sa,sep='\t',index=False)
     
-    f = open(output_path+'_candidates.txt', 'a')
+    f = open(output_path+'_candidates.txt', 'w')
     f.write('##mindepth:' + str(mindepth) + '\n')
     f.write('##maxlen:'   + str(maxlen) + '\n') 
     header_cand = ["#ID"] + list(candidates.columns.values)
@@ -279,8 +279,8 @@ def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
             print('\nError: output file(s) already exists.\n')
             exit(1)
     
-    candidates=pd.read_csv(cand_file.name,sep='\t').rename(columns={'#ID':'ID','filter':'Filter'})
-    sequences = SeqIO.to_dict(SeqIO.parse(reference.name,'fasta'))
+    candidates = pd.read_csv(cand_file.name,sep='\t',skiprows=2).rename(columns={'#ID':'ID','filter':'Filter'})
+    sequences  = SeqIO.to_dict(SeqIO.parse(reference.name,'fasta'))
     
     trimmed_records=[]
     if candidates.loc[lambda df : df.Filter == "PASS"].size :
@@ -331,7 +331,6 @@ def df_ORF(pep_file,candidates) :
     return pd.DataFrame(orfs)
     
 def analyzeORF(reference, cand_file, output, force, prefix, no_refine, rm) :
-    
     candidates = pd.read_csv(cand_file.name,sep='\t',skiprows=2)
     output_path = output + "/orf";
     if prefix:
