@@ -1,0 +1,52 @@
+
+---------------- Information for assembly 'data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta' ----------------
+
+
+                                         Number of scaffolds         13
+                                     Total size of scaffolds      19789
+                                            Longest scaffold       4614
+                                           Shortest scaffold        206
+                                 Number of scaffolds > 1K nt          8  61.5%
+                                Number of scaffolds > 10K nt          0   0.0%
+                               Number of scaffolds > 100K nt          0   0.0%
+                                 Number of scaffolds > 1M nt          0   0.0%
+                                Number of scaffolds > 10M nt          0   0.0%
+                                          Mean scaffold size       1522
+                                        Median scaffold size       1193
+                                         N50 scaffold length       1745
+                                          L50 scaffold count          4
+                                                 scaffold %A      27.39
+                                                 scaffold %C      21.35
+                                                 scaffold %G      20.41
+                                                 scaffold %T      30.85
+                                                 scaffold %N       0.00
+                                         scaffold %non-ACGTN       0.00
+                             Number of scaffold non-ACGTN nt          0
+
+                Percentage of assembly in scaffolded contigs       0.0%
+              Percentage of assembly in unscaffolded contigs     100.0%
+                      Average number of contigs per scaffold        1.0
+Average length of break (>25 Ns) between contigs in scaffold          0
+
+                                           Number of contigs         13
+                              Number of contigs in scaffolds          0
+                          Number of contigs not in scaffolds         13
+                                       Total size of contigs      19789
+                                              Longest contig       4614
+                                             Shortest contig        206
+                                   Number of contigs > 1K nt          8  61.5%
+                                  Number of contigs > 10K nt          0   0.0%
+                                 Number of contigs > 100K nt          0   0.0%
+                                   Number of contigs > 1M nt          0   0.0%
+                                  Number of contigs > 10M nt          0   0.0%
+                                            Mean contig size       1522
+                                          Median contig size       1193
+                                           N50 contig length       1745
+                                            L50 contig count          4
+                                                   contig %A      27.39
+                                                   contig %C      21.35
+                                                   contig %G      20.41
+                                                   contig %T      30.85
+                                                   contig %N       0.00
+                                           contig %non-ACGTN       0.00
+                               Number of contig non-ACGTN nt          0
