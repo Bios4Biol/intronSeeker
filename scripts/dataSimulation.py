@@ -181,8 +181,9 @@ def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, uppe
                 intron_start = len(reference_seq)-intron_end
                 intron_end   = len(reference_seq)-old_start
 
-        intron_start += 1
-        
+        if intron_start != None:
+            intron_start += 1
+
         library_contigs_set.append(SeqRecord(library_seq,id=name.split()[0],description="reverse="+str(reverse)))
         
         description = " ".join(["intron_start="+str(intron_start),"intron_end="+str(intron_end),"reverse="+str(reverse)])
