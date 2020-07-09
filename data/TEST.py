@@ -53,7 +53,7 @@ def mkdirWorkDir(workDir: str, pipelineName:str):
 
 
 
-def simulationTests(mode: str, grinder: str, pipelineName: str, workDir:str, gtf:str, fasta:str, settingsFRS: str, settingsGBS:str, settingsSTAR: str, settingsHISAT2: str, settingsSRS: str, settingsTF: str):
+def simulationTests(mode: str, grinder: str, pipelineName: str, workDir:str, gtf:str, fasta:str, r1: str, r2: str, settingsFRS: str, settingsGBS:str, settingsSTAR: str, settingsHISAT2: str, settingsSRS: str, settingsTF: str):
 
     if (mode == "InstallIntronSeeker"):
         #Installation IntronSeeker
@@ -108,7 +108,7 @@ def simulationTests(mode: str, grinder: str, pipelineName: str, workDir:str, gtf
         os.system('intronSeeker starAlignment -r '+pipelineName+'/gbs_'+pipelineName+'_transcripts-modified.fa -1 '+pipelineName+'/sr_'+pipelineName+'_R1.fastq.gz \
                 -2 '+pipelineName+'/sr_'+pipelineName+'_R2.fastq.gz -o  -o '+pipelineName+' -t 6   -p '+pipelineName)
         print('Step 4/8 : splitReadSearch post STAR')
-        os.system('intronSeeker splitReadSearch -a '+pipelineName+'/star_'+pipelineName+'.sort.bam -r '+pipelineName+'/gbs_'+pipelineName+'_transcripts.fa -o starSplit  -o '+pipelineName+' -p '+pipelineName+' -t 6')
+        os.system('intronSeeker splitReadSearch -a '+pipelineName+'/star_'+pipelineName+'.sort.bam -r '+pipelineName+'/gbs_'+pipelineName+'_transcripts.fa -o '+pipelineName+' -p '+pipelineName+' -t 6')
         print('Step 5/8 : trimFastaFromTXT post STAR')
         os.system('intronSeeker.py trimFastaFromTXT -r '+pipelineName+'/frs_'+pipelineName+'_contigs-modified.fa \
                 -c '+testsDir+'/srs_'+pipelineName+'_STAR_candidates.txt -o '+pipelineName+' -p '+pipelineName)	
@@ -126,6 +126,35 @@ def simulationTests(mode: str, grinder: str, pipelineName: str, workDir:str, gtf
         os.system('python3 /home/smaman/Documents/PROJETS/INTRONSEEKER/intronSeeker/scripts/simulation2HTML.py -F --config_file '+ testsDir+'/'+pipelineName+'_STAR.cfg')
         os.system('python3 /home/smaman/Documents/PROJETS/INTRONSEEKER/intronSeeker/scripts/simulation2HTML.py -F --config_file '+ testsDir+'/'+pipelineName+'_HISAT2.cfg')
 
+    #REAL
+    if (mode == "REAL"):
+        print('REAL mode')
+        testsDir=mkdirWorkDir(workDir, pipelineName)
+        print('Step 3/8 : starAlignment')
+        os.system('intronSeeker starAlignment -r '+fasta+' -1 '+r1+' \
+                -2 '+r2+' -o '+pipelineName+' -t 6   -p '+pipelineName)
+        print('Step 4/8 : splitReadSearch post STAR')
+        os.system('intronSeeker splitReadSearch -a '+pipelineName+'/star_'+pipelineName+'.sort.bam -r '+pipelineName+'/'+pipelineName+'_transcripts.fa \
+                 -o '+pipelineName+' -p '+pipelineName+' -t 6')
+        print('Step 5/8 : trimFastaFromTXT post STAR')
+        os.system('intronSeeker.py trimFastaFromTXT -r '+pipelineName+'/'+pipelineName+'_contigs-modified.fa \
+                -c '+testsDir+'/'+pipelineName+'_STAR_candidates.txt -o '+pipelineName+' -p '+pipelineName)	
+        print('Step 6/8 : hisat2Alignment')
+        os.system('intronSeeker hisat2Alignment '+settingsHISAT2+' -r '+pipelineName+'/'+pipelineName+'_transcripts-modified.fa \
+                -1 '+r1+'   -2 '+r2+' -o '+pipelineName+' -p '+pipelineName)
+        print('Step 7/8 : splitReadSearch post HISAT2')
+        os.system('intronSeeker splitReadSearch '+settingsSRS+' -a '+pipelineName+'/hisat2_'+pipelineName+'.sort.bam \
+                -r '+pipelineName+'/'+pipelineName+'_transcripts-modified.fa -o '+pipelineName+' -p '+pipelineName+'_HISAT2')	
+        print('Step 8/8 : trimFastaFromTXT post HISAT2')
+        os.system('intronSeeker.py trimFastaFromTXT -r '+pipelineName+'/'+pipelineName+'_contigs-modified.fa \
+                -c '+testsDir+'/'+pipelineName+'_HISAT2_candidates.txt -o '+pipelineName+' -p '+pipelineName)			
+        write_cgf_file('STAR', testsDir, pipelineName, mode)
+        write_cgf_file('HISAT2', testsDir, pipelineName, mode)
+        os.system('python3 /home/smaman/Documents/PROJETS/INTRONSEEKER/intronSeeker/scripts/simulation2HTML.py -F --config_file '+ testsDir+'/'+pipelineName+'_STAR.cfg')
+        os.system('python3 /home/smaman/Documents/PROJETS/INTRONSEEKER/intronSeeker/scripts/simulation2HTML.py -F --config_file '+ testsDir+'/'+pipelineName+'_HISAT2.cfg')
+
+
+
 
 if __name__ == '__main__' :
     
@@ -137,6 +166,8 @@ if __name__ == '__main__' :
     parser.add_argument('-o','--workDir', type=str, required=True, dest='workDir', help="Path to outputs dir")
     parser.add_argument('--fasta', type=str, required=False, dest='fasta', help="Reference fasta file.")
     parser.add_argument('--gtf', type=str, required=False, dest='gtf', help="GTF file.")
+    parser.add_argument('--R1', type=str, required=False, dest='r1', help="Reads 1 fastq file.")
+    parser.add_argument('--R2', type=str, required=False, dest='r2', help="Reads 2 fastq file.")
     parser.add_argument('--settingsFRS', type=str, required=False, dest='settingsFRS', help="FRS settings.")
     parser.add_argument('--settingsGBS', type=str, required=False, dest='settingsGBS', help="GBS settings.")
     parser.add_argument('--settingsSTAR', type=str, required=False, dest='settingsSTAR', help="STAR settings.")
