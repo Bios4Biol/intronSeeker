@@ -19,12 +19,16 @@ def write_cgf_file(alignment:str, testsDir: str, pipelineName:str, mode:str ):
 	print('Report Step : Simulation Report with '+alignment)
 	lowerAlignment = alignment.lower()
 	if (mode == "FRS"):
+        fasta = testsDir+'/frs_'+pipelineName+'_contigs.fa'
 		mfasta= testsDir+'/frs_'+pipelineName+'_contigs-modified.fa'
+        gtf   = testsDir+'/frs_'+pipelineName+'_contigs-modified.gtf'
 	if (mode == 'GBS'):
+        fasta  =testsDir+'/gbs_'+pipelineName+'_transcripts.fa 
 		mfasta = pipelineName+'/gbs_'+pipelineName+'_transcripts-modified.fa'		
+        gtf    = testsDir+'/gbs_'+pipelineName+'_transcripts-modified.gtf'
 	with open(testsDir+'/'+pipelineName+'_'+alignment+'.cfg', 'w+') as f:
-			print('[Defaults]\nfasta: '+testsDir+'/frs_'+pipelineName+'_contigs.fa\nmfasta: '+mfasta+'\
-				\ngtf: '+testsDir+'/frs_'+pipelineName+'_contigs-modified.gtf\nr1: '+testsDir+'/sr_'+pipelineName+'_R1.fastq.gz\
+			print('[Defaults]\nfasta: '+fasta+'\nmfasta: '+mfasta+'\
+				\ngtf: '+gtf+'\nr1: '+testsDir+'/sr_'+pipelineName+'_R1.fastq.gz\
 				\nr2: '+testsDir+'/sr_'+pipelineName+'_R2.fastq.gz\nflagstat: '+testsDir+'/'+lowerAlignment+'_'+pipelineName+'.sort.flagstat.txt\
 				\ncandidat: '+testsDir+'/srs_'+pipelineName+'_'+alignment+'_candidates.txt\nranks: '+testsDir+'/sr_'+pipelineName+'_ranks.txt\
 				\nsplit: '+testsDir+'/srs_'+pipelineName+'_'+alignment+'_split_alignments.txt\nprefix: '+pipelineName+'_'+alignment+'\nthreads: 6\
@@ -110,7 +114,7 @@ def simulationTests(mode: str, grinder: str, pipelineName: str, workDir:str, gtf
         print('Step 4/8 : splitReadSearch post STAR')
         os.system('intronSeeker splitReadSearch -a '+pipelineName+'/star_'+pipelineName+'.sort.bam -r '+pipelineName+'/gbs_'+pipelineName+'_transcripts.fa -o '+pipelineName+' -p '+pipelineName+' -t 6')
         print('Step 5/8 : trimFastaFromTXT post STAR')
-        os.system('intronSeeker.py trimFastaFromTXT -r '+pipelineName+'/frs_'+pipelineName+'_contigs-modified.fa \
+        os.system('intronSeeker.py trimFastaFromTXT -r '+pipelineName+'/frs_'+pipelineName+'_transcripts-modified.fa \
                 -c '+testsDir+'/srs_'+pipelineName+'_STAR_candidates.txt -o '+pipelineName+' -p '+pipelineName)	
         print('Step 6/8 : hisat2Alignment')
         os.system('intronSeeker hisat2Alignment '+settingsHISAT2+' -r '+pipelineName+'/gbs_'+pipelineName+'_transcripts-modified.fa \
@@ -119,7 +123,7 @@ def simulationTests(mode: str, grinder: str, pipelineName: str, workDir:str, gtf
         os.system('intronSeeker splitReadSearch '+settingsSRS+' -a '+pipelineName+'/hisat2_'+pipelineName+'.sort.bam \
                 -r '+pipelineName+'/gbs_'+pipelineName+'_transcripts-modified.fa -o '+pipelineName+' -p '+pipelineName+'_HISAT2')	
         print('Step 8/8 : trimFastaFromTXT post HISAT2')
-        os.system('intronSeeker.py trimFastaFromTXT -r '+pipelineName+'/frs_'+pipelineName+'_contigs-modified.fa \
+        os.system('intronSeeker.py trimFastaFromTXT -r '+pipelineName+'/frs_'+pipelineName+'_transcripts-modified.fa \
                 -c '+testsDir+'/srs_'+pipelineName+'_HISAT2_candidates.txt -o '+pipelineName+' -p '+pipelineName)			
         write_cgf_file('STAR', testsDir, pipelineName, mode)
         write_cgf_file('HISAT2', testsDir, pipelineName, mode)
