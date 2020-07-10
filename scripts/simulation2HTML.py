@@ -9,7 +9,7 @@ import pandas as pd
 import pysam   # To generate a dataframe from a BAM : pysam and pickle
 import pickle
 import glob
-import time
+import json
 import subprocess as sp # To run subprocess
 import concurrent.futures as prl # For Split read signal analysis
 from itertools import repeat     # For Split read signal analysis
@@ -537,6 +537,29 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         print('df_split', df_split, '\n\n')
     if candidat:
         print('df_candidat', df_candidat, '\n\n')
+
+    # SARAH : main stats in a json file
+    # https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/    
+    data = {}
+    data['comparison'] = []
+    data['comparison'].append({
+        'F1score': eval_f_stat["7"+eval_def["F1"]],
+        'Se': eval_f_stat["5"+eval_def["Se"]],
+        'Sp': eval_f_stat["6"+eval_def["Sp"]]
+    })
+
+    # Output path filename comparison json
+    output_file = output_path + "_comparison_simulation.json"
+    if not force:
+        try :
+            if os.path.exists(output_file):
+                raise FileExistsError
+        except FileExistsError as e :
+            print('\nError: output file already exists.\n')
+            exit(1)
+
+    with open(output_file, 'w') as outfile:
+        json.dump(data, outfile)
 
 
 if __name__ == '__main__' :
