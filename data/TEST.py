@@ -58,7 +58,7 @@ def mkdirWorkDir(workDir: str, pipelineName:str):
     # mkdir tests outputs directory
     testsDir=workDir+"/"+pipelineName
     os.system('mkdir '+ testsDir)
-    os.system('chmod 777 '+ testsDir)
+    os.system('chmod -R 777 '+ testsDir)
     print('Your work directory is: ', workDir+"/"+pipelineName)
 
     return testsDir
@@ -80,6 +80,7 @@ def simulationTests(mode: str, grinder: str, pipelineName: str, workDir:str, gtf
     if (mode == "FRS"):
         print('FRS mode')
         testsDir = mkdirWorkDir(workDir, pipelineName)
+        subprocess.check_call(["chmod 777 "+testsDir], shell=True)
         print('Step 1/8 : Generate contigs fasta')
         subprocess.check_call(["intronSeeker fullRandomSimulation "+settingsFRS+" -o "+pipelineName+" -p "+pipelineName],shell=True)
         print('Step 2/8 : Generate reads with intronSeeker simulateReads from reference fasta')
@@ -113,54 +114,66 @@ def simulationTests(mode: str, grinder: str, pipelineName: str, workDir:str, gtf
     if (mode == "GBS"):
         print('GBS mode')
         testsDir=mkdirWorkDir(workDir, pipelineName)
+        subprocess.run(["chmod -R 777 "+workDir], shell=True)
+        subprocess.run(["chmod -R 777 "+testsDir], shell=True)
         print('Step 1/8 : Generate contigs fasta')
-        subprocess.check_call(["intronSeeker.py GTFbasedSimulation "+settingsGBS+" -a "+gtf+" -r "+fasta+" -p "+pipelineName+" -o "+pipelineName],shell=True)
+        print("intronSeeker.py GTFbasedSimulation "+settingsGBS+" -a "+gtf+" -r "+fasta+" -p "+pipelineName+" -o "+testsDir)
+        subprocess.run(["intronSeeker.py GTFbasedSimulation "+settingsGBS+" -a "+gtf+" -r "+fasta+" -p "+pipelineName+" -o "+testsDir],shell=True)
         print('Step 2/8 : Generate reads with intronSeeker simulateReads from reference fasta')
-        subprocess.check_call(["intronSeeker.py simulateReads -f "+pipelineName+"/gbs_"+pipelineName+"_transcripts.fa -c "+grinder+" -p "+pipelineName+" -o "+pipelineName],shell=True)
+        print("intronSeeker.py simulateReads -f "+testsDir+"/gbs_"+pipelineName+"_transcripts.fa -c "+grinder+" -p "+pipelineName+" -o "+pipelineName)
+        subprocess.run(["intronSeeker.py simulateReads -f "+testsDir+"/gbs_"+pipelineName+"_transcripts.fa -c "+grinder+" -p "+pipelineName+" -o "+pipelineName],shell=True)
         print('Step 3/8 : starAlignment')
-        subprocess.check_call(["intronSeeker starAlignment -r "+pipelineName+"/gbs_"+pipelineName+"_transcripts-modified.fa -1 "+pipelineName+"/sr_"+pipelineName+"_R1.fastq.gz \
-                -2 "+pipelineName+"/sr_"+pipelineName+"_R2.fastq.gz -o "+pipelineName+" -t 6   -p "+pipelineName],shell=True)
+        print("intronSeeker starAlignment -r "+testsDir+"/gbs_"+pipelineName+"_transcripts-modified.fa -1 "+testsDir+"/sr_"+pipelineName+"_R1.fastq.gz  -2 "+testsDir+"/sr_"+pipelineName+"_R2.fastq.gz -o "+testsDir+" -t 6   -p "+pipelineName)
+        subprocess.run(["intronSeeker starAlignment -r "+testsDir+"/gbs_"+pipelineName+"_transcripts-modified.fa -1 "+testsDir+"/sr_"+pipelineName+"_R1.fastq.gz \
+                -2 "+testsDir+"/sr_"+pipelineName+"_R2.fastq.gz -o "+testsDir+" -t 6   -p "+pipelineName],shell=True,  timeout=None)
         print('Step 4/8 : splitReadSearch post STAR')
-        subprocess.check_call(["intronSeeker splitReadSearch -a "+pipelineName+"/star_"+pipelineName+".sort.bam -r "+pipelineName+"/gbs_"+pipelineName+"_transcripts-modified.fa -o "+pipelineName+" -p "+pipelineName+" -t 6"],shell=True)
+        print("intronSeeker splitReadSearch -a "+testsDir+"/star_"+pipelineName+".sort.bam -r "+testsDir+"/gbs_"+pipelineName+"_transcripts-modified.fa -o "+testsDir+" -p "+pipelineName+"_STAR -t 6")
+        subprocess.run(["intronSeeker splitReadSearch -a "+testsDir+"/star_"+pipelineName+".sort.bam -r "+testsDir+"/gbs_"+pipelineName+"_transcripts-modified.fa -o "+testsDir+" -p "+pipelineName+"_STAR -t 6"],shell=True)
         print('Step 5/8 : trimFastaFromTXT post STAR')
-        subprocess.check_call(["intronSeeker.py trimFastaFromTXT -r "+pipelineName+"/frs_"+pipelineName+"_transcripts-modified.fa \
-                -c "+testsDir+"/srs_"+pipelineName+"_STAR_candidates.txt -o "+pipelineName+" -p "+pipelineName],shell=True)
+        subprocess.run(["intronSeeker.py trimFastaFromTXT -r "+testsDir+"/gbs_"+pipelineName+"_transcripts-modified.fa \
+                -c "+testsDir+"/srs_"+pipelineName+"_STAR_candidates.txt -o "+testsDir+"/STAR_trim/ -p "+pipelineName],shell=True)
         print('Step 6/8 : hisat2Alignment')
-        subprocess.check_call(["intronSeeker hisat2Alignment "+settingsHISAT2+" -r "+pipelineName+"/gbs_"+pipelineName+"_transcripts-modified.fa \
-                -1 "+pipelineName+"/sr_"+pipelineName+"_R1.fastq.gz -2 "+pipelineName+"/sr_"+pipelineName+"_R2.fastq.gz -o "+pipelineName+" -p "+pipelineName],shell=True)
+        subprocess.run(["intronSeeker hisat2Alignment "+settingsHISAT2+" -r "+testsDir+"/gbs_"+pipelineName+"_transcripts-modified.fa \
+                -1 "+testsDir+"/sr_"+pipelineName+"_R1.fastq.gz -2 "+testsDir+"/sr_"+pipelineName+"_R2.fastq.gz -o "+testsDir+" -p "+pipelineName],shell=True)
         print('Step 7/8 : splitReadSearch post HISAT2')
-        subprocess.check_call(["intronSeeker splitReadSearch "+settingsSRS+" -a "+pipelineName+"/hisat2_"+pipelineName+".sort.bam \
-                -r "+pipelineName+"/gbs_"+pipelineName+"_transcripts-modified.fa -o "+pipelineName+" -p "+pipelineName+"_HISAT2"],shell=True)
+        subprocess.run(["intronSeeker splitReadSearch "+settingsSRS+" -a "+testsDir+"/hisat2_"+pipelineName+".sort.bam \
+                -r "+testsDir+"/gbs_"+pipelineName+"_transcripts-modified.fa -o "+testsDir+" -p "+pipelineName+"_HISAT2"],shell=True)
         print('Step 8/8 : trimFastaFromTXT post HISAT2')
-        subprocess.check_call(["intronSeeker.py trimFastaFromTXT -r "+pipelineName+"/frs_"+pipelineName+"_transcripts-modified.fa \
-                -c "+testsDir+"/srs_"+pipelineName+"_HISAT2_candidates.txt -o "+pipelineName+" -p "+pipelineName],shell=True)		
+        subprocess.run(["intronSeeker.py trimFastaFromTXT -r "+testsDir+"/gbs_"+pipelineName+"_transcripts-modified.fa \
+                -c "+testsDir+"/srs_"+pipelineName+"_HISAT2_candidates.txt -o "+testsDir+"/HISAT2_trim/ -p "+pipelineName],shell=True)		
         write_cgf_file('STAR', testsDir, pipelineName, mode)
         write_cgf_file('HISAT2', testsDir, pipelineName, mode)
-        subprocess.check_call(["python3 /home/smaman/Documents/PROJETS/INTRONSEEKER/intronSeeker/scripts/simulation2HTML.py -F --config_file "+ testsDir+"/"+pipelineName+"_STAR.cfg"],shell=True)
-        subprocess.check_call(["python3 /home/smaman/Documents/PROJETS/INTRONSEEKER/intronSeeker/scripts/simulation2HTML.py -F --config_file "+ testsDir+"/"+pipelineName+"_HISAT2.cfg"],shell=True)
+        subprocess.run(["python3 /home/smaman/Documents/PROJETS/INTRONSEEKER/intronSeeker/scripts/simulation2HTML.py -F --config_file "+ testsDir+"/"+pipelineName+"_STAR.cfg"],shell=True)
+        subprocess.run(["python3 /home/smaman/Documents/PROJETS/INTRONSEEKER/intronSeeker/scripts/simulation2HTML.py -F --config_file "+ testsDir+"/"+pipelineName+"_HISAT2.cfg"],shell=True)
 
     #REAL
     if (mode == "REAL"):
         print('REAL mode')
         testsDir=mkdirWorkDir(workDir, pipelineName)
+        subprocess.check_call(["chmod -R 777 "+testsDir], shell=True)
         print('Step 1/6 : starAlignment')
         subprocess.check_call(["intronSeeker starAlignment -r "+fasta+" -1 "+r1+" \
-                -2 "+r2+" -o "+pipelineName+" -t 6   -p "+pipelineName],shell=True)
+                -2 "+r2+" -o "+testsDir+" -t 6   -p "+pipelineName],shell=True)
+        print("intronSeeker starAlignment -r "+fasta+" -1 "+r1+" -2 "+r2+" -o "+testsDir+" -t 6 -p "+pipelineName)        
         print('Step 2/6 : splitReadSearch post STAR')
         subprocess.check_call(["intronSeeker splitReadSearch -a "+pipelineName+"/star_"+pipelineName+".sort.bam -r "+fasta+" \
-                 -o "+pipelineName+" -p "+pipelineName+" -t 6"], shell=True)
+                 -o "+testsDir+" -p "+pipelineName+" -t 6"], shell=True)
+        print("intronSeeker splitReadSearch -a "+pipelineName+"/star_"+pipelineName+".sort.bam -r "+fasta+" -o "+testsDir+" -p "+pipelineName+" -t 6")         
         print('Step 3/6 : trimFastaFromTXT post STAR')
         subprocess.check_call(["intronSeeker.py trimFastaFromTXT -r "+fasta+" \
-                -c "+testsDir+"/"+pipelineName+"_STAR_candidates.txt -o "+pipelineName+" -p "+pipelineName], shell=True)	
+                -c "+testsDir+"/"+pipelineName+"_STAR_candidates.txt -o "+testsDir+"/STAR_trim -p "+pipelineName], shell=True)	
+        print("intronSeeker.py trimFastaFromTXT -r "+fasta+" -c "+testsDir+"/"+pipelineName+"_STAR_candidates.txt -o "+testsDir+"/STAR_trim -p "+pipelineName)
         print('Step 4/6 : hisat2Alignment')
         subprocess.check_call(["intronSeeker hisat2Alignment "+settingsHISAT2+" -r "+fasta+" \
-                -1 "+r1+"   -2 "+r2+" -o "+pipelineName+" -p "+pipelineName], shell=True)
+                -1 "+r1+"   -2 "+r2+" -o "+testsDir+" -p "+pipelineName], shell=True)
+        print("intronSeeker hisat2Alignment "+settingsHISAT2+" -r "+fasta+" -1 "+r1+"   -2 "+r2+" -o "+testsDir+" -p "+pipelineName)
         print('Step 5/6 : splitReadSearch post HISAT2')
         subprocess.check_call(["intronSeeker splitReadSearch "+settingsSRS+" -a "+pipelineName+"/hisat2_"+pipelineName+".sort.bam \
-                -r "+fasta+" -o "+pipelineName+" -p "+pipelineName+"_HISAT2"], shell=True)	
+                -r "+fasta+" -o "+testsDir+" -p "+pipelineName+"_HISAT2"], shell=True)	
+        print("intronSeeker splitReadSearch "+settingsSRS+" -a "+pipelineName+"/hisat2_"+pipelineName+".sort.bam -r "+fasta+" -o "+testsDir+" -p "+pipelineName+"_HISAT2")
         print('Step 6/6 : trimFastaFromTXT post HISAT2')
         subprocess.check_call(["intronSeeker.py trimFastaFromTXT -r "+fasta+" \
-                -c "+testsDir+"/"+pipelineName+"_HISAT2_candidates.txt -o "+pipelineName+" -p "+pipelineName], shell=True)
+                -c "+testsDir+"/"+pipelineName+"_HISAT2_candidates.txt "+testsDir+"/HISAT2_trim -p "+pipelineName], shell=True)
         write_cgf_file('STAR', testsDir, pipelineName, mode, fasta, r1, r2)
         write_cgf_file('HISAT2', testsDir, pipelineName, mode)
         subprocess.check_call(["python3 /home/smaman/Documents/PROJETS/INTRONSEEKER/intronSeeker/scripts/simulation2HTML.py -F --config_file "+ testsDir+"/"+pipelineName+"_STAR.cfg"], shell= True)
@@ -174,7 +187,7 @@ if __name__ == '__main__' :
     parser = ArgumentParser()
    	
     parser.add_argument('-m','--mode', type=str, required=True, dest='mode', help="Tests on FRS or GBS or REAL data.")
-    parser.add_argument('-g','--grinder', type=str, required=True, dest='grinder', help="Path to the config grinder file (grinder*.cfg).")
+    parser.add_argument('-g','--grinder', type=str, required=False, dest='grinder', help="Path to the config grinder file (grinder*.cfg).")
     parser.add_argument('-p','--pipelineName', type=str, required=True, dest='pipelineName', help="Name of your test pipeline.")
     parser.add_argument('-o','--workDir', type=str, required=True, dest='workDir', help="Path to outputs dir")
     parser.add_argument('--fasta', type=str, required=False, dest='fasta', help="Reference fasta file.")
