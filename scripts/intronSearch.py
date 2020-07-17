@@ -95,7 +95,6 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
         contig_seq = ref_dict.fetch(ref_id)
         for read in aligned:
             if read.cigartuples is not None:
-            
                 if '(3,' in str(read.cigartuples):
                     split = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
                     split['read'] = read.query_name
@@ -197,6 +196,9 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     
     ref_id_list = [x.split("\t")[0] for x in pysam.idxstats(bamfile.name).split("\n")[:-2]]
     
+    if not os.path.exists(fastafile.name + '.fai'):
+        pysam.faidx(fastafile.name)
+
     with prl.ProcessPoolExecutor(max_workers=threads) as ex :
         # ~ s_t = time.time()
         ref_id_array = np.array_split(ref_id_list,ex._max_workers)
