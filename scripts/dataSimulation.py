@@ -229,8 +229,10 @@ def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
     :return:
     """    
     output_path = output + "/sr"
+    grinderprefix = "sr"
     if prefix:
-        output_path += "_" + prefix
+        output_path   += "_" + prefix
+        grinderprefix += "_" + prefix
 
     # Create output dir if not exist
     if not os.path.exists(output) :
@@ -243,8 +245,8 @@ def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
             print('\nError: output file(s) already exists.\n')
             exit(1)
 
-    os.system("grinder -rf {input_file} -pf {profile_file} -bn {output_file} > {log}".format(
-        input_file=rf.name, profile_file=pf.name, output_file=output_path, log=output_path + ".log"
+    os.system("grinder -rf {input_file} -pf {profile_file} -od {output} -bn {prefix} > {log}".format(
+        input_file=rf.name, profile_file=pf.name, output=output, prefix=grinderprefix, log=output_path + ".log"
         ))
     os.rename(output_path + "-ranks.txt", output_path + "_ranks.txt")
     split_read(output_path)
