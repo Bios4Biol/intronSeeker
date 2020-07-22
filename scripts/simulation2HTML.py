@@ -10,6 +10,7 @@ import pysam   # To generate a dataframe from a BAM : pysam and pickle
 import pickle
 import glob
 import json
+import csv
 import subprocess as sp # To run subprocess
 import concurrent.futures as prl # For Split read signal analysis
 from itertools import repeat     # For Split read signal analysis
@@ -541,12 +542,30 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # SARAH : main stats in a json file
     # https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/    
     data = {}
-    data['comparison'] = []
-    data['comparison'].append({
-        'F1score': eval_f_stat["7"+eval_def["F1"]],
-        'Se': eval_f_stat["5"+eval_def["Se"]],
-        'Sp': eval_f_stat["6"+eval_def["Sp"]]
+    data[output_path] = []
+    data[output_path].append({
+        'Nb seq'             : global_stat["0Contig FASTA - Number of sequences"],
+        'Mean seq. length'   : global_stat["1Contig FASTA - Mean sequence length"],
+        'Nb contigs'         : global_stat["2Contig FASTA with feature(s) - Number of sequences"],
+        'Mean contigs length': global_stat["3Contig FASTA with feature(s) - Mean sequence length"],
+        'Nb reads'           : global_stat_fastq["0Number of reads"],
+        'Nb prop reads'      : global_stat_flagstat["4Number of properly paired reads"],
+        'Nb splits'          : global_stat_split["0Number of reads overlapping introns"],
+        'Mean len of introns': global_stat_split["1Mean length of introns"],
+        'Nb detected'        : global_stat_f_detected_introns["0" + definitions['PASS']],
+        'Nb detectable'      : global_stat_detectable_features["0" + definitions['PASS']],
+        'len detected'       : global_stat_f_detected_introns["6Mean length"],
+        'len detectable'     : global_stat_f_detected_introns["6Mean length"],
+        'dep detected'       : global_stat_f_detected_introns["9Mean depth"],
+        'dep detectable'     : global_stat_detectable_features["9Mean depth"],
+        'TP'                 : eval_f_stat["2"+eval_def["TP"]],
+        'FN'                 : eval_f_stat["4"+eval_def["FN"]],
+        'FP'                 : eval_f_stat["3"+eval_def["FP"]],
+        'F1score'            : eval_f_stat["7"+eval_def["F1"]],
+        'Se'                 : eval_f_stat["5"+eval_def["Se"]],
+        'Sp'                 : eval_f_stat["6"+eval_def["Sp"]]
     })
+    
 
     # Output path filename comparison json
     output_file = output_path + "_comparison_simulation.json"
@@ -560,6 +579,34 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
     with open(output_file, 'w') as outfile:
         json.dump(data, outfile)
+
+    # Opening JSON file and loading the data into the variable data 
+    with open(output_file) as json_file: 
+        data = json.load(json_file) 
+    
+    stats_data = data[output_path]
+    
+    # now we will open a file for writing 
+    data_file = open(output_file+'.csv', 'w') 
+    
+    # create the csv writer object 
+    csv_writer = csv.writer(data_file) 
+    
+    # Counter variable used for writing headers to the CSV file 
+    count = 0
+    
+    for i in stats_data: 
+        if count == 0: 
+    
+            # Writing headers of CSV file 
+            header = i.keys() 
+            csv_writer.writerow(header) 
+            count += 1
+    
+        # Writing data of CSV file 
+        csv_writer.writerow(i.values()) 
+    
+    data_file.close()
 
 
 if __name__ == '__main__' :
