@@ -206,6 +206,12 @@ def get_html_body1(flagstat="", split="", candidat=""):
 				    	Filtered detected introns
 			    	</a>
 			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#too_complex_detected">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Contigs with too complex introns
+			    	</a>
+			    </li>
                 '''
     r +='''      
                 <li class="nav-item">
@@ -483,6 +489,38 @@ def get_html_candidat(global_stat_f_detected_introns:dict, global_stat_detectabl
         </div>
     '''
     return r
+
+# Tab too complex 
+def get_html_too_complex_detected(global_stat_too_complex_detected:dict):
+    r =  '''
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Contigs with too complex detected introns</h5>
+                <span class="anchor" id="too_complex_detected"></span>
+''' +  dict_to_table(global_stat_too_complex_detected, -1, False) + '''  
+            </div>
+        </div>  
+'''
+    return r
+
+def get_html_too_complex_detectable(global_stat_too_complex_detectable:dict, global_stat_too_complex_detected:dict):
+    r =  '''
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Contigs with too complex detected introns</h5>
+                <span class="anchor" id="too_complex_detected"></span>
+''' +  dict_to_table(global_stat_too_complex_detected, -1, False) + '''  
+            </div>
+        </div>  
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Contigs with too complex detectable introns</h5>
+                <span class="anchor" id="too_complex_detectable"></span>
+''' +  dict_to_table(global_stat_too_complex_detectable, -1, False) + '''  
+            </div>
+        </div>  
+'''
+    return r   
 
 
 def get_html_eval(eval_stat:dict, eval_f_stat:dict):

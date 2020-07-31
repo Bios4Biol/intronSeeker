@@ -275,17 +275,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     if candidat:
         df_candidat, mindepth, maxlen = parse_candidat(candidat.name)
 
-        # Test Sarah : Number of too complexes introns
-        overlap = 0
-        for index, row in df_candidat.iterrows():
-            overlapping  = len(df_features.loc[lambda df :
-                (df['contig'] == row['reference']) &
-                (df['start']  > row['start']) &
-                (df['end']    < row['end'])])
-            if overlapping == 1:
-                overlap += 1
-
-         # Definition dict
+        # Definition dict
         definitions = dict()
         definitions['DP']   = "Filtered because of depth (<= "+ str(mindepth)+ ")"
         definitions['LEN']  = "Filtered because of length (>= "+ str(maxlen)+ "%)"    
@@ -312,7 +302,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_detected_introns["4Min depth"]  = df_candidat['depth'].min()
         global_stat_detected_introns["5Max depth"]  = df_candidat['depth'].max()
         global_stat_detected_introns["6Mean depth"]  = round(df_candidat['depth'].mean(), 2)
-        global_stat_detected_introns["7Number of too complexes introns"]  = overlap
         html += get_html_detected(global_stat_detected_introns, df_candidat)
 
         # Filtered detected introns
@@ -354,7 +343,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         else :
             global_stat_f_detected_introns["6Mean length"] = "NaN"
             global_stat_f_detected_introns["9Mean depth"]  = "NaN"
-            
+
+          
+       
         # if simulation ?                   
         if mfasta :
             # Detectable features (filter features because of threshold: mindepth and maxlength)
@@ -415,6 +406,50 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         else :
             html += get_html_candidat(global_stat_f_detected_introns)
  
+  
+
+
+        # Test Sarah
+        global_stat_too_complex_detected = dict()
+        # https://stackoverflow.com/questions/40454030/count-and-sort-with-pandas
+        # DETECTED : Nom de contig / filtered_detected_too_complex
+        df_too_complex_detected = df_candidat[['reference']].groupby(['reference']) \
+                             .size() \
+                             .nlargest(10) \
+                             .reset_index(name='top10')
+ 
+        
+        for k, v in df_too_complex_detected['reference'].items() :
+            global_stat_too_complex_detected[str(v)] = df_too_complex_detected.loc[k]['top10']
+            
+          
+        # DETECTABLE :  nom contig detectable / nb too complex introns
+        global_stat_too_complex_detectable = dict()
+        if mfasta:      
+            for index, row in df_too_complex_detected['reference'].items():
+                df_too_complex_detectable  = df_features.loc[lambda df :(row == df['contig'])].groupby(['contig']) \
+                             .size() \
+                             .reset_index(name='nbIntrons')
+            
+            for index, row in df_too_complex_detectable['contig'].items() :
+                val = df_too_complex_detectable.loc[index]['nbIntrons']
+                global_stat_too_complex_detectable[str(row)] = val
+                     
+            #Add table "too complex" in html report    
+            html += get_html_too_complex_detectable(global_stat_too_complex_detectable, global_stat_too_complex_detected)
+        else:
+            html += get_html_too_complex_detected(global_stat_too_complex_detected)
+        
+        # (TODO) 6 - Filtrer les contigs pour ne garder que ceux n'ayant pas d'intron chevauchant & comparer detected/detectable sur ces contigs là.
+        overlap = 0
+        for index, row in df_candidat.iterrows():
+            overlapping  = len(df_features.loc[lambda df :
+                (df['contig'] == row['reference']) &
+                (df['start']  > row['start']) &
+                (df['end']    < row['end'])])
+            if overlapping == 1:
+                overlap += 1
+
         # if simulation ?
         if mfasta:
             eval_def = dict()
@@ -540,10 +575,13 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         print('df_candidat', df_candidat, '\n\n')
 
     # SARAH : main stats in a json file
-    # https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/    
+    # https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/  
+    genowebReportPath='http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA/report_'+prefix+'_simulation.html'  
     data = {}
     data[output_path] = []
     data[output_path].append({
+        'Prefix'             : prefix,
+        'Output path'        : output,
         'Nb seq'             : global_stat["0Contig FASTA - Number of sequences"],
         'Mean seq. length'   : global_stat["1Contig FASTA - Mean sequence length"],
         'Nb contigs'         : global_stat["2Contig FASTA with feature(s) - Number of sequences"],
@@ -563,7 +601,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         'FP'                 : eval_f_stat["3"+eval_def["FP"]],
         'F1score'            : eval_f_stat["7"+eval_def["F1"]],
         'Se'                 : eval_f_stat["5"+eval_def["Se"]],
-        'Sp'                 : eval_f_stat["6"+eval_def["Sp"]]
+        'Sp'                 : eval_f_stat["6"+eval_def["Sp"]],
+        'Report'             : genowebReportPath
     })
     
 
@@ -586,12 +625,14 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     
     stats_data = data[output_path]
     
-    # now we will open a file for writing 
+    # now we will open a file for writing (w) and synthese file without overwriting (a)
     data_file = open(output_file+'.csv', 'w') 
+    data_file_synthese = open('/home/smaman/Documents/SYNTHESE.csv', 'a') 
     
     # create the csv writer object 
     csv_writer = csv.writer(data_file) 
-    
+    csv_writer_synthese = csv.writer(data_file_synthese)
+
     # Counter variable used for writing headers to the CSV file 
     count = 0
     
@@ -600,13 +641,21 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     
             # Writing headers of CSV file 
             header = i.keys() 
-            csv_writer.writerow(header) 
+            csv_writer.writerow(header)
             count += 1
-    
+        
+        # Write headers in synthesis file only if this file is not empty
+        if os.stat('/home/smaman/Documents/SYNTHESE.csv').st_size == 0:
+            header = i.keys()
+            csv_writer_synthese.writerow(header)
+
         # Writing data of CSV file 
         csv_writer.writerow(i.values()) 
+        csv_writer_synthese.writerow(i.values()) 
     
+
     data_file.close()
+    data_file_synthese.close()
 
 
 if __name__ == '__main__' :
