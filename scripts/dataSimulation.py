@@ -475,7 +475,8 @@ def parse_gtf_content(gtf_content, choosen, mix):
             # If --mix-library flag is precised (i.e. the library has to contain the modified transcript and original transcript),
             # we add the modified reference_transcript to library only if it is really modified (if the class is not 0)
             if mix and reference_transcript[0][-1]["class"] != '0':
-                library.extend([e[:-1] + [{**e[-1],"transcript_id":e[-1]["transcript_id"]+".modif"}] for e in list(reference_transcript)])
+                reference.extend(list(library_transcript))
+                #library.extend([e[:-1] + [{**e[-1],"transcript_id":e[-1]["transcript_id"]+".modif"}] for e in list(reference_transcript)])
             del choosen[exons[0][-1]["transcript_id"]]
             exons = []
         if not choosen:
@@ -724,24 +725,18 @@ def extract_fasta(genome: str, mix: bool, ref_file: str, lib_file: str, path: st
     """
     sp.call(["gffread", ref_file, "-g", genome,
              "-w", path + "_transcripts-modified.fa", "-F"])
-    if mix:
-        sp.call(["gffread", lib_file, "-g", genome,
-             "-w", path + "_transcripts-mix-state.fa", "-F"])
-    else:
-        sp.call(["gffread", lib_file, "-g", genome,
+    sp.call(["gffread", lib_file, "-g", genome,
              "-w", path + "_transcripts.fa", "-F"])
 
 
 def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, output: str, force: bool, mix: bool):
     """
-    Simulate a RNA-seq pseudo-assembly from a GTF file with retained introns or spliced exons. This procedure produces 3 files :
-        - output_reference.fasta : pseudo-assembly where the contigs have potentially retained introns. 
-        - output_library.fasta : pseudo-assembly where the contigs have potentially spliced exons. This file have to be used to generate reads library with simulateReads module
+    Simulate a RNA-seq pseudo-assembly from a GTF file with retained introns and/or spliced exons.
+    This procedure produces 3 files :
+        - "reference" : transcript fasta file (no modification)  => input of the simulateReads next step
+        - "library"   : transcript modified fasta file (retained intron / spliced exon : proportion is define in the intronseeker.properties file.
         - output_Features_of_interest.gtf : gtf which contains all simulated retained introns and spliced exons.
     To choose the number of pseudo-contigs, you have to use the nb argument. If nb=0, all the transcripts contained in the GTF will be pseudo-transcripted.
-    The mix arguments rules if a mixed library is generated : by default, the library file contains the shorter contigs (without intron or with spliced exon) compared to reference file ; 
-    a mixed library file contains both of the peudo-contig states  :the shorter one (without intron and spliced exon) and the longer on (like in reference file : with retained intron or with all exons).
-    The goal is to produce some reads with the intron or the exon (which will not split in the reference/library alignment) and reads without the intron or the exon (which will split during the alignment).
     
     :param annotation: GTF filename which contains genome annotation
     :type annotation: str

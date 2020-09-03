@@ -605,8 +605,12 @@ intronSeeker analyzeProtein -r <ref.fa> -o <outfile_basename> [-k] [-t INT]',
 def frs_help() :
     text='\
 \nDescription:\n\
-Simulates two  Fasta  files which contains  the pseudo-contigs and a GTF file which contains the pseudo retained\
- intron charesteristics. All the sequences (contigs and introns) as well as the introns insertion are fully random.\
+Simulates two Fasta and one GTF files.\n\
+Three files are generated: one corresponds  to reference  pseudo-assembly\
+ used to simulate the reads library another one contains the modified transcripts (retained introns)\
+ used as reference of the  alignment step  and  the third  one  which contains the pseudo  retained\
+ intron charesteristics (GTF).\n\
+All the sequences are fully random.\
 '
     tw = textwrap.TextWrapper(
         width=90,
@@ -651,7 +655,7 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-rF] [-l,-H INT] [-p STR
     ))
     print('   --mix/--mix-state\t',end='')
     print(cw.fill(
-'Boolean which rules  if the generated contigs (input  of simulateReads) is mixed i.e. if the library contains the transcript in two state when a intron is retained  or an exon is spliced.'
+'Boolean which rules if the modified contigs is mixed: if    the fasta file contains the transcript in the two states  (with AND without retained introns).'
     ))
     print('   -l/--lower-intron-len INT',end='')
     print(cw.fill(
@@ -687,10 +691,11 @@ intronSeeker fullRandomSimulation [-n INT] [-m,-M INT] [-rF] [-l,-H INT] [-p STR
 def gbs_help() :
     text='\
 \nDescription:\n\
-From a genome and associated ensembl GTF file, generates pseudo-contigs (corresponds to transcripts) with potentially\
- retained introns or spliced exons.\nThree files are generated: one corresponds to reference pseudo-assembly,\
- another one is used  for  simulate  the reads library  and  the third  one gathers  all the  simulated features \
-(retained introns or  spliced  exons). gffread  program  is called during  the simulation process.\
+From a genome and associated ensembl GTF file, generates pseudo-contigs (corresponds  to transcripts) with potentially\
+ retained introns or spliced exons.\nThree files are generated: one corresponds to reference pseudo-assembly\
+ used to simulate the reads library another one contains the modified transcripts (retained introns and or spliced exons)\
+ used as reference of the alignment step  and  the third  one gathers  all the  simulated features \
+ (retained introns or  spliced  exons).\ngffread  program  is called during  the simulation process.\
 '
     tw = textwrap.TextWrapper(
         width=90,
@@ -731,9 +736,9 @@ From a genome and associated ensembl GTF file, generates pseudo-contigs (corresp
     ))
     print('   -m/--mix-state\t',end='')
     print(cw.fill(
-'Boolean which rules if the generated contigs (input  of simulateReads)  is mixed i.e. if  the library  contains the  transcript  in two state when a intron is retained or an exon is spliced.'
+'Boolean which rules if the modified contigs is mixed:    if the fasta file contains the transcripts in the two states  (with  AND  without  retained introns  and/or spliced exons).'
     ))
-    print('   -p/--prefix STR',end='')
+    print('   -p/--prefix STR',end='') 
     print(cw.fill(
 '\tPrefix for output files name.'
     ))
