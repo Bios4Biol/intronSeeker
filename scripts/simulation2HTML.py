@@ -416,12 +416,11 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         df_too_complex_detected = df_candidat[['reference']].groupby(['reference']) \
                              .size() \
                              .nlargest(10) \
-                             .reset_index(name='top10')
- 
-        
+                             .reset_index(name='top10')        
+        cmp = 0
         for k, v in df_too_complex_detected['reference'].items() :
-            global_stat_too_complex_detected[str(v)] = df_too_complex_detected.loc[k]['top10']
-            
+            global_stat_too_complex_detected[str(cmp)+str(v)] = df_too_complex_detected.loc[k]['top10']
+            cmp += 1
           
         # DETECTABLE :  nom contig detectable / nb too complex introns
         global_stat_too_complex_detectable = dict()
@@ -626,36 +625,36 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     stats_data = data[output_path]
     
     # now we will open a file for writing (w) and synthese file without overwriting (a)
-    data_file = open(output_file+'.csv', 'w') 
-    data_file_synthese = open('/home/smaman/Documents/SYNTHESE.csv', 'a') 
+    #data_file = open(output_file+'.csv', 'w') 
+    #data_file_synthese = open('/home/smaman/Documents/SYNTHESE.csv', 'a') 
     
     # create the csv writer object 
-    csv_writer = csv.writer(data_file) 
-    csv_writer_synthese = csv.writer(data_file_synthese)
+    #csv_writer = csv.writer(data_file) 
+    #csv_writer_synthese = csv.writer(data_file_synthese)
 
     # Counter variable used for writing headers to the CSV file 
-    count = 0
+    # count = 0
     
-    for i in stats_data: 
-        if count == 0: 
+    # for i in stats_data: 
+    #     if count == 0: 
     
-            # Writing headers of CSV file 
-            header = i.keys() 
-            csv_writer.writerow(header)
-            count += 1
+    #         # Writing headers of CSV file 
+    #         header = i.keys() 
+    #         csv_writer.writerow(header)
+    #         count += 1
         
-        # Write headers in synthesis file only if this file is not empty
-        if os.stat('/home/smaman/Documents/SYNTHESE.csv').st_size == 0:
-            header = i.keys()
-            csv_writer_synthese.writerow(header)
+    #     # Write headers in synthesis file only if this file is not empty
+    #     if os.stat('/home/smaman/Documents/SYNTHESE.csv').st_size == 0:
+    #         header = i.keys()
+    #         csv_writer_synthese.writerow(header)
 
-        # Writing data of CSV file 
-        csv_writer.writerow(i.values()) 
-        csv_writer_synthese.writerow(i.values()) 
+    #     # Writing data of CSV file 
+    #     csv_writer.writerow(i.values()) 
+    #     csv_writer_synthese.writerow(i.values()) 
     
 
-    data_file.close()
-    data_file_synthese.close()
+    # data_file.close()
+    # data_file_synthese.close()
 
 
 if __name__ == '__main__' :

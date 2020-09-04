@@ -497,7 +497,7 @@ def get_html_too_complex_detected(global_stat_too_complex_detected:dict):
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Contigs with too complex detected introns</h5>
                 <span class="anchor" id="too_complex_detected"></span>
-''' +  dict_to_table(global_stat_too_complex_detected, -1, False) + '''  
+''' +  dict_to_table(global_stat_too_complex_detected, -1, True) + '''  
             </div>
         </div>  
 '''
@@ -509,7 +509,7 @@ def get_html_too_complex_detectable(global_stat_too_complex_detectable:dict, glo
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Contigs with too complex detected introns</h5>
                 <span class="anchor" id="too_complex_detected"></span>
-''' +  dict_to_table(global_stat_too_complex_detected, -1, False) + '''  
+''' +  dict_to_table(global_stat_too_complex_detected, -1, True) + '''  
             </div>
         </div>  
         <div class="d-flex">
