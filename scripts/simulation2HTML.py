@@ -417,27 +417,34 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              .size() \
                              .nlargest(10) \
                              .reset_index(name='top10')        
+        print('df_too_complex_detected ', df_too_complex_detected )  
         cmp = 0
         for k, v in df_too_complex_detected['reference'].items() :
             global_stat_too_complex_detected[str(cmp)+str(v)] = df_too_complex_detected.loc[k]['top10']
             cmp += 1
-          
+        
+        df_too_complex_detected_filtered = df_candidat[['reference']].loc[df_candidat['filter'].str.contains('PASS')].groupby(['reference']) \
+                             .size() \
+                             .nlargest(10) \
+                             .reset_index(name='top10')        
+        print('df_too_complex_detected_filtered', df_too_complex_detected_filtered)
+
         # DETECTABLE :  nom contig detectable / nb too complex introns
         global_stat_too_complex_detectable = dict()
-        if mfasta:      
-            for index, row in df_too_complex_detected['reference'].items():
-                df_too_complex_detectable  = df_features.loc[lambda df :(row == df['contig'])].groupby(['contig']) \
+        if mfasta:
+            df_too_complex_detectable = df_features[['contig']].groupby(['contig']) \
                              .size() \
-                             .reset_index(name='nbIntrons')
-            
-            for index, row in df_too_complex_detectable['contig'].items() :
-                val = df_too_complex_detectable.loc[index]['nbIntrons']
-                global_stat_too_complex_detectable[str(row)] = val
+                             .nlargest(10) \
+                             .reset_index(name='top10')        
+            cmp = 0
+            for k, v in df_too_complex_detectable['contig'].items() :
+                global_stat_too_complex_detectable[str(cmp)+str(v)] = df_too_complex_detectable.loc[k]['top10']
+                cmp += 1
                      
             #Add table "too complex" in html report    
-            html += get_html_too_complex_detectable(global_stat_too_complex_detectable, global_stat_too_complex_detected)
+            html += get_html_too_complex(global_stat_too_complex_detected, global_stat_too_complex_detectable)
         else:
-            html += get_html_too_complex_detected(global_stat_too_complex_detected)
+            html += get_html_too_complex(global_stat_too_complex_detected)
         
         # (TODO) 6 - Filtrer les contigs pour ne garder que ceux n'ayant pas d'intron chevauchant & comparer detected/detectable sur ces contigs là.
         overlap = 0
@@ -448,6 +455,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 (df['end']    < row['end'])])
             if overlapping == 1:
                 overlap += 1
+
+
 
         # if simulation ?
         if mfasta:
