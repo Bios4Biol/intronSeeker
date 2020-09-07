@@ -491,19 +491,7 @@ def get_html_candidat(global_stat_f_detected_introns:dict, global_stat_detectabl
     return r
 
 # Tab too complex 
-def get_html_too_complex_detected(global_stat_too_complex_detected:dict):
-    r =  '''
-		<div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Contigs with too complex detected introns</h5>
-                <span class="anchor" id="too_complex_detected"></span>
-''' +  dict_to_table(global_stat_too_complex_detected, -1, True) + '''  
-            </div>
-        </div>  
-'''
-    return r
-
-def get_html_too_complex_detectable(global_stat_too_complex_detectable:dict, global_stat_too_complex_detected:dict):
+def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_complex_detectable=0):
     r =  '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
@@ -511,12 +499,13 @@ def get_html_too_complex_detectable(global_stat_too_complex_detectable:dict, glo
                 <span class="anchor" id="too_complex_detected"></span>
 ''' +  dict_to_table(global_stat_too_complex_detected, -1, True) + '''  
             </div>
-        </div>  
-        <div class="d-flex">
+        </div>'''
+    if global_stat_too_complex_detectable:    
+        r += '''<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Contigs with too complex detectable introns</h5>
                 <span class="anchor" id="too_complex_detectable"></span>
-''' +  dict_to_table(global_stat_too_complex_detectable, -1, False) + '''  
+''' +  dict_to_table(global_stat_too_complex_detectable, -1, True) + '''  
             </div>
         </div>  
 '''
