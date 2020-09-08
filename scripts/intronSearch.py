@@ -214,7 +214,35 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
         split_alignments = pd.concat(out[1])
         
         # ~ print(time.time()-s_t)
+
+    print(candidates.head(5))
     
+    prevCtg   = ""
+    prevStart = 0
+    prevEnd   = 0
+    prevFilter= ""
+    prevIndex = 0
+    for k, v in candidates.iterrows():
+        print("Ref:" + str(v['reference'] +"\tstart:" + str(v['start']) + "\tend: "+ str(v['end']) + "\tfilter: " +str(v['filter'])))
+        
+        # if (str(v['filter']) == "PASS"):  #corrected
+        if "PASS" in str(v['filter']):
+            if (prevCtg == "" or prevCtg != v['reference']):
+                # prefCtg   = v['reference']  #corrected
+                prevCtg   = v['reference']
+                prevStart = v['start']
+                prevEnd   = v['end']
+                prevFilter= v['filter']
+                prevIndex = k
+            # elif (v['start'] < prevEnd):  
+            elif (v['start'] < prevEnd): 
+                print("Overlapping "+ str(v['reference']) +"\tstart:" + str(v['start']) + " < " + str(prevEnd))  
+                print("Overlapping "+ str(v['reference']) +"\tprevEnd:" + str(prevStart) + " >  " + str(v['end']) + " ? ")  # To add ? previous start < end current
+                candidates.loc[k, 'filter'] = "OI"   #or candidates.at[k,'filter'] = "OI"
+                candidates.loc[prevIndex, 'filter'] = "OI"
+                # candidates[k]['filter'] = "OI"           #corrected
+                # candidates[prevIndex]['filter'] = "OI"   #corrected
+
     # ~ candidates = find_split(ref_id_list,bamfile.name,fastafile.name)
     # ~ candidates['selected'] = 1
     # ~ print(candidates)
