@@ -416,9 +416,12 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              .nlargest(10) \
                              .reset_index(name='top10')        
         print('df_too_complex_detected ', df_too_complex_detected )  
-        # Remove candidates with too complex introns
-        df_too_complex_detected_without_too_complex = df_too_complex_detected[df_too_complex_detected['filter'] != "OI"] 
+        
+        # Remove candidates with too complex introns (to plot ?)
+        df_too_complex_detected_without_too_complex = df_candidat[df_candidat['filter'] != "OI"][['reference']].groupby(['reference']) \
+                             .size()
         print('df_too_complex_detected_without_too_complex', df_too_complex_detected_without_too_complex)
+        
         cmp = 0
         for k, v in df_too_complex_detected['reference'].items() :
             global_stat_too_complex_detected[str(cmp)+str(v)] = df_too_complex_detected.loc[k]['top10']
