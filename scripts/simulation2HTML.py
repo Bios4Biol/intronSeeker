@@ -261,7 +261,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             if k == "GT_AG" or k == "CT_AC":
                 nbCanonic += v
             elif n < 6:
-                global_stat_split[str(c)+"Junction "+k] = v
+                global_stat_split["0"+str(c)+"Junction "+k] = v
                 n += 1
                 c += 1
             else:
