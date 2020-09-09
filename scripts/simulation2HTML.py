@@ -152,13 +152,13 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # Global stat
     nb_distinct_features, nb_ctg_by_feature, ctg_descr = stat_from_gtf(gtf.name)
     global_stat = dict()
-    global_stat["0Contig FASTA - Number of sequences"]  = len(df_fasta.index)
-    global_stat["1Contig FASTA - Mean sequence length"] = int(df_fasta['length'].mean())
-    global_stat["2Contig FASTA with feature(s) - Number of sequences"]  = len(df_mfasta.index)
-    global_stat["3Contig FASTA with feature(s) - Mean sequence length"] = int(df_mfasta['length'].mean())
-    global_stat["4Number of modified sequences"]       = df_mfasta.loc[df_mfasta.index.str.contains(".modif")].shape[0]
-    global_stat["5Number of distinct features in GTF"] = df_features.feature.value_counts().shape[0]
-    global_stat["6Number of features in GTF"]          = len(df_features.index)
+    global_stat["01Contig FASTA - Number of sequences"]  = len(df_fasta.index)
+    global_stat["02Contig FASTA - Mean sequence length"] = int(df_fasta['length'].mean())
+    global_stat["03Contig FASTA with feature(s) - Number of sequences"]  = len(df_mfasta.index)
+    global_stat["04Contig FASTA with feature(s) - Mean sequence length"] = int(df_mfasta['length'].mean())
+    global_stat["05Number of modified sequences"]       = df_mfasta.loc[df_mfasta.index.str.contains(".modif")].shape[0]
+    global_stat["06Number of distinct features in GTF"] = df_features.feature.value_counts().shape[0]
+    global_stat["07Number of features in GTF"]          = len(df_features.index)
     c = 7
     for k, v in (df_features.feature.value_counts()).items() :
         global_stat[str(c)+k] = v
@@ -167,42 +167,42 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # ASSEMBLATHON on fasta files        
     nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = run_assemblathon(fasta.name)
     global_stat_assemblathon_fasta = dict()
-    global_stat_assemblathon_fasta["0Number of contigs"]         = nbContigs
-    global_stat_assemblathon_fasta["1Mean contigs length"]       = round(meanContigSize, 0)
-    global_stat_assemblathon_fasta["2Total size of contigs"]     = totContigSize
-    global_stat_assemblathon_fasta["3Longest contig"]            = longestContig
-    global_stat_assemblathon_fasta["4Shortest contig"]           = shortestContig
-    global_stat_assemblathon_fasta["5Number of contigs > 1K nt"] = nbContigsSup1K
-    global_stat_assemblathon_fasta["6N50 contig length"]         = n50
-    global_stat_assemblathon_fasta["7L50 contig count"]          = l50
+    global_stat_assemblathon_fasta["01Number of contigs"]         = nbContigs
+    global_stat_assemblathon_fasta["02Mean contigs length"]       = round(meanContigSize, 0)
+    global_stat_assemblathon_fasta["03Total size of contigs"]     = totContigSize
+    global_stat_assemblathon_fasta["04Longest contig"]            = longestContig
+    global_stat_assemblathon_fasta["05Shortest contig"]           = shortestContig
+    global_stat_assemblathon_fasta["06Number of contigs > 1K nt"] = nbContigsSup1K
+    global_stat_assemblathon_fasta["07N50 contig length"]         = n50
+    global_stat_assemblathon_fasta["08L50 contig count"]          = l50
 
     if mfasta:
         nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = run_assemblathon(mfasta.name)
         global_stat_assemblathon_mfasta = dict()
-        global_stat_assemblathon_mfasta["0Number of contigs"]         = nbContigs
-        global_stat_assemblathon_mfasta["1Mean contigs length"]       = round(meanContigSize, 0)
-        global_stat_assemblathon_mfasta["2Total size of contigs"]     = totContigSize
-        global_stat_assemblathon_mfasta["3Longest contig"]            = longestContig
-        global_stat_assemblathon_mfasta["4Shortest contig"]           = shortestContig
-        global_stat_assemblathon_mfasta["5Number of contigs > 1K nt"] = nbContigsSup1K
-        global_stat_assemblathon_mfasta["6N50 contig length"]         = n50
-        global_stat_assemblathon_mfasta["7L50 contig count"]          = l50
+        global_stat_assemblathon_mfasta["01Number of contigs"]         = nbContigs
+        global_stat_assemblathon_mfasta["02Mean contigs length"]       = round(meanContigSize, 0)
+        global_stat_assemblathon_mfasta["03Total size of contigs"]     = totContigSize
+        global_stat_assemblathon_mfasta["04Longest contig"]            = longestContig
+        global_stat_assemblathon_mfasta["05Shortest contig"]           = shortestContig
+        global_stat_assemblathon_mfasta["06Number of contigs > 1K nt"] = nbContigsSup1K
+        global_stat_assemblathon_mfasta["07N50 contig length"]         = n50
+        global_stat_assemblathon_mfasta["08L50 contig count"]          = l50
     html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta)
 
     # READS STAT
     # Global stat
     global_stat_fastq = dict()
-    global_stat_fastq["0Number of reads"]  = len(df_library.index)
-    global_stat_fastq["1Mean coverage"]    = df_library['length'].sum()
-    deno = global_stat["1Contig FASTA - Mean sequence length"] * global_stat["0Contig FASTA - Number of sequences"]
+    global_stat_fastq["01Number of reads"]  = len(df_library.index)
+    global_stat_fastq["02Mean coverage"]    = df_library['length'].sum()
+    deno = global_stat["02Contig FASTA - Mean sequence length"] * global_stat["01Contig FASTA - Number of sequences"]
     if deno:
-        global_stat_fastq["1Mean coverage"] /= deno
+        global_stat_fastq["02Mean coverage"] /= deno
     else :
-        global_stat_fastq["1Mean coverage"] = "NaN"
-    global_stat_fastq["1Mean coverage"]    = round(global_stat_fastq["1Mean coverage"], 2)
-    global_stat_fastq["2Min reads length"] = df_library['length'].min()
-    global_stat_fastq["3Max reads length"] = df_library['length'].max()
-    global_stat_fastq["4Mean reads length"]= round(df_library['length'].mean(), 2)
+        global_stat_fastq["02Mean coverage"] = "NaN"
+    global_stat_fastq["02Mean coverage"]    = round(global_stat_fastq["02Mean coverage"], 2)
+    global_stat_fastq["03Min reads length"] = df_library['length'].min()
+    global_stat_fastq["04Max reads length"] = df_library['length'].max()
+    global_stat_fastq["05Mean reads length"]= round(df_library['length'].mean(), 2)
     html += get_html_reads_descr(global_stat_fastq, df_library) 
 
     # # ABUNDANCE number of reads by contig
@@ -233,14 +233,14 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     if flagstat:
         nbreads, mapped, mappercent, paired, proper, properpercent, secondary, singletons=parse_flagstat(flagstat_file)
         global_stat_flagstat = dict()
-        global_stat_flagstat["0Number of reads"] = paired
-        global_stat_flagstat["1Number of lines in the BAM"] = nbreads
-        global_stat_flagstat["2Number of mapped reads"] = mapped
-        global_stat_flagstat["3Percentage of mapped reads"] = mappercent
-        global_stat_flagstat["4Number of properly paired reads"] = proper
-        global_stat_flagstat["5Percentage of properly paired reads"] = properpercent
-        global_stat_flagstat["6Secondary alignments"] = secondary
-        global_stat_flagstat["7Singletons alignements"] = singletons
+        global_stat_flagstat["01Number of reads"] = paired
+        global_stat_flagstat["02Number of lines in the BAM"] = nbreads
+        global_stat_flagstat["03Number of mapped reads"] = mapped
+        global_stat_flagstat["04Percentage of mapped reads"] = mappercent
+        global_stat_flagstat["05Number of properly paired reads"] = proper
+        global_stat_flagstat["06Percentage of properly paired reads"] = properpercent
+        global_stat_flagstat["07Secondary alignments"] = secondary
+        global_stat_flagstat["08Singletons alignements"] = singletons
         html += get_html_flagstat_descr(global_stat_flagstat)
    
     html += get_html_results()
@@ -249,13 +249,13 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     if split:
         df_split=parse_split(split.name)   
         global_stat_split = dict()
-        global_stat_split["0Number of reads overlapping introns"] = len(df_split.index)
-        global_stat_split["1Mean length of introns"] = round(df_split['split_length'].mean(), 2)
+        global_stat_split["01Number of reads overlapping introns"] = len(df_split.index)
+        global_stat_split["02Mean length of introns"] = round(df_split['split_length'].mean(), 2)
 
         nbCanonic = 0
         nbOtherJunctions = 0
         df_split.sort_values(by=['split_borders'])
-        c = 2
+        c = 3
         n = 0
         for k, v in (df_split['split_borders'].value_counts()).items() :
             if k == "GT_AG" or k == "CT_AC":
@@ -266,8 +266,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 c += 1
             else:
                 nbOtherJunctions += v
-        global_stat_split[str(c)+"Other junctions"] = nbOtherJunctions
-        global_stat_split[str(c+1)+"Canonical junction (GT_AG or CT_AC)"] = nbCanonic
+        global_stat_split["0"+str(c)+"Other junctions"] = nbOtherJunctions
+        global_stat_split["0"+str(c+1)+"Canonical junction (GT_AG or CT_AC)"] = nbCanonic
         
         html += get_html_split_descr(global_stat_split)   
 
@@ -280,70 +280,74 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         definitions['DP']   = "Filtered because of depth (<= "+ str(mindepth)+ ")"
         definitions['LEN']  = "Filtered because of length (>= "+ str(maxlen)+ "%)"    
         definitions['SS']   = "Filtered because of non canonical junction"
+        definitions['OI']   = "Filtered because of overlapping introns"
         definitions['PASS'] = "Number"
         
         # Detected introns (stat table and depth distribution)
         global_stat_detected_introns = dict()
-        global_stat_detected_introns["0Number"] = len(df_candidat.index)
-        global_stat_detected_introns["1Min length"]  = df_candidat.iloc[0]['end'] - df_candidat.iloc[0]['start'] + 1 
-        global_stat_detected_introns["2Max length"]  = 0
-        global_stat_detected_introns["3Mean length"] = 0
+        global_stat_detected_introns["01Number"] = len(df_candidat.index)
+        global_stat_detected_introns["02Min length"]  = df_candidat.iloc[0]['end'] - df_candidat.iloc[0]['start'] + 1 
+        global_stat_detected_introns["03Max length"]  = 0
+        global_stat_detected_introns["04Mean length"] = 0
         for i,row in df_candidat.iterrows():
             l = row['end'] - row['start'] + 1
-            global_stat_detected_introns["1Min length"] = min(l, global_stat_detected_introns["1Min length"])
-            global_stat_detected_introns["2Max length"] = max(l, global_stat_detected_introns["2Max length"])
-            global_stat_detected_introns["3Mean length"] += row['end'] - row['start'] + 1
-        deno = global_stat_detected_introns["0Number"]
+            global_stat_detected_introns["02Min length"] = min(l, global_stat_detected_introns["02Min length"])
+            global_stat_detected_introns["03Max length"] = max(l, global_stat_detected_introns["03Max length"])
+            global_stat_detected_introns["04Mean length"] += row['end'] - row['start'] + 1
+        deno = global_stat_detected_introns["01Number"]
         if deno :
-            global_stat_detected_introns["3Mean length"] /= deno
+            global_stat_detected_introns["04Mean length"] /= deno
         else :
-            global_stat_detected_introns["3Mean length"] = "NaN"
-        global_stat_detected_introns["3Mean length"] = round(global_stat_detected_introns["3Mean length"], 2)
-        global_stat_detected_introns["4Min depth"]  = df_candidat['depth'].min()
-        global_stat_detected_introns["5Max depth"]  = df_candidat['depth'].max()
-        global_stat_detected_introns["6Mean depth"]  = round(df_candidat['depth'].mean(), 2)
+            global_stat_detected_introns["04Mean length"] = "NaN"
+        global_stat_detected_introns["04Mean length"] = round(global_stat_detected_introns["04Mean length"], 2)
+        global_stat_detected_introns["05Min depth"]  = df_candidat['depth'].min()
+        global_stat_detected_introns["06Max depth"]  = df_candidat['depth'].max()
+        global_stat_detected_introns["07Mean depth"]  = round(df_candidat['depth'].mean(), 2)
         html += get_html_detected(global_stat_detected_introns, df_candidat)
 
         # Filtered detected introns
         global_stat_f_detected_introns = dict()
-        global_stat_f_detected_introns["0" + definitions['PASS']] = 0
-        global_stat_f_detected_introns["1" + definitions['DP']]   = 0
-        global_stat_f_detected_introns["2" + definitions['LEN']]  = 0
-        global_stat_f_detected_introns["3" + definitions['SS']]   = 0
-        global_stat_f_detected_introns["4Min length"]  = 99999999
-        global_stat_f_detected_introns["5Max length"]  = 0 
-        global_stat_f_detected_introns["6Mean length"] = 0
-        global_stat_f_detected_introns["7Min depth"]   = 99999999
-        global_stat_f_detected_introns["8Max depth"]   = 0 
-        global_stat_f_detected_introns["9Mean depth"]  = 0
+        global_stat_f_detected_introns["01" + definitions['PASS']] = 0
+        global_stat_f_detected_introns["02" + definitions['DP']]   = 0
+        global_stat_f_detected_introns["03" + definitions['LEN']]  = 0
+        global_stat_f_detected_introns["04" + definitions['SS']]   = 0
+        global_stat_f_detected_introns["05" + definitions['OI']]   = 0
+        global_stat_f_detected_introns["06Min length"]  = 99999999
+        global_stat_f_detected_introns["07Max length"]  = 0 
+        global_stat_f_detected_introns["08Mean length"] = 0
+        global_stat_f_detected_introns["09Min depth"]   = 99999999
+        global_stat_f_detected_introns["10Max depth"]   = 0 
+        global_stat_f_detected_introns["11Mean depth"]  = 0
         for i, v in (df_candidat['filter'].items()) :
             if "PASS" in v:
-                global_stat_f_detected_introns["0" + definitions['PASS']] += 1
+                global_stat_f_detected_introns["01" + definitions['PASS']] += 1
                 l = df_candidat.loc[i]['end'] - df_candidat.loc[i]['start'] + 1
-                global_stat_f_detected_introns["4Min length"] = min(l, global_stat_f_detected_introns["4Min length"])
-                global_stat_f_detected_introns["5Max length"] = max(l, global_stat_f_detected_introns["5Max length"])
-                global_stat_f_detected_introns["6Mean length"]+= l
+                global_stat_f_detected_introns["06Min length"] = min(l, global_stat_f_detected_introns["06Min length"])
+                global_stat_f_detected_introns["07Max length"] = max(l, global_stat_f_detected_introns["07Max length"])
+                global_stat_f_detected_introns["08Mean length"]+= l
                 l = df_candidat.loc[i]['depth']
-                global_stat_f_detected_introns["7Min depth"]  = min(l, global_stat_f_detected_introns["7Min depth"])
-                global_stat_f_detected_introns["8Max depth"]  = max(l, global_stat_f_detected_introns["8Max depth"])
-                global_stat_f_detected_introns["9Mean depth"] += l
+                global_stat_f_detected_introns["09Min depth"]  = min(l, global_stat_f_detected_introns["09Min depth"])
+                global_stat_f_detected_introns["10Max depth"]  = max(l, global_stat_f_detected_introns["10Max depth"])
+                global_stat_f_detected_introns["11Mean depth"] += l
             else :
                 if "DP" in v:
-                    global_stat_f_detected_introns["1" + definitions['DP']] += 1
+                    global_stat_f_detected_introns["02" + definitions['DP']] += 1
                 if "LEN" in v:
-                        global_stat_f_detected_introns["2" + definitions['LEN']] += 1
+                        global_stat_f_detected_introns["03" + definitions['LEN']] += 1
                 if "SS" in v:
-                    global_stat_f_detected_introns["3" + definitions['SS']] += 1
-        deno = global_stat_f_detected_introns["0" + definitions['PASS']]
-        if deno :
-            global_stat_f_detected_introns["6Mean length"] /= deno
-            global_stat_f_detected_introns["6Mean length"]  = round(global_stat_f_detected_introns["6Mean length"], 2)
-            global_stat_f_detected_introns["9Mean depth"]  /= deno
-            global_stat_f_detected_introns["9Mean depth"]   = round(global_stat_f_detected_introns["9Mean depth"], 2)
-        else :
-            global_stat_f_detected_introns["6Mean length"] = "NaN"
-            global_stat_f_detected_introns["9Mean depth"]  = "NaN"
+                    global_stat_f_detected_introns["04" + definitions['SS']] += 1
+                if "OI" in v:
+                    global_stat_f_detected_introns["05" + definitions['OI']] += 1
 
+        deno = global_stat_f_detected_introns["01" + definitions['PASS']]
+        if deno :
+            global_stat_f_detected_introns["08Mean length"] /= deno
+            global_stat_f_detected_introns["08Mean length"]  = round(global_stat_f_detected_introns["08Mean length"], 2)
+            global_stat_f_detected_introns["11Mean depth"]  /= deno
+            global_stat_f_detected_introns["11Mean depth"]   = round(global_stat_f_detected_introns["11Mean depth"], 2)
+        else :
+            global_stat_f_detected_introns["08Mean length"] = "NaN"
+            global_stat_f_detected_introns["11Mean depth"]  = "NaN"
           
        
         # if simulation ?                   
@@ -362,46 +366,47 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 df_mfasta=df_mfasta
             )
             global_stat_detectable_features = dict()
-            global_stat_detectable_features["0" + definitions['PASS']] = 0
-            global_stat_detectable_features["1" + definitions['DP']]   = 0
-            global_stat_detectable_features["2" + definitions['LEN']]  = 0
-            global_stat_detectable_features["3" + definitions['SS']]   = 0
-            global_stat_detectable_features["4Min length"]  = 99999999
-            global_stat_detectable_features["5Max length"]  = 0 
-            global_stat_detectable_features["6Mean length"] = 0
-            global_stat_detectable_features["7Min depth"]   = 99999999
-            global_stat_detectable_features["8Max depth"]   = 0 
-            global_stat_detectable_features["9Mean depth"]  = 0
+            global_stat_detectable_features["01" + definitions['PASS']] = 0
+            global_stat_detectable_features["02" + definitions['DP']]   = 0
+            global_stat_detectable_features["03" + definitions['LEN']]  = 0
+            global_stat_detectable_features["04" + definitions['SS']]   = 0
+            global_stat_detectable_features["05" + definitions['OI']]   = "-"
+            global_stat_detectable_features["06Min length"]  = 99999999
+            global_stat_detectable_features["07Max length"]  = 0 
+            global_stat_detectable_features["08Mean length"] = 0
+            global_stat_detectable_features["09Min depth"]   = 99999999
+            global_stat_detectable_features["10Max depth"]   = 0 
+            global_stat_detectable_features["11Mean depth"]  = 0
             for index, row in df_features.iterrows():            
                 PASS = True
                 if (row['flanks'] != 'GT_AG' and row['flanks'] != 'CT_AC'): 
-                    global_stat_detectable_features["3" + definitions['SS']] += 1    
+                    global_stat_detectable_features["04" + definitions['SS']] += 1    
                     PASS = False 
                 if ((((row['end'] - row['start'] + 1) / row['ctg_length']) * 100) >= int(maxlen)):
-                    global_stat_detectable_features["2" + definitions['LEN']] += 1
+                    global_stat_detectable_features["03" + definitions['LEN']] += 1
                     PASS = False
                 if (row['depth'] <= int(mindepth)):
-                    global_stat_detectable_features["1" + definitions['DP']] += 1
+                    global_stat_detectable_features["02" + definitions['DP']] += 1
                     PASS = False
                 if PASS:
-                    global_stat_detectable_features["0" + definitions['PASS']] += 1
+                    global_stat_detectable_features["01" + definitions['PASS']] += 1
                     l = row['end'] - row['start'] + 1
-                    global_stat_detectable_features["4Min length"] = min(l, global_stat_detectable_features["4Min length"])
-                    global_stat_detectable_features["5Max length"] = max(l, global_stat_detectable_features["5Max length"])
-                    global_stat_detectable_features["6Mean length"]+= l
+                    global_stat_detectable_features["06Min length"] = min(l, global_stat_detectable_features["06Min length"])
+                    global_stat_detectable_features["07Max length"] = max(l, global_stat_detectable_features["07Max length"])
+                    global_stat_detectable_features["08Mean length"]+= l
                     l = row['depth']
-                    global_stat_detectable_features["7Min depth"]  = min(l, global_stat_detectable_features["7Min depth"])
-                    global_stat_detectable_features["8Max depth"]  = max(l, global_stat_detectable_features["8Max depth"])
-                    global_stat_detectable_features["9Mean depth"] += l
-            deno = global_stat_detectable_features["0" + definitions['PASS']]
+                    global_stat_detectable_features["09Min depth"]  = min(l, global_stat_detectable_features["09Min depth"])
+                    global_stat_detectable_features["10Max depth"]  = max(l, global_stat_detectable_features["10Max depth"])
+                    global_stat_detectable_features["11Mean depth"] += l
+            deno = global_stat_detectable_features["01" + definitions['PASS']]
             if deno :
-                global_stat_detectable_features["6Mean length"] /= deno
-                global_stat_detectable_features["6Mean length"] =  round(global_stat_detectable_features["6Mean length"], 2)
-                global_stat_detectable_features["9Mean depth"]  /= deno
-                global_stat_detectable_features["9Mean depth"]  =  round(global_stat_detectable_features["9Mean depth"], 2)
+                global_stat_detectable_features["08Mean length"] /= deno
+                global_stat_detectable_features["08Mean length"] =  round(global_stat_detectable_features["08Mean length"], 2)
+                global_stat_detectable_features["11Mean depth"]  /= deno
+                global_stat_detectable_features["11Mean depth"]  =  round(global_stat_detectable_features["11Mean depth"], 2)
             else :
-                global_stat_detectable_features["6Mean length"] = "NaN"
-                global_stat_detectable_features["9Mean depth"]  = "NaN"
+                global_stat_detectable_features["08Mean length"] = "NaN"
+                global_stat_detectable_features["11Mean depth"]  = "NaN"
             html += get_html_candidat(global_stat_f_detected_introns, global_stat_detectable_features)
         else :
             html += get_html_candidat(global_stat_f_detected_introns)
@@ -457,56 +462,56 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_def["F1"] = "F1 score = (2*Se*Sp) / (Se+Sp)"
             
             eval_stat = dict()
-            eval_stat["0Number of detected introns"] = global_stat_detected_introns["0Number"] 
-            eval_stat["1Number of features"] = global_stat["6Number of features in GTF"] 
-            eval_stat["2"+eval_def["TP"]] = 0
-            eval_stat["3"+eval_def["FP"]] = 0
-            eval_stat["4"+eval_def["FN"]] = 0
-            eval_stat["5"+eval_def["Se"]] = 0
-            eval_stat["6"+eval_def["Sp"]] = 0
-            eval_stat["7"+eval_def["F1"]] = 0
+            eval_stat["01Number of detected introns"] = global_stat_detected_introns["01Number"] 
+            eval_stat["02Number of features"] = global_stat["07Number of features in GTF"] 
+            eval_stat["03"+eval_def["TP"]] = 0
+            eval_stat["04"+eval_def["FP"]] = 0
+            eval_stat["05"+eval_def["FN"]] = 0
+            eval_stat["06"+eval_def["Se"]] = 0
+            eval_stat["07"+eval_def["Sp"]] = 0
+            eval_stat["08"+eval_def["F1"]] = 0
             for index, row in df_candidat.iterrows():
                 ok = len(df_features.loc[lambda df :
                             (df['contig'] == row['reference']) &
                             (df['start']  == row['start']) &
                             (df['end']    == row['end'])])  
                 if ok == 1:
-                    eval_stat["2"+eval_def["TP"]] += 1         
+                    eval_stat["03"+eval_def["TP"]] += 1         
                 else:
-                    eval_stat["3"+eval_def["FP"]] += 1
-            eval_stat["4"+eval_def["FN"]] = eval_stat["1Number of features"] - eval_stat["2"+eval_def["TP"]]
-            deno = eval_stat["2"+eval_def["TP"]] + eval_stat["4"+eval_def["FN"]]
+                    eval_stat["04"+eval_def["FP"]] += 1
+            eval_stat["05"+eval_def["FN"]] = eval_stat["02Number of features"] - eval_stat["03"+eval_def["TP"]]
+            deno = eval_stat["03"+eval_def["TP"]] + eval_stat["05"+eval_def["FN"]]
             if deno :
-                eval_stat["5"+eval_def["Se"]] = eval_stat["2"+eval_def["TP"]] / deno * 100
+                eval_stat["06"+eval_def["Se"]] = eval_stat["03"+eval_def["TP"]] / deno * 100
             else :
-                eval_stat["5"+eval_def["Se"]] = "NaN"
-            deno = (eval_stat["2"+eval_def["TP"]] + eval_stat["3"+eval_def["FP"]])
+                eval_stat["06"+eval_def["Se"]] = "NaN"
+            deno = (eval_stat["03"+eval_def["TP"]] + eval_stat["04"+eval_def["FP"]])
             if deno :
-                eval_stat["6"+eval_def["Sp"]] = eval_stat["2"+eval_def["TP"]] / deno * 100
+                eval_stat["07"+eval_def["Sp"]] = eval_stat["03"+eval_def["TP"]] / deno * 100
             else :
-                eval_stat["6"+eval_def["Sp"]] = "NaN"
-            if eval_stat["5"+eval_def["Se"]] != "NaN" and eval_stat["6"+eval_def["Sp"]] != "NaN" :
-                deno = eval_stat["5"+eval_def["Se"]] + eval_stat["6"+eval_def["Sp"]]
+                eval_stat["07"+eval_def["Sp"]] = "NaN"
+            if eval_stat["06"+eval_def["Se"]] != "NaN" and eval_stat["07"+eval_def["Sp"]] != "NaN" :
+                deno = eval_stat["06"+eval_def["Se"]] + eval_stat["07"+eval_def["Sp"]]
                 if deno :
-                    eval_stat["7"+eval_def["F1"]] = round(2*(eval_stat["5"+eval_def["Se"]]*eval_stat["6"+eval_def["Sp"]]) / deno, 2) 
+                    eval_stat["08"+eval_def["F1"]] = round(2*(eval_stat["06"+eval_def["Se"]]*eval_stat["07"+eval_def["Sp"]]) / deno, 2) 
                 else :
-                    eval_stat["7"+eval_def["F1"]] = "NaN"
+                    eval_stat["08"+eval_def["F1"]] = "NaN"
             else :
-                eval_stat["7"+eval_def["F1"]] = "NaN"
-            if isinstance(eval_stat["5"+eval_def["Se"]], float) :
-                eval_stat["5"+eval_def["Se"]] = round(eval_stat["5"+eval_def["Se"]], 2)
-            if isinstance(eval_stat["6"+eval_def["Sp"]], float) :
-                eval_stat["6"+eval_def["Sp"]] = round(eval_stat["6"+eval_def["Sp"]], 2)
+                eval_stat["08"+eval_def["F1"]] = "NaN"
+            if isinstance(eval_stat["06"+eval_def["Se"]], float) :
+                eval_stat["06"+eval_def["Se"]] = round(eval_stat["06"+eval_def["Se"]], 2)
+            if isinstance(eval_stat["07"+eval_def["Sp"]], float) :
+                eval_stat["07"+eval_def["Sp"]] = round(eval_stat["07"+eval_def["Sp"]], 2)
 
             eval_f_stat = dict()
-            eval_f_stat["0Number of detected introns"] = global_stat_f_detected_introns["0" + definitions['PASS']]
-            eval_f_stat["1Number of features"] = global_stat_detectable_features["0" + definitions['PASS']]
-            eval_f_stat["2"+eval_def["TP"]] = 0
-            eval_f_stat["3"+eval_def["FP"]] = 0
-            eval_f_stat["4"+eval_def["FN"]] = 0
-            eval_f_stat["5"+eval_def["Se"]] = 0
-            eval_f_stat["6"+eval_def["Sp"]] = 0
-            eval_f_stat["7"+eval_def["F1"]] = 0
+            eval_f_stat["01Number of detected introns"] = global_stat_f_detected_introns["01" + definitions['PASS']]
+            eval_f_stat["02Number of features"] = global_stat_detectable_features["01" + definitions['PASS']]
+            eval_f_stat["03"+eval_def["TP"]] = 0
+            eval_f_stat["04"+eval_def["FP"]] = 0
+            eval_f_stat["05"+eval_def["FN"]] = 0
+            eval_f_stat["06"+eval_def["Se"]] = 0
+            eval_f_stat["07"+eval_def["Sp"]] = 0
+            eval_f_stat["08"+eval_def["F1"]] = 0
             for index, row in df_candidat.iterrows():
                 if "PASS" in row['filter']:
                     ok = len(df_features.loc[lambda df :
@@ -517,32 +522,32 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              ((((df['end'] - df['start'] + 1) / df['ctg_length']) * 100) < int(maxlen)) &
                              (df['flanks'].str.contains('GT_AG|CT_AC'))])   
                     if ok == 1:
-                        eval_f_stat["2"+eval_def["TP"]] += 1         
+                        eval_f_stat["03"+eval_def["TP"]] += 1         
                     else:
-                        eval_f_stat["3"+eval_def["FP"]] += 1
-            eval_f_stat["4"+eval_def["FN"]] = eval_f_stat["1Number of features"] - eval_f_stat["2"+eval_def["TP"]]
-            deno = eval_f_stat["2"+eval_def["TP"]] + eval_f_stat["4"+eval_def["FN"]]
+                        eval_f_stat["04"+eval_def["FP"]] += 1
+            eval_f_stat["05"+eval_def["FN"]] = eval_f_stat["02Number of features"] - eval_f_stat["03"+eval_def["TP"]]
+            deno = eval_f_stat["03"+eval_def["TP"]] + eval_f_stat["05"+eval_def["FN"]]
             if deno :
-                eval_f_stat["5"+eval_def["Se"]] = eval_f_stat["2"+eval_def["TP"]] / deno * 100
+                eval_f_stat["06"+eval_def["Se"]] = eval_f_stat["03"+eval_def["TP"]] / deno * 100
             else :
-                eval_f_stat["5"+eval_def["Se"]] = "NaN"
-            deno = eval_f_stat["2"+eval_def["TP"]] + eval_f_stat["3"+eval_def["FP"]]
+                eval_f_stat["06"+eval_def["Se"]] = "NaN"
+            deno = eval_f_stat["03"+eval_def["TP"]] + eval_f_stat["04"+eval_def["FP"]]
             if deno :
-                eval_f_stat["6"+eval_def["Sp"]] = eval_f_stat["2"+eval_def["TP"]] / deno * 100
+                eval_f_stat["07"+eval_def["Sp"]] = eval_f_stat["03"+eval_def["TP"]] / deno * 100
             else :
-                eval_f_stat["6"+eval_def["Sp"]] = "NaN"
-            if eval_f_stat["5"+eval_def["Se"]] != "NaN" and eval_f_stat["6"+eval_def["Sp"]] != "NaN" :
-                deno = eval_f_stat["5"+eval_def["Se"]] + eval_f_stat["6"+eval_def["Sp"]]
+                eval_f_stat["07"+eval_def["Sp"]] = "NaN"
+            if eval_f_stat["06"+eval_def["Se"]] != "NaN" and eval_f_stat["07"+eval_def["Sp"]] != "NaN" :
+                deno = eval_f_stat["06"+eval_def["Se"]] + eval_f_stat["07"+eval_def["Sp"]]
                 if deno :
-                    eval_f_stat["7"+eval_def["F1"]] = round(2*(eval_f_stat["5"+eval_def["Se"]]*eval_f_stat["6"+eval_def["Sp"]]) / deno, 2) 
+                    eval_f_stat["08"+eval_def["F1"]] = round(2*(eval_f_stat["06"+eval_def["Se"]]*eval_f_stat["07"+eval_def["Sp"]]) / deno, 2) 
                 else :
-                    eval_f_stat["7"+eval_def["F1"]] = "NaN"
+                    eval_f_stat["08"+eval_def["F1"]] = "NaN"
             else :
-                eval_f_stat["7"+eval_def["F1"]] = "NaN"
-            if isinstance(eval_f_stat["5"+eval_def["Se"]], float) :
-                eval_f_stat["5"+eval_def["Se"]] = round(eval_f_stat["5"+eval_def["Se"]], 2)
-            if isinstance(eval_f_stat["6"+eval_def["Sp"]], float) :
-                eval_f_stat["6"+eval_def["Sp"]] = round(eval_f_stat["6"+eval_def["Sp"]], 2)
+                eval_f_stat["08"+eval_def["F1"]] = "NaN"
+            if isinstance(eval_f_stat["06"+eval_def["Se"]], float) :
+                eval_f_stat["06"+eval_def["Se"]] = round(eval_f_stat["06"+eval_def["Se"]], 2)
+            if isinstance(eval_f_stat["07"+eval_def["Sp"]], float) :
+                eval_f_stat["07"+eval_def["Sp"]] = round(eval_f_stat["07"+eval_def["Sp"]], 2)
 
             html += get_html_eval(eval_stat, eval_f_stat)
 
@@ -578,27 +583,27 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     data[output_path].append({
         'Prefix'                 : prefix,
         'Output path'            : output,
-        'Nb seq'                 : global_stat["0Contig FASTA - Number of sequences"],
-        'Mean seq. length'       : global_stat["1Contig FASTA - Mean sequence length"],
-        'Nb contigs'             : global_stat["2Contig FASTA with feature(s) - Number of sequences"],
-        'Mean contigs length'    : global_stat["3Contig FASTA with feature(s) - Mean sequence length"],
-        'Nb reads'               : global_stat_fastq["0Number of reads"],
-        'Nb prop reads'          : global_stat_flagstat["4Number of properly paired reads"],
+        'Nb seq'                 : global_stat["01Contig FASTA - Number of sequences"],
+        'Mean seq. length'       : global_stat["02Contig FASTA - Mean sequence length"],
+        'Nb contigs'             : global_stat["03Contig FASTA with feature(s) - Number of sequences"],
+        'Mean contigs length'    : global_stat["04Contig FASTA with feature(s) - Mean sequence length"],
+        'Nb reads'               : global_stat_fastq["01Number of reads"],
+        'Nb prop reads'          : global_stat_flagstat["05Number of properly paired reads"],
         'Nb secondary alignments': secondary,
-        'Nb splits'              : global_stat_split["0Number of reads overlapping introns"],
-        'Mean len of introns'    : global_stat_split["1Mean length of introns"],
-        'Nb detected'            : global_stat_f_detected_introns["0" + definitions['PASS']],
-        'Nb detectable'          : global_stat_detectable_features["0" + definitions['PASS']],
-        'len detected'           : global_stat_f_detected_introns["6Mean length"],
-        'len detectable'         : global_stat_f_detected_introns["6Mean length"],
-        'dep detected'           : global_stat_f_detected_introns["9Mean depth"],
-        'dep detectable'         : global_stat_detectable_features["9Mean depth"],
-        'TP'                     : eval_f_stat["2"+eval_def["TP"]],
-        'FN'                     : eval_f_stat["4"+eval_def["FN"]],
-        'FP'                     : eval_f_stat["3"+eval_def["FP"]],
-        'F1score'                : eval_f_stat["7"+eval_def["F1"]],
-        'Se'                     : eval_f_stat["5"+eval_def["Se"]],
-        'Sp'                     : eval_f_stat["6"+eval_def["Sp"]],
+        'Nb splits'              : global_stat_split["01Number of reads overlapping introns"],
+        'Mean len of introns'    : global_stat_split["02Mean length of introns"],
+        'Nb detected'            : global_stat_f_detected_introns["01" + definitions['PASS']],
+        'Nb detectable'          : global_stat_detectable_features["01" + definitions['PASS']],
+        'len detected'           : global_stat_f_detected_introns["08Mean length"],
+        'len detectable'         : global_stat_detectable_features["08Mean length"],
+        'dep detected'           : global_stat_f_detected_introns["11Mean depth"],
+        'dep detectable'         : global_stat_detectable_features["11Mean depth"],
+        'TP'                     : eval_f_stat["03"+eval_def["TP"]],
+        'FN'                     : eval_f_stat["05"+eval_def["FN"]],
+        'FP'                     : eval_f_stat["04"+eval_def["FP"]],
+        'F1score'                : eval_f_stat["08"+eval_def["F1"]],
+        'Se'                     : eval_f_stat["06"+eval_def["Se"]],
+        'Sp'                     : eval_f_stat["07"+eval_def["Sp"]],
         'Report'                 : genowebReportPath
     })
     

@@ -285,7 +285,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
                         </span>
                     </div>
                 </div>               
-'''+dict_to_table(global_stat,7,True)+'''
+'''+dict_to_table(global_stat,7,2)+'''
             </div>   
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <div class="d-flex">
@@ -304,7 +304,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
                         </span>
                     </div>
                 </div>
-'''+dict_to_table(nb_ctg_by_feature,-1,False)+'''
+'''+dict_to_table(nb_ctg_by_feature,-1,0)+'''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-4">
                <div class="d-flex">
@@ -323,7 +323,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
                         </span>
                     </div>
                 </div>
-'''+dict_to_table(ctg_descr,-1,False)+'''
+'''+dict_to_table(ctg_descr,-1,0)+'''
             </div>
         </div>
         <div class="d-flex">
@@ -384,7 +384,7 @@ def get_html_reads_descr(global_stat_fastq : dict, df_library:dict):
             <div class="mt-4 mr-4 pl-0 col-md-4">
                  <h5>Reads statistics</h5>
                 <span class="anchor" id="readgstat"></span>'''
-    r += dict_to_table(global_stat_fastq,-1,True)
+    r += dict_to_table(global_stat_fastq,-1,2)
     r += '''
             </div>
             <div class="mt-4 mr-0 pl-0 col-md-8">
@@ -404,7 +404,7 @@ def get_html_flagstat_descr(global_stat_flagstat:dict):
         </div>
 		<div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
-'''+ dict_to_table(global_stat_flagstat, -1,True) +'''
+'''+ dict_to_table(global_stat_flagstat,-1,2) +'''
             </div>
         </div>
 '''
@@ -416,7 +416,7 @@ def get_html_table_descr(global_stats_table):
             <div class="mt-4 mr-4 pl-0 col-md-4">
             <h5>TO COMPLETE</h5>
                 <span class="anchor" id="assemblystat"></span>
-'''+dict_to_table(global_stats_table,-1,True)+'''
+'''+dict_to_table(global_stats_table,-1,2)+'''
             </div>
         </div>
 '''
@@ -441,7 +441,7 @@ def get_html_split_descr(df_splitRead:dict):
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Split reads</h5>
                 <span class="anchor" id="splitstat"></span>
-''' +  dict_to_table(df_splitRead, 2, True) + '''  
+''' +  dict_to_table(df_splitRead,2,2) + '''  
             </div>
         </div>  
 '''
@@ -455,7 +455,7 @@ def get_html_detected(global_stat_detected_introns:dict, df_candidat:dict):
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Detected introns</h5>
                 <span class="anchor" id="candidatstat"></span>
-'''+dict_to_table(global_stat_detected_introns,-1,True)+'''
+'''+dict_to_table(global_stat_detected_introns,-1,2)+'''
             </div>  
             <div class="mt-4 mr-0 pl-0 col-md-8">
                 <h5>Detected introns depth distribution</h5>
@@ -483,7 +483,7 @@ def get_html_candidat(global_stat_f_detected_introns:dict, global_stat_detectabl
         r += ''' col-md-4">
             <h5>Filtered detected introns</h5>
                 <span class="anchor" id="filtered_detected_introns"></span>'''
-        r += dict_to_table(global_stat_f_detected_introns, -1, True)
+        r += dict_to_table(global_stat_f_detected_introns,-1,2)
     r+='''
             </div>
         </div>
@@ -497,7 +497,7 @@ def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Contigs with too complex detected introns</h5>
                 <span class="anchor" id="too_complex_detected"></span>
-''' +  dict_to_table(global_stat_too_complex_detected, -1, True) + '''  
+''' +  dict_to_table(global_stat_too_complex_detected,-1,2) + '''  
             </div>
         </div>'''
     if global_stat_too_complex_detectable:    
@@ -505,7 +505,7 @@ def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Contigs with too complex detectable introns</h5>
                 <span class="anchor" id="too_complex_detectable"></span>
-''' +  dict_to_table(global_stat_too_complex_detectable, -1, True) + '''  
+''' +  dict_to_table(global_stat_too_complex_detectable,-1,2) + '''  
             </div>
         </div>  
 '''
@@ -583,8 +583,8 @@ def get_html_footer():
 # Return HTML table from dict
 # Param 1 : dict (key, val)
 # Param 2 : int for which line number first col (key) will be right align
-# Param 3 : bool to remove first char of the key (used to sort by key)
-def dict_to_table(d : dict, i : int, rmfirstchar : bool):
+# Param 3 : int number of first char to remove (used to sort by key)
+def dict_to_table(d : dict, i : int, rmfirstchar : int):
     table = '''
             <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
         	    <tbody>
@@ -595,10 +595,7 @@ def dict_to_table(d : dict, i : int, rmfirstchar : bool):
         if(c >= i & i!=-1):
             table += " text-right"
         val = re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str(v))   # Remove (nb%) in val    
-        if(rmfirstchar):
-            table += "'>" + k[1:] + "</td><td class='valn text-right'>" + split_int(val) + "</td></tr>"   
-        else:
-            table += "'>" + k + "</td><td class='valn text-right'>" + split_int(val) + "</td></tr>"
+        table += "'>" + k[rmfirstchar:] + "</td><td class='valn text-right'>" + split_int(val) + "</td></tr>"   
         c += 1
     table += "</tbody></table>"
     return table
