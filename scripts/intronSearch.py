@@ -215,49 +215,34 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
         
         # ~ print(time.time()-s_t)
 
-    print(candidates.head(5))
-    
+    # After filtering, focus on flagged PASS candidates and modify
+    # filter field (from PASS to OI) if two "retained introns"
+    # are overlapping
     prevCtg   = ""
     prevStart = 0
     prevEnd   = 0
     prevFilter= ""
     prevIndex = 0
     for k, v in candidates.iterrows():
-        print("Ref:" + str(v['reference'] +"\tstart:" + str(v['start']) + "\tend: "+ str(v['end']) + "\tfilter: " +str(v['filter'])))
-        
-        if "PASS" in str(v['filter']):
-            print("PASS")    
+        if "PASS" in str(v['filter']): 
             if (prevCtg == "" or prevCtg != v['reference']):  
-                print("Initialisation")
                 prevCtg   = v['reference']
                 prevStart = v['start']
                 prevEnd   = v['end']
                 prevFilter= v['filter']
                 prevIndex = k
             elif (v['start'] < prevEnd): 
-                print("Overlapping "+ str(prevCtg) + "\t" + str(prevStart) + "\t" + str(prevEnd))  
-                print("Overlapping "+ str(v['reference']) +"\t" + str(v['start']) + "\t" + str(v['end']))
                 candidates.loc[k, 'filter'] = "OI"
                 candidates.loc[prevIndex, 'filter'] = "OI"
-                prevCtg   = v['reference']
-                prevStart = v['start']
-                prevEnd   = v['end']
-                prevFilter= v['filter']
-                prevIndex = k
-
-    # (1)
-    # Ref:ENSGALT00000093407.modif    start:750       end: 1065       filter: PASS
-    # PASS
-    # Ref:ENSGALT00000093407.modif    start:750       end: 1375       filter: PASS
-    # PASS
-    # Ref:ENSGALT00000093407.modif    start:750       end: 1821       filter: PASS
-    # PASS
-    # Ref:ENSGALT00000093407.modif    start:750       end: 1983       filter: PASS
+            prevCtg   = v['reference']
+            prevStart = v['start']
+            prevEnd   = v['end']
+            prevFilter= v['filter']
+            prevIndex = k
 
     # ~ candidates = find_split(ref_id_list,bamfile.name,fastafile.name)
     # ~ candidates['selected'] = 1
     # ~ print(candidates)
-    
     
     split_alignments=split_alignments[['reference','read','start_split','end_split','split_length','split_borders','strand']] #re-arrange the columns order of split_alignments output
     header_sa= list(split_alignments.columns.values)
