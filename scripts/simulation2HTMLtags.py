@@ -618,7 +618,7 @@ def dict_to_table_multi_col(col1name:str, d1:dict, col2name="", d2="", col3name=
         table += "<td class='valn text-center' " + colmd + ">" + col3name + "</td>"
     table += "</tr></thead><tbody>"
     for k, v in sorted(d1.items(), key=lambda t: t[0]):
-        table += "<tr><td class='valn text-left'>" + k[1:] + "</td>"
+        table += "<tr><td class='valn text-left'>" + k[2:] + "</td>"
         table += "<td class='valn text-right'>" + split_int(v)  + "</td>"
         if col2name:
             table += "<td class='valn text-right'>" + split_int(d2[k])  + "</td>"
