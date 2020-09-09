@@ -412,16 +412,14 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             html += get_html_candidat(global_stat_f_detected_introns)
  
 
-        # Test Sarah
-        global_stat_too_complex_detected = dict()
         # https://stackoverflow.com/questions/40454030/count-and-sort-with-pandas
         # DETECTED : Nom de contig / filtered_detected_too_complex
+        global_stat_too_complex_detected = dict()
+        global_stat_too_complex_detected_filtered = dict()
         df_too_complex_detected = df_candidat[['reference']].groupby(['reference']) \
                              .size() \
                              .nlargest(10) \
-                             .reset_index(name='top10')        
-        print('df_too_complex_detected ', df_too_complex_detected )  
-        
+                             .reset_index(name='top10')  
         cmp = 0
         for k, v in df_too_complex_detected['reference'].items() :
             global_stat_too_complex_detected["0"+str(cmp)+str(v)] = df_too_complex_detected.loc[k]['top10']
@@ -431,24 +429,27 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              .size() \
                              .nlargest(10) \
                              .reset_index(name='top10')        
-        print('df_too_complex_detected_filtered', df_too_complex_detected_filtered)
-
-        # DETECTABLE :  nom contig detectable / nb too complex introns
-        global_stat_too_complex_detectable = dict()
-        if mfasta:
-            df_too_complex_detectable = df_features[['contig']].groupby(['contig']) \
-                             .size() \
-                             .nlargest(10) \
-                             .reset_index(name='top10')        
-            cmp = 0
-            for k, v in df_too_complex_detectable['contig'].items() :
-                global_stat_too_complex_detectable["0"+str(cmp)+str(v)] = df_too_complex_detectable.loc[k]['top10']
-                cmp += 1
+        cmp = 0
+        for k, v in df_too_complex_detected_filtered['reference'].items() :
+            global_stat_too_complex_detected_filtered["0"+str(cmp)+str(v)] = df_too_complex_detected_filtered.loc[k]['top10']
+            cmp += 1
+        
+        # # DETECTABLE :  nom contig detectable / nb too complex introns
+        # global_stat_too_complex_detectable = dict()
+        # if mfasta:
+        #     df_too_complex_detectable = df_features[['contig']].groupby(['contig']) \
+        #                      .size() \
+        #                      .nlargest(10) \
+        #                      .reset_index(name='top10')        
+        #     cmp = 0
+        #     for k, v in df_too_complex_detectable['contig'].items() :
+        #         global_stat_too_complex_detectable["0"+str(cmp)+str(v)] = df_too_complex_detectable.loc[k]['top10']
+        #         cmp += 1
                      
             #Add table "too complex" in html report    
-            html += get_html_too_complex(global_stat_too_complex_detected, global_stat_too_complex_detectable)
-        else:
-            html += get_html_too_complex(global_stat_too_complex_detected)
+        html += get_html_too_complex(global_stat_too_complex_detected, global_stat_too_complex_detected_filtered)
+        # else:
+        #     html += get_html_too_complex(global_stat_too_complex_detected)
 
 
         # if simulation ?
