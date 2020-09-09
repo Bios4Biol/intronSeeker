@@ -417,11 +417,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              .reset_index(name='top10')        
         print('df_too_complex_detected ', df_too_complex_detected )  
         
-        # Remove candidates with too complex introns (to plot ?)
-        df_too_complex_detected_without_too_complex = df_candidat[df_candidat['filter'] != "OI"][['reference']].groupby(['reference']) \
-                             .size()
-        print('df_too_complex_detected_without_too_complex', df_too_complex_detected_without_too_complex)
-        
         cmp = 0
         for k, v in df_too_complex_detected['reference'].items() :
             global_stat_too_complex_detected[str(cmp)+str(v)] = df_too_complex_detected.loc[k]['top10']
@@ -581,29 +576,30 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     data = {}
     data[output_path] = []
     data[output_path].append({
-        'Prefix'             : prefix,
-        'Output path'        : output,
-        'Nb seq'             : global_stat["0Contig FASTA - Number of sequences"],
-        'Mean seq. length'   : global_stat["1Contig FASTA - Mean sequence length"],
-        'Nb contigs'         : global_stat["2Contig FASTA with feature(s) - Number of sequences"],
-        'Mean contigs length': global_stat["3Contig FASTA with feature(s) - Mean sequence length"],
-        'Nb reads'           : global_stat_fastq["0Number of reads"],
-        'Nb prop reads'      : global_stat_flagstat["4Number of properly paired reads"],
-        'Nb splits'          : global_stat_split["0Number of reads overlapping introns"],
-        'Mean len of introns': global_stat_split["1Mean length of introns"],
-        'Nb detected'        : global_stat_f_detected_introns["0" + definitions['PASS']],
-        'Nb detectable'      : global_stat_detectable_features["0" + definitions['PASS']],
-        'len detected'       : global_stat_f_detected_introns["6Mean length"],
-        'len detectable'     : global_stat_f_detected_introns["6Mean length"],
-        'dep detected'       : global_stat_f_detected_introns["9Mean depth"],
-        'dep detectable'     : global_stat_detectable_features["9Mean depth"],
-        'TP'                 : eval_f_stat["2"+eval_def["TP"]],
-        'FN'                 : eval_f_stat["4"+eval_def["FN"]],
-        'FP'                 : eval_f_stat["3"+eval_def["FP"]],
-        'F1score'            : eval_f_stat["7"+eval_def["F1"]],
-        'Se'                 : eval_f_stat["5"+eval_def["Se"]],
-        'Sp'                 : eval_f_stat["6"+eval_def["Sp"]],
-        'Report'             : genowebReportPath
+        'Prefix'                 : prefix,
+        'Output path'            : output,
+        'Nb seq'                 : global_stat["0Contig FASTA - Number of sequences"],
+        'Mean seq. length'       : global_stat["1Contig FASTA - Mean sequence length"],
+        'Nb contigs'             : global_stat["2Contig FASTA with feature(s) - Number of sequences"],
+        'Mean contigs length'    : global_stat["3Contig FASTA with feature(s) - Mean sequence length"],
+        'Nb reads'               : global_stat_fastq["0Number of reads"],
+        'Nb prop reads'          : global_stat_flagstat["4Number of properly paired reads"],
+        'Nb secondary alignments': secondary,
+        'Nb splits'              : global_stat_split["0Number of reads overlapping introns"],
+        'Mean len of introns'    : global_stat_split["1Mean length of introns"],
+        'Nb detected'            : global_stat_f_detected_introns["0" + definitions['PASS']],
+        'Nb detectable'          : global_stat_detectable_features["0" + definitions['PASS']],
+        'len detected'           : global_stat_f_detected_introns["6Mean length"],
+        'len detectable'         : global_stat_f_detected_introns["6Mean length"],
+        'dep detected'           : global_stat_f_detected_introns["9Mean depth"],
+        'dep detectable'         : global_stat_detectable_features["9Mean depth"],
+        'TP'                     : eval_f_stat["2"+eval_def["TP"]],
+        'FN'                     : eval_f_stat["4"+eval_def["FN"]],
+        'FP'                     : eval_f_stat["3"+eval_def["FP"]],
+        'F1score'                : eval_f_stat["7"+eval_def["F1"]],
+        'Se'                     : eval_f_stat["5"+eval_def["Se"]],
+        'Sp'                     : eval_f_stat["6"+eval_def["Sp"]],
+        'Report'                 : genowebReportPath
     })
     
 

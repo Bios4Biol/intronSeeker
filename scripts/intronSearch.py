@@ -225,31 +225,25 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     for k, v in candidates.iterrows():
         print("Ref:" + str(v['reference'] +"\tstart:" + str(v['start']) + "\tend: "+ str(v['end']) + "\tfilter: " +str(v['filter'])))
         
-        # if (str(v['filter']) == "PASS"):  #corrected
         if "PASS" in str(v['filter']):
             print("PASS")    
             if (prevCtg == "" or prevCtg != v['reference']):  
                 print("Initialisation")
-                # prefCtg   = v['reference']  #corrected
                 prevCtg   = v['reference']
                 prevStart = v['start']
                 prevEnd   = v['end']
                 prevFilter= v['filter']
                 prevIndex = k
             elif (v['start'] < prevEnd): 
-                print("Tag overlapping")
-                print("Overlapping "+ str(v['reference']) +"\tstart:" + str(v['start']) + " < " + str(prevEnd))  
-                print("Overlapping "+ str(v['reference']) +"\tprevEnd:" + str(prevStart) + " >  " + str(v['end']) + " ? ")  # To add ? previous start < end current
-                candidates.loc[k, 'filter'] = "OI"   #or candidates.at[k,'filter'] = "OI"
+                print("Overlapping "+ str(prevCtg) + "\t" + str(prevStart) + "\t" + str(prevEnd))  
+                print("Overlapping "+ str(v['reference']) +"\t" + str(v['start']) + "\t" + str(v['end']))
+                candidates.loc[k, 'filter'] = "OI"
                 candidates.loc[prevIndex, 'filter'] = "OI"
-                # candidates[k]['filter'] = "OI"           #corrected
-                # candidates[prevIndex]['filter'] = "OI"   #corrected
-        else: #CORRECTED : pb si meme ref mais passe de PASS à DP/.. puis PASS à nouveau ... (1)
-            prevCtg   = ""
-            prevStart = 0
-            prevEnd   = 0
-            prevFilter= ""
-            prevIndex = 0
+                prevCtg   = v['reference']
+                prevStart = v['start']
+                prevEnd   = v['end']
+                prevFilter= v['filter']
+                prevIndex = k
 
     # (1)
     # Ref:ENSGALT00000093407.modif    start:750       end: 1065       filter: PASS
