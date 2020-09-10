@@ -161,7 +161,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     global_stat["07Number of features in GTF"]          = len(df_features.index)
     c = 7
     for k, v in (df_features.feature.value_counts()).items() :
-        global_stat[str(c)+k] = v
+        global_stat[+"0"+str(c)+k] = v
         c+=1
 
     # ASSEMBLATHON on fasta files        
