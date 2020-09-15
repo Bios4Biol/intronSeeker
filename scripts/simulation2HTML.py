@@ -425,6 +425,11 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             global_stat_too_complex_detected["0"+str(cmp)+str(v)] = df_too_complex_detected.loc[k]['top10']
             cmp += 1
         
+        # Add start/end and reads in df_too_complex_detected, from df_candidat and df_splits thanks to reference merging column
+        df_too_complex_detected_len=df_candidat[['reference','start','end']].merge(df_too_complex_detected, on='reference')
+        df_too_complex_detected_len_reads=df_split[['reference','split_length']].merge(df_too_complex_detected_len, on='reference')
+
+
         df_too_complex_detected_filtered = df_candidat[['reference']].loc[df_candidat['filter'].str.contains('PASS')].groupby(['reference']) \
                              .size() \
                              .nlargest(10) \
@@ -434,23 +439,16 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             global_stat_too_complex_detected_filtered["0"+str(cmp)+str(v)] = df_too_complex_detected_filtered.loc[k]['top10']
             cmp += 1
         
-        # # DETECTABLE :  nom contig detectable / nb too complex introns
-        # global_stat_too_complex_detectable = dict()
-        # if mfasta:
-        #     df_too_complex_detectable = df_features[['contig']].groupby(['contig']) \
-        #                      .size() \
-        #                      .nlargest(10) \
-        #                      .reset_index(name='top10')        
-        #     cmp = 0
-        #     for k, v in df_too_complex_detectable['contig'].items() :
-        #         global_stat_too_complex_detectable["0"+str(cmp)+str(v)] = df_too_complex_detectable.loc[k]['top10']
-        #         cmp += 1
-                     
-            #Add table "too complex" in html report    
-        html += get_html_too_complex(global_stat_too_complex_detected, global_stat_too_complex_detected_filtered)
-        # else:
-        #     html += get_html_too_complex(global_stat_too_complex_detected)
+        print(df_too_complex_detected_filtered)
 
+        # Add start/end and reads in df_too_complex_detected, from df_candidat and df_splits thanks to reference merging column
+        df_too_complex_detected_filtered_len=df_candidat[['reference','start','end']].merge(df_too_complex_detected_filtered, on='reference')
+        df_too_complex_detected_filtered_len_reads=df_split[['reference','split_length']].merge(df_too_complex_detected_filtered_len, on='reference')
+        print(df_too_complex_detected_filtered_len_reads)
+                     
+        #Add table "too complex" in html report    
+        # html += get_html_too_complex(global_stat_too_complex_detected, global_stat_too_complex_detected_filtered, df_candidat, df_features)
+        html += get_html_too_complex(global_stat_too_complex_detected, global_stat_too_complex_detected_filtered, df_too_complex_detected_len_reads, df_too_complex_detected_filtered_len_reads)
 
         # if simulation ?
         if mfasta:
@@ -582,33 +580,45 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     data = {}
     data[output_path] = []
     data[output_path].append({
-        'Prefix'                 : prefix,
-        'Output path'            : output,
-        'Nb seq'                 : global_stat["01Contig FASTA - Number of sequences"],
-        'Mean seq. length'       : global_stat["02Contig FASTA - Mean sequence length"],
-        'Nb contigs'             : global_stat["03Contig FASTA with feature(s) - Number of sequences"],
-        'Mean contigs length'    : global_stat["04Contig FASTA with feature(s) - Mean sequence length"],
-        'Nb reads'               : global_stat_fastq["01Number of reads"],
-        'Nb prop reads'          : global_stat_flagstat["05Number of properly paired reads"],
-        'Nb secondary alignments': secondary,
-        'Nb splits'              : global_stat_split["01Number of reads overlapping introns"],
-        'Mean len of introns'    : global_stat_split["02Mean length of introns"],
-        'Nb detected'            : global_stat_f_detected_introns["01" + definitions['PASS']],
-        'Nb detectable'          : global_stat_detectable_features["01" + definitions['PASS']],
-        'len detected'           : global_stat_f_detected_introns["08Mean length"],
-        'len detectable'         : global_stat_detectable_features["08Mean length"],
-        'dep detected'           : global_stat_f_detected_introns["11Mean depth"],
-        'dep detectable'         : global_stat_detectable_features["11Mean depth"],
-        'noise'                  : global_stat_f_detected_introns["05" + definitions['OI']],
-        'TP'                     : eval_f_stat["03"+eval_def["TP"]],
-        'FN'                     : eval_f_stat["05"+eval_def["FN"]],
-        'FP'                     : eval_f_stat["04"+eval_def["FP"]],
-        'F1score'                : eval_f_stat["08"+eval_def["F1"]],
-        'Se'                     : eval_f_stat["06"+eval_def["Se"]],
-        'Sp'                     : eval_f_stat["07"+eval_def["Sp"]],
-        'Report'                 : genowebReportPath
+        'Prefix'                             : prefix,
+        'Output path'                        : output,
+        'Nb contigs'                         : global_stat["01Contig FASTA - Number of sequences"],
+        'Mean contigs length'                : global_stat["02Contig FASTA - Mean sequence length"],
+        'Nb modified contigs'                : global_stat["03Contig FASTA with feature(s) - Number of sequences"],
+        'Mean modified contigs length'       : global_stat["04Contig FASTA with feature(s) - Mean sequence length"],
+        'Nb reads'                           : global_stat_fastq["01Number of reads"],
+        'Mean coverage'                      : global_stat_fastq["02Mean coverage"],
+        'Nb prop reads'                      : global_stat_flagstat["05Number of properly paired reads"],
+        'Nb secondary alignments'            : secondary,
+        'Nb splits'                          : global_stat_split["01Number of reads overlapping introns"],
+        'Mean len of introns'                : global_stat_split["02Mean length of introns"],
+        'Nb filtered detected introns'       : global_stat_f_detected_introns["01" + definitions['PASS']],
+        'Nb filtered features (detectable)'  : global_stat_detectable_features["01" + definitions['PASS']],
+        'len filtered detected introns'      : global_stat_f_detected_introns["08Mean length"],
+        'len filtered features (detectable)' : global_stat_detectable_features["08Mean length"],
+        'dep filtered detected introns'      : global_stat_f_detected_introns["11Mean depth"],
+        'dep filtered features (detectable)' : global_stat_detectable_features["11Mean depth"],
+        'noise'                              : global_stat_f_detected_introns["05" + definitions['OI']],
+        'TP'                                 : eval_f_stat["03"+eval_def["TP"]],
+        'FN'                                 : eval_f_stat["05"+eval_def["FN"]],
+        'FP'                                 : eval_f_stat["04"+eval_def["FP"]],
+        'F1score'                            : eval_f_stat["08"+eval_def["F1"]],
+        'Se'                                 : eval_f_stat["06"+eval_def["Se"]],
+        'Sp'                                 : eval_f_stat["07"+eval_def["Sp"]],
+        'Report'                             : genowebReportPath
     })
     
+    # Nb seq               => Nb contigs
+    # Mean seq. length     => Mean contigs length 
+    # Nb contigs           => Nb modified contigs  
+    # Mean contigs length  => Mean modified contigs length
+    # Nb detected          => Nb filtered detected introns
+    # Nb detectable        => Nb filtered features (detectable)
+    # len detected         => len filtered detected introns
+    # len detectable       => len filtered features (detectable)
+    # dep detected         => dep filtered detected introns
+    # dep detectable       => dep filtered features (detectable)
+
 
     # Output path filename comparison json
     output_file = output_path + "_comparison_simulation.json"
@@ -630,36 +640,36 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     stats_data = data[output_path]
     
     # now we will open a file for writing (w) and synthese file without overwriting (a)
-    #data_file = open(output_file+'.csv', 'w') 
-    #data_file_synthese = open('/home/smaman/Documents/SYNTHESE.csv', 'a') 
+    data_file = open(output_file+'.csv', 'w') 
+    data_file_synthese = open('/home/smaman/Documents/SYNTHESE.csv', 'a') 
     
     # create the csv writer object 
-    #csv_writer = csv.writer(data_file) 
-    #csv_writer_synthese = csv.writer(data_file_synthese)
+    csv_writer = csv.writer(data_file) 
+    csv_writer_synthese = csv.writer(data_file_synthese)
 
     # Counter variable used for writing headers to the CSV file 
-    # count = 0
+    count = 0
     
-    # for i in stats_data: 
-    #     if count == 0: 
+    for i in stats_data: 
+        if count == 0: 
     
-    #         # Writing headers of CSV file 
-    #         header = i.keys() 
-    #         csv_writer.writerow(header)
-    #         count += 1
+            # Writing headers of CSV file 
+            header = i.keys() 
+            csv_writer.writerow(header)
+            count += 1
         
-    #     # Write headers in synthesis file only if this file is not empty
-    #     if os.stat('/home/smaman/Documents/SYNTHESE.csv').st_size == 0:
-    #         header = i.keys()
-    #         csv_writer_synthese.writerow(header)
+        # Write headers in synthesis file only if this file is not empty
+        if os.stat('/home/smaman/Documents/SYNTHESE.csv').st_size == 0:
+            header = i.keys()
+            csv_writer_synthese.writerow(header)
 
-    #     # Writing data of CSV file 
-    #     csv_writer.writerow(i.values()) 
-    #     csv_writer_synthese.writerow(i.values()) 
+        # Writing data of CSV file 
+        csv_writer.writerow(i.values()) 
+        csv_writer_synthese.writerow(i.values()) 
     
 
-    # data_file.close()
-    # data_file_synthese.close()
+    data_file.close()
+    data_file_synthese.close()
 
 
 if __name__ == '__main__' :
