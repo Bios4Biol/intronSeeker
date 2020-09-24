@@ -156,33 +156,6 @@ def plot_insertion_in_contig(positions) :
     )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
-# https://plotly.com/python/candlestick-charts/#simple-candlestick-with-pandas
-# https://stackoverflow.com/questions/62090228/plotly-lines-using-start-and-end-dates
-def plot_introns_complexity(df):
-
-    fig = go.Figure()
-    for (start, end, value) in zip(df["start"], df["end"], df["reference"]):
-        name = f"{start} to {end}"
-        fig.add_trace(go.Scatter(x=[start, end], y=[value, value],
-                mode='lines', name = name))  
-    
-    fig.update_layout(
-        xaxis=dict(
-            title='Start/end intron position'
-        ),
-        yaxis=dict(
-            title='Contigs'
-        ),
-        margin=go.layout.Margin(
-            l=50,
-            r=50,
-            b=20,
-            t=30,
-            pad=0
-        )
-    )
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')                
-
 def plot_abondance_model(df_fasta:dict) :
     """
     plot_abondance_model function plot abundance from df_fasta dataframe

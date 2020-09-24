@@ -491,7 +491,7 @@ def get_html_candidat(global_stat_f_detected_introns:dict, global_stat_detectabl
     return r
 
 # Tab too complex
-def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_complex_detected_filtered:dict, df_too_complex_detected_len_reads: dict, df_too_complex_detected_filtered_len_reads:dict):
+def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_complex_detected_filtered:dict):
     r =  '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
@@ -499,11 +499,7 @@ def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_
                 <span class="anchor" id="too_complex_detected"></span>
 ''' +  dict_to_table(global_stat_too_complex_detected,-1,2) + '''  
             </div>
-             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Detected introns position and reads involved</h5>
-                <span class="anchor" id="too_complex_detectable"></span>
-''' +  plot_introns_complexity(df_too_complex_detected_len_reads) + '''  
-            </div>
+
         </div>
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
@@ -511,11 +507,7 @@ def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_
                 <span class="anchor" id="too_complex_detectable"></span>
 ''' +  dict_to_table(global_stat_too_complex_detected_filtered,-1,2) + '''  
             </div>
-             <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Detected filtered introns position and reads involved</h5>
-                <span class="anchor" id="too_complex_detectable"></span>
-''' +  plot_introns_complexity(df_too_complex_detected_filtered_len_reads) + '''  
-            </div>
+
         </div>  
 '''
     return r
