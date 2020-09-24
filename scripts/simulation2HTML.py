@@ -267,7 +267,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             else:
                 nbOtherJunctions += v
         global_stat_split["0"+str(c)+"Other junctions"] = nbOtherJunctions
-        global_stat_split[str(c+1)+"Canonical junction (GT_AG or CT_AC)"] = nbCanonic
+        global_stat_split["0"+str(c+1)+"Canonical junction (GT_AG or CT_AC)"] = nbCanonic
 
 
         # #Sarah en cours
