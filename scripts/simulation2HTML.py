@@ -465,22 +465,36 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              .size() \
                              .nlargest(10) \
                              .reset_index(name='top10')  
+        # cmp = 0
+        # for k, v in df_too_complex_detected['reference'].items() :
+        #     global_stat_too_complex_detected["0"+str(cmp)+str(v)] = df_too_complex_detected.loc[k]['top10']
+        #     cmp += 1
+        
+        # sarah
+        # Add filter information for each complex intron in top 10 of contigs with the highest number of detected introns
         cmp = 0
         for k, v in df_too_complex_detected['reference'].items() :
-            global_stat_too_complex_detected["0"+str(cmp)+str(v)] = df_too_complex_detected.loc[k]['top10']
-            cmp += 1
-
-        df_too_complex_detected_filtered = df_candidat[['reference']].loc[df_candidat['filter'].str.contains('PASS')].groupby(['reference']) \
-                             .size() \
-                             .nlargest(10) \
-                             .reset_index(name='top10')        
-        cmp = 0
-        for k, v in df_too_complex_detected_filtered['reference'].items() :
-            global_stat_too_complex_detected_filtered["0"+str(cmp)+str(v)] = df_too_complex_detected_filtered.loc[k]['top10']
-            cmp += 1
+            nbPASS =len(df_candidat[(df_candidat['reference'] == v) & (df_candidat['filter'] == "PASS" )] )
+            nbDP   =len(df_candidat[(df_candidat['reference'] == v) & (df_candidat['filter'] == "DP" )] ) 
+            nbOI   =len(df_candidat[(df_candidat['reference'] == v) & (df_candidat['filter'] == "OI" )] ) 
+            nbSS   =len(df_candidat[(df_candidat['reference'] == v) & (df_candidat['filter'] == "SS" )] ) 
+            nbLEN  =len(df_candidat[(df_candidat['reference'] == v) & (df_candidat['filter'] == "LEN" )] ) 
+            global_stat_too_complex_detected["0"+str(cmp)+str(v)] = str(nbPASS)+" PASS | "+str(nbDP)+" DP | "+str(nbOI)+" IO | "+str(nbSS)+" SS | "+str(nbLEN)+" LEN"
+            cmp += 1    
+         
+        # # sarah : remove top of contigs with the highest number of detected filtered introns
+        # df_too_complex_detected_filtered = df_candidat[['reference']].loc[df_candidat['filter'].str.contains('PASS')].groupby(['reference']) \
+        #                      .size() \
+        #                      .nlargest(10) \
+        #                      .reset_index(name='top10')        
+        # cmp = 0
+        # for k, v in df_too_complex_detected_filtered['reference'].items() :
+        #     global_stat_too_complex_detected_filtered["0"+str(cmp)+str(v)] = df_too_complex_detected_filtered.loc[k]['top10']
+        #     cmp += 1
         
         
-        html += get_html_too_complex(global_stat_too_complex_detected, global_stat_too_complex_detected_filtered)
+        # html += get_html_too_complex(global_stat_too_complex_detected, global_stat_too_complex_detected_filtered)
+        html += get_html_too_complex(global_stat_too_complex_detected)
 
         # if simulation ?
         if mfasta:
@@ -581,7 +595,17 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 eval_f_stat["07"+eval_def["Sp"]] = round(eval_f_stat["07"+eval_def["Sp"]], 2)
 
             html += get_html_eval(eval_stat, eval_f_stat)
+ 
 
+    # # Typology of FN, FP :
+    # df_cand_tmp=df_candidat[['ID','start','end']].copy()
+    # df_features_tmp=df_features[['start', 'end']].copy()
+    # print('df_features_tmp', df_features_tmp)
+    # print('df_cand_tmp', df_cand_tmp)
+    # df_typology = df_cand_tmp.merge(df_features_tmp, how = 'outer' ,indicator=True).loc[lambda x : x['_merge']=='candidat_only']
+    # print('df_typology', df_typology)
+
+    
     # GLOSSARY
     html += get_html_glossary()
 

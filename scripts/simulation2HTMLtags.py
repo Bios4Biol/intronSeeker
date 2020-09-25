@@ -490,28 +490,41 @@ def get_html_candidat(global_stat_f_detected_introns:dict, global_stat_detectabl
     '''
     return r
 
+# # Tab too complex
+# def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_complex_detected_filtered:dict):
+#     r =  '''
+#         <div class="d-flex">
+#             <div class="mt-4 mr-0 pl-0 col-md-4">
+#             <h5>Top 10 of contigs with the highest number of detected introns</h5>
+#                 <span class="anchor" id="too_complex_detected"></span>
+# ''' +  dict_to_table(global_stat_too_complex_detected,-1,2) + '''  
+#             </div>
+
+#         </div>
+#         <div class="d-flex">
+#             <div class="mt-4 mr-0 pl-0 col-md-4">
+#             <h5>Top 10 of contigs with the highest number of detected filtered introns</h5>
+#                 <span class="anchor" id="too_complex_detectable"></span>
+# ''' +  dict_to_table(global_stat_too_complex_detected_filtered,-1,2) + '''  
+#             </div>
+
+#         </div>  
+# '''
+#     return r
+
 # Tab too complex
-def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_complex_detected_filtered:dict):
+def get_html_too_complex(global_stat_too_complex_detected:dict):
     r =  '''
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-4">
             <h5>Top 10 of contigs with the highest number of detected introns</h5>
                 <span class="anchor" id="too_complex_detected"></span>
-''' +  dict_to_table(global_stat_too_complex_detected,-1,2) + '''  
+''' +  dict_to_table_simple(global_stat_too_complex_detected,-1,2) + '''  
             </div>
-
         </div>
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-4">
-            <h5>Top 10 of contigs with the highest number of detected filtered introns</h5>
-                <span class="anchor" id="too_complex_detectable"></span>
-''' +  dict_to_table(global_stat_too_complex_detected_filtered,-1,2) + '''  
-            </div>
-
-        </div>  
 '''
     return r
- 
+
 def get_html_eval(eval_stat:dict, eval_f_stat:dict):
     r =  '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
@@ -600,6 +613,22 @@ def dict_to_table(d : dict, i : int, rmfirstchar : int):
     table += "</tbody></table>"
     return table
 
+def dict_to_table_simple(d : dict, i : int, rmfirstchar : int):
+    table = '''
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+''' 
+    c = 0
+    for k, v in sorted(d.items(), key=lambda t: t[0]):
+        table += "<tr><td class='valn"
+        if(c >= i & i!=-1):
+            table += " text-right"
+        val = re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str(v))   # Remove (nb%) in val    
+        table += "'>" + k[rmfirstchar:] + "</td><td class='valn text-right'>" + str(val) + "</td></tr>"   
+        c += 1
+    table += "</tbody></table>"
+    return table
+
 
 def dict_to_table_multi_col(col1name:str, d1:dict, col2name="", d2="", col3name="", d3=""):
     colmd = "width='50%'"
@@ -626,6 +655,7 @@ def dict_to_table_multi_col(col1name:str, d1:dict, col2name="", d2="", col3name=
             table += "<td class='valn text-right'>" + split_int(d3[k])  + "</td>"
         table += "</tr>"
     return table + "</tbody></table>"
+
 
 
 # Return HTML table from dataframe
