@@ -270,50 +270,21 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_split["0"+str(c+1)+"Canonical junction (GT_AG or CT_AC)"] = nbCanonic
 
 
-        # #Sarah en cours
-        # df_features['tinystart']=df_features['start']+10
-        # df_features['tinyend']=df_features['end']-10
-        # df_expected_splits = df_features[['contig', 'tinystart', 'tinyend']].copy()
-        # print('df_expected_splits', df_expected_splits)
-        # df_expected_splits = pd.DataFrame(columns=['contig','start_split','end_split','start_reads', 'end_reads'])
-        # for index, v in df_library.iterrows():
-        #     ok=df_features['contig'].str.contains(v['contig'])
-        #     if ok.item():
-        #         df_expected_splits['contig']=v
-        #         # df_expected_splits['start_split']=df_features[ok]['start']+10
-        #         # df_expected_splits['end_split']=df_features['end']+10
-        #         df_expected_splits['start_reads']=df_library['start']
-        #         df_expected_splits['end']=df_library['end']
-        #         print(df_expected_splits)
-                
-        # exit()    
-        
+        # # Sarah en cours 
+        # nbExpectedSplits = 0
+        # for k, v in df_features['contig'].items() :
+        #     for row in df_library.groupby(['contig']):
+        #         # print('row', row[1].index)
+        #         for read in enumerate(row[1].index): 
+        #             # doutes sur ajout .modif !! TODO
+        #             if (((df_library.loc[read[1], 'contig'])+".modif" == v) \
+        #                 & (df_library.loc[read[1], 'start'] > (df_features.loc[k,'start']+10)) \
+        #                 &  (df_library.loc[read[1], 'end'] < (df_features.loc[k,'end']-10)) ):
+        #                 nbExpectedSplits += 1
+                           
+        # print('nbExpectedSplits', nbExpectedSplits)
+        # global_stat_split[str(c+2)+"Number of expected splits"] = nbExpectedSplits
 
-# library head :          old_contig  start  end  complement           contig
-# lecture                                                     
-# 80032/1   SEQUENCE1      0  101       False  SEQUENCE1.modif
-# 110561/1  SEQUENCE1      0  101       False  SEQUENCE1.modif
-# 119188/1  SEQUENCE1      0  101       False  SEQUENCE1.modif
-# 105463/2  SEQUENCE1      0  101       False  SEQUENCE1.modif
-# 122895/1  SEQUENCE1      2  103       False  SEQUENCE1.modif 
-
-
-# features head :                                     contig          feature  start   end  length flanks  pos_on_contig
-# features                                                                                              
-# SEQUENCE1.modif|635|962    SEQUENCE1.modif  retained_intron    635   962     327  GT_AG      63.310070
-# SEQUENCE2.modif|941|1318   SEQUENCE2.modif  retained_intron    941  1318     377  GT_AG      76.317924
-# SEQUENCE3.modif|102|587    SEQUENCE3.modif  retained_intron    102   587     485  CT_AC      37.226277
-# SEQUENCE4.modif|1175|1643  SEQUENCE4.modif  retained_intron   1175  1643     468  GT_AG      86.460633
-
-        # df_expected_splits= pd.DataFrame((df_library.groupby('contig').size()), columns = ['nb_reads_by_contigs'])        
-        # print('df_expected_splits', df_expected_splits)
-
-       
-        # df_expected_splits['reads']=df_library.at[df_expected_splits.contig, df_library.index]
-        
-        # nb_splits_attendus=len(df_library.loc[(df_library['tinystart'] >= df_library['start']) & (df_library['tinyend'] <= df_library['tinyend'])]=
-        # global_stat_split[str(c+2)+"Number of expected splits"] = len(df_expected_splits.index)
- 
         html += get_html_split_descr(global_stat_split)   
 
     ## CANDIDATS statistics - detected introns
@@ -506,6 +477,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_def["Sp"] = "Specificity (Sp) = TP / (TP+FP)"
             eval_def["F1"] = "F1 score = (2*Se*Sp) / (Se+Sp)"
             
+            df_FP = pd.DataFrame(columns=('ID', 'reference', 'start', 'end', 'depth', 'split_borders', 'filter'))
+            df_FN = pd.DataFrame(columns=('ID', 'reference', 'start', 'end', 'depth', 'split_borders', 'filter'))
+
             eval_stat = dict()
             eval_stat["01Number of detected introns"] = global_stat_detected_introns["01Number"] 
             eval_stat["02Number of features"] = global_stat["07Number of features in GTF"] 
@@ -524,7 +498,28 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                     eval_stat["03"+eval_def["TP"]] += 1         
                 else:
                     eval_stat["04"+eval_def["FP"]] += 1
-            eval_stat["05"+eval_def["FN"]] = eval_stat["02Number of features"] - eval_stat["03"+eval_def["TP"]]
+                    # sarah
+                    # https://stackoverflow.com/questions/17839973/constructing-pandas-dataframe-from-values-in-variables-gives-valueerror-if-usi
+                    data = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
+                        'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
+                    df_FP = df_FP.append(data)
+                  
+            eval_stat["05"+eval_def["FN"]] = eval_stat["02Number of features"] - eval_stat["03"+eval_def["TP"]] #TODO ?? FN = tous - TP - FP ?                           
+            #sarah
+            for index, row in df_candidat.iterrows():
+                ok = len(df_features.loc[lambda df :
+                            (df['contig'] == row['reference']) &
+                            (df['start']  == row['start']) &
+                            (df['end']  == row['end']) &
+                            (row['filter'] != "PASS") ])
+                if ok == 1:
+                    data = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
+                        'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
+                    df_FN = df_FN.append(data)
+            print('df_FN', df_FN)        
+            print('df_FP', df_FP)
+
+
             deno = eval_stat["03"+eval_def["TP"]] + eval_stat["05"+eval_def["FN"]]
             if deno :
                 eval_stat["06"+eval_def["Se"]] = eval_stat["03"+eval_def["TP"]] / deno * 100
@@ -595,15 +590,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 eval_f_stat["07"+eval_def["Sp"]] = round(eval_f_stat["07"+eval_def["Sp"]], 2)
 
             html += get_html_eval(eval_stat, eval_f_stat)
- 
 
-    # # Typology of FN, FP :
-    # df_cand_tmp=df_candidat[['ID','start','end']].copy()
-    # df_features_tmp=df_features[['start', 'end']].copy()
-    # print('df_features_tmp', df_features_tmp)
-    # print('df_cand_tmp', df_cand_tmp)
-    # df_typology = df_cand_tmp.merge(df_features_tmp, how = 'outer' ,indicator=True).loc[lambda x : x['_merge']=='candidat_only']
-    # print('df_typology', df_typology)
 
     
     # GLOSSARY
