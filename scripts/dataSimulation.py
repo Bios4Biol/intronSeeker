@@ -18,6 +18,7 @@ try :
     from Bio import SeqIO
     from Bio.SeqRecord import SeqRecord
     from collections import defaultdict
+    from math import *  #sarah
 except ImportError as error :
     print(error)
     exit(1)
@@ -81,14 +82,14 @@ def insert_intron(contig_seq : str, lower : int, upper: int,):
     
     .. seealso:: random_seq(), full_random_simulation()
     """
-    rand_length = random.randint(lower, upper) - 4 # Random choice of the intorn length
+    rand_length = random.randint(lower, upper) - 4 # Random choice of the intron length   #sarah : random length = max 80% exon length (= upper)
     intron_seq = "".join(["GT", random_seq(rand_length, "ATCG"),"AG"]) # Generate the random sequence
     insert_pos = random.randint(1, len(contig_seq)) # Random choice of the insertion position of the intron
     new_seq = "".join([contig_seq[:insert_pos], intron_seq, contig_seq[insert_pos:]]) # Insertion of the intron
     intron_end = insert_pos+rand_length+4
     return new_seq, insert_pos, intron_end
 
-def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, upper:int, prefix:str, output:str, force:bool, mix: bool) :
+def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, upper:int, prefix:str, output:str, force:bool, mix: bool) :  #sarah : upper param de frs
     """
     Simulate a set of nb contigs (with entirely random sequence) with random length beetween [mini,maxi].
     In each contig, an intron with a random length beetween [lower,upper] is randomly inserted. 
@@ -521,7 +522,8 @@ def transcript_df(exons) :
             exons[i][1],
             "intron",
             str(intr_start),
-            str(intr_end),
+            #str(intr_end),
+            str(intr_start+floor(0.8*(intr_end-intr_start))),  #sarah
             exons[i][5],
             exons[i][6],
             exons[i][7],
@@ -664,7 +666,7 @@ def construct_new_transcript(exons, classe):
             
             # Construction of the feature which corresponds to spliced exon for the control GFF file
             i_start = sum(whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < retained_intron),"end"].apply(int)-whole_transcript.loc[lambda df : (df.in_transcript == True) & (df.index < retained_intron),"start"].apply(int)+1)+1
-            i_end = i_start + (int(whole_transcript.at[retained_intron,"end"])-int(whole_transcript.at[retained_intron,"start"]))
+            i_end = i_start + (int(whole_transcript.at[retained_intron,"end"])-int(whole_transcript.at[retained_intron,"start"])) #sarah : 0.80*(exon length)
             ft_on_t.append([
                 whole_transcript.at[retained_intron,"misc_attr"]["transcript_id"]+".modif",
                 whole_transcript.at[retained_intron,"DB"],
