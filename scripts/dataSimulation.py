@@ -510,7 +510,6 @@ def transcript_df(exons) :
     
     .. seealso:: construct_new_transcript()
     """
-    
     introns = []
     for i in range(len(exons) -1) :
         if exons[i][6] == "+" :
@@ -522,8 +521,7 @@ def transcript_df(exons) :
             exons[i][1],
             "intron",
             str(intr_start),
-            #str(intr_end),
-            str(intr_start+floor(0.8*(intr_end-intr_start))),  #sarah
+            str(intr_end),
             exons[i][5],
             exons[i][6],
             exons[i][7],
@@ -730,7 +728,41 @@ def extract_fasta(genome: str, mix: bool, ref_file: str, lib_file: str, path: st
     sp.call(["gffread", lib_file, "-g", genome,
              "-w", path + "_transcripts.fa", "-F"])
 
+def removeTrWithTooLongIntron(gtf_content, transcripts):
+    """
+    Because we don't want to retained intron with length greater than 80% of the exons length
+    we need to remove transcript from transcripts...
+    """
+    # We add a false transcript feature at the end in the case of the true
+    # last transcript of the file is choosen (in order to oblige the function to
+    # processes last exons)
+    gtf_content.append(["ref",".","transcript","0","0",".",".",".", {'transcript_id': 'tr'}])
+    exons_len = 0
+    tr_len = 0
+    tr_id  = ""
+    #print(len(transcripts))
+    for feature in gtf_content:        
+        # Only for first transcript
+        if feature[2] == "transcript" and exons_len == 0:
+            tr_len = int(feature[4]) - int(feature[3]) + 1
+            tr_id  = feature[-1]["transcript_id"]
 
+        if feature[2] == "exon":
+            exons_len += int(feature[4]) - int(feature[3]) + 1
+        
+        # End of transcript we need reset tr_len and exons_len        
+        if feature[2] == "transcript" and exons_len:
+            # Intron too long ?
+            if(tr_len - exons_len >= exons_len * 5):
+                if(tr_id in transcripts):
+                    transcripts.remove(tr_id)
+            exons_len = 0
+            tr_len = int(feature[4]) - int(feature[3]) + 1
+            tr_id  = feature[-1]["transcript_id"]
+    gtf_content.pop()
+    #print(len(transcripts))
+    return transcripts
+    
 def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, output: str, force: bool, mix: bool):
     """
     Simulate a RNA-seq pseudo-assembly from a GTF file with retained introns and/or spliced exons.
@@ -769,6 +801,8 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, outp
     
     #print("GTF reading...")
     gtf_content, transcripts = read_gtf(annotation.name)
+    #Remove transcript if intron lenght greater than 80% of the total exons length
+    transcripts = removeTrWithTooLongIntron(gtf_content, transcripts)
     #print("Generate transcripts...")
     choosen = choose_transcripts(transcripts, nb)
     reference, library, control = parse_gtf_content(gtf_content, choosen, mix)
