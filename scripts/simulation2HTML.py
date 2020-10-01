@@ -450,7 +450,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             nbOI   =len(df_candidat[(df_candidat['reference'] == v) & (df_candidat['filter'] == "OI" )] ) 
             nbSS   =len(df_candidat[(df_candidat['reference'] == v) & (df_candidat['filter'] == "SS" )] ) 
             nbLEN  =len(df_candidat[(df_candidat['reference'] == v) & (df_candidat['filter'] == "LEN" )] ) 
-            global_stat_too_complex_detected["0"+str(cmp)+str(v)] = str(nbPASS)+" PASS | "+str(nbDP)+" DP | "+str(nbOI)+" IO | "+str(nbSS)+" SS | "+str(nbLEN)+" LEN"
+            global_stat_too_complex_detected["0"+str(cmp)+str(v)] = str(nbPASS)+" PASS; "+str(nbDP)+" DP; "+str(nbOI)+" IO; "+str(nbSS)+" SS; "+str(nbLEN)+" LEN"
             cmp += 1    
          
         # # sarah : remove top of contigs with the highest number of detected filtered introns
@@ -478,7 +478,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_def["F1"] = "F1 score = (2*Se*Sp) / (Se+Sp)"
             
             df_FP = pd.DataFrame(columns=('ID', 'reference', 'start', 'end', 'depth', 'split_borders', 'filter'))
-            df_FN = pd.DataFrame(columns=('ID', 'reference', 'start', 'end', 'depth', 'split_borders', 'filter'))
+            df_FN = pd.DataFrame(columns=('ID', 'reference', 'start', 'end'))
 
             eval_stat = dict()
             eval_stat["01Number of detected introns"] = global_stat_detected_introns["01Number"] 
@@ -499,25 +499,31 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 else:
                     eval_stat["04"+eval_def["FP"]] += 1
                     # sarah
-                    # https://stackoverflow.com/questions/17839973/constructing-pandas-dataframe-from-values-in-variables-gives-valueerror-if-usi
-                    data = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
+                    data_FP = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
                         'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
-                    df_FP = df_FP.append(data)
+                    df_FP = df_FP.append(data_FP)
                   
-            eval_stat["05"+eval_def["FN"]] = eval_stat["02Number of features"] - eval_stat["03"+eval_def["TP"]] #TODO ?? FN = tous - TP - FP ?                           
-            #sarah
-            for index, row in df_candidat.iterrows():
-                ok = len(df_features.loc[lambda df :
-                            (df['contig'] == row['reference']) &
-                            (df['start']  == row['start']) &
-                            (df['end']  == row['end']) &
-                            (row['filter'] != "PASS") ])
-                if ok == 1:
-                    data = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
-                        'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
-                    df_FN = df_FN.append(data)
-            print('df_FN', df_FN)        
+            eval_stat["05"+eval_def["FN"]] = eval_stat["02Number of features"] - eval_stat["03"+eval_def["TP"]]                         
+            # sarah
+            # FN : all features which are not in dataframe df_candidat
+            for index, row in df_features.iterrows():
+                if index not in df_candidat['ID']:
+                    data_FN = pd.DataFrame({'ID':index, 'reference':[row['contig']], 'start':[row['start']], \
+                        'end':[row['end']]})
+                    df_FN = df_FN.append(data_FN)
+            # FP : another method but no need to go through the dataframe a second time
+            # for index, row in df_candidat.iterrows():
+            #     if row['ID'] not in df_features.index:
+            #         data_FP = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
+            #             'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
+            #         df_FP = df_FP.append(data_FP)
             print('df_FP', df_FP)
+            print('df_FN', df_FN)  
+            # Export dataframes in csv files
+            FP_file = output_path + "_FP.csv"
+            FN_file = output_path + "_FN.csv"
+            df_FP.to_csv(FP_file, sep='\t', encoding='utf-8')      
+            df_FN.to_csv(FN_file, sep='\t', encoding='utf-8')    
 
 
             deno = eval_stat["03"+eval_def["TP"]] + eval_stat["05"+eval_def["FN"]]
