@@ -260,7 +260,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         for k, v in (df_split['split_borders'].value_counts()).items() :
             if k == "GT_AG" or k == "CT_AC":
                 nbCanonic += v
-            elif n < 6:
+            elif n < 5:
                 global_stat_split["0"+str(c)+"Junction "+k] = v
                 n += 1
                 c += 1
@@ -571,7 +571,29 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                         eval_f_stat["03"+eval_def["TP"]] += 1         
                     else:
                         eval_f_stat["04"+eval_def["FP"]] += 1
+                    # sarah
+                    data_FP_filtered = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
+                        'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
+                    df_FP_filtered = df_FP.append(data_FP_filtered)
+                  
             eval_f_stat["05"+eval_def["FN"]] = eval_f_stat["02Number of features"] - eval_f_stat["03"+eval_def["TP"]]
+
+            # sarah
+            # FN : all features which are not in dataframe df_candidat
+            for index, row in df_features.iterrows():
+                if index not in df_candidat['ID']:
+                    data_FN_filtered = pd.DataFrame({'ID':index, 'reference':[row['contig']], 'start':[row['start']], \
+                        'end':[row['end']]})
+                    df_FN_filtered = df_FN.append(data_FN_filtered)
+ 
+            # Export dataframes in csv files
+            FP_filtred_file = output_path + "_FP_filtered.csv"
+            FN_filtred_file = output_path + "_FN_filtered.csv"
+            df_FP_filtered.to_csv(FP_filtred_file, sep='\t', encoding='utf-8')      
+            df_FN_filtered.to_csv(FN_filtred_file, sep='\t', encoding='utf-8')    
+
+
+
             deno = eval_f_stat["03"+eval_def["TP"]] + eval_f_stat["05"+eval_def["FN"]]
             if deno :
                 eval_f_stat["06"+eval_def["Se"]] = eval_f_stat["03"+eval_def["TP"]] / deno * 100
