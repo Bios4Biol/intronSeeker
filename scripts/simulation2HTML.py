@@ -580,8 +580,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
             # sarah
             # FN : all features which are not in dataframe df_candidat
+            # todo : df_features - df_FP_filtered
             for index, row in df_features.iterrows():
-                if index not in df_candidat['ID']:
+                if index == df_FP_filtered['ID']:
                     data_FN_filtered = pd.DataFrame({'ID':index, 'reference':[row['contig']], 'start':[row['start']], \
                         'end':[row['end']]})
                     df_FN_filtered = df_FN.append(data_FN_filtered)
