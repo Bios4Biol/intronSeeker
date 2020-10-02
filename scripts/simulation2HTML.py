@@ -549,6 +549,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             if isinstance(eval_stat["07"+eval_def["Sp"]], float) :
                 eval_stat["07"+eval_def["Sp"]] = round(eval_stat["07"+eval_def["Sp"]], 2)
 
+            df_FP_filtered = pd.DataFrame(columns=('ID', 'reference', 'start', 'end', 'depth', 'split_borders', 'filter'))
+            df_FN_filtered = pd.DataFrame(columns=('contig'))
             eval_f_stat = dict()
             eval_f_stat["01Number of detected introns"] = global_stat_f_detected_introns["01" + definitions['PASS']]
             eval_f_stat["02Number of features"] = global_stat_detectable_features["01" + definitions['PASS']]
@@ -568,30 +570,31 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              ((((df['end'] - df['start'] + 1) / df['ctg_length']) * 100) < int(maxlen)) &
                              (df['flanks'].str.contains('GT_AG|CT_AC'))])   
                     if ok == 1:
-                        eval_f_stat["03"+eval_def["TP"]] += 1         
+                        eval_f_stat["03"+eval_def["TP"]] += 1
+                        # sarah 
+                        # FN : all features which are not in dataframe df_candidat
+                        # df_features - TP
+                        df_TP = pd.DataFrame({'contig':[row['reference']]})
+                        print('df_TP', df_TP)
+                        # print('features', df_features.loc[row['ID'], 'contig'])
+                        # df_FN_filtered = df_features.loc[row['ID'], 'contig'] - df_TP
+                        # print('df_FN_filtered', df_FN_filtered) 
                     else:
                         eval_f_stat["04"+eval_def["FP"]] += 1
                     # sarah
                     data_FP_filtered = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
                         'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
                     df_FP_filtered = df_FP.append(data_FP_filtered)
-                  
+                    print('df_FP_filtered', df_FP_filtered)
+            exit()     
             eval_f_stat["05"+eval_def["FN"]] = eval_f_stat["02Number of features"] - eval_f_stat["03"+eval_def["TP"]]
 
-            # sarah
-            # FN : all features which are not in dataframe df_candidat
-            # todo : df_features - df_FP_filtered
-            for index, row in df_features.iterrows():
-                if index == df_FP_filtered['ID']:
-                    data_FN_filtered = pd.DataFrame({'ID':index, 'reference':[row['contig']], 'start':[row['start']], \
-                        'end':[row['end']]})
-                    df_FN_filtered = df_FN.append(data_FN_filtered)
  
             # Export dataframes in csv files
             FP_filtred_file = output_path + "_FP_filtered.csv"
-            FN_filtred_file = output_path + "_FN_filtered.csv"
+            # FN_filtred_file = output_path + "_FN_filtered.csv"
             df_FP_filtered.to_csv(FP_filtred_file, sep='\t', encoding='utf-8')      
-            df_FN_filtered.to_csv(FN_filtred_file, sep='\t', encoding='utf-8')    
+            # df_FN_filtered.to_csv(FN_filtred_file, sep='\t', encoding='utf-8')    
 
 
 
