@@ -762,6 +762,32 @@ def removeTrWithTooLongIntron(gtf_content, transcripts):
     gtf_content.pop()
     #print(len(transcripts))
     return transcripts
+
+# sarah : test to remove
+def removeTranscriptsComingFromSameGene(gtf_content, transcripts):
+    """
+    Remove transcripts that come from the same gene to decrease number of FP.
+    """
+    # We add a false transcript feature at the end in the case of the true
+    # last transcript of the file is choosen (in order to oblige the function to
+    # processes last exons)
+    gtf_content.append(["ref",".","transcript","0","0",".",".",".", {'gene_id': 'gene'}])
+    gene=""
+    previous_gene=""
+    f=[]
+     
+    for feature in gtf_content:  
+        gene  = feature[-1]["gene_id"]   
+        f.append(feature[2])
+        if (gene == previous_gene) and (f.count("transcript")>1) and ("transcript" in feature[2]) :
+            #print('transcript on the same gene')
+            gtf_content.remove(feature)
+        elif gene != previous_gene:
+            f=[]    
+            previous_gene=gene
+            
+            
+    return transcripts    
     
 def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, output: str, force: bool, mix: bool):
     """
@@ -803,6 +829,8 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, outp
     gtf_content, transcripts = read_gtf(annotation.name)
     #Remove transcript if intron lenght greater than 80% of the total exons length
     transcripts = removeTrWithTooLongIntron(gtf_content, transcripts)
+    # sarah: Remove transcripts that come from the same gene to decrease number of FP
+    transcripts= removeTranscriptsComingFromSameGene(gtf_content, transcripts)
     #print("Generate transcripts...")
     choosen = choose_transcripts(transcripts, nb)
     reference, library, control = parse_gtf_content(gtf_content, choosen, mix)

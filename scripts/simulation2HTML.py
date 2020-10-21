@@ -524,9 +524,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             FN_file = output_path + "_FN.csv"
             df_FP.to_csv(FP_file, sep='\t', encoding='utf-8')      
             df_FN.to_csv(FN_file, sep='\t', encoding='utf-8')   
-            j=0 
-
-
+            
             deno = eval_stat["03"+eval_def["TP"]] + eval_stat["05"+eval_def["FN"]]
             if deno :
                 eval_stat["06"+eval_def["Se"]] = eval_stat["03"+eval_def["TP"]] / deno * 100
@@ -563,6 +561,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_f_stat["06"+eval_def["Se"]] = 0
             eval_f_stat["07"+eval_def["Sp"]] = 0
             eval_f_stat["08"+eval_def["F1"]] = 0
+            j=0 
             for index, row in df_candidat.iterrows():
                 if "PASS" in row['filter']:
                     ok = len(df_features.loc[lambda df :
