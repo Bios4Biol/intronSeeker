@@ -477,8 +477,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_def["Sp"] = "Specificity (Sp) = TP / (TP+FP)"
             eval_def["F1"] = "F1 score = (2*Se*Sp) / (Se+Sp)"
             
-            df_FP = pd.DataFrame(columns=('ID', 'reference', 'start', 'end', 'depth', 'split_borders', 'filter'))
-            df_FN = pd.DataFrame(columns=('ID', 'reference', 'start', 'end'))
+            FP_file = open(output_path + "_FP.csv", mode='wt', encoding='utf-8')  #sarah
 
             eval_stat = dict()
             eval_stat["01Number of detected introns"] = global_stat_detected_introns["01Number"] 
@@ -499,31 +498,12 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 else:
                     eval_stat["04"+eval_def["FP"]] += 1
                     # sarah
-                    data_FP = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
-                        'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
-                    df_FP = df_FP.append(data_FP)
-                  
+                    FP_file.write(row['ID'] + "\n")  # list of FP in a csv file
+                    
             eval_stat["05"+eval_def["FN"]] = eval_stat["02Number of features"] - eval_stat["03"+eval_def["TP"]]                         
             # sarah
-            # FN : all features which are not in dataframe df_candidat
-            for index, row in df_features.iterrows():
-                if index not in df_candidat['ID']:
-                    data_FN = pd.DataFrame({'ID':index, 'reference':[row['contig']], 'start':[row['start']], \
-                        'end':[row['end']]})
-                    df_FN = df_FN.append(data_FN)
-            # FP : another method but no need to go through the dataframe a second time
-            # for index, row in df_candidat.iterrows():
-            #     if row['ID'] not in df_features.index:
-            #         data_FP = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
-            #             'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
-            #         df_FP = df_FP.append(data_FP)
-            print('df_FP', df_FP)
-            print('df_FN', df_FN)  
-            # Export dataframes in csv files
-            FP_file = output_path + "_FP.csv"
-            FN_file = output_path + "_FN.csv"
-            df_FP.to_csv(FP_file, sep='\t', encoding='utf-8')      
-            df_FN.to_csv(FN_file, sep='\t', encoding='utf-8')   
+            FP_file.close
+            
             
             deno = eval_stat["03"+eval_def["TP"]] + eval_stat["05"+eval_def["FN"]]
             if deno :
@@ -548,9 +528,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             if isinstance(eval_stat["07"+eval_def["Sp"]], float) :
                 eval_stat["07"+eval_def["Sp"]] = round(eval_stat["07"+eval_def["Sp"]], 2)
 
-            df_FP_filtered = pd.DataFrame(columns=('ID', 'reference', 'start', 'end', 'depth', 'split_borders', 'filter'))
-            df_TP_filtered = pd.DataFrame(columns=('ID', 'contig'))
-            # df_FN_filtered = pd.DataFrame(columns=('contig'))
 
             eval_f_stat = dict()
             eval_f_stat["01Number of detected introns"] = global_stat_f_detected_introns["01" + definitions['PASS']]
@@ -562,6 +539,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_f_stat["07"+eval_def["Sp"]] = 0
             eval_f_stat["08"+eval_def["F1"]] = 0
             j=0 
+            FPfiltered_file = open(output_path + "_FP_filtered.csv", mode='wt', encoding='utf-8')  #sarah
             for index, row in df_candidat.iterrows():
                 if "PASS" in row['filter']:
                     ok = len(df_features.loc[lambda df :
@@ -573,37 +551,14 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              (df['flanks'].str.contains('GT_AG|CT_AC'))])   
                     if ok == 1:
                         eval_f_stat["03"+eval_def["TP"]] += 1
-                        # sarah 
-                        # FN : all features which are not in dataframe df_candidat
-                        # df_features - TP
-                        df_TP_filtered.loc[j, 'contig']=row['reference']
                         j += 1
-                        # df_TP_filtered = pd.DataFrame({'contig':[row['reference']]})
-                        
-                        # print('features', df_features.loc[row['ID'], 'contig'])
-                        # df_FN_filtered = df_features.loc[row['ID'], 'contig'] - df_TP
-                        # print('df_FN_filtered', df_FN_filtered) 
                     else:
                         eval_f_stat["04"+eval_def["FP"]] += 1
-                        # sarah
-                        data_FP_filtered = pd.DataFrame({'ID':[row['ID']], 'reference':[row['reference']], 'start':[row['start']], \
-                            'end':[row['end']], 'depth':[row['depth']], 'split_borders':[row['split_borders']], 'filter':[row['filter']]})
-                        df_FP_filtered = df_FP.append(data_FP_filtered)
-                        
+                        FPfiltered_file.write(row['ID'] + "\n")  # list of filtered FP in a csv file
+                
             eval_f_stat["05"+eval_def["FN"]] = eval_f_stat["02Number of features"] - eval_f_stat["03"+eval_def["TP"]]
-
-            # sarah
-            # Export dataframes in csv files
-            print('df_TP_filtered', df_TP_filtered)
-            print('df_FP_filtered', df_FP_filtered)
-            FP_filtred_file = output_path + "_FP_filtered.csv"
-            # FN_filtred_file = output_path + "_FN_filtered.csv"
-            df_FP_filtered.to_csv(FP_filtred_file, sep='\t', encoding='utf-8')      
-            # df_FN_filtered.to_csv(FN_filtred_file, sep='\t', encoding='utf-8')    
-            #export df_features to check dep and len
-            df_features_file = output_path + "_FP_features.csv"
-            df_features.to_csv(df_features_file,  sep='\t', encoding='utf-8')      
-
+            FPfiltered_file.close
+           
 
             deno = eval_f_stat["03"+eval_def["TP"]] + eval_f_stat["05"+eval_def["FN"]]
             if deno :
