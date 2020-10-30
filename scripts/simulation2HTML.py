@@ -553,7 +553,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                     #sarah         
                     nok = len(df_features.loc[lambda df :
                              (df['contig'] == row['reference']) &
-                             (df['start']  != row['start']) or (df['end']    != row['end'])  ])   
+                             (df['start']  != row['start']) &
+                             (df['end']    != row['end'])])   
                     
                     if ok == 1:
                         eval_f_stat["03"+eval_def["TP"]] += 1
