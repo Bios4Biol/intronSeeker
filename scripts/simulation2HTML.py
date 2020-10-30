@@ -538,7 +538,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_f_stat["06"+eval_def["Se"]] = 0
             eval_f_stat["07"+eval_def["Sp"]] = 0
             eval_f_stat["08"+eval_def["F1"]] = 0
-            j=0 
+            j=0 #sarah : a enlever, non ?
+            nbFP=0 #sarah
             FPfiltered_file = open(output_path + "_FP_filtered.csv", mode='wt', encoding='utf-8')  #sarah
             for index, row in df_candidat.iterrows():
                 if "PASS" in row['filter']:
@@ -549,15 +550,23 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              (df['depth'] > int(mindepth)) &
                              ((((df['end'] - df['start'] + 1) / df['ctg_length']) * 100) < int(maxlen)) &
                              (df['flanks'].str.contains('GT_AG|CT_AC'))])   
+                    #sarah         
+                    nok = len(df_features.loc[lambda df :
+                             (df['contig'] == row['reference']) &
+                             (df['start']  != row['start']) or (df['end']    != row['end'])  ])   
+                    
                     if ok == 1:
                         eval_f_stat["03"+eval_def["TP"]] += 1
-                        j += 1
+                        j += 1     #sarah : a enlever, non ?
+                    elif nok == 1: #sarah
+                        nbFP += 1  #sarah
                     else:
                         eval_f_stat["04"+eval_def["FP"]] += 1
                         FPfiltered_file.write(row['ID'] + "\n")  # list of filtered FP in a csv file
-                
+            print('nbFP', nbFP) #sarah    
             eval_f_stat["05"+eval_def["FN"]] = eval_f_stat["02Number of features"] - eval_f_stat["03"+eval_def["TP"]]
             FPfiltered_file.close
+
            
 
             deno = eval_f_stat["03"+eval_def["TP"]] + eval_f_stat["05"+eval_def["FN"]]
