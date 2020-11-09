@@ -77,6 +77,28 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
     df_features = parse_gtf(gtf.name)
 
+    # Add to df_library the read positions on the modified contig
+    # --------IIIII----------- 
+    #          rrrrr                     
+    #          >>>>>rrrrrr
+    # if mfasta:
+    #     df_library['mstart'] = df_library['start']
+    #     df_library['mend']   = df_library['end']
+
+    #     for index, row in df_features.iterrows():
+    #         df_tmp = pd.DataFrame(row, columns=list(df_features.columns))
+    #         print('df_tmp', df_tmp)
+    #         df_library['mstart'] = df_library.apply(
+    #             recompute_start_pos,
+    #             axis = 1,
+    #             df_features=df_tmp
+    #         )
+    #         df_library['mend'] = df_library.apply(
+    #             recompute_end_pos,
+    #             axis = 1,
+    #             df_features=df_tmp
+    #         )
+    
     # Add a column to df_fasta with the "fasta" length (without any simulated features)
     # SARAH / CAS REAL
     if mfasta:
@@ -541,6 +563,11 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             j=0 #sarah : a enlever, non ?
             nbFP=0 #sarah
             FPfiltered_file = open(output_path + "_FP_filtered.csv", mode='wt', encoding='utf-8')  #sarah
+            TPfiltered_file = open(output_path + "_TP_filtered.csv", mode='wt', encoding='utf-8')  #sarah
+            FNfiltered_file = open(output_path + "_FN_filtered.csv", mode='wt', encoding='utf-8')  #sarah
+            print('features head :', df_features.head(5), '\n\n')
+            print('candidat head :', df_candidat.head(5), '\n\n')
+            print('library head :', df_library, '\n\n')
             for index, row in df_candidat.iterrows():
                 if "PASS" in row['filter']:
                     ok = len(df_features.loc[lambda df :
@@ -549,8 +576,9 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              (df['end']    == row['end']) &
                              (df['depth'] > int(mindepth)) &
                              ((((df['end'] - df['start'] + 1) / df['ctg_length']) * 100) < int(maxlen)) &
-                             (df['flanks'].str.contains('GT_AG|CT_AC'))])   
-                    #sarah         
+                             (df['flanks'].str.contains('GT_AG|CT_AC'))])
+                    print(row['ID'] + ":" + str(ok))
+                    #sarah
                     nok = len(df_features.loc[lambda df :
                              (df['contig'] == row['reference']) &
                              (df['start']  != row['start']) &
@@ -559,14 +587,20 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                     if ok == 1:
                         eval_f_stat["03"+eval_def["TP"]] += 1
                         j += 1     #sarah : a enlever, non ?
+                        TPfiltered_file.write(row['ID'] + "\n")  # list of filtered TP in a csv file
                     elif nok == 1: #sarah
                         nbFP += 1  #sarah
                     else:
                         eval_f_stat["04"+eval_def["FP"]] += 1
                         FPfiltered_file.write(row['ID'] + "\n")  # list of filtered FP in a csv file
-            print('nbFP', nbFP) #sarah    
+
+            print('nbFP', eval_f_stat["04"+eval_def["FP"]])
+            print('nbTP', eval_f_stat["03"+eval_def["TP"]])
+
             eval_f_stat["05"+eval_def["FN"]] = eval_f_stat["02Number of features"] - eval_f_stat["03"+eval_def["TP"]]
-            FPfiltered_file.close
+            FPfiltered_file.close #sarah
+            TPfiltered_file.close #sarah
+            FNfiltered_file.close #sarah
 
            
 
@@ -607,19 +641,19 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     with open(output_file, "w") as f:
         f.write(html)
 
-    print('DATAFRAMES:\n\n')
-    print('fasta head :' , df_fasta.head(5), '\n\n')
-    # SARAH / CAS REAL
-    if mfasta:
-        print('mfasta head :' , df_mfasta.head(5), '\n\n')    
-    # print('mfasta head :' , df_mfasta.head(5), '\n\n')    
-    # SARAH / CAS REAL
-    print('library head :' , df_library.head(5), '\n\n')
-    print('features head :', df_features.head(5), '\n\n')
-    if split:
-        print('df_split', df_split, '\n\n')
-    if candidat:
-        print('df_candidat', df_candidat, '\n\n')
+    # print('DATAFRAMES:\n\n')
+    # print('fasta head :' , df_fasta.head(5), '\n\n')
+    # # SARAH / CAS REAL
+    # if mfasta:
+    #     print('mfasta head :' , df_mfasta.head(5), '\n\n')    
+    # # print('mfasta head :' , df_mfasta.head(5), '\n\n')    
+    # # SARAH / CAS REAL
+    # print('library head :' , df_library.head(5), '\n\n')
+    # print('features head :', df_features.head(5), '\n\n')
+    # if split:
+    #     print('df_split', df_split, '\n\n')
+    # if candidat:
+    #     print('df_candidat', df_candidat, '\n\n')
 
     # SARAH : main stats in a json file
     # https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/  

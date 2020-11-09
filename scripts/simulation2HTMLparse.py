@@ -331,12 +331,34 @@ def compute_dp(df_features, df_library) :
     compute_dp function add DP to df_features using df_library
     """
     ref = df_features['contig'].replace('.modif','')
-    return len(df_library.loc[lambda df : (df['contig'] == ref) & (df_features['start'] > df['start']) & (df_features['start'] < df['end'])])
+    return len(df_library.loc[lambda df : (df['contig'] == ref) & (df_features['start'] > df['mstart']) & (df_features['start'] < df['mend'])])
 
 
-def compute_len(df_features, df_mfasta) :
+def compute_len(df_features, df_mfasta) :  
     """
     compute_len function add contig length to df_features using df_mfasta dataframe
     """
     ref = df_features['contig']
     return (df_mfasta.loc[ref, 'length'])
+
+def recompute_start_pos(df_library, df_features) :
+    """
+    recompute_position function recompute read positions on the modified contig
+    Because we need to shift of the read position (add intron length) because of presence of a retained intron
+    """
+    ref = df_library['contig'] + ".modif"
+    return df_library['mstart'] + df_features.loc[lambda df : (df['contig'] == ref) & (df_library['start'] > df_features['start']), 'length']
+
+def recompute_end_pos(df_library, df_features) :
+    """
+    recompute_position function recompute read positions on the modified contig
+    Because we need to shift of the read position (add intron length) because of presence of a retained intron
+    """
+    ref = df_library['contig'] + ".modif"
+    return df_library['mend'] + df_features.loc[lambda df : (df['contig'] == ref) & (df_library['end'] > df_features['start']), 'length']
+
+
+
+ 
+    
+
