@@ -81,23 +81,25 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # --------IIIII----------- 
     #          rrrrr                     
     #          >>>>>rrrrrr
-    # if mfasta:
-    #     df_library['mstart'] = df_library['start']
-    #     df_library['mend']   = df_library['end']
-
-    #     for index, row in df_features.iterrows():
-    #         df_tmp = pd.DataFrame(row, columns=list(df_features.columns))
-    #         print('df_tmp', df_tmp)
-    #         df_library['mstart'] = df_library.apply(
-    #             recompute_start_pos,
-    #             axis = 1,
-    #             df_features=df_tmp
-    #         )
-    #         df_library['mend'] = df_library.apply(
-    #             recompute_end_pos,
-    #             axis = 1,
-    #             df_features=df_tmp
-    #         )
+    if mfasta:
+        df_library['mstart'] = df_library['start']
+        df_library['mend']   = df_library['end']
+        #https://stackoverflow.com/questions/10715965/add-one-row-to-pandas-dataframe
+        df_tmp = pd.DataFrame(columns=['contig', 'feature','start','end','length'])
+        for i, row in df_features.iterrows():
+            #df_tmp = pd.DataFrame(row, columns=list(df_features.columns))
+            df_tmp.loc[i] = row
+            print('df_tmp', df_tmp)
+            df_library['mstart'] = df_library.apply(
+                recompute_start_pos,
+                axis = 1,
+                df_features=df_tmp
+            )
+            df_library['mend'] = df_library.apply(
+                recompute_end_pos,
+                axis = 1,
+                df_features=df_tmp
+            )
     
     # Add a column to df_fasta with the "fasta" length (without any simulated features)
     # SARAH / CAS REAL
