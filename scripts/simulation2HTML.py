@@ -78,28 +78,19 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     df_features = parse_gtf(gtf.name)
 
     # Add to df_library the read positions on the modified contig
-    # --------IIIII----------- 
-    #          rrrrr                     
-    #          >>>>>rrrrrr
     if mfasta:
         df_library['mstart'] = df_library['start']
         df_library['mend']   = df_library['end']
-        #https://stackoverflow.com/questions/10715965/add-one-row-to-pandas-dataframe
-        df_tmp = pd.DataFrame(columns=['contig', 'feature','start','end','length'])
-        for i, row in df_features.iterrows():
-            #df_tmp = pd.DataFrame(row, columns=list(df_features.columns))
-            df_tmp.loc[i] = row
-            print('df_tmp', df_tmp)
-            df_library['mstart'] = df_library.apply(
-                recompute_start_pos,
-                axis = 1,
-                df_features=df_tmp
-            )
-            df_library['mend'] = df_library.apply(
-                recompute_end_pos,
-                axis = 1,
-                df_features=df_tmp
-            )
+        for i, feature in df_features.iterrows():
+            c = feature['contig'].replace('.modif','')
+            s = feature['start']
+            e = feature['end']
+            l = feature['length']
+            
+            for v in df_library.loc[(df_library['contig'] == c) & (df_library['mstart'] > s)].index.values:
+                df_library.at[v, 'mstart'] += l
+            for v in df_library.loc[(df_library['contig'] == c) & (df_library['mend'] > s)].index.values:
+                df_library.at[v, 'mend'] += l
     
     # Add a column to df_fasta with the "fasta" length (without any simulated features)
     # SARAH / CAS REAL
@@ -579,32 +570,16 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              (df['depth'] > int(mindepth)) &
                              ((((df['end'] - df['start'] + 1) / df['ctg_length']) * 100) < int(maxlen)) &
                              (df['flanks'].str.contains('GT_AG|CT_AC'))])
-                    print(row['ID'] + ":" + str(ok))
-                    #sarah
-                    nok = len(df_features.loc[lambda df :
-                             (df['contig'] == row['reference']) &
-                             (df['start']  != row['start']) &
-                             (df['end']    != row['end'])])   
-                    
                     if ok == 1:
                         eval_f_stat["03"+eval_def["TP"]] += 1
-                        j += 1     #sarah : a enlever, non ?
                         TPfiltered_file.write(row['ID'] + "\n")  # list of filtered TP in a csv file
-                    elif nok == 1: #sarah
-                        nbFP += 1  #sarah
                     else:
                         eval_f_stat["04"+eval_def["FP"]] += 1
                         FPfiltered_file.write(row['ID'] + "\n")  # list of filtered FP in a csv file
-
-            print('nbFP', eval_f_stat["04"+eval_def["FP"]])
-            print('nbTP', eval_f_stat["03"+eval_def["TP"]])
-
             eval_f_stat["05"+eval_def["FN"]] = eval_f_stat["02Number of features"] - eval_f_stat["03"+eval_def["TP"]]
             FPfiltered_file.close #sarah
             TPfiltered_file.close #sarah
-            FNfiltered_file.close #sarah
-
-           
+            FNfiltered_file.close #sarah      
 
             deno = eval_f_stat["03"+eval_def["TP"]] + eval_f_stat["05"+eval_def["FN"]]
             if deno :
@@ -630,8 +605,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 eval_f_stat["07"+eval_def["Sp"]] = round(eval_f_stat["07"+eval_def["Sp"]], 2)
 
             html += get_html_eval(eval_stat, eval_f_stat)
-
-
     
     # GLOSSARY
     html += get_html_glossary()
