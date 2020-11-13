@@ -94,7 +94,7 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
         split_reads=[]
         contig_seq = ref_dict.fetch(ref_id)
         for read in aligned:
-            if read.cigartuples is not None:
+            if read.cigartuples is not None and read.mapping_quality >= 2:
                 if '(3,' in str(read.cigartuples):
                     split = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
                     split['read'] = read.query_name
