@@ -553,11 +553,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_f_stat["06"+eval_def["Se"]] = 0
             eval_f_stat["07"+eval_def["Sp"]] = 0
             eval_f_stat["08"+eval_def["F1"]] = 0
-            j=0 #sarah : a enlever, non ?
-            nbFP=0 #sarah
-            FPfiltered_file = open(output_path + "_FP_filtered.csv", mode='wt', encoding='utf-8')  #sarah
-            TPfiltered_file = open(output_path + "_TP_filtered.csv", mode='wt', encoding='utf-8')  #sarah
-            FNfiltered_file = open(output_path + "_FN_filtered.csv", mode='wt', encoding='utf-8')  #sarah
+            FPfiltered_file = open(output_path + "_FP_filtered.csv", mode='wt', encoding='utf-8')
+            TPfiltered_file = open(output_path + "_TP_filtered.csv", mode='wt', encoding='utf-8') 
             print('features head :', df_features.head(5), '\n\n')
             print('candidat head :', df_candidat.head(5), '\n\n')
             print('library head :', df_library, '\n\n')
@@ -577,9 +574,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                         eval_f_stat["04"+eval_def["FP"]] += 1
                         FPfiltered_file.write(row['ID'] + "\n")  # list of filtered FP in a csv file
             eval_f_stat["05"+eval_def["FN"]] = eval_f_stat["02Number of features"] - eval_f_stat["03"+eval_def["TP"]]
-            FPfiltered_file.close #sarah
-            TPfiltered_file.close #sarah
-            FNfiltered_file.close #sarah      
+            FPfiltered_file.close
+            TPfiltered_file.close
 
             deno = eval_f_stat["03"+eval_def["TP"]] + eval_f_stat["05"+eval_def["FN"]]
             if deno :
@@ -695,6 +691,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     
     stats_data = data[output_path]
     
+    '''
     # now we will open a file for writing (w) and synthese file without overwriting (a)
     data_file = open(output_file+'.csv', 'w') 
     data_file_synthese = open('/home/smaman/Documents/SYNTHESE.csv', 'a') 
@@ -726,7 +723,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
     data_file.close()
     data_file_synthese.close()
-
+    '''
 
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser(add_help=False)
