@@ -446,8 +446,12 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         # https://stackoverflow.com/questions/40454030/count-and-sort-with-pandas
         # DETECTED : Nom de contig / filtered_detected_too_complex
         global_stat_too_complex_detected = dict()
-        global_stat_too_complex_detected_filtered = dict()
-        df_too_complex_detected = df_candidat[['reference']].groupby(['reference']) \
+         
+        #df_tmp=df_candidat.loc[df_candidat['filter'] == "PASS"]
+        #df_too_complex_detected =df_tmp[['reference']].groupby(['reference']) \
+
+        #df_too_complex_detected = df_candidat[['reference']].groupby(['reference']) \
+        df_too_complex_detected = df_candidat.loc[df_candidat['filter'] == "PASS"][['reference']].groupby(['reference']) \
                              .size() \
                              .nlargest(10) \
                              .reset_index(name='top10')  
@@ -468,18 +472,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             global_stat_too_complex_detected["0"+str(cmp)+str(v)] = str(nbPASS)+" PASS; "+str(nbDP)+" DP; "+str(nbOI)+" IO; "+str(nbSS)+" SS; "+str(nbLEN)+" LEN"
             cmp += 1    
          
-        # # sarah : remove top of contigs with the highest number of detected filtered introns
-        # df_too_complex_detected_filtered = df_candidat[['reference']].loc[df_candidat['filter'].str.contains('PASS')].groupby(['reference']) \
-        #                      .size() \
-        #                      .nlargest(10) \
-        #                      .reset_index(name='top10')        
-        # cmp = 0
-        # for k, v in df_too_complex_detected_filtered['reference'].items() :
-        #     global_stat_too_complex_detected_filtered["0"+str(cmp)+str(v)] = df_too_complex_detected_filtered.loc[k]['top10']
-        #     cmp += 1
-        
-        
-        # html += get_html_too_complex(global_stat_too_complex_detected, global_stat_too_complex_detected_filtered)
         html += get_html_too_complex(global_stat_too_complex_detected)
 
         # if simulation ?
