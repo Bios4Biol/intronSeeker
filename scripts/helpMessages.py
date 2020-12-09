@@ -489,7 +489,7 @@ Performs the ORF analysis on a reference FASTA file: predicts, with TransDecoder
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker analyzeORF -r <ref.fa> -c <candidates.txt> -o STR [-p STR] [-F, -k, -R]',
+intronSeeker analyzeORF -r <ref.fa> -t <tref.fa> -c <cand.txt> -o STR [-p STR] [-F,-k,-R]',
     width=90
     ))
     print()
@@ -505,9 +505,13 @@ intronSeeker analyzeORF -r <ref.fa> -c <candidates.txt> -o STR [-p STR] [-F, -k,
     print(cw.fill(
 'Name  of the reference FASTA file  on which  the ORF prediction must be performed.'
     ))
+    print('   -t/--trim-ref FILE',end='')
+    print(cw.fill(
+'Name  of the trimmed reference FASTA file  on which  the ORF prediction must be performed.'
+    ))
     print('   -c/--candidates FILE',end='')
     print(cw.fill(
-'Name the candidates TXT file to consider only the ORFs which overlap a selected candidate.'
+'Name the candidates TXT file to consider only the ORFs which overlap a "PASS" candidate.'
     ))
     print('   -p/--prefix STR',end='')
     print(cw.fill(

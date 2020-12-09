@@ -71,12 +71,13 @@ def parse_arguments() :
     # subparser for searching ORF on sequences
     parser_orf = subparser.add_parser('analyzeORF',add_help=False)
     parser_orf.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='reference')
+    parser_orf.add_argument('-t', '--trim-reference', type=argparse.FileType('r'), required=True, dest='trim_ref')
     parser_orf.add_argument('-c', '--candidates', type=argparse.FileType('r'),  required=True, dest='cand_file')
-    parser_orf.add_argument('-k','--keep', action='store_false',required=False, default=True, dest='rm')
+    parser_orf.add_argument('-k','--keep', action='store_false',required=False, default=False, dest='rm')
     parser_orf.add_argument('-o','--output', type=str, required=True, dest='output')
     parser_orf.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_orf.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
-    parser_orf.add_argument('--no-refine-starts', action='store_true', required=False, default=False, dest='no_refine')
+    parser_orf.add_argument('-R,--no-refine-starts', action='store_true', required=False, default=False, dest='no_refine')
     parser_orf.add_argument('-h','--help',action='store_const', const = parser_orf.prog.split()[-1],dest='c_help')
     parser_orf.set_defaults(func=analyzeORF)
 
