@@ -265,8 +265,8 @@ def single_trim(candidate, sequences) :
     new_seq = contig[0:candidate.start-1].seq+contig[candidate.end:].seq
     new_record= SeqRecord(
         new_seq,
-        id=contig.id+'::'+candidate.ID,
-        name=contig.name+'::'+candidate.ID,
+        id=contig.id+'##'+candidate.ID,
+        name=contig.name+'##'+candidate.ID,
         description=contig.description+' trimmed_candidate='+candidate.ID
         )
     return new_record
@@ -328,7 +328,7 @@ def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
 #######################
 
 
-def df_ORF(pep_file,candidates) : 
+def df_ORF(pep_file, candidates, trim=0) : 
     """
     From the TransDecoder output, write a tsv file which contains information about each predicted ORF.
     :param transdecoder_orfs: Transdecoder output which contains all the predicte ORFs (nucleic or proteic fasta format)
@@ -350,20 +350,29 @@ def df_ORF(pep_file,candidates) :
             'score' : float(vals[5].split('=')[1]), #score
             'strand' : vals[5].split(')')[0].lstrip('(')
         }
-        c = candidates.loc[lambda c :(c.reference==orf['reference'])&~((c.end <= orf['start'])|(c.start >= orf['end'])),:]
+        c = 0
+        #c = candidates.loc[lambda c :(c.reference==orf['reference']) &~((c.end <= orf['start'])|(c.start >= orf['end'])), :]
+        if trim:
+            orf['reference'] = orf['reference'].split("##")[0]
+            c = candidates.loc[lambda c :(c.reference==orf['reference']) & (c['filter']=="PASS") & (c.start<=orf['end']) & (c.start>=orf['start'])]
+        else:
+            c = candidates.loc[lambda c :(c.reference==orf['reference']) & (c['filter']=="PASS") & (c.start<=orf['end']) & (c.end>=orf['start'])]
+        
         if not c.empty :
             orf['candidates'] = ",".join(c['#ID'].values)
             orfs.append(pd.Series(orf))
     return pd.DataFrame(orfs)
     
-def analyzeORF(reference, cand_file, output, force, prefix, no_refine, rm) :
+def analyzeORF(reference, trim_ref, cand_file, output, force, prefix, no_refine, rm) :
     candidates = pd.read_csv(cand_file.name,sep='\t',skiprows=2)
     output_path = output + "/orf";
     if prefix:
         output_path += "_" + prefix;
         inter_dir = 'orf_'+prefix+'_intermediate'
+        inter_trim_dir = 'orf_'+prefix+'_trim_intermediate'
     else :
         inter_dir = 'orf_intermediate'
+        inter_trim_dir = 'orf_trim_intermediate'
     
     # Create output dir if not exist
     if not os.path.exists(output) :
@@ -377,29 +386,42 @@ def analyzeORF(reference, cand_file, output, force, prefix, no_refine, rm) :
             exit(1)
     
     cmd_long_orf = ['TransDecoder.LongOrfs','-t',os.path.abspath(reference.name),'-O',inter_dir]
-    cmd_predict = ['TransDecoder.Predict','-t',os.path.abspath(reference.name),'-O',inter_dir]
+    cmd_predict  = ['TransDecoder.Predict','-t',os.path.abspath(reference.name),'-O',inter_dir]
     if no_refine :
         cmd_predict.append('--no_refine_starts')
+    
+    cmd_long_orf_trim = ['TransDecoder.LongOrfs','-t',os.path.abspath(trim_ref.name),'-O',inter_trim_dir]
+    cmd_predict_trim  = ['TransDecoder.Predict','-t',os.path.abspath(trim_ref.name),'-O',inter_trim_dir]
+    if no_refine :
+        cmd_predict_trim.append('--no_refine_starts')
         
     with open(output_path+'.log', 'w') as log :
         here = os.path.abspath('.')
         os.chdir(output)
         log.write('COMMANDS launched by intronSeeker :\n')
+
         log.write(' '.join(cmd_long_orf)+'\n')
         log.write(' '.join(cmd_predict)+'\n\n')
         long_prcs = sp.run(cmd_long_orf,stdout=log,stderr=sp.STDOUT)
         predict_prcs = sp.run(cmd_predict,stdout=log,stderr=sp.STDOUT)
         os.system('mv *.transdecoder.* {intermediate} ; mv pipeliner* {intermediate}'.format(intermediate=inter_dir))
 
+        log.write(' '.join(cmd_long_orf_trim)+'\n')
+        log.write(' '.join(cmd_predict_trim)+'\n\n')
+        long_prcs_trim = sp.run(cmd_long_orf_trim,stdout=log,stderr=sp.STDOUT)
+        predict_prcs_trim = sp.run(cmd_predict_trim,stdout=log,stderr=sp.STDOUT)
+        os.system('mv *.transdecoder.* {intermediate} ; mv pipeliner* {intermediate}'.format(intermediate=inter_trim_dir))
     
     transdecoder_out = inter_dir+'/'+os.path.basename(reference.name)+".transdecoder.pep"
     orfs = df_ORF(transdecoder_out,candidates)
-    
+    transdecoder_out = inter_trim_dir+'/'+os.path.basename(trim_ref.name)+".transdecoder.pep"
+    orfs_trim = df_ORF(transdecoder_out,candidates,True)
     if rm :
         os.system('rm -r '+inter_dir+'*')
 
     os.chdir(here)
     orfs.to_csv(output_path+'.txt',sep='\t',index=False)
+    orfs_trim.to_csv(output_path+'_trim.txt',sep='\t',index=False)
 
 
 #################################################
