@@ -117,6 +117,7 @@ def parse_arguments() :
     parser_gbs.add_argument('-o','--output', type=str, required=True, dest='output')
     parser_gbs.add_argument('-F', '--force', action='store_true', default=False, dest='force')
     parser_gbs.add_argument('-m', '--mix-state', action='store_true', default=False, dest='mix')
+    parser_gbs.add_argument('-u', '--uniq-transcript', action='store_true', default=False, dest='uniq')
     parser_gbs.add_argument('-h','--help',action='store_const', const = parser_gbs.prog.split()[-1],dest='c_help')
     parser_gbs.set_defaults(func=gtf_based_simulation)
 

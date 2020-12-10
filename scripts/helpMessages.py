@@ -128,7 +128,7 @@ The second simulation is based on an existing genome and corresponding genome\
  which contains the pseudo retained  introns  charesteristics.  All the sequences\
  (contigs and introns)  as  well  as  the  introns  insertion are fully random.'
     ))
-    # fullRandomSimulation
+    # GTFbasedSimulation
     print('   GTFbasedSimulation',end='')
     print(cw.fill(
 'From  a genome  and an  associated  GTF  file,  generates   pseudo-contigs   (corresponds \
@@ -489,7 +489,7 @@ Performs the ORF analysis on a reference FASTA file: predicts, with TransDecoder
     print('Usage:')
     print(
     textwrap.fill('\
-intronSeeker analyzeORF -r <ref.fa> -t <tref.fa> -c <cand.txt> -o STR [-p STR] [-F,-k,-R]',
+intronSeeker analyzeORF -r <ref.fa> -c <candidates.txt> -o STR [-p STR] [-F, -k, -R]',
     width=90
     ))
     print()
@@ -505,13 +505,9 @@ intronSeeker analyzeORF -r <ref.fa> -t <tref.fa> -c <cand.txt> -o STR [-p STR] [
     print(cw.fill(
 'Name  of the reference FASTA file  on which  the ORF prediction must be performed.'
     ))
-    print('   -t/--trim-ref FILE',end='')
-    print(cw.fill(
-'Name  of the trimmed reference FASTA file  on which  the ORF prediction must be performed.'
-    ))
     print('   -c/--candidates FILE',end='')
     print(cw.fill(
-'Name the candidates TXT file to consider only the ORFs which overlap a "PASS" candidate.'
+'Name the candidates TXT file to consider only the ORFs which overlap a selected candidate.'
     ))
     print('   -p/--prefix STR',end='')
     print(cw.fill(
@@ -741,6 +737,10 @@ From a genome and associated ensembl GTF file, generates pseudo-contigs (corresp
     print('   -m/--mix-state\t',end='')
     print(cw.fill(
 'Boolean which rules if the modified contigs is mixed:    if the fasta file contains the transcripts in the two states  (with  AND  without  retained introns  and/or spliced exons).'
+    ))
+    print('   -u/--uniq-transcript\t',end='')
+    print(cw.fill(
+'Generate transcripts only from uniq transcript genes.'
     ))
     print('   -p/--prefix STR',end='') 
     print(cw.fill(

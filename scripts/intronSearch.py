@@ -236,13 +236,8 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
                 candidates.loc[prevIndex, 'filter'] = "OI" 
             prevCtg   = v['reference']
             prevStart = v['start']
-            #prevEnd   = v['end']
-            #sarah##################
-            if v['end'] < prevEnd:
-                prevEnd = prevEnd
-            else:
+            if prevEnd > v['end']:
                 prevEnd = v['end']
-            #sarah##################
             prevFilter= v['filter']
             prevIndex = k
     # ~ candidates = find_split(ref_id_list,bamfile.name,fastafile.name)
