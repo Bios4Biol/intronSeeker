@@ -790,7 +790,8 @@ def removeTranscriptsComingFromSameGene(gtf_content, transcripts):
                 prev_gene_id = curr_gene_id
                 prev_tran_id = curr_tran_id
     for tr in tr_id_to_remove:
-        transcripts.remove(tr)
+        if tr in transcripts: # example: too lon transcripts already removed
+            transcripts.remove(tr)
     # Remove last empty line        
     gtf_content.pop()       
     return transcripts    
