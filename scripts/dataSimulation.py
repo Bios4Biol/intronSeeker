@@ -772,38 +772,27 @@ def removeTranscriptsComingFromSameGene(gtf_content, transcripts):
     # last transcript of the file is choosen (in order to oblige the function to
     # processes last exons)
     gtf_content.append(["ref",".","transcript","0","0",".",".",".", {'transcript_id': 'tr', 'gene_id': 'gene'}])
-    #print('gtf_content', gtf_content[-1])
-    gene=""
-    previous_gene=""
-    previous_transcript=""
-    tr_id=""
-    multi = 0
-
+    curr_gene_id = ""
+    prev_gene_id = ""
+    curr_tran_id = ""
+    prev_tran_id = ""
+    tr_id_to_remove = []
     for feature in gtf_content :
         if feature[2] == "transcript" :
-            gene  = feature[-1]["gene_id"]  
-            tr_id = feature[-1]["transcript_id"]
-            # multi += 1
+            curr_gene_id = feature[-1]["gene_id"]  
+            curr_tran_id = feature[-1]["transcript_id"]
 
-            if previous_gene != gene:
-                # if multi>1 and (tr_id in transcripts):  # je ne vois pas trop comment utiliser ce cas... car si on change de gene, rien a rm..
-                #     multi += 1
-                # else: 
-                    multi = 0
+            if prev_gene_id == curr_gene_id:
+                if prev_tran_id not in tr_id_to_remove:
+                    tr_id_to_remove.append(prev_tran_id)
+                tr_id_to_remove.append(curr_tran_id)
             else:
-                if previous_transcript != tr_id:
-                    transcripts.remove(tr_id)
-                    multi += 1
-                else:
-                    multi = 0    
-    
-            previous_gene = gene
-            previous_transcript=tr_id
-
-            
+                prev_gene_id = curr_gene_id
+                prev_tran_id = curr_tran_id
+    for tr in tr_id_to_remove:
+        transcripts.remove(tr)
     # Remove last empty line        
     gtf_content.pop()       
-
     return transcripts    
     
 def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, output: str, force: bool, mix: bool, uniq: bool):
