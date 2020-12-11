@@ -89,12 +89,38 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
     
     split_alignments = []
     candidates=[]
+    cigarM1=0
+    cigarM2=0
+    foot=0
     for ref_id in ref_id_list:
         aligned = bamfile.fetch(ref_id, multiple_iterators=True)
         split_reads=[]
         contig_seq = ref_dict.fetch(ref_id)
         for read in aligned:
-            if read.cigartuples is not None and read.mapping_quality >= 2:
+            #sarah
+            if read.cigarstring is not None and "N" in read.cigarstring and "I" not in read.cigarstring:
+                #print('cigar string', read.cigarstring)
+                cigar_pattern = "([0-9]+)M([0-9]+)N([0-9]+)M"  
+                cigar         = re.search(cigar_pattern, read.cigarstring)
+                try:
+                    cigarM1 = int(cigar.group(1))
+                except:
+                    cigarM1 = 0
+                try : 
+                    cigarM2 = int(cigar.group(3))
+                except:
+                    cigarM2 = 0   
+                foot=  min(cigarM1,cigarM2)
+                #print('foot', foot)
+            else:
+                foot = None
+                # cigar = re.search("([0-9]+)M", str(read.cigarstring))
+                # try:
+                #     foot = int(cigar.group(1))
+                # except:
+                #     foot = 0       
+            # sarah
+            if read.cigartuples is not None and read.mapping_quality >= 2 and  foot is not None and foot >= 5: #sarah : remove reads with cigarM1 or cigarM2 < 5
                 if '(3,' in str(read.cigartuples):
                     split = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
                     split['read'] = read.query_name
