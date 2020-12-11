@@ -89,9 +89,6 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
     
     split_alignments = []
     candidates=[]
-    cigarM1=0
-    cigarM2=0
-    foot=0
     for ref_id in ref_id_list:
         aligned = bamfile.fetch(ref_id, multiple_iterators=True)
         split_reads=[]
