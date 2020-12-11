@@ -68,7 +68,7 @@ def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
                     index = ["start_split","end_split","split_length","split_borders"])
 
-def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
+def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
     """
     For an alignment file, list all split reads.
 
@@ -117,7 +117,7 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
                 # except:
                 #     foot = 0       
             # sarah
-            if read.cigartuples is not None and read.mapping_quality >= 2 and  foot is not None and foot >= 5: #sarah : remove reads with cigarM1 or cigarM2 < 5
+            if read.cigartuples is not None and read.mapping_quality >= 2 and  foot is not None and foot >= minfootsize: #sarah : remove reads with cigarM1 or cigarM2 < 5
                 if '(3,' in str(read.cigartuples):
                     split = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
                     split['read'] = read.query_name
@@ -194,7 +194,7 @@ def merge_split(contig_reads,contig_name,contig_seq,contig_len,mindepth,maxlen) 
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
 
-def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force, threads) :
+def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force, threads, minfootsize) :
     """
     Search the split reads and write two output files : the first with all the spliced events and the second where all the identical spliced events are merged
     :param bamfilename: name of the input alignment file
@@ -231,7 +231,8 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
             repeat(bamfile.name,ex._max_workers),
             repeat(fastafile.name,ex._max_workers),
             repeat(mindepth,ex._max_workers),
-            repeat(maxlen,ex._max_workers)
+            repeat(maxlen,ex._max_workers),
+            repeat(minfootsize,ex._max_workers)
             ))))
         candidates= pd.concat(out[0])
         split_alignments = pd.concat(out[1])
