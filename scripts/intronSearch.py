@@ -107,17 +107,12 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
                     cigarM2 = int(cigar.group(3))
                 except:
                     cigarM2 = 0   
-                foot=  min(cigarM1,cigarM2)
-                #print('foot', foot)
-            else:
-                foot = None
-                # cigar = re.search("([0-9]+)M", str(read.cigarstring))
-                # try:
-                #     foot = int(cigar.group(1))
-                # except:
-                #     foot = 0       
-            # sarah
-            if read.cigartuples is not None and read.mapping_quality >= 2 and  foot is not None and foot >= minfootsize: #sarah : remove reads with cigarM1 or cigarM2 < 5
+                  # Remove reads with cigarM1 or cigarM2 < minfootsize       
+                if min(cigarM1,cigarM2) < minfootsize:
+                    foot = False
+                    #print('READ TO REMOVE :', min(cigarM1,cigarM2), 'read: ', read.query_name,' and cigar', cigar )
+      
+            if read.cigartuples is not None and read.mapping_quality >= 2 and foot == True :
                 if '(3,' in str(read.cigartuples):
                     split = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
                     split['read'] = read.query_name
@@ -127,6 +122,7 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
                     else :
                         split['strand'] = '+'
                     split_reads.append(split)
+                    #print('Keep ', foot, ' read : ', read.query_name, ' and cigar ', read.cigarstring)
         df_split_reads = pd.DataFrame(split_reads)
         if not df_split_reads.empty :
             contig_len = len(ref_dict.fetch(ref_id))
