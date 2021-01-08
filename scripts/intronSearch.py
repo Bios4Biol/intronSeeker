@@ -111,6 +111,8 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
                 if min(cigarM1,cigarM2) < minfootsize:
                     foot = False
                     #print('READ TO REMOVE :', min(cigarM1,cigarM2), 'read: ', read.query_name,' and cigar', cigar )
+                else:
+                    foot = True    
       
             if read.cigartuples is not None and read.mapping_quality >= 2 and foot == True :
                 if '(3,' in str(read.cigartuples):
