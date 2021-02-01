@@ -370,6 +370,10 @@ Performs  the split read  signal  extraction  from  an   alignment (BAM File)  b
     print('   -l/--max-length INT',end='')
     print(cw.fill(
 'Candidates will be flagged if length greater  than [80] percent of contig length.'
+    )) 
+    print('   -f/--foot-size INT',end='')
+    print(cw.fill(
+'Splited reads of candidates will be removed if their minimal foot size is less than [5].'
     ))    
     print('   -p/--prefix STR',end='')
     print(cw.fill(

@@ -68,7 +68,7 @@ def limit_from_cigar(cigar_list: list, start: int, ref_seq: str):
     return pd.Series([int(split_start),int(split_end),length,flank_left+"_"+flank_right],
                     index = ["start_split","end_split","split_length","split_borders"])
 
-def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
+def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
     """
     For an alignment file, list all split reads.
 
@@ -94,7 +94,27 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
         split_reads=[]
         contig_seq = ref_dict.fetch(ref_id)
         for read in aligned:
-            if read.cigartuples is not None and read.mapping_quality >= 2:
+            #sarah
+            if read.cigarstring is not None and "N" in read.cigarstring and "I" not in read.cigarstring:
+                #print('cigar string', read.cigarstring)
+                cigar_pattern = "([0-9]+)M([0-9]+)N([0-9]+)M"  
+                cigar         = re.search(cigar_pattern, read.cigarstring)
+                try:
+                    cigarM1 = int(cigar.group(1))
+                except:
+                    cigarM1 = 0
+                try : 
+                    cigarM2 = int(cigar.group(3))
+                except:
+                    cigarM2 = 0   
+                  # Remove reads with cigarM1 or cigarM2 < minfootsize       
+                if min(cigarM1,cigarM2) < minfootsize:
+                    foot = False
+                    #print('READ TO REMOVE :', min(cigarM1,cigarM2), 'read: ', read.query_name,' and cigar', cigar )
+                else:
+                    foot = True    
+      
+            if read.cigartuples is not None and read.mapping_quality >= 2 and foot == True :
                 if '(3,' in str(read.cigartuples):
                     split = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
                     split['read'] = read.query_name
@@ -104,6 +124,7 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen):
                     else :
                         split['strand'] = '+'
                     split_reads.append(split)
+                    #print('Keep ', foot, ' read : ', read.query_name, ' and cigar ', read.cigarstring)
         df_split_reads = pd.DataFrame(split_reads)
         if not df_split_reads.empty :
             contig_len = len(ref_dict.fetch(ref_id))
@@ -171,7 +192,7 @@ def merge_split(contig_reads,contig_name,contig_seq,contig_len,mindepth,maxlen) 
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
 
-def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force, threads) :
+def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force, threads, minfootsize) :
     """
     Search the split reads and write two output files : the first with all the spliced events and the second where all the identical spliced events are merged
     :param bamfilename: name of the input alignment file
@@ -208,7 +229,8 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
             repeat(bamfile.name,ex._max_workers),
             repeat(fastafile.name,ex._max_workers),
             repeat(mindepth,ex._max_workers),
-            repeat(maxlen,ex._max_workers)
+            repeat(maxlen,ex._max_workers),
+            repeat(minfootsize,ex._max_workers)
             ))))
         candidates= pd.concat(out[0])
         split_alignments = pd.concat(out[1])
