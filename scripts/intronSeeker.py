@@ -72,6 +72,7 @@ def parse_arguments() :
     parser_orf = subparser.add_parser('analyzeORF',add_help=False)
     parser_orf.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='reference')
     parser_orf.add_argument('-t', '--trim-reference', type=argparse.FileType('r'), required=True, dest='trim_ref')
+    parser_orf.add_argument('-d', '--database', type=argparse.FileType('r'),  required=True, dest='db_file')
     parser_orf.add_argument('-c', '--candidates', type=argparse.FileType('r'),  required=True, dest='cand_file')
     parser_orf.add_argument('-k','--keep', action='store_false',required=False, default=False, dest='rm')
     parser_orf.add_argument('-o','--output', type=str, required=True, dest='output')

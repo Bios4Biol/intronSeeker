@@ -327,101 +327,205 @@ def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
 # search ORF on fasta #
 #######################
 
-
-def df_ORF(pep_file, candidates, trim=0) : 
+def df_lg_ref_ORF(getorf_file, candidates) :
     """
-    From the TransDecoder output, write a tsv file which contains information about each predicted ORF.
-    :param transdecoder_orfs: Transdecoder output which contains all the predicte ORFs (nucleic or proteic fasta format)
-    :param output_tsv: name of the tsv ouput file
-    :return: nothing
+    Search longest getorf overlapping start of each candidate
+    Return new df candidates with one more col "lg_ref_ORF"
     """
-    grep_out = sp.run(['grep','^>', pep_file],stdout=sp.PIPE)
+    grep_out = sp.run(['grep','^>', getorf_file],stdout=sp.PIPE)
     lines = grep_out.stdout.decode('utf-8').rstrip().split('\n')
-    orfs=[]
+    # orfs = dict of array of found orfs by sequence
+    orfs={}
     for line in lines :
         vals = line.lstrip('>').split()
-        orf = {
-            '#orf_id' : vals[0], #orf_id
-            'reference' : vals[-1].split(':')[0], #reference
-            'start' : int(vals[-1].split(':')[1].split('-')[0])-1, #start-1 because of O-based coord
-            'end' : int(vals[-1].split(':')[1].split('-')[1].rstrip('(+-)')), #end 
-            'length' : int(vals[4].split(':')[1]), #length
-            'type' : vals[3].split(':')[1], #type
-            'score' : float(vals[5].split('=')[1]), #score
-            'strand' : vals[5].split(')')[0].lstrip('(')
-        }
-        c = 0
-        #c = candidates.loc[lambda c :(c.reference==orf['reference']) &~((c.end <= orf['start'])|(c.start >= orf['end'])), :]
-        if trim:
-            orf['reference'] = orf['reference'].split("##")[0]
-            c = candidates.loc[lambda c :(c.reference==orf['reference']) & (c['filter']=="PASS") & (c.start<=orf['end']) & (c.start>=orf['start'])]
+        tmp_id = vals[0].split("_")
+        tmp_id.pop()
+        id    = "_".join(tmp_id)
+        start = int(vals[1].lstrip('['))
+        end   = int(vals[3].rstrip(']'))
+        if id not in orfs:
+            orfs[id] = []
+        if start<end:
+            orfs[id].append([start, end])
         else:
-            c = candidates.loc[lambda c :(c.reference==orf['reference']) & (c['filter']=="PASS") & (c.start<=orf['end']) & (c.end>=orf['start'])]
+            orfs[id].append([end, start])
+    df_new_candidates = candidates[candidates["filter"] == "PASS"].copy()
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_rows', None)
+    #print('New_cand:', df_new_candidates.head(5), '\n\n')
+    longestORF = []
+    for index, row in df_new_candidates.iterrows(): 
+        current_longestORF = 0
+        if row["reference"] in orfs:
+            for s,e in orfs[row["reference"]]:
+                #print("Deb:",s," End:",e)
+                if(row["start"]>=s and row["start"]<=e):
+                    #print("Deb:",s," End:",e, "<======DANS LA ZONE")
+                    t = e-s+1
+                    if(t>current_longestORF):
+                        current_longestORF = t
+        longestORF.append(current_longestORF) 
+        #print(row["#ID"], " ",row["reference"]," ", str(row["start"])," ",str(row["end"]))
+    df_new_candidates['lgORF_ref'] = longestORF
+    print('New_cand:', df_new_candidates.head(5), '\n\n')
+    return df_new_candidates
+
+def df_lg_trim_ORF(getorf_file, candidates) :
+    """
+    Search longest getorf overlapping start of each candidate
+    Return new df candidates with one more col "lg_ref_ORF"
+    """
+    grep_out = sp.run(['grep','^>', getorf_file],stdout=sp.PIPE)
+    lines = grep_out.stdout.decode('utf-8').rstrip().split('\n')
+    # orfs = dict of array of found orfs by sequence
+    orfs={}
+    for line in lines :
+        vals = line.lstrip('>').split()
+        id    = vals[-1].split('=')[1]
+        start = int(vals[1].lstrip('['))
+        end   = int(vals[3].rstrip(']'))
+        if id not in orfs:
+            orfs[id] = []
+        if start<end:
+            orfs[id].append([start, end])
+        else:
+            orfs[id].append([end, start])
+    df_new_candidates = candidates[candidates["filter"] == "PASS"].copy()
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_rows', None)
+    longestORF = []
+    for index, row in df_new_candidates.iterrows(): 
+        current_longestORF = 0
+        if row["#ID"] in orfs:
+            for s,e in orfs[row["#ID"]]:
+                if(row["start"]>=s and row["start"]<=e):
+                    t = e-s+1
+                    if(t>current_longestORF):
+                        current_longestORF = t
+        longestORF.append(current_longestORF)
         
-        if not c.empty :
-            orf['candidates'] = ",".join(c['#ID'].values)
-            orfs.append(pd.Series(orf))
-    return pd.DataFrame(orfs)
-    
-def analyzeORF(reference, trim_ref, cand_file, output, force, prefix, no_refine, rm) :
+    df_new_candidates['lgORF_trim'] = longestORF
+    print('New_cand:', df_new_candidates.head(5), '\n\n')
+    return df_new_candidates
+
+def df_parseDiamond(diamond_file, candidates) :
+    file = open(diamond_file, "r")
+    line = file.readline()
+    prots={}
+    while line:
+        vals = line.split('\t')
+        id    = vals[0]
+        start = int(vals[2])
+        end   = int(vals[3])
+        if id not in prots:
+            prots[id] = []
+        if start<end:
+            prots[id].append([start, end])
+        else:
+            prots[id].append([end, start]) 
+        line = file.readline()
+    file.close()
+ 
+    protoverlap = []
+    protbefore = []
+    protafter = []
+    protbilan = []
+    for index, row in candidates.iterrows(): 
+        nboverlap = 0
+        nbbefore = 0
+        nbafter = 0
+
+        #ENSGALT00000097829.modif|478|1157      1       441     405     12      12      1       --
+
+        if row["reference"] in prots:
+            for s,e in prots[row["reference"]]:
+                #if(s+10<=row["end"] and e-10>=row["start"]):
+                #    nboverlap += 1
+                
+                #if((row["start"]+15>s and row["start"]+15<e) or ((row["end"]-15>s and row["end"]-15<e))):
+                #    nboverlap += 1
+                center = row["start"] + ((row["end"]-row["start"]+1)/2)
+                if(s<=center and e>=center):
+                    nboverlap += 1
+                elif(abs(row["start"]-e) < 10):
+                    nbbefore += 1
+                elif(abs(s-row["end"]) < 10):
+                    nbafter += 1
+        
+        protoverlap.append(nboverlap)
+        protbefore.append(nbbefore)
+        protafter.append(nbafter)
+        if(nbafter+nbbefore > nboverlap):
+            protbilan.append("OK")
+        else:
+            protbilan.append("--")
+        
+    candidates['protoverlap'] = protoverlap
+    candidates['before'] = protbefore
+    candidates['after'] = protafter
+    candidates['bilan'] = protbilan
+
+    print('New_cand:', candidates.head(5), '\n\n')
+    return candidates
+
+
+def analyzeORF(reference, trim_ref, db_file, cand_file, output, force, prefix, no_refine, rm) :
     candidates = pd.read_csv(cand_file.name,sep='\t',skiprows=2)
-    output_path = output + "/orf";
+    output_path = output + "/orf"
     if prefix:
-        output_path += "_" + prefix;
-        inter_dir = 'orf_'+prefix+'_intermediate'
-        inter_trim_dir = 'orf_'+prefix+'_trim_intermediate'
-    else :
-        inter_dir = 'orf_intermediate'
-        inter_trim_dir = 'orf_trim_intermediate'
+        output_path += "_" + prefix
+    output_tmp_dir = output_path+'_tmp'
     
     # Create output dir if not exist
     if not os.path.exists(output) :
         os.makedirs(output)
+    if not os.path.exists(output_tmp_dir) :
+        os.makedirs(output_tmp_dir)
     if not force:
         try :
             if os.path.exists(output_path + '.txt'):
-                   raise FileExistsError
+                raise FileExistsError
         except FileExistsError as e :
             print('\nError: output file(s) already exists.\n')
             exit(1)
     
-    cmd_long_orf = ['TransDecoder.LongOrfs','-t',os.path.abspath(reference.name),'-O',inter_dir]
-    cmd_predict  = ['TransDecoder.Predict','-t',os.path.abspath(reference.name),'-O',inter_dir]
-    if no_refine :
-        cmd_predict.append('--no_refine_starts')
-    
-    cmd_long_orf_trim = ['TransDecoder.LongOrfs','-t',os.path.abspath(trim_ref.name),'-O',inter_trim_dir]
-    cmd_predict_trim  = ['TransDecoder.Predict','-t',os.path.abspath(trim_ref.name),'-O',inter_trim_dir]
-    if no_refine :
-        cmd_predict_trim.append('--no_refine_starts')
-        
+    cmd_getorf = ['getorf','-sequence',os.path.abspath(reference.name),'-outseq',output_tmp_dir+'/reference.getorf']
+    cmd_getorf_trim = ['getorf','-sequence',os.path.abspath(trim_ref.name),'-outseq',output_tmp_dir+"/trimmed_reference.getorf"]
+
     with open(output_path+'.log', 'w') as log :
-        here = os.path.abspath('.')
-        os.chdir(output)
         log.write('COMMANDS launched by intronSeeker :\n')
-
-        log.write(' '.join(cmd_long_orf)+'\n')
-        log.write(' '.join(cmd_predict)+'\n\n')
-        long_prcs = sp.run(cmd_long_orf,stdout=log,stderr=sp.STDOUT)
-        predict_prcs = sp.run(cmd_predict,stdout=log,stderr=sp.STDOUT)
-        os.system('mv *.transdecoder.* {intermediate} ; mv pipeliner* {intermediate}'.format(intermediate=inter_dir))
-
-        log.write(' '.join(cmd_long_orf_trim)+'\n')
-        log.write(' '.join(cmd_predict_trim)+'\n\n')
-        long_prcs_trim = sp.run(cmd_long_orf_trim,stdout=log,stderr=sp.STDOUT)
-        predict_prcs_trim = sp.run(cmd_predict_trim,stdout=log,stderr=sp.STDOUT)
-        os.system('mv *.transdecoder.* {intermediate} ; mv pipeliner* {intermediate}'.format(intermediate=inter_trim_dir))
+        log.write(' '.join(cmd_getorf)+'\n')
+        getorf_prcs = sp.run(cmd_getorf,stdout=log,stderr=sp.STDOUT)
+        log.write(' '.join(cmd_getorf_trim)+'\n\n')
+        getorf_trim_prcs = sp.run(cmd_getorf_trim,stdout=log,stderr=sp.STDOUT)
     
-    transdecoder_out = inter_dir+'/'+os.path.basename(reference.name)+".transdecoder.pep"
-    orfs = df_ORF(transdecoder_out,candidates)
-    transdecoder_out = inter_trim_dir+'/'+os.path.basename(trim_ref.name)+".transdecoder.pep"
-    orfs_trim = df_ORF(transdecoder_out,candidates,True)
-    if rm :
-        os.system('rm -r '+inter_dir+'*')
+    df_candidates_new = df_lg_ref_ORF(output_tmp_dir+'/reference.getorf', candidates)
+    df_candidates_new = df_lg_trim_ORF(output_tmp_dir+'/trimmed_reference.getorf', df_candidates_new)
 
-    os.chdir(here)
-    orfs.to_csv(output_path+'.txt',sep='\t',index=False)
-    orfs_trim.to_csv(output_path+'_trim.txt',sep='\t',index=False)
+    if rm :
+        os.system('rm -r '+output_tmp_dir)
+
+    #df_candidates_new.to_csv(output_path+'.txt',sep='\t',index=False)
+    #orfs_trim.to_csv(output_path+'_trim.txt',sep='\t',index=False)
+
+    ## Prot
+    db = output_tmp_dir+"/"+os.path.basename(db_file.name)
+    cmd_diamond_makedb = ['diamond','makedb','--in',os.path.abspath(db_file.name),'--db',db]
+    makedb_prcs = sp.run(cmd_diamond_makedb)
+
+    os.system("diamond blastx -q {fasta} -d {db} -o {output} -f 6 qseqid qlen qstart qend sseqid slen sstart send pident length evalue bitscore -p 1 -e 0.05 --max-target-seqs 0".format(
+        fasta=os.path.abspath(reference.name),db=db+".dmnd",output=db+"_ref_output.tsv"))
+    print(db+"_ref_output.tsv")
+    df_candidates_new = df_parseDiamond(db+"_ref_output.tsv", df_candidates_new)
+    df_candidates_new.to_csv(output_path+'.txt',sep='\t',index=False)
+
+
+    #os.system("diamond blastx -q {fasta} -d {db} -o {output} -f 6 qseqid qlen sseqid slen pident length qstart qend evalue bitscore -p 1 -e 0.05 --max-target-seqs 0".format(
+    #    fasta=os.path.abspath(trim_ref.name),db=db+".dmnd",output=db+"_trim_output.tsv"))
+
+    
+    # `diamond makedb --in $diamond --db $outputDir/private_tmp_ 2> $outputDir/private.diamond_makedb_tmp_.stderr`;
+    # `diamond blastx --db $outputDir/private_tmp_ --query $prokkaTFA --threads $threads --outfmt 6 qseqid sseqid pident nident length mismatch gaps gapopen qstart qend sstart send evalue bitscore stitle qcovhsp  -k 1000 --query-cover $diamond_queryCover -e $diamond_evalue --out $outputDir/private.diamond.tsv 2> $outputDir/private.diamond_tmp_.stderr`;
 
 
 #################################################
