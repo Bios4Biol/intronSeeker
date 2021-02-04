@@ -97,7 +97,7 @@ def get_html_header():
 '''
 
 # icons : https://useiconic.com/open/
-def get_html_body1(flagstat="", split="", candidat=""):
+def get_html_body1(flagstat="", split="", candidat="", mfasta=""):
     r = '''
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
@@ -138,19 +138,24 @@ def get_html_body1(flagstat="", split="", candidat=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Nb. of seq. with same features
 			    	</a>
-			    </li>
+			    </li>'''
+    if mfasta:
+        r += '''                
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#ref-descr_assemblathon_fasta">
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Assemblathon(s)
 			    	</a>
-			    </li>
+			    </li>'''
+        r += '''			    
                 <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#contigs_len_dist">
 				        <span class="oi oi-bar-chart" aria-hidden="true"></span>
 				        Contigs len. distribution
 				    </a>
-			    </li>
+			    </li>'''
+    if mfasta:
+        r += '''
 			    <li class="nav-item" style="padding-left:10px">
 				    <a class="nav-link" href="#feat_len_dist">
 				        <span class="oi oi-graph" aria-hidden="true"></span>
@@ -162,7 +167,8 @@ def get_html_body1(flagstat="", split="", candidat=""):
 				        <span class="oi oi-bar-chart" aria-hidden="true"></span>
 				        Introns positions
 				    </a>
-			    </li>  
+			    </li>'''
+        r += '''
 			    <li class="nav-item">
 				    <a class="nav-link" href="#read-descr">
 				        <span class="oi oi-collapse-up" aria-hidden="true"></span>
@@ -211,13 +217,12 @@ def get_html_body1(flagstat="", split="", candidat=""):
 				    	<span class="oi oi-list" aria-hidden="true"></span>
 				    	Contigs with too complex introns
 			    	</a>
-			    </li>
-                '''
-    r +='''      
+			    </li>'''
+        r+= '''      
                 <li class="nav-item">
                     <a class="nav-link" href="#eval">
                         <span class="oi oi-circle-check" aria-hidden="true"></span>
-                        Evaluation of the detected introns
+                        Evaluation of the detected introns (simulation only)
                     </a>
                 </li> 
                 <li class="nav-item">
@@ -238,6 +243,8 @@ def get_html_body1(flagstat="", split="", candidat=""):
 		<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
 '''
     return r
+
+
 
 def get_html_inputfiles(files:dict):
     r = '''
@@ -261,7 +268,7 @@ def get_html_inputfiles(files:dict):
     return r
 
 
-def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict, df_fasta:dict, df_mfasta:dict, global_stat_assemblathon_fasta:dict, global_stat_assemblathon_mfasta:" "):
+def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, df_fasta:"", df_mfasta=0, global_stat_assemblathon_fasta=0, global_stat_assemblathon_mfasta=0, pos=0):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Contigs</h1>
@@ -284,8 +291,15 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
                             <span class="oi oi-info" ></span>
                         </span>
                     </div>
-                </div>               
+                </div> 
+'''
+    if df_mfasta:
+	    r += '''                              
 '''+dict_to_table(global_stat,7,2)+'''
+'''
+    else:
+        r += '''
+'''+dict_to_table(global_stat,4,3)+'''	
             </div>   
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <div class="d-flex">
@@ -326,6 +340,9 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 '''+dict_to_table(ctg_descr,-1,0)+'''
             </div>
         </div>
+'''
+    if  global_stat_assemblathon_mfasta:
+        r += '''		       
         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-6">
                 <h5>Assemblathon statistics</h5>
@@ -337,7 +354,8 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 
     # Len dist for gtf
     len_by_features, feature_names = len_dist_from_gtf(gtf)
-    r += '''
+    if df_mfasta:
+        r += '''
         <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5>Contigs length distribution</h5>
                 <span class="anchor" id="contigs_len_dist"></span>
@@ -350,7 +368,17 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 '''+plot_dist_features_len(len_by_features, feature_names)+'''
             </div>
 '''
-    r += '''
+    else:
+        r += '''
+        <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5>Contigs length distribution</h5>
+                <span class="anchor" id="contigs_len_dist"></span>
+'''+plot_hist_contigs_len_real_data(df_fasta['length'])+'''
+        </div>
+'''
+    if pos:
+        r += '''
+         <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-6">
                 <h5>Insertion position of introns along contigs</h5>
                 <span class="anchor" id="feat_dist_intron"></span>

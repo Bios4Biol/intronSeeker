@@ -110,7 +110,7 @@ def parse_positions(fastq_pos) :
     return start,end,complement
 
 
-def parse_library(r1, r2=0) :
+def parse_library(r1, r2=0, mfasta=0) :
     """
     parse_library function parse library R1, and, if present, library R2 to return a pandas.DataFrame named library where each line is a read description.
     """
@@ -123,17 +123,26 @@ def parse_library(r1, r2=0) :
         for record in SeqIO.parse(file1, "fastq") :
             reference = record.description.split()[1].lstrip("reference=")
             id = record.id
-            start,end,complement = parse_positions(record.description.split()[2])
+            if mfasta:
+                start,end,complement = parse_positions(record.description.split()[2])
+            else:
+                start = 0
+                end = 0
+                complement = 0
             lectures.append([reference, id, len(record), start, end, complement])
     if r2 :
         with my_open(r2,"rt") as file2 :
             for record in SeqIO.parse(file2, "fastq") :
                 reference = record.description.split()[1].lstrip("reference=")
                 id = record.id
-                start,end,complement = parse_positions(record.description.split()[2])
+                if mfasta:
+                    start,end,complement = parse_positions(record.description.split()[2])
+                else:
+                    start = 0
+                    end = 0
+                    complement = 0
                 lectures.append([reference, id, len(record), start, end, complement])
     return pd.DataFrame(lectures,columns=["contig","lecture","length","start","end","complement"]).sort_values(["contig","start","end"]).set_index('lecture') 
-    
 
 def parse_gtf(gtf) :
     """

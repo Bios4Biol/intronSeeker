@@ -62,22 +62,20 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # df_features : pandas.DataFrame where each line is a simulated features description 
     # df_candidat : pandas.DataFrame where each line is a candidat description
     df_fasta  = parse_fasta(fasta.name, False)
-    # SARAH / CAS REAL
+    
+    # if simulation ?
     if mfasta:
         df_mfasta = parse_fasta(mfasta.name,True)
         # # Drop rows without not modified contigs (only sequence.modif)
-        # df_mfasta = df_mfasta[df_mfasta.index.str.contains("modif")]
-    # df_mfasta = parse_fasta(mfasta.name, True)    
-    # SARAH / CAS REAL
-
     if r2 :
-        df_library = parse_library(r1.name, r2.name)
+        df_library = parse_library(r1.name, r2.name, mfasta)
     else :
-        df_library = parse_library(r1.name)
-
+        df_library = parse_library(r1.name, mfasta)
+		
     df_features = parse_gtf(gtf.name)
 
     # Add to df_library the read positions on the modified contig
+    # if simulation ?
     if mfasta:
         df_library['mstart'] = df_library['start']
         df_library['mend']   = df_library['end']
@@ -93,26 +91,19 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 df_library.at[v, 'mend'] += l
     
     # Add a column to df_fasta with the "fasta" length (without any simulated features)
-    # SARAH / CAS REAL
+    # if simulation ?
     if mfasta:
         df_mfasta["short_length"] = df_mfasta.apply(
             compute_tr_length,
             axis = 1,
             df_features=df_features
         )
-
-    # df_mfasta["short_length"] = df_mfasta.apply(
-    #     compute_tr_length,
-    #     axis = 1,
-    #     df_features=df_features
-    # )
-    # SARAH / CAS REAL
     
     # Add two columns to df_features:
     #  1- the true insertion position of the simulated feature (in term of mfasta length percentage)
     #  2- the borders of the simulated features (in term of nucleotides)
 
-    # SARAH / CAS REAL
+    # if simulation ?
     if mfasta:
         df_features = df_features.join(
             other = df_features.apply(
@@ -121,24 +112,24 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 df_mfasta=df_mfasta
             )
         )    
-    # df_features = df_features.join(
-    #     other = df_features.apply(
-    #         compute_pos_on_mfasta,
-    #         axis=1,
-    #         df_mfasta=df_mfasta
-    #     )
-    # )
-    # SARAH / CAS REAL
 
     # HEADER
     html = get_html_header()
     
-    inputfiles = [
-        "Contig FASTA#" + os.path.basename(fasta.name),
-        "Contig FASTA with feature(s)#" + os.path.basename(mfasta.name),
-        "GTF of contig with feature(s)#" + os.path.basename(gtf.name),
-        "Read1 FASTQ#" + os.path.basename(r1.name)
-    ]
+    # if simulation ?
+    if mfasta:
+        inputfiles = [
+            "Contig FASTA#" + os.path.basename(fasta.name),
+            "Contig FASTA with feature(s)#" + os.path.basename(mfasta.name),
+            "GTF of contig with feature(s)#" + os.path.basename(gtf.name),
+             "Read1 FASTQ#" + os.path.basename(r1.name)
+        ]
+    else:
+        inputfiles = [
+            "Contig FASTA#" + os.path.basename(fasta.name),
+            "GTF of contig with feature(s)#" + os.path.basename(gtf.name),
+             "Read1 FASTQ#" + os.path.basename(r1.name)
+        ]   
     if r2:
         inputfiles.append("Read2 FASTQ#" + os.path.basename(r2.name))
     ranks_file=""    
@@ -157,8 +148,11 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     if candidat:
         candidat_file=candidat.name
         inputfiles.append("Candidat#" + os.path.basename(candidat.name))
-
-    html += get_html_body1(flagstat_file, split_file, candidat_file)
+    
+    if mfasta:
+        html += get_html_body1(flagstat_file, split_file, candidat_file, mfasta)
+    else:
+        html += get_html_body1(flagstat_file, split_file, candidat_file)		
    
     # INPUT FILES
     html += get_html_inputfiles(inputfiles)
@@ -167,16 +161,21 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     # Global stat
     nb_distinct_features, nb_ctg_by_feature, ctg_descr = stat_from_gtf(gtf.name)
     global_stat = dict()
-    global_stat["01Contig FASTA - Number of sequences"]  = len(df_fasta.index)
-    global_stat["02Contig FASTA - Mean sequence length"] = int(df_fasta['length'].mean())
-    global_stat["03Contig FASTA with feature(s) - Number of sequences"]  = len(df_mfasta.index)
-    global_stat["04Contig FASTA with feature(s) - Mean sequence length"] = int(df_mfasta['length'].mean())
-    global_stat["05Number of modified sequences"]       = df_mfasta.loc[df_mfasta.index.str.contains(".modif")].shape[0]
-    global_stat["06Number of distinct features in GTF"] = df_features.feature.value_counts().shape[0]
-    global_stat["07Number of features in GTF"]          = len(df_features.index)
-    c = 7
+    global_stat["001Contig FASTA - Number of sequences"]  = len(df_fasta.index)
+    global_stat["002Contig FASTA - Mean sequence length"] = int(df_fasta['length'].mean())
+    # if simulation ?
+    if mfasta:
+        global_stat["003Contig FASTA with feature(s) - Number of sequences"]  = len(df_mfasta.index)
+        global_stat["004Contig FASTA with feature(s) - Mean sequence length"] = int(df_mfasta['length'].mean())
+        global_stat["005Number of modified sequences"]       = df_mfasta.loc[df_mfasta.index.str.contains(".modif")].shape[0]
+    global_stat["006Number of distinct features in GTF"] = df_features.feature.value_counts().shape[0]
+    global_stat["007Number of features in GTF"]          = len(df_features.index)
+    if mfasta:
+        c = 7
+    else:
+        c = 4	    
     for k, v in (df_features.feature.value_counts()).items() :
-        global_stat["0"+str(c)+k] = v
+        global_stat["0"+str(c)+k+' (s) '] = v
         c+=1
 
     # ASSEMBLATHON on fasta files        
@@ -190,7 +189,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     global_stat_assemblathon_fasta["06Number of contigs > 1K nt"] = nbContigsSup1K
     global_stat_assemblathon_fasta["07N50 contig length"]         = n50
     global_stat_assemblathon_fasta["08L50 contig count"]          = l50
-
+    
+    # if simulation ?
     if mfasta:
         nbContigs, totContigSize, longestContig, shortestContig, nbContigsSup1K, n50, l50, meanContigSize = run_assemblathon(mfasta.name)
         global_stat_assemblathon_mfasta = dict()
@@ -202,14 +202,18 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_assemblathon_mfasta["06Number of contigs > 1K nt"] = nbContigsSup1K
         global_stat_assemblathon_mfasta["07N50 contig length"]         = n50
         global_stat_assemblathon_mfasta["08L50 contig count"]          = l50
-    html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta)
-
+    # if simulation ?
+    if mfasta:
+        html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta, df_features['pos_on_contig'])
+    else:
+        html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta)
+		
     # READS STAT
     # Global stat
     global_stat_fastq = dict()
     global_stat_fastq["01Number of reads"]  = len(df_library.index)
     global_stat_fastq["02Mean coverage"]    = df_library['length'].sum()
-    deno = global_stat["02Contig FASTA - Mean sequence length"] * global_stat["01Contig FASTA - Number of sequences"]
+    deno = global_stat["002Contig FASTA - Mean sequence length"] * global_stat["001Contig FASTA - Number of sequences"]
     if deno:
         global_stat_fastq["02Mean coverage"] /= deno
     else :
@@ -379,9 +383,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         else :
             global_stat_f_detected_introns["08Mean length"] = "NaN"
             global_stat_f_detected_introns["11Mean depth"]  = "NaN"
-          
-       
-        # if simulation ?                   
+                          
         if mfasta :
             # Detectable features (filter features because of threshold: mindepth and maxlength)
             # Add a column to df_features for the DP (using df_library)
@@ -488,7 +490,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
             eval_stat = dict()
             eval_stat["01Number of detected introns"] = global_stat_detected_introns["01Number"] 
-            eval_stat["02Number of features"] = global_stat["07Number of features in GTF"] 
+            eval_stat["02Number of features"] = global_stat["007Number of features in GTF"] 
             eval_stat["03"+eval_def["TP"]] = 0
             eval_stat["04"+eval_def["FP"]] = 0
             eval_stat["05"+eval_def["FN"]] = 0
@@ -620,38 +622,69 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
     # SARAH : main stats in a json file
     # https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/  
+    '''
     genowebReportPath='http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA/report_'+prefix+'_simulation.html'  
     data = {}
     data[output_path] = []
-    data[output_path].append({
-        'Prefix'                             : prefix,
-        'Output path'                        : output,
-        'Nb contigs'                         : global_stat["01Contig FASTA - Number of sequences"],
-        'Mean contigs length'                : global_stat["02Contig FASTA - Mean sequence length"],
-        'Nb modified contigs'                : global_stat["03Contig FASTA with feature(s) - Number of sequences"],
-        'Mean modified contigs length'       : global_stat["04Contig FASTA with feature(s) - Mean sequence length"],
-        'Nb reads'                           : global_stat_fastq["01Number of reads"],
-        'Mean coverage'                      : global_stat_fastq["02Mean coverage"],
-        'Nb prop reads'                      : global_stat_flagstat["05Number of properly paired reads"],
-        'Nb secondary alignments'            : secondary,
-        'Nb splits'                          : global_stat_split["01Number of reads overlapping introns"],
-        'Mean len of introns'                : global_stat_split["02Mean length of introns"],
-        'Nb filtered detected introns'       : global_stat_f_detected_introns["01" + definitions['PASS']],
-        'Nb filtered features (detectable)'  : global_stat_detectable_features["01" + definitions['PASS']],
-        'len filtered detected introns'      : global_stat_f_detected_introns["08Mean length"],
-        'len filtered features (detectable)' : global_stat_detectable_features["08Mean length"],
-        'dep filtered detected introns'      : global_stat_f_detected_introns["11Mean depth"],
-        'dep filtered features (detectable)' : global_stat_detectable_features["11Mean depth"],
-        'noise'                              : global_stat_f_detected_introns["05" + definitions['OI']],
-        'TP'                                 : eval_f_stat["03"+eval_def["TP"]],
-        'FN'                                 : eval_f_stat["05"+eval_def["FN"]],
-        'FP'                                 : eval_f_stat["04"+eval_def["FP"]],
-        'F1score'                            : eval_f_stat["08"+eval_def["F1"]],
-        'Se'                                 : eval_f_stat["06"+eval_def["Se"]],
-        'Sp'                                 : eval_f_stat["07"+eval_def["Sp"]],
-        'Report'                             : genowebReportPath
-    })
-    
+    if mfasta:
+        data[output_path].append({
+            'Prefix'                             : prefix,
+            'Output path'                        : output,
+            'Nb contigs'                         : global_stat["001Contig FASTA - Number of sequences"],
+            'Mean contigs length'                : global_stat["002Contig FASTA - Mean sequence length"],
+            'Nb modified contigs'                : global_stat["003Contig FASTA with feature(s) - Number of sequences"],
+            'Mean modified contigs length'       : global_stat["004Contig FASTA with feature(s) - Mean sequence length"],
+            'Nb reads'                           : global_stat_fastq["01Number of reads"],
+            'Mean coverage'                      : global_stat_fastq["02Mean coverage"],
+            'Nb prop reads'                      : global_stat_flagstat["05Number of properly paired reads"],
+            'Nb secondary alignments'            : secondary,
+            'Nb splits'                          : global_stat_split["01Number of reads overlapping introns"],
+            'Mean len of introns'                : global_stat_split["02Mean length of introns"],
+            'Nb filtered detected introns'       : global_stat_f_detected_introns["01" + definitions['PASS']],
+            'Nb filtered features (detectable)'  : global_stat_detectable_features["01" + definitions['PASS']],
+            'len filtered detected introns'      : global_stat_f_detected_introns["08Mean length"],
+            'len filtered features (detectable)' : global_stat_detectable_features["08Mean length"],
+            'dep filtered detected introns'      : global_stat_f_detected_introns["11Mean depth"],
+            'dep filtered features (detectable)' : global_stat_detectable_features["11Mean depth"],
+            'noise'                              : global_stat_f_detected_introns["05" + definitions['OI']],
+            'TP'                                 : eval_f_stat["03"+eval_def["TP"]],
+            'FN'                                 : eval_f_stat["05"+eval_def["FN"]],
+            'FP'                                 : eval_f_stat["04"+eval_def["FP"]],
+            'F1score'                            : eval_f_stat["08"+eval_def["F1"]],
+            'Se'                                 : eval_f_stat["06"+eval_def["Se"]],
+            'Sp'                                 : eval_f_stat["07"+eval_def["Sp"]],
+            'Report'                             : genowebReportPath
+        })
+    else:
+        data[output_path].append({
+            'Prefix'                             : prefix,
+            'Output path'                        : output,
+            'Nb contigs'                         : global_stat["001Contig FASTA - Number of sequences"],
+            'Mean contigs length'                : global_stat["002Contig FASTA - Mean sequence length"],
+            'Nb modified contigs'                : 'N/A',
+            'Mean modified contigs length'       : 'N/A',
+            'Nb reads'                           : global_stat_fastq["01Number of reads"],
+            'Mean coverage'                      : global_stat_fastq["02Mean coverage"],
+            'Nb prop reads'                      : global_stat_flagstat["05Number of properly paired reads"],
+            'Nb secondary alignments'            : secondary,
+            'Nb splits'                          : global_stat_split["01Number of reads overlapping introns"],
+            'Mean len of introns'                : global_stat_split["02Mean length of introns"],
+            'Nb filtered detected introns'       : global_stat_f_detected_introns["01" + definitions['PASS']],
+            'Nb filtered features (detectable)'  : 'N/A',
+            'len filtered detected introns'      : global_stat_f_detected_introns["08Mean length"],
+            'len filtered features (detectable)' : 'N/A',
+            'dep filtered detected introns'      : global_stat_f_detected_introns["11Mean depth"],
+            'dep filtered features (detectable)' : 'N/A',
+            'noise'                              : global_stat_f_detected_introns["05" + definitions['OI']],
+            'TP'                                 : 'N/A',
+            'FN'                                 : 'N/A',
+            'FP'                                 : 'N/A',
+            'F1score'                            : 'N/A',
+            'Se'                                 : 'N/A',
+            'Sp'                                 : 'N/A',
+            'Report'                             : genowebReportPath
+        })		
+		
     # Nb seq               => Nb contigs
     # Mean seq. length     => Mean contigs length 
     # Nb contigs           => Nb modified contigs  
@@ -683,10 +716,10 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     
     stats_data = data[output_path]
     
-    '''
+    
     # now we will open a file for writing (w) and synthese file without overwriting (a)
     data_file = open(output_file+'.csv', 'w') 
-    data_file_synthese = open('/home/smaman/Documents/SYNTHESE.csv', 'a') 
+    data_file_synthese = open('/work/smaman/INTRONSEEKER/TESTS_4_STATS/SYNTHESE.csv', 'a') 
     
     # create the csv writer object 
     csv_writer = csv.writer(data_file) 
@@ -704,7 +737,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             count += 1
         
         # Write headers in synthesis file only if this file is not empty
-        if os.stat('/home/smaman/Documents/SYNTHESE.csv').st_size == 0:
+        if os.stat('/work/smaman/INTRONSEEKER/TESTS_4_STATS/SYNTHESE.csv').st_size == 0:
             header = i.keys()
             csv_writer_synthese.writerow(header)
 
@@ -716,6 +749,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     data_file.close()
     data_file_synthese.close()
     '''
+
 
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser(add_help=False)
@@ -729,7 +763,7 @@ if __name__ == '__main__' :
     parser = ArgumentParser()
     parser.add_argument('--config-file', type=argparse.FileType('r'), required=False, help="Provide a config file")
     parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta', help="Path to the reference FASTA file.")
-    parser.add_argument('-m','--modified-fasta', type=argparse.FileType('r'), required=True, dest='mfasta', help="Path to the modified FASTA file.")
+    parser.add_argument('-m','--modified-fasta', type=argparse.FileType('r'), required=False, dest='mfasta', help="Path to the modified FASTA file.")  # SARAH 01/2021 required=False
     parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=True, dest='gtf', help="GTF filename which contains the genome annotation.")
     parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1', help="Name of the  FASTQ  file  which  contains  the  single-end   reads library. If paired-end, filename of #1 reads mates")
     parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2', help="Only for a paired-end library, filename of #2 reads mates.")
