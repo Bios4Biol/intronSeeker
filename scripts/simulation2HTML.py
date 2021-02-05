@@ -202,11 +202,11 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_assemblathon_mfasta["06Number of contigs > 1K nt"] = nbContigsSup1K
         global_stat_assemblathon_mfasta["07N50 contig length"]         = n50
         global_stat_assemblathon_mfasta["08L50 contig count"]          = l50
-    # if simulation ?
+     # if simulation ?
     if mfasta:
-        html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta, df_features['pos_on_contig'])
+        html += get_html_seq_descr("simulation", global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta, df_features['pos_on_contig'])
     else:
-        html += get_html_seq_descr(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta)
+        html += get_html_seq_descr("real", global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta)
 		
     # READS STAT
     # Global stat
