@@ -268,7 +268,7 @@ def get_html_inputfiles(files:dict):
     return r
 
 
-def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, df_fasta:"", df_mfasta=0, global_stat_assemblathon_fasta=0, global_stat_assemblathon_mfasta=0, pos=0):
+def get_html_seq_descr(case:str, global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, df_fasta:"", df_mfasta=0, global_stat_assemblathon_fasta=0, global_stat_assemblathon_mfasta=0, pos=0):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Contigs</h1>
@@ -293,7 +293,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
                     </div>
                 </div> 
 '''
-    if df_mfasta:
+    if "simulation" in case:
 	    r += '''                              
 '''+dict_to_table(global_stat,7,2)+'''
 '''
@@ -354,7 +354,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 
     # Len dist for gtf
     len_by_features, feature_names = len_dist_from_gtf(gtf)
-    if df_mfasta:
+    if "simulation" in case:
         r += '''
         <div class="mt-4 mr-0 pl-0 col-md-12">
                 <h5>Contigs length distribution</h5>
@@ -376,7 +376,7 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
 '''+plot_hist_contigs_len_real_data(df_fasta['length'])+'''
         </div>
 '''
-    if pos:
+    if "simulation" in case:
         r += '''
          <div class="d-flex">
             <div class="mt-4 mr-0 pl-0 col-md-6">
@@ -387,7 +387,6 @@ def get_html_seq_descr(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict,
         </div>  
 '''
     return r
-
 
 def get_html_abundance(df_fasta:dict, title):
     r = '''
