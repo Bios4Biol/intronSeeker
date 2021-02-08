@@ -266,9 +266,9 @@ def get_html_inputfiles(files:dict):
 		</div>
 '''
     return r
-
-
-def get_html_seq_descr(case:str, global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, df_fasta:"", df_mfasta=0, global_stat_assemblathon_fasta=0, global_stat_assemblathon_mfasta=0, pos=0):
+    
+#  html += get_html_seq_descr_simulation(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta, df_features['pos_on_contig'])
+def get_html_seq_descr_simulation(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, pos:dict, df_fasta:dict, df_mfasta:dict, global_stat_assemblathon_fasta:dict, global_stat_assemblathon_mfasta:" "):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Contigs</h1>
@@ -291,16 +291,110 @@ def get_html_seq_descr(case:str, global_stat:dict, nb_ctg_by_feature:dict, ctg_d
                             <span class="oi oi-info" ></span>
                         </span>
                     </div>
-                </div> 
-'''
-    if "simulation" in case:
-	    r += '''                              
+                </div>               
 '''+dict_to_table(global_stat,7,2)+'''
-'''
-    else:
-        r += '''
-'''+dict_to_table(global_stat,4,3)+'''	
             </div>   
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+                <div class="d-flex">
+                    <div>
+                        <h5>Number of sequences by feature type</h5>
+                        <span class="anchor" id="ref-descr"></span>
+                    </div>
+                    <div class="ml-2">
+                        <span
+                            class="badge badge-pill badge-dark"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            title="<p nowrap><b>Number of ctg by feature from all GTF lines </b> (Ex: 'Exon' see in X ctg, 'Intron' see in Y ctg, ...)</p>">
+                            <span class="oi oi-info"></span>
+                        </span>
+                    </div>
+                </div>
+'''+dict_to_table(nb_ctg_by_feature,-1,0)+'''
+            </div>
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+               <div class="d-flex">
+                    <div>
+                        <h5>Number of sequences with same feature(s)</h5>
+                        <span class="anchor" id="ref-descr"></span>
+                    </div>
+                    <div class="ml-2">
+                        <span
+                            class="badge badge-pill badge-dark"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            title="<p nowrap><b>Number of features profiles by ctg </b>(Ex: '1 Exon & 2 Intron' see in X ctg, '3 Introns' see in Y ctg , ...)</p>">
+                            <span class="oi oi-info"></span>
+                        </span>
+                    </div>
+                </div>
+'''+dict_to_table(ctg_descr,-1,0)+'''
+            </div>
+        </div>		       
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-6">
+                <h5>Assemblathon statistics</h5>
+                <span class="anchor" id="ref-descr_assemblathon_fasta"></span>
+'''+dict_to_table_multi_col("Contig FASTA", global_stat_assemblathon_fasta, "Contig FASTA with feature(s)", global_stat_assemblathon_mfasta)+'''
+            </div>          
+        </div>    
+'''
+
+    # Len dist for gtf
+    len_by_features, feature_names = len_dist_from_gtf(gtf)
+    r += '''
+        <div class="mt-4 mr-0 pl-0 col-md-12">
+                <h5>Contigs length distribution</h5>
+                <span class="anchor" id="contigs_len_dist"></span>
+'''+plot_hist_contigs_len(df_fasta['length'], df_mfasta['length'])+'''
+        </div>
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-6">
+                <h5>Features length distribution</h5>
+                <span class="anchor" id="feat_len_dist"></span>
+'''+plot_dist_features_len(len_by_features, feature_names)+'''
+            </div>
+'''
+    r += '''
+            <div class="mt-4 mr-0 pl-0 col-md-6">
+                <h5>Insertion position of introns along contigs</h5>
+                <span class="anchor" id="feat_dist_intron"></span>
+'''+plot_insertion_in_contig(pos)+'''
+            </div>
+        </div>  
+'''
+    return r
+
+
+# html += get_html_seq_descr_real(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta)
+def get_html_seq_descr_real(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, df_fasta:dict):
+    r = '''
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Contigs</h1>
+                <span class="anchor" id="ref-descr"></span>
+        </div>
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+                <div class="d-flex">
+                    <div>
+                        <h5>Contigs statistics</h5>
+                        <span class="anchor" id="ref-descr"></span>
+                    </div>
+                    <div class="ml-2">
+                        <span
+                            class="badge badge-pill badge-dark"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            title="<p nowrap><b>Number of features in GTF</b>: total number of features from GTF file</p><p nowrap><b>Number of distinct features in GTF</b>: number of distinct features from all GTF lines</p>">
+                            <span class="oi oi-info" ></span>
+                        </span>
+                    </div>
+                   </div> 
+'''+dict_to_table(global_stat,4,3)+'''	
+                </div>   
             <div class="mt-4 mr-0 pl-0 col-md-4">
                 <div class="d-flex">
                     <div>
@@ -341,52 +435,18 @@ def get_html_seq_descr(case:str, global_stat:dict, nb_ctg_by_feature:dict, ctg_d
             </div>
         </div>
 '''
-    if  global_stat_assemblathon_mfasta:
-        r += '''		       
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-6">
-                <h5>Assemblathon statistics</h5>
-                <span class="anchor" id="ref-descr_assemblathon_fasta"></span>
-'''+dict_to_table_multi_col("Contig FASTA", global_stat_assemblathon_fasta, "Contig FASTA with feature(s)", global_stat_assemblathon_mfasta)+'''
-            </div>          
-        </div>    
-'''
 
     # Len dist for gtf
     len_by_features, feature_names = len_dist_from_gtf(gtf)
-    if "simulation" in case:
-        r += '''
+    r += '''
         <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Contigs length distribution</h5>
-                <span class="anchor" id="contigs_len_dist"></span>
-'''+plot_hist_contigs_len(df_fasta['length'], df_mfasta['length'])+'''
-        </div>
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-6">
-                <h5>Features length distribution</h5>
-                <span class="anchor" id="feat_len_dist"></span>
-'''+plot_dist_features_len(len_by_features, feature_names)+'''
-            </div>
-'''
-    else:
-        r += '''
-        <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>Contigs length distribution</h5>
-                <span class="anchor" id="contigs_len_dist"></span>
+            <h5>Contigs length distribution</h5>
+            <span class="anchor" id="contigs_len_dist"></span>
 '''+plot_hist_contigs_len_real_data(df_fasta['length'])+'''
         </div>
 '''
-    if "simulation" in case:
-        r += '''
-         <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-6">
-                <h5>Insertion position of introns along contigs</h5>
-                <span class="anchor" id="feat_dist_intron"></span>
-'''+plot_insertion_in_contig(pos)+'''
-            </div>
-        </div>  
-'''
     return r
+
 
 def get_html_abundance(df_fasta:dict, title):
     r = '''
