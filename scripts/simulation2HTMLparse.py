@@ -150,7 +150,7 @@ def parse_gtf(gtf) :
     """
     t = pd.read_table(gtf, usecols=[0,2,3,4], names=['contig','feature','start', 'end'], header=None)
     t["length"] = t["end"]-t["start"]
-    t['features'] = t.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
+    t['features'] = t.apply(lambda df : "|".join([str(df.contig),str(df.start),str(df.end)]),axis=1)
     return t.set_index('features')
 
 # def parse_control_introns(introns_coord_file) :
