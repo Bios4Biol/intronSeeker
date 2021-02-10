@@ -491,7 +491,7 @@ def df_parseDiamond(diamond_file, candidates) :
     return candidates
 
 
-def analyzeORF(reference, trim_ref, db_file, cand_file, output, force, prefix, no_refine, rm) :
+def findEvidence(reference, trim_ref, db_file, cand_file, output, force, prefix, rm) :
     candidates = pd.read_csv(cand_file.name,sep='\t',skiprows=2)
     output_path = output + "/orf"
     if prefix:

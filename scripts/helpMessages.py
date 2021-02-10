@@ -102,21 +102,11 @@ The second simulation is based on an existing genome and corresponding genome\
  containing each sequence of the original Fasta  spliced  of  the  segments \
  corresponding  to  the features of the TXT file.'
     ))
-    # analyzeORF
-    print('   analyzeORF\t',end='')
+    # findEvidence
+    print('   findEvidence\t',end='')
     print(cw.fill(
-'From a reference Fasta file, predicts  the  Open  Reading Frames  for  each\
- sequence  of the Fasta and returns  the characteristics  of  the  best  predicted \
- ORF  for  each sequence  in  a tabulated  file.  The ORF  prediction  is performed\
- with TransDecoder.'
-    ))
-    # analyzeProtein
-    print('   analyzeProtein',end='')
-    print(cw.fill(
-'From a reference Fasta file and a proteic bank,  performs  the  proteic  alignment\
-  all-vs-all  beetween  the  Fasta  and  the  bank  and  returns  the  characteristics\
- of the  best  alignment  for each  sequence  of  the  Fasta  in a tabulated file. \
- The proteic alignment is performed  with Diamond.'
+'From the reference  and trimmed Fasta files, predicts the Open  Reading  Frames\
+  (getorf)  and  find  proteic  hits (diamond) to find evidences.'
     ))
     print()
     
@@ -175,10 +165,8 @@ def command_help(command: str) :
         split_help()
     elif command == "trimFastaFromTXT" :
         trim_help()
-    elif command == "analyzeORF" :
-        orf_help()
-    elif command == "analyzeProtein" :
-        protein_help()
+    elif command == "findEvidence" :
+        findEvidence_help()
     elif command == "fullRandomSimulation" :
         frs_help()
     elif command == "GTFbasedSimulation" :
@@ -467,18 +455,14 @@ intronSeeker trimFastaFromTXT -r <ref.fa> -c <candidates.txt> -o STR [-m, -F, -p
     print()
 
 
-########################################
-####### analyzeORF help printing #######
-########################################
+##########################################
+####### findEvidence help printing #######
+##########################################
 
-def orf_help() :
+def findEvidence_help() :
     text='\
 \nDescription:\n\
-Performs the ORF analysis on a reference FASTA file: predicts, with TransDecoder software, the ORF  of each sequence  of the FASTA\
- and  produces a file where each line characterizes the best predicted ORF of each  sequence.  This module  is involved  two times  in  intron identification:\
- first, directly  on the  original  reference  file  to predict ORFs  and a second time after the intron candidates identification.\
-  The candidates  are trimmed  from the original reference FASTA and the ORFs prediction is performed on the resulting file. The goal of this approach\
- is to analyze the potential ORFs modifications in order  to help us in intron identification.\
+Analyze and compare ORF (getorf - emboss) and proteic hits (Diamond) between the reference FASTA file and the trimmed reference FASTA file (output of trimFastaFromTXT command).\
 '
     tw = textwrap.TextWrapper(
         width=90,
@@ -486,17 +470,13 @@ Performs the ORF analysis on a reference FASTA file: predicts, with TransDecoder
         drop_whitespace=True
     )
 
-    # analyzeORF Description
+    # findEvidence Description
     print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
     
     # Usage
     print('Usage:')
-    print(
-    textwrap.fill('\
-intronSeeker analyzeORF -r <ref.fa> -t <trim.fa> -c <cand.txt> -o STR [-p STR] [-F,-k,-R]',
-    width=90
-    ))
-    print()
+    print('intronSeeker findEvidence -r <ref.fa> -t <trim.fa> -d <db.fa> -c <cand.txt> -o STR')
+    print('                          [-p STR] [-F,-k]')
     
     cw = textwrap.TextWrapper(
         width=59,
@@ -507,7 +487,7 @@ intronSeeker analyzeORF -r <ref.fa> -t <trim.fa> -c <cand.txt> -o STR [-p STR] [
     print('Options:')
     print('   -r/--reference FILE',end='')
     print(cw.fill(
-'Name  of the reference FASTA file  on which  the ORF prediction must be performed.'
+'Name of the reference FASTA file.'
     ))
     print('   -t/--trimref FILE',end='')
     print(cw.fill(
@@ -519,7 +499,7 @@ intronSeeker analyzeORF -r <ref.fa> -t <trim.fa> -c <cand.txt> -o STR [-p STR] [
     ))
     print('   -c/--candidates FILE',end='')
     print(cw.fill(
-'Name of the candidates TXT file to consider only the ORFs which overlap a selected candidate.'
+'Name of the candidates TXT file.'
     ))
     print('   -p/--prefix STR',end='')
     print(cw.fill(
@@ -536,72 +516,6 @@ intronSeeker analyzeORF -r <ref.fa> -t <trim.fa> -c <cand.txt> -o STR [-p STR] [
     print('   -k/--keep',end='')
     print(cw.fill(
 '\tKeep all intermediate files.'
-    ))
-    print('   -R/--no-refine',end='')
-    print(cw.fill(
-'Allow TransDecoder  to not perform  ORF\'s starts refining. Use this option  only  if TransDecoder      fails at this step of ORF prediction.'
-    ))
-    print('   -h/--help\t',end='')
-    print(cw.fill(
-'Print this help message.'
-    ))
-    print()
-
-
-########################################
-##### analyzeProtein help printing #####
-########################################
-
-def protein_help() :
-    text='\
-\nDescription:\n\
-Performs a proteic alignment on a reference FASTA file with Diamond. Produces a file where each line characterize the best alignment for each sequence of the FASTA.\
- This module take part of the same approach of the  analyzeORF module:  the  proteic  alignments  before and after candidate trimming are compared to support the intron identification.\
-'
-    tw = textwrap.TextWrapper(
-        width=90,
-        initial_indent="",
-        drop_whitespace=True
-    )
-
-    # analyzeProtein Description
-    print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
-    
-    # Usage
-    print('Usage:')
-    print(
-    textwrap.fill('\
-intronSeeker analyzeProtein -r <ref.fa> -o <outfile_basename> [-k] [-t INT]',
-    width=90
-    ))
-    print()
-    
-    cw = textwrap.TextWrapper(
-        width=63,
-        initial_indent="\t",
-        subsequent_indent="\t\t\t",
-        break_long_words=False
-    )
-    print('Options:')
-    print('   -r/--reference FILE',end='')
-    print(cw.fill(
-'Name of the reference FASTA file on which the proteic alignment must be performed.'
-    ))
-    print('   -p/--db-proteins STR',end='')
-    print(cw.fill(
-'Name of the Diamond database containing the indexed proteic sequences.'
-    ))
-    print('   -o/--output STR',end='')
-    print(cw.fill(
-'Basename of  the output directory where the ouput file will be stored.'
-    ))
-    print('   -k/--keep',end='')
-    print(cw.fill(
-'\tKeep all intermediate files.'
-    ))
-    print('   -t/--threads INT',end='')
-    print(cw.fill(
-'Number of alignment threads to launch [1].'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(

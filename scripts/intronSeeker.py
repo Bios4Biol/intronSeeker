@@ -4,7 +4,7 @@
 import argparse 
 import sys 
 import os 
-from intronSearch import searchProtein,analyzeORF,trimFastaFromTXT,splitReadSearch
+from intronSearch import findEvidence,trimFastaFromTXT,splitReadSearch
 from readsMapping import star,hisat2
 from dataSimulation import full_random_simulation,gtf_based_simulation,grinder
 from checkInstall import checkInstall
@@ -69,29 +69,18 @@ def parse_arguments() :
     parser_trim.add_argument('-h','--help',action='store_const', const = parser_trim.prog.split()[-1],dest='c_help')
     parser_trim.set_defaults(func=trimFastaFromTXT)
 
-    # subparser for searching ORF on sequences
-    parser_orf = subparser.add_parser('analyzeORF',add_help=False)
-    parser_orf.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='reference')
-    parser_orf.add_argument('-t', '--trim-reference', type=argparse.FileType('r'), required=True, dest='trim_ref')
-    parser_orf.add_argument('-d', '--database', type=argparse.FileType('r'),  required=True, dest='db_file')
-    parser_orf.add_argument('-c', '--candidates', type=argparse.FileType('r'),  required=True, dest='cand_file')
-    parser_orf.add_argument('-k','--keep', action='store_false',required=False, default=False, dest='rm')
-    parser_orf.add_argument('-o','--output', type=str, required=True, dest='output')
-    parser_orf.add_argument('-F', '--force', action='store_true', default=False, dest='force')
-    parser_orf.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
-    parser_orf.add_argument('-R,--no-refine-starts', action='store_true', required=False, default=False, dest='no_refine')
-    parser_orf.add_argument('-h','--help',action='store_const', const = parser_orf.prog.split()[-1],dest='c_help')
-    parser_orf.set_defaults(func=analyzeORF)
-
-    # subparser for aligning contigs and proteins
-    parser_protein = subparser.add_parser('analyzeProtein',add_help=False)
-    parser_protein.add_argument('-r', '--reference', type=argparse.FileType('r'), dest='fasta')
-    parser_protein.add_argument('-p','--dbprotein', type=str, dest='dbprotein')
-    parser_protein.add_argument('-o', '--output', type=str, required=False, default='LongGaps.gff', dest='output')
-    parser_protein.add_argument('-k','--keep', action='store_true',required=False, default=False, dest='rm')
-    parser_protein.add_argument('-t','--threads', type=int, default=1, dest='threads')
-    parser_protein.add_argument('-h','--help', action='store_const', const = parser_protein.prog.split()[-1],dest='c_help')
-    parser_protein.set_defaults(func=searchProtein)
+    # subparser for analyze candidates (findEvidence)
+    parser_findEvidence = subparser.add_parser('findEvidence',add_help=False)
+    parser_findEvidence.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='reference')
+    parser_findEvidence.add_argument('-t', '--trim-reference', type=argparse.FileType('r'), required=True, dest='trim_ref')
+    parser_findEvidence.add_argument('-d', '--database', type=argparse.FileType('r'),  required=True, dest='db_file')
+    parser_findEvidence.add_argument('-c', '--candidates', type=argparse.FileType('r'),  required=True, dest='cand_file')
+    parser_findEvidence.add_argument('-k','--keep', action='store_false',required=False, default=False, dest='rm')
+    parser_findEvidence.add_argument('-o','--output', type=str, required=True, dest='output')
+    parser_findEvidence.add_argument('-F', '--force', action='store_true', default=False, dest='force')
+    parser_findEvidence.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix')
+    parser_findEvidence.add_argument('-h','--help',action='store_const', const = parser_findEvidence.prog.split()[-1],dest='c_help')
+    parser_findEvidence.set_defaults(func=findEvidence)
 
     # subparser for Full Random Simulation
     parser_frs = subparser.add_parser('fullRandomSimulation',add_help=False)
