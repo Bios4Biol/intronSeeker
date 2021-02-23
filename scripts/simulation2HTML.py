@@ -42,7 +42,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         os.makedirs(output)
     
     # Output path filename report html
-    output_file = output_path + "_simulation.html"
+    output_file = output_path + ".html"
     if not force:
         try :
             if os.path.exists(output_file):
