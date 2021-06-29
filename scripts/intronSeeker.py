@@ -73,7 +73,7 @@ def parse_arguments() :
     parser_findEvidence = subparser.add_parser('findEvidence',add_help=False)
     parser_findEvidence.add_argument('-r', '--reference', type=argparse.FileType('r'), required=True, dest='reference')
     parser_findEvidence.add_argument('-t', '--trim-reference', type=argparse.FileType('r'), required=True, dest='trim_ref')
-    parser_findEvidence.add_argument('-d', '--database', type=argparse.FileType('r'),  required=True, dest='db_file')
+    parser_findEvidence.add_argument('-d', '--database', type=argparse.FileType('r'),  required=True, dest='db_prot')
     parser_findEvidence.add_argument('-c', '--candidates', type=argparse.FileType('r'),  required=True, dest='cand_file')
     parser_findEvidence.add_argument('-k','--keep', action='store_false',required=False, default=False, dest='rm')
     parser_findEvidence.add_argument('-o','--output', type=str, required=True, dest='output')

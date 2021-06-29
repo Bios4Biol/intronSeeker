@@ -389,7 +389,6 @@ def df_lg_ref_ORF(getorf_file, candidates) :
         longestORF.append(current_longestORF) 
         #print(row["#ID"], " ",row["reference"]," ", str(row["start"])," ",str(row["end"]))
     df_new_candidates['lgORF_ref'] = longestORF
-    print('New_cand:', df_new_candidates.head(5), '\n\n')
     return df_new_candidates
 
 def df_lg_trim_ORF(getorf_file, candidates) :
@@ -427,10 +426,9 @@ def df_lg_trim_ORF(getorf_file, candidates) :
         longestORF.append(current_longestORF)
         
     df_new_candidates['lgORF_trim'] = longestORF
-    print('New_cand:', df_new_candidates.head(5), '\n\n')
     return df_new_candidates
 
-def df_parseDiamond(diamond_file, candidates) :
+def df_parseDiamond(diamond_file, candidates, flag) :
     file = open(diamond_file, "r")
     line = file.readline()
     prots={}
@@ -482,18 +480,15 @@ def df_parseDiamond(diamond_file, candidates) :
         else:
             protbilan.append("--")
         
-    candidates['protoverlap'] = protoverlap
-    candidates['before'] = protbefore
-    candidates['after'] = protafter
-    candidates['bilan'] = protbilan
-
-    print('New_cand:', candidates.head(5), '\n\n')
+    candidates[flag+'overlap'] = protoverlap
+    candidates[flag+'before']  = protbefore
+    candidates[flag+'after']   = protafter
+    candidates[flag+'bilan']   = protbilan
     return candidates
 
-
-def findEvidence(reference, trim_ref, db_file, cand_file, output, force, prefix, rm) :
+def findEvidence(reference, trim_ref, db_prot, cand_file, output, force, prefix, rm) :
     candidates = pd.read_csv(cand_file.name,sep='\t',skiprows=2)
-    output_path = output + "/orf"
+    output_path = output + "/fe"
     if prefix:
         output_path += "_" + prefix
     output_tmp_dir = output_path+'_tmp'
@@ -511,44 +506,55 @@ def findEvidence(reference, trim_ref, db_file, cand_file, output, force, prefix,
             print('\nError: output file(s) already exists.\n')
             exit(1)
     
+    # ORF
     cmd_getorf = ['getorf','-sequence',os.path.abspath(reference.name),'-outseq',output_tmp_dir+'/reference.getorf']
     cmd_getorf_trim = ['getorf','-sequence',os.path.abspath(trim_ref.name),'-outseq',output_tmp_dir+"/trimmed_reference.getorf"]
 
     with open(output_path+'.log', 'w') as log :
-        log.write('COMMANDS launched by intronSeeker :\n')
+        log.write('#### ORF evidences:\n')
         log.write(' '.join(cmd_getorf)+'\n')
         getorf_prcs = sp.run(cmd_getorf,stdout=log,stderr=sp.STDOUT)
         log.write(' '.join(cmd_getorf_trim)+'\n\n')
         getorf_trim_prcs = sp.run(cmd_getorf_trim,stdout=log,stderr=sp.STDOUT)
-    
     df_candidates_new = df_lg_ref_ORF(output_tmp_dir+'/reference.getorf', candidates)
     df_candidates_new = df_lg_trim_ORF(output_tmp_dir+'/trimmed_reference.getorf', df_candidates_new)
 
-    if rm :
-        os.system('rm -r '+output_tmp_dir)
-
-    #df_candidates_new.to_csv(output_path+'.txt',sep='\t',index=False)
-    #orfs_trim.to_csv(output_path+'_trim.txt',sep='\t',index=False)
-
     ## Prot
-    db = output_tmp_dir+"/"+os.path.basename(db_file.name)
-    cmd_diamond_makedb = ['diamond','makedb','--in',os.path.abspath(db_file.name),'--db',db]
-    makedb_prcs = sp.run(cmd_diamond_makedb)
+    db = output_tmp_dir+"/"+os.path.basename(db_prot.name)
+    cmd_diamond_makedb = ['diamond','makedb','--in',os.path.abspath(db_prot.name),'--db',db]
+    cmd_diamond = ['diamond','blastx', '-q',os.path.abspath(reference.name),'-d',db+".dmnd",'-o',db+"_ref_output.tsv",'-f','6','qseqid','qlen','qstart','qend','sseqid','slen','sstart','send','pident','length','evalue','bitscore','-p','1','-e','0.05','--max-target-seqs','0']
+    with open(output_path+'.log', 'a') as log :
+        log.write('#### Prot evidences:\n')
+        log.write(' '.join(cmd_diamond_makedb)+'\n')
+        makedb_prcs = sp.run(cmd_diamond_makedb,stdout=log,stderr=sp.STDOUT)
+        log.write(' '.join(cmd_diamond)+'\n')
+        diamond_prcs = sp.run(cmd_diamond,stdout=log,stderr=sp.STDOUT)
+    df_candidates_new = df_parseDiamond(db+"_ref_output.tsv", df_candidates_new,"prot")
+    #df_candidates_new.to_csv(output_path+'.txt',sep='\t',index=False)
 
-    os.system("diamond blastx -q {fasta} -d {db} -o {output} -f 6 qseqid qlen qstart qend sseqid slen sstart send pident length evalue bitscore -p 1 -e 0.05 --max-target-seqs 0".format(
-        fasta=os.path.abspath(reference.name),db=db+".dmnd",output=db+"_ref_output.tsv"))
-    print(db+"_ref_output.tsv")
-    df_candidates_new = df_parseDiamond(db+"_ref_output.tsv", df_candidates_new)
+    #Scored
+    # For DP  : np.sqrt(min(100,DP))
+    # For CDS : +1 if extented else -1 
+    # For Prot: +0.5 if hit before +1 if no hit overlap +0.5 if hit after
+    score = []
+    for index, row in df_candidates_new.iterrows(): 
+        current_score = np.sqrt(np.minimum(row["depth"],100))
+        if(row["lgORF_trim"]>row["lgORF_ref"]):
+            current_score += 10
+        else :
+            current_score -= 10
+        if(row["protbefore"]>0):
+            current_score += 0.5
+        if(row["protoverlap"]<row["protbefore"] or row["protoverlap"]<row["protafter"]):
+            current_score += 10
+        if(row["protafter"]>0):
+            current_score += 0.5
+        score.append(np.around(current_score,decimals=2))
+    df_candidates_new['score'] = score
     df_candidates_new.to_csv(output_path+'.txt',sep='\t',index=False)
 
-
-    #os.system("diamond blastx -q {fasta} -d {db} -o {output} -f 6 qseqid qlen sseqid slen pident length qstart qend evalue bitscore -p 1 -e 0.05 --max-target-seqs 0".format(
-    #    fasta=os.path.abspath(trim_ref.name),db=db+".dmnd",output=db+"_trim_output.tsv"))
-
-    
-    # `diamond makedb --in $diamond --db $outputDir/private_tmp_ 2> $outputDir/private.diamond_makedb_tmp_.stderr`;
-    # `diamond blastx --db $outputDir/private_tmp_ --query $prokkaTFA --threads $threads --outfmt 6 qseqid sseqid pident nident length mismatch gaps gapopen qstart qend sstart send evalue bitscore stitle qcovhsp  -k 1000 --query-cover $diamond_queryCover -e $diamond_evalue --out $outputDir/private.diamond.tsv 2> $outputDir/private.diamond_tmp_.stderr`;
-
+    if not rm :
+        os.system("rm -r {outdir}".format(outdir=output_tmp_dir))
 
 #################################################
 # Search long gap on contigs-proteins alignment #
