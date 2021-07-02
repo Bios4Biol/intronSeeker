@@ -95,6 +95,7 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
         contig_seq = ref_dict.fetch(ref_id)
         for read in aligned:
             #sarah
+            foot = True
             if read.cigarstring is not None and "N" in read.cigarstring and "I" not in read.cigarstring:
                 #print('cigar string', read.cigarstring)
                 cigar_pattern = "([0-9]+)M([0-9]+)N([0-9]+)M"  
@@ -107,13 +108,13 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
                     cigarM2 = int(cigar.group(3))
                 except:
                     cigarM2 = 0   
-                  # Remove reads with cigarM1 or cigarM2 < minfootsize       
+                # Remove reads with cigarM1 or cigarM2 < minfootsize       
                 if min(cigarM1,cigarM2) < minfootsize:
                     foot = False
                     #print('READ TO REMOVE :', min(cigarM1,cigarM2), 'read: ', read.query_name,' and cigar', cigar )
                 else:
                     foot = True    
-      
+
             if read.cigartuples is not None and read.mapping_quality >= 2 and foot == True :
                 if '(3,' in str(read.cigartuples):
                     split = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
@@ -128,12 +129,27 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
         df_split_reads = pd.DataFrame(split_reads)
         if not df_split_reads.empty :
             contig_len = len(ref_dict.fetch(ref_id))
-            candidates.append(merge_split(df_split_reads, ref_id, contig_seq, contig_len, mindepth, maxlen))
+            candidates.append(merge_split(bamfile, df_split_reads, ref_id, contig_seq, contig_len, mindepth, maxlen))
             split_alignments.append(df_split_reads)
     return pd.concat(candidates), pd.concat(split_alignments)
 
+# Compute mean depth form chr:start-end
+# (reads with deletion (I/N in cigar) not used)
+def get_mean_DP (bamfile, ref, start, end) :
+    res = 0
+    count = 0
+    if(start < 1) : start = 1
+    for pileupcolumn in bamfile.pileup(ref, start, end):
+        if(start <= pileupcolumn.pos and pileupcolumn.pos <= end):
+            reads = pileupcolumn.pileups
+            deletion = len([read for read in reads if read.is_del])
+            res   += pileupcolumn.n - deletion
+            count += 1
+    if(count != 0): res /= count
+    return res
+
 # Work per contig
-def merge_split(contig_reads,contig_name,contig_seq,contig_len,mindepth,maxlen) :
+def merge_split(bamfile, contig_reads,contig_name,contig_seq,contig_len,mindepth,maxlen) :
     candidates = []
     split_alignments = contig_reads.sort_values(by=['start_split','end_split']).reset_index(drop=True)
     while not split_alignments.empty :
@@ -160,6 +176,23 @@ def merge_split(contig_reads,contig_name,contig_seq,contig_len,mindepth,maxlen) 
         left_border  = contig_seq[int(current.start_split)-1: int(current.start_split) + 1]
         right_border = contig_seq[int(current.end_split) - 2: int(current.end_split)]
         
+        # DP_before = Mean DP for 10bp before the candidate
+        # DP_in     = Mean DP of candidate
+        # DP_after  = Mean DP for 10bp after the candidate
+        (DP_before, DP_in, DP_after) = (0, 0, 0)
+        DP_before = get_mean_DP ( bamfile,
+                                  contig_name,
+                                  int(current.start_split)-10,
+                                  int(current.start_split)-1 )
+        DP_in = get_mean_DP ( bamfile,
+                              contig_name,
+                              int(current.start_split)-1,
+                              int(current.end_split)-1 )
+        DP_after = get_mean_DP ( bamfile,
+                                 contig_name,
+                                 int(current.end_split),
+                                 int(current.end_split)+9 )
+        
         #Flag "filter"
         flag = ""
         if len(selected_reads) <= mindepth:
@@ -168,6 +201,8 @@ def merge_split(contig_reads,contig_name,contig_seq,contig_len,mindepth,maxlen) 
             flag += "LEN;"
         if left_border+'_'+right_border != "CT_AC" and left_border+'_'+right_border != "GT_AG":
             flag += "SS;"
+        if (DP_before + DP_after)/2 /5 < DP_in:
+            flag += "RDP;"
         if flag == "":
             flag = "PASS"
         else:
@@ -185,9 +220,12 @@ def merge_split(contig_reads,contig_name,contig_seq,contig_len,mindepth,maxlen) 
                     int(current.end_split),
                     len(selected_reads),
                     left_border+'_'+right_border,
+                    DP_before,
+                    DP_in,
+                    DP_after,
                     flag
                     ],
-            index =  ['reference','start','end','depth','split_borders','filter']
+            index =  ['reference','start','end','depth','split_borders','DP_before','DP_in','DP_after','filter']
         ))
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
