@@ -184,7 +184,7 @@ def parse_candidat(candidat) :
             else:
                 break
     
-    t = pd.read_table(candidat, usecols=[0,1,2,3,4,5,6], names=['ID', 'reference', 'start', 'end', 'depth','split_borders', 'filter'], skiprows=skip_rows) 
+    t = pd.read_table(candidat, usecols=[0,1,2,3,4,5,6,7,8,9], names=['ID', 'reference', 'start', 'end', 'depth','split_borders', 'DP_before', 'DP_in', 'DP_after', 'filter'], skiprows=skip_rows) 
     t['key'] = t['ID']
     return t.set_index('key'), mindepth, maxlen
 
