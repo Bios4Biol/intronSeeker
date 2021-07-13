@@ -369,7 +369,7 @@ def get_html_seq_descr_simulation(global_stat:dict, nb_ctg_by_feature:dict, ctg_
 
 
 # html += get_html_seq_descr_real(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta)
-def get_html_seq_descr_real(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:dict, gtf:str, df_fasta:dict):
+def get_html_seq_descr_real(global_stat:dict, df_fasta:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
             <h1 class="h4">Contigs</h1>
@@ -395,54 +395,6 @@ def get_html_seq_descr_real(global_stat:dict, nb_ctg_by_feature:dict, ctg_descr:
                    </div> 
 '''+dict_to_table(global_stat,4,3)+'''	
                 </div>   
-            <div class="mt-4 mr-0 pl-0 col-md-4">
-                <div class="d-flex">
-                    <div>
-                        <h5>Number of sequences by feature type</h5>
-                        <span class="anchor" id="ref-descr"></span>
-                    </div>
-                    <div class="ml-2">
-                        <span
-                            class="badge badge-pill badge-dark"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            data-html="true"
-                            title="<p nowrap><b>Number of ctg by feature from all GTF lines </b> (Ex: 'Exon' see in X ctg, 'Intron' see in Y ctg, ...)</p>">
-                            <span class="oi oi-info"></span>
-                        </span>
-                    </div>
-                </div>
-'''+dict_to_table(nb_ctg_by_feature,-1,0)+'''
-            </div>
-            <div class="mt-4 mr-0 pl-0 col-md-4">
-               <div class="d-flex">
-                    <div>
-                        <h5>Number of sequences with same feature(s)</h5>
-                        <span class="anchor" id="ref-descr"></span>
-                    </div>
-                    <div class="ml-2">
-                        <span
-                            class="badge badge-pill badge-dark"
-                            data-toggle="tooltip"
-                            data-placement="top"
-                            data-html="true"
-                            title="<p nowrap><b>Number of features profiles by ctg </b>(Ex: '1 Exon & 2 Intron' see in X ctg, '3 Introns' see in Y ctg , ...)</p>">
-                            <span class="oi oi-info"></span>
-                        </span>
-                    </div>
-                </div>
-'''+dict_to_table(ctg_descr,-1,0)+'''
-            </div>
-        </div>
-'''
-
-    # Len dist for gtf
-    len_by_features, feature_names = len_dist_from_gtf(gtf)
-    r += '''
-        <div class="mt-4 mr-0 pl-0 col-md-12">
-            <h5>Contigs length distribution</h5>
-            <span class="anchor" id="contigs_len_dist"></span>
-'''+plot_hist_contigs_len_real_data(df_fasta['length'])+'''
         </div>
 '''
     return r
