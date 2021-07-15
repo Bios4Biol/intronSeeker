@@ -23,8 +23,7 @@ from simulation2HTMLplots import *
 # source activate ISeeker_environment;
 # cd scripts/; 
 # python3 simulation2HTML.py -F --config_file ../config/simulation2HTML_example.cfg
-# scp  /home/Sarah/Documents/PROJETS/INTRONSEEKER/FRS/CAS-A/sample1/HTML/*FRS_CASA_sample1_n1000_r_STAR*.html smaman@genologin.toulouse.inra.fr:/save/smaman/public_html/intronSeeker/.
-# See result : http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/report_FRS_CASA_sample1_n1000_r_STAR_simulation.html
+
 
 ############
 # SUB MAIN #
@@ -636,7 +635,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     #     print('df_split', df_split, '\n\n')
     # if candidat:
     #     print('df_candidat', df_candidat, '\n\n')
-
+'''
     # SARAH : main stats in a json file
     # https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/  
     genowebReportPath='http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA/report_'+prefix+'_simulation.html'  
@@ -765,7 +764,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
     data_file.close()
     data_file_synthese.close()
-
+'''
 
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser(add_help=False)
