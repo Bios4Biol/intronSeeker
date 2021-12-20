@@ -1,9 +1,8 @@
 name: ISeeker_environment
 channels:
-  - plotly
-  - defaults
-  - bioconda
   - conda-forge
+  - bioconda
+  - defaults
 dependencies:
   - bcftools>=1.9
   - biopython>=1.74
@@ -19,7 +18,8 @@ dependencies:
   - samtools>=1.9
   - star>=2.7.1a
   - transdecoder>=5.5.0
-  - gcc_linux-64>=7.3.0
+  - gcc_linux-64==9.3.0
+  - libgcc-ng==9.3.0
   - perl-test-more>=1.001002
   - perl-test-warn>=0.36
   - perl-bioperl-core>=1.007002
