@@ -5,6 +5,7 @@ try :
     import pysam
     import subprocess as sp
     import sys
+    from helpMessages import print_to_stdout ;
 except ImportError as error :
     print(error)
     exit(1)
@@ -55,6 +56,7 @@ def star(reference, r1, r2, output, prefix, force, rm, threads):
     :param pref: output prefix
     :return:
     """
+    print_to_stdout('###  Start to map with STAR   ###') 
     output_path = output + "/star";
     if prefix:
         output_path += "_" + prefix;
@@ -115,6 +117,7 @@ def star(reference, r1, r2, output, prefix, force, rm, threads):
     
     if not rm:
         os.system("rm {path}*progress.out {path}*final.out {path}*SJ.out.tab".format(path=output_path))
+    print_to_stdout('###  End of STAR mapping   ###')         
 
 def hisat2(reference, r1, r2, output, prefix, force, threads):
     """
@@ -127,6 +130,7 @@ def hisat2(reference, r1, r2, output, prefix, force, threads):
     :param threads: number of threads used to perform the alignment
     :return:
     """
+    print_to_stdout('###  Start to map with HiSat2   ###') 
     output_path = output + "/hisat2";
     if prefix:
         output_path += "_" + prefix;
@@ -149,14 +153,23 @@ def hisat2(reference, r1, r2, output, prefix, force, threads):
     cmdlog = open(output_path+".log", "w")
     
     # Reference File indexing
-    if not os.path.exists(ref_path + ".1.ht2") or force:
-        index_command = ['hisat2-build', reference.name, ref_path]
-        cmdlog.write('\n# Fasta indexing:\n')
-        cmdlog.write(" ".join(index_command) + "\n")
-        log = sp.check_output(index_command, stderr=sp.STDOUT)
-        with open(output_path + '_build.log','w') as log_file :
-            log_file.write(log.decode('utf-8'))
-
+    tries = 3
+    for i in range(tries):
+        try:
+            if not os.path.exists(ref_path + ".1.ht2") or force:
+                index_command = ['hisat2-build', reference.name, ref_path]
+                cmdlog.write('\n# Fasta indexing:\n')
+                cmdlog.write(" ".join(index_command) + "\n")
+                log = sp.check_output(index_command, stderr=sp.STDOUT)
+                with open(output_path + '_build.log','w') as log_file :
+                    log_file.write(log.decode('utf-8'))
+        except KeyError as e:
+            if i < tries - 1: # i is zero indexed
+                continue
+            else:
+                raise OSError
+        break
+        
     # Reads Mapping and ouput files writing 
     hisat_command = ['hisat2',
                     '-x', ref_path,
@@ -198,3 +211,4 @@ def hisat2(reference, r1, r2, output, prefix, force, threads):
     flagstat(output_path+'.sort.bam', cmdlog, threads)
     cmdlog.write("\n")
     cmdlog.close()
+    print_to_stdout('###  End of HiSat2 mapping   ###')  

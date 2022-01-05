@@ -19,6 +19,7 @@ try :
     from Bio.SeqRecord import SeqRecord
     from collections import defaultdict
     from math import *  #sarah
+    from helpMessages import print_to_stdout
 except ImportError as error :
     print(error)
     exit(1)
@@ -120,6 +121,7 @@ def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, uppe
     
     .. seealso:: random_seq(), insert_intron(), annoToData()
     """
+    print_to_stdout('###  Start full random simulation   ###') 
     output_path = output + "/frs";
     if prefix:
         output_path += "_" + prefix;
@@ -207,7 +209,7 @@ def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, uppe
     
     with open(output_path+"_contigs-modified.gtf","w") as out :
         out.write("\n".join(introns))
-    
+    print_to_stdout('###  End of full random simulation   ###')     
 
 
 ################################
@@ -229,6 +231,7 @@ def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
     :param pref: prefix of the output files
     :return:
     """    
+    print_to_stdout('###  Start to simulate reads (grinder)   ###') 
     output_path = output + "/sr"
     grinderprefix = "sr"
     if prefix:
@@ -251,7 +254,7 @@ def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
         ))
     os.rename(output_path + "-ranks.txt", output_path + "_ranks.txt")
     split_read(output_path)
-
+    print_to_stdout('###  End of reads simulation (grinder)   ###') 
 
 def split_read(output_path : str):
     """
@@ -817,6 +820,7 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, outp
     :type mix: bool
     
     """
+    print_to_stdout('###  Start GTF based simulation   ###')     
     output_path = output + "/gbs";
     if prefix:
         output_path += "_" + prefix;
@@ -850,4 +854,4 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, outp
     write_gtf_file(control,output_path + "_transcripts-modified.gtf")
     #print("FASTA files writing with gffread...")
     extract_fasta(fasta.name, mix, ref_tmpfile.name, lib_tmpfile.name, output_path)
-    
+    print_to_stdout('###  End of GTF based simulation   ###')     

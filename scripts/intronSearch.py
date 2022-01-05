@@ -15,6 +15,7 @@ try :
     import re
     import subprocess as sp
     import time
+    from helpMessages import print_to_stdout 
 except ImportError as error :
     print(error) ;
     exit(1) ;
@@ -238,6 +239,7 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     :param basename: prefix for the name of output files 
     :return: nothing
     """
+    print_to_stdout('###  Start to search split read   ###')        
     output_path = output + "/srs"
     if prefix:
         output_path += "_" + prefix
@@ -315,6 +317,7 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     header_cand = ["#ID"] + list(candidates.columns.values)
     candidates.reset_index().to_csv(f, header=header_cand, sep='\t', index=False)
     f.close()
+    print_to_stdout('###  End of searching split read   ###')      
 
 #########################
 # write truncated fasta #
@@ -350,6 +353,7 @@ def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
     :param fasta_file: original sequences file
     :param gff_feature: candidates file which contains the features to delete
     """
+    print_to_stdout('###  Start to trim fasta  ###')     
     output_path = output + "/tf";
     if prefix:
         output_path += "_" + prefix;
@@ -380,7 +384,7 @@ def trimFastaFromTXT(reference, cand_file, output, prefix, force, multi) :
     for c in no_trimmed_ids :
         no_trimmed_records.append(sequences[c])
     SeqIO.write(trimmed_records+no_trimmed_records,output_path+'_trimmed.fa','fasta')
-
+    print_to_stdout('###  End of trimming fasta  ###')     
 
 
 #######################
@@ -525,6 +529,7 @@ def df_parseDiamond(diamond_file, candidates, flag) :
     return candidates
 
 def findEvidence(reference, trim_ref, db_prot, cand_file, output, force, prefix, rm) :
+    print_to_stdout('###  Start to find evidence  ###') 
     candidates = pd.read_csv(cand_file.name,sep='\t',skiprows=2)
     output_path = output + "/fe"
     if prefix:
@@ -593,7 +598,8 @@ def findEvidence(reference, trim_ref, db_prot, cand_file, output, force, prefix,
 
     if not rm :
         os.system("rm -r {outdir}".format(outdir=output_tmp_dir))
-
+    print_to_stdout('###  End of finding evidence  ###') 
+    
 #################################################
 # Search long gap on contigs-proteins alignment #
 #################################################

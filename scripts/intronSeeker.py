@@ -8,7 +8,8 @@ from intronSearch import findEvidence,trimFastaFromTXT,splitReadSearch
 from readsMapping import star,hisat2
 from dataSimulation import full_random_simulation,gtf_based_simulation,grinder
 from checkInstall import checkInstall
-from helpMessages import program_help,command_help,program_version
+from helpMessages import program_help,command_help,program_version, print_to_stdout
+
 
 def parse_arguments() :
     
@@ -17,8 +18,8 @@ def parse_arguments() :
     parser.add_argument('-v','--version',action='store_true',required=False,dest='version')
     parser.add_argument('-h','--help',action='store_true',required=False,dest='help')
     
-    subparser = parser.add_subparsers()
-    
+    subparser = parser.add_subparsers(
+        
     # subparser to call STAR aligner
     parser_star = subparser.add_parser('starAlignment',add_help=False)
     parser_star.add_argument('-r','--reference', type=argparse.FileType('r'), required=True, dest='reference')
@@ -144,6 +145,10 @@ def parse_arguments() :
         command_help(h_command)
         exit(2)
 
+    #if args.pop('checkInstall') :
+    #    print_to_stdout("### checkInstallcheckInstallcheckInstallcheckInstallcheckInstall ###")
+
+
     # Printing of help or version messages with the 'help' or 'version' option.
     if args.pop('help') :
         program_help()
@@ -166,4 +171,5 @@ if __name__ == '__main__':
     # Run the program
     func = args.pop('func')
     func(**args)
+    
 

@@ -6,12 +6,15 @@ try :
     import subprocess ;
     import re ;
     import sys ;
+    from helpMessages import print_to_stdout ;
 except ImportError as error :
     print(error) ;
     exit(1) ;
 
 def checkInstall() :
 
+    print_to_stdout('###  Start to check installation   ###')        
+    
     config_path = os.path.abspath(os.path.dirname(__file__))+"/../config/intronSeeker.properties"
 
     config = configparser.RawConfigParser() ;
@@ -36,6 +39,7 @@ def checkInstall() :
         print("Finally, the following programs are missing or are not up to date:") ;
         print("\t"+", ".join(miss_dpdc)) ;
         print() ;
+    print_to_stdout('###  Check installation finished   ###')        
 
 def checkProgram(program : str, command : str, asked_version : str , warning : str) :
     try :
@@ -77,6 +81,13 @@ def checkVersion(asked_version : str, real_version : str) :
         if int(real[i]) < int(ref[i]) :
             return False ;
     return True ;
+
+
+def print_to_stdout(*a):
+ 
+    # Here a is the array holding the objects
+    # passed as the argument of the function
+    print(*a, file = sys.stdout)
 
 
 if __name__ == "__main__" :

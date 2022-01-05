@@ -2,6 +2,7 @@
 
 import textwrap
 import os
+import sys
 
 # Metadata
 __author__    = "Lasguignes E., Oudin F., Cabanettes F., Klopp C."
@@ -11,6 +12,15 @@ __version__   = "1.0"
 __email__     = "support.bioinfo.genotoul(at)inra.fr"
 __status__    = "dev"
 
+
+########################################
+###########   Logs Printing  ###########
+########################################
+def print_to_stdout(*a):
+ 
+    # Here a is the array holding the objects
+    # passed as the argument of the function
+    print(*a, file = sys.stdout)
 
 ########################################
 ########### Version Printing ###########
