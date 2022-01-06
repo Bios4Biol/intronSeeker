@@ -18,7 +18,7 @@ def parse_arguments() :
     parser.add_argument('-v','--version',action='store_true',required=False,dest='version')
     parser.add_argument('-h','--help',action='store_true',required=False,dest='help')
     
-    subparser = parser.add_subparsers(
+    subparser = parser.add_subparsers()
         
     # subparser to call STAR aligner
     parser_star = subparser.add_parser('starAlignment',add_help=False)
