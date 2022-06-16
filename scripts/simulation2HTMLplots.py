@@ -89,10 +89,6 @@ def plot_hist(values:dict, title:str, xtitle:str, ytitle:str):
     myhist = go.Histogram(
         x=values,
         name=title,
-        xbins=dict( # bins used for histogram
-        start=1,
-        size=1
-        ),
         opacity=0.85
     )
     data = [myhist]
@@ -105,6 +101,8 @@ def plot_hist(values:dict, title:str, xtitle:str, ytitle:str):
         )
     )
     fig = go.Figure(data=data, layout=layout)
+    fig.update(layout_yaxis_range = [0,len(values)])
+    fig.update(layout_xaxis_range = [0,values.max()])
     fig.update_layout(
         margin=go.layout.Margin(
             l=50,
