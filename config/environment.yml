@@ -26,3 +26,5 @@ dependencies:
   - perl-getopt-long>=2.50
   - perl-list-moreutils>=0.428
   - perl-math-random>=0.72
+  - scipy>=1.4.1
+
