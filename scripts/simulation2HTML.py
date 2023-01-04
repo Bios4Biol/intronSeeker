@@ -76,7 +76,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     else:
         d = {'features': ['featureID'], 'contig': ['contig'],'feature': ['feature'],'start': [0],'end': [0],'length': [0],'flanks': ['CT_AC'],'pos_on_contig': [0]}
         df_features = pd.DataFrame(data=d)
-        #df_features = pd.DataFrame(index='features', columns=['features','contig','feature','start','end','length','flanks','pos_on_contig'])
         
 
     # Add to df_library the read positions on the modified contig
@@ -217,10 +216,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
         global_stat_assemblathon_mfasta["08L50 contig count"]          = l50
     # if simulation ?
     if mfasta and gtf:
-        #html += get_html_seq_descr("simulation", global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta, df_features['pos_on_contig'])
         html += get_html_seq_descr_simulation(global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_features['pos_on_contig'], df_fasta, df_mfasta, global_stat_assemblathon_fasta, global_stat_assemblathon_mfasta)
     else:
-        #html += get_html_seq_descr("real", global_stat, nb_ctg_by_feature, ctg_descr, gtf.name, df_fasta)
         html += get_html_seq_descr_real(global_stat, df_fasta)
 		
     # READS STAT
@@ -302,22 +299,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                 nbOtherJunctions += v
         global_stat_split["0"+str(c)+"Other junctions"] = nbOtherJunctions
         global_stat_split["0"+str(c+1)+"Canonical junction (GT_AG or CT_AC)"] = nbCanonic
-
-
-        # # Sarah en cours 
-        # nbExpectedSplits = 0
-        # for k, v in df_features['contig'].items() :
-        #     for row in df_library.groupby(['contig']):
-        #         # print('row', row[1].index)
-        #         for read in enumerate(row[1].index): 
-        #             # doutes sur ajout .modif !! TODO
-        #             if (((df_library.loc[read[1], 'contig'])+".modif" == v) \
-        #                 & (df_library.loc[read[1], 'start'] > (df_features.loc[k,'start']+10)) \
-        #                 &  (df_library.loc[read[1], 'end'] < (df_features.loc[k,'end']-10)) ):
-        #                 nbExpectedSplits += 1
-                           
-        # print('nbExpectedSplits', nbExpectedSplits)
-        # global_stat_split[str(c+2)+"Number of expected splits"] = nbExpectedSplits
 
         html += get_html_split_descr(global_stat_split)   
 
@@ -460,24 +441,14 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             html += get_html_candidat(global_stat_f_detected_introns)
  
 
-        # https://stackoverflow.com/questions/40454030/count-and-sort-with-pandas
-        # DETECTED : Nom de contig / filtered_detected_too_complex
+        # Detected : contig name / filtered_detected_too_complex
         global_stat_too_complex_detected = dict()
-         
-        #df_tmp=df_candidat.loc[df_candidat['filter'] == "PASS"]
-        #df_too_complex_detected =df_tmp[['reference']].groupby(['reference']) \
-
-        #df_too_complex_detected = df_candidat[['reference']].groupby(['reference']) \
+        
         df_too_complex_detected = df_candidat.loc[df_candidat['filter'] == "PASS"][['reference']].groupby(['reference']) \
                              .size() \
                              .nlargest(10) \
                              .reset_index(name='top10')  
-        # cmp = 0
-        # for k, v in df_too_complex_detected['reference'].items() :
-        #     global_stat_too_complex_detected["0"+str(cmp)+str(v)] = df_too_complex_detected.loc[k]['top10']
-        #     cmp += 1
         
-        # sarah
         # Add filter information for each complex intron in top 10 of contigs with the highest number of detected introns
         cmp = 0
         for k, v in df_too_complex_detected['reference'].items() :
@@ -500,8 +471,6 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_def["Se"] = "Sensibility (Se) = TP / (TP+FN)"
             eval_def["Sp"] = "Specificity (Sp) = TP / (TP+FP)"
             eval_def["F1"] = "F1 score = (2*Se*Sp) / (Se+Sp)"
-            
-            FP_file = open(output_path + "_FP.csv", mode='wt', encoding='utf-8')  #sarah
 
             eval_stat = dict()
             eval_stat["01Number of detected introns"] = global_stat_detected_introns["01Number"] 
@@ -521,12 +490,8 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                     eval_stat["03"+eval_def["TP"]] += 1         
                 else:
                     eval_stat["04"+eval_def["FP"]] += 1
-                    # sarah
-                    FP_file.write(row['ID'] + "\n")  # list of FP in a csv file
                     
-            eval_stat["05"+eval_def["FN"]] = eval_stat["02Number of features"] - eval_stat["03"+eval_def["TP"]]                         
-            # sarah
-            FP_file.close
+            eval_stat["05"+eval_def["FN"]] = eval_stat["02Number of features"] - eval_stat["03"+eval_def["TP"]]
             
             
             deno = eval_stat["03"+eval_def["TP"]] + eval_stat["05"+eval_def["FN"]]
@@ -562,8 +527,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
             eval_f_stat["06"+eval_def["Se"]] = 0
             eval_f_stat["07"+eval_def["Sp"]] = 0
             eval_f_stat["08"+eval_def["F1"]] = 0
-            FPfiltered_file = open(output_path + "_FP_filtered.csv", mode='wt', encoding='utf-8')
-            TPfiltered_file = open(output_path + "_TP_filtered.csv", mode='wt', encoding='utf-8') 
+            
             if gtf:
                 print('features head :', df_features.head(5), '\n\n')
             print('candidat head :', df_candidat.head(5), '\n\n')
@@ -579,13 +543,11 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
                              (df['flanks'].str.contains('GT_AG|CT_AC'))])
                     if ok == 1:
                         eval_f_stat["03"+eval_def["TP"]] += 1
-                        TPfiltered_file.write(row['ID'] + "\n")  # list of filtered TP in a csv file
                     else:
                         eval_f_stat["04"+eval_def["FP"]] += 1
-                        FPfiltered_file.write(row['ID'] + "\n")  # list of filtered FP in a csv file
+                       
             eval_f_stat["05"+eval_def["FN"]] = eval_f_stat["02Number of features"] - eval_f_stat["03"+eval_def["TP"]]
-            FPfiltered_file.close
-            TPfiltered_file.close
+            
 
             deno = eval_f_stat["03"+eval_def["TP"]] + eval_f_stat["05"+eval_def["FN"]]
             if deno :
@@ -624,147 +586,16 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
 
     # print('DATAFRAMES:\n\n')
     # print('fasta head :' , df_fasta.head(5), '\n\n')
-    # # SARAH / CAS REAL
     # if mfasta:
     #     print('mfasta head :' , df_mfasta.head(5), '\n\n')    
     # # print('mfasta head :' , df_mfasta.head(5), '\n\n')    
-    # # SARAH / CAS REAL
     # print('library head :' , df_library.head(5), '\n\n')
     # print('features head :', df_features.head(5), '\n\n')
     # if split:
     #     print('df_split', df_split, '\n\n')
     # if candidat:
     #     print('df_candidat', df_candidat, '\n\n')
-'''
-    # SARAH : main stats in a json file
-    # https://stackabuse.com/reading-and-writing-json-to-a-file-in-python/  
-    genowebReportPath='http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA/report_'+prefix+'_simulation.html'  
-    data = {}
-    data[output_path] = []
 
-    if mfasta and gtf:
-        data[output_path].append({
-            'Prefix'                             : prefix,
-            'Output path'                        : output,
-            'Nb contigs'                         : global_stat["001Contig FASTA - Number of sequences"],
-            'Mean contigs length'                : global_stat["002Contig FASTA - Mean sequence length"],
-            'Nb modified contigs'                : global_stat["003Contig FASTA with feature(s) - Number of sequences"],
-            'Mean modified contigs length'       : global_stat["004Contig FASTA with feature(s) - Mean sequence length"],
-            'Nb reads'                           : global_stat_fastq["01Number of reads"],
-            'Mean coverage'                      : global_stat_fastq["02Mean coverage"],
-            'Nb prop reads'                      : global_stat_flagstat["05Number of properly paired reads"],
-            'Nb secondary alignments'            : secondary,
-            'Nb splits'                      : global_stat_split["01Number of reads overlapping introns"],
-            'Mean len of introns'                : global_stat_split["02Mean length of introns"],
-            'Nb filtered detected introns'       : global_stat_f_detected_introns["01" + definitions['PASS']],
-            'Nb filtered features (detectable)'  : global_stat_detectable_features["01" + definitions['PASS']],
-            'len filtered detected introns'      : global_stat_f_detected_introns["08Mean length"],
-            'len filtered features (detectable)' : global_stat_detectable_features["08Mean length"],
-            'dep filtered detected introns'      : global_stat_f_detected_introns["11Mean depth"],
-            'dep filtered features (detectable)' : global_stat_detectable_features["11Mean depth"],
-            'noise'                              : global_stat_f_detected_introns["05" + definitions['OI']],
-            'TP'                                 : eval_f_stat["03"+eval_def["TP"]],
-            'FN'                                 : eval_f_stat["05"+eval_def["FN"]],
-            'FP'                                 : eval_f_stat["04"+eval_def["FP"]],
-            'F1score'                            : eval_f_stat["08"+eval_def["F1"]],
-            'Se'                                 : eval_f_stat["06"+eval_def["Se"]],
-            'Sp'                                 : eval_f_stat["07"+eval_def["Sp"]],
-            'Report'                             : "genowebReportPath"
-        })
-    else:
-        data[output_path].append({
-            'Prefix'                             : prefix,
-            'Output path'                        : output,
-            'Nb contigs'                         : global_stat["001Contig FASTA - Number of sequences"],
-            'Mean contigs length'                : global_stat["002Contig FASTA - Mean sequence length"],
-            'Nb modified contigs'                : 'N/A',
-            'Mean modified contigs length'       : 'N/A',
-            'Nb reads'                           : global_stat_fastq["01Number of reads"],
-            'Mean coverage'                      : global_stat_fastq["02Mean coverage"],
-            'Nb prop reads'                      : global_stat_flagstat["05Number of properly paired reads"],
-            'Nb secondary alignments'            : secondary,
-            'Nb splits'                      : global_stat_split["01Number of reads overlapping introns"],
-            'Mean len of introns'                : global_stat_split["02Mean length of introns"],
-            'Nb filtered detected introns'       : global_stat_f_detected_introns["01" + definitions['PASS']],
-            'Nb filtered features (detectable)'  : 'N/A',
-            'len filtered detected introns'      : global_stat_f_detected_introns["08Mean length"],
-            'len filtered features (detectable)' : 'N/A',
-            'dep filtered detected introns'      : global_stat_f_detected_introns["11Mean depth"],
-            'dep filtered features (detectable)' : 'N/A',
-            'noise'                              : global_stat_f_detected_introns["05" + definitions['OI']],
-            'TP'                                 : 'N/A',
-            'FN'                                 : 'N/A',
-            'FP'                                 : 'N/A',
-            'F1score'                            : 'N/A',
-            'Se'                                 : 'N/A',
-            'Sp'                                 : 'N/A',
-            'Report'                             : "genowebReportPath"
-        })		
-		
-    # Nb seq               => Nb contigs
-    # Mean seq. length     => Mean contigs length 
-    # Nb contigs           => Nb modified contigs  
-    # Mean contigs length  => Mean modified contigs length
-    # Nb detected          => Nb filtered detected introns
-    # Nb detectable        => Nb filtered features (detectable)
-    # len detected         => len filtered detected introns
-    # len detectable       => len filtered features (detectable)
-    # dep detected         => dep filtered detected introns
-    # dep detectable       => dep filtered features (detectable)
-
-
-    # Output path filename comparison json
-    output_file = output_path + "_comparison_simulation.json"
-    if not force:
-        try :
-            if os.path.exists(output_file):
-                raise FileExistsError
-        except FileExistsError as e :
-            print('\nError: output file already exists.\n')
-            exit(1)
-
-    with open(output_file, 'w') as outfile:
-        json.dump(data, outfile)
-
-    # Opening JSON file and loading the data into the variable data 
-    with open(output_file) as json_file: 
-        data = json.load(json_file) 
-    
-    stats_data = data[output_path]
-    
-    
-    # now we will open a file for writing (w) and synthese file without overwriting (a)
-    data_file = open(output_file+'.csv', 'w') 
-    data_file_synthese = open('/work/smaman/SYNTHESE.csv', 'a') 
-    
-    # create the csv writer object 
-    csv_writer = csv.writer(data_file) 
-    csv_writer_synthese = csv.writer(data_file_synthese)
-
-    # Counter variable used for writing headers to the CSV file 
-    count = 0
-    
-    for i in stats_data: 
-        if count == 0: 
-    
-            # Writing headers of CSV file 
-            header = i.keys() 
-            csv_writer.writerow(header)
-            count += 1
-        
-        # Write headers in synthesis file only if this file is not empty
-        if os.stat('/work/smaman/SYNTHESE.csv').st_size == 0:
-            header = i.keys()
-            csv_writer_synthese.writerow(header)
-
-        # Writing data of CSV file 
-        csv_writer.writerow(i.values()) 
-        csv_writer_synthese.writerow(i.values()) 
-    
-
-    data_file.close()
-    data_file_synthese.close()
-'''
 
 if __name__ == '__main__' :
     parser = argparse.ArgumentParser(add_help=False)
@@ -778,7 +609,7 @@ if __name__ == '__main__' :
     parser = ArgumentParser()
     parser.add_argument('--config-file', type=argparse.FileType('r'), required=False, help="Provide a config file")
     parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta', help="Path to the reference FASTA file.")
-    parser.add_argument('-m','--modified-fasta', type=argparse.FileType('r'), required=False, dest='mfasta', help="Path to the modified FASTA file.")  # SARAH 01/2021 required=False
+    parser.add_argument('-m','--modified-fasta', type=argparse.FileType('r'), required=False, dest='mfasta', help="Path to the modified FASTA file.")
     parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=False, dest='gtf', help="GTF filename which contains the genome annotation.")
     parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1', help="Name of the  FASTQ  file  which  contains  the  single-end   reads library. If paired-end, filename of #1 reads mates")
     parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2', help="Only for a paired-end library, filename of #2 reads mates.")
