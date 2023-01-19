@@ -11,12 +11,11 @@ IntronSeeker requires Python version 3.6 or above. You don't need to change your
 It also needs Python packages and external softwares to work 
 correctly (all these dependancies and their versions are detailed in the file 
 requirements.txt). So, to make install easier, a conda enviromnent (grinder excluded)
-has been created  : [Conda environment](https://anaconda.org/elasguignes/Stalker_env/files) 
+has been created  : Conda environment 
 (it is the [environment.yml](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/config/environment.yml) file)
 
-For an easy install, conda environments is recommended. To install Miniconda, 
-follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) or,
-to install Ananconda, follow [this one](https://docs.anaconda.com/anaconda/install/).
+For an easy install, conda environments is recommended. 
+Follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to install Miniconda.
 
 Installation procedure
 ----------------------
