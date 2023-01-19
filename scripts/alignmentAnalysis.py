@@ -259,7 +259,6 @@ def alignment_analysis(args_dict) :
             reads_mapping = pd.read_pickle(path_rmpg_pick)
         
     else :
-        print('ICI')
         reads_mapping = pd.read_pickle(path_rmpg_pick)
         lectures = pd.read_pickle(path_resreads_pick)
     print()
@@ -286,12 +285,6 @@ def alignment_analysis(args_dict) :
                 os.path.basename(args_dict['control'])
                 ])+'.gz'
         control = pd.read_pickle(path_ctrl_pick)
-    
-    # ~ res_introns = control.reset_index().merge(candidates.reset_index(),right_on='reference',left_on='contig',suffixes=('_ctrl','_cand'),how='outer',indicator=True)
-    # ~ print(res_introns['reference'].value_counts())
-    # ~ res_introns.apply(class_event,axis=1)
-    # ~ print('Number of candidates')
-    # ~ print(len(candidates))
 
     return 
     
