@@ -16,7 +16,7 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
     - ./setup.sh
     - source activate ISeeker_environment
     - intronSeeker checkInstall
-    - echo "End check installation"
+    - echo "End install and check installation"
 
 
 hiSATalign-job:   
