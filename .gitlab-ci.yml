@@ -10,6 +10,9 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
   stage: testInstall
   script:
     - echo "Tests on intronSeeker installation..."
+    - module load system/Miniconda3-4.7.10;
+    - cd intronSeeker/
+    - ./setup.sh
     - source activate ISeeker_environment
     - intronSeeker checkInstall
 
