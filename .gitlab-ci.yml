@@ -2,7 +2,7 @@
 
 stages:          # List of stages for jobs, and their order of execution
   - testInstall
-  - hiSATalign
+  - align
   - splitReadSearch
   - trimFastaFromTXT
 
@@ -20,10 +20,20 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
 
 
 hiSATalign-job:   
-  stage: hiSATalign    # It only starts when the job in the test intallation stage completes successfully.
+  stage: align    # It only starts when the job in the test intallation stage completes successfully.
   script:
     - echo "Reads alignment on reference contigs with Hisat"
     #- intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
+  artifacts:
+    paths:
+      - tests/
+
+
+STARalign-job:   
+  stage: align    # It only starts when the job in the test intallation stage completes successfully.
+  script:
+    - echo "Reads alignment on reference contigs with STAR"
+    #- intronSeeker ....
   artifacts:
     paths:
       - tests/
