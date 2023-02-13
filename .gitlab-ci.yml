@@ -8,7 +8,6 @@ stages:          # List of stages for jobs, and their order of execution
 
 testInstall-job:       # This job first runs tests on intronSeeker install.
   stage: testInstall
-  image: runnermia_docker_4 
   script:
     - echo "Tests on intronSeeker installation..."
     - wget https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git
