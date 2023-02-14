@@ -7,6 +7,7 @@ try :
     import re ;
     import sys ;
     from helpMessages import print_to_stdout ;
+    from packaging import version
 except ImportError as error :
     print(error) ;
     exit(1) ;
@@ -74,13 +75,19 @@ def checkProgram(program : str, command : str, asked_version : str , warning : s
 class OldVersion(Exception) :
     pass
 
+#def checkVersion(asked_version : str, real_version : str) :
+#    ref = asked_version.split(".") ;
+#    real = real_version.split(".") ;
+#    for i in range(min(len(ref),len(real))) :
+#        if int(real[i]) < int(ref[i]) :
+#            return False ;
+#    return True ;
+
 def checkVersion(asked_version : str, real_version : str) :
-    ref = asked_version.split(".") ;
-    real = real_version.split(".") ;
-    for i in range(min(len(ref),len(real))) :
-        if int(real[i]) < int(ref[i]) :
-            return False ;
-    return True ;
+    if version.parse(real_version) > version.parse(asked_version)
+        return False;
+    else
+        return True;
 
 
 def print_to_stdout(*a):
