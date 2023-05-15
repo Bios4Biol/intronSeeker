@@ -14,6 +14,12 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
     - echo "(optional) Tests on intronSeeker installation..."
     #- git clone https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git #inutile 
     #- ls
+
+    #Replace conda by mamba
+    #To install and set the new solver, run the following commands:
+    - conda update -n base conda
+    - conda install -n base conda-libmamba-solver
+    - conda config --set solver libmamba 
     - /bin/bash setup.sh
     - source activate ISeeker_environment
     - intronSeeker checkInstall
