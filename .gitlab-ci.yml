@@ -12,7 +12,8 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
   stage: testInstall
   script:
     - echo "(optional) Tests on intronSeeker installation..."
-    - git clone https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git
+    #- git clone https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git #inutile 
+    - ls
     #- module load system/Miniconda3-4.7.10;
     #- cd intronSeeker/
     #- ./setup.sh
