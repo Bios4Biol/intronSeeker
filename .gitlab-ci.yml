@@ -1,4 +1,6 @@
 # CI/CD configuration file to test install and run alignment, SRS and trim FASTA on tests data.
+default:
+  image: continuumio/miniconda3
 
 stages:          # List of stages for jobs, and their order of execution
   - testInstall
@@ -10,7 +12,7 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
   stage: testInstall
   script:
     - echo "(optional) Tests on intronSeeker installation..."
-    #- wget https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git
+    - wget https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git
     #- module load system/Miniconda3-4.7.10;
     #- cd intronSeeker/
     #- ./setup.sh
