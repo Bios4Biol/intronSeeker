@@ -13,13 +13,11 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
   script:
     - echo "(optional) Tests on intronSeeker installation..."
     #- git clone https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git #inutile 
-    - ls
-    #- module load system/Miniconda3-4.7.10;
-    #- cd intronSeeker/
-    #- ./setup.sh
-    #- source activate ISeeker_environment
-    #- intronSeeker checkInstall
-    #- echo "End install and check installation..."
+    #- ls
+    - /bin/bash setup.sh
+    - source activate ISeeker_environment
+    - intronSeeker checkInstall
+    - echo "End install and check installation..."
 
 
 hiSATalign-job:   
