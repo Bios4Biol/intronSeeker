@@ -21,8 +21,8 @@ For a faster installation, we advise you to use mamba, available in the latest v
 
 ```diff
 + conda update -n base conda
- + conda install -n base conda-libmamba-solver
- + conda config --set solver libmamba 
++ conda install -n base conda-libmamba-solver
++ conda config --set solver libmamba 
 ```
 
 Installation procedure
