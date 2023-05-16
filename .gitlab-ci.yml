@@ -22,11 +22,16 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
     - source activate ISeeker_environment
     - intronSeeker checkInstall
     - echo "End install and check installation..."
+  artifacts:
+      paths:
+        - continuumio/miniconda3:latest
 
 
 hiSATalign-job:   
   stage: align    # It only starts when the job in the test intallation stage completes successfully.
   script:
+    - echo "Reuse imageIS ?"
+    - docker run --rm $(cat $CI_JOB_NAME/artifacts/continuumio/miniconda3:latest)
     - echo "Reads alignment on reference contigs with Hisat"
     - intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
   artifacts:
