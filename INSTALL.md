@@ -17,6 +17,14 @@ has been created  : Conda environment
 For an easy install, conda environments is recommended. 
 Follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to install Miniconda.
 
+For a faster installation, we advise you to use mamba, available in the latest version of conda:
+
+```diff
++ conda update -n base conda
+ + conda install -n base conda-libmamba-solver
+ + conda config --set solver libmamba 
+```
+
 Installation procedure
 ----------------------
 
@@ -27,7 +35,7 @@ To install intronSeeker, download all files and directories found at
 then, open a bash session if you are not already in bash (bash command) and run the setup.sh script :
 
  ```diff
- + ./setup.sh
+ + /bin/bash setup.sh
  ```
 
 This script will  install the Conda environment, configure the newly installed
