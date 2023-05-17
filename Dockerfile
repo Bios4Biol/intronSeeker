@@ -8,6 +8,7 @@ RUN conda install -n base conda-libmamba-solver
 RUN conda config --set solver libmamba  
 
 # Copy intronSeeker's code in the futur Docker image:
+WORKDIR /
 COPY README.md ./
 RUN ls /
 RUN ls
