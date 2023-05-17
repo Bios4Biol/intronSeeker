@@ -26,8 +26,6 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
         - < Dockerfile
   after_script:
     - docker push $CI_REGISTRY_IMAGE:intronSeeker
-  when: manual
-  
 
 
 hiSATalign-job:   
