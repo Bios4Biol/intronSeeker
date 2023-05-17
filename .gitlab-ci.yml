@@ -23,7 +23,7 @@ buildDocker-job:       # This job first runs tests on intronSeeker install.
     - docker build 
         --tag $CI_REGISTRY_IMAGE:intronSeeker
         --build-arg BUILDKIT_INLINE_CACHE=1
-        - < Dockerfile
+        .
   after_script:
     - docker push $CI_REGISTRY_IMAGE:intronSeeker
 
