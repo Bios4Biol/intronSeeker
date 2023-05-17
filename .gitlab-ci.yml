@@ -1,13 +1,14 @@
 # CI/CD configuration file to test install and run alignment, SRS and trim FASTA on tests data.
 stages:  # List of stages for jobs, and their order of execution
-  - testInstall
+  - buildDocker-installIS
   - align
   - splitReadSearch
   - trimFastaFromTXT
 
 
-testInstall-job:       # This job first runs tests on intronSeeker install.
-  stage: testInstall
+buildDocker-job:       # This job first runs tests on intronSeeker install.
+  stage: buildDocker-installIS
+  tags: ["stable"]
   image: docker:20.10.20
   services:
     - docker:20.10.20-dind
@@ -19,7 +20,6 @@ testInstall-job:       # This job first runs tests on intronSeeker install.
     - docker info
     - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   script:
-    - ls
     - docker build 
         --tag $CI_REGISTRY_IMAGE:intronSeeker
         --build-arg BUILDKIT_INLINE_CACHE=1
