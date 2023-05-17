@@ -11,7 +11,7 @@ RUN conda config --set solver libmamba
 COPY . /intronSeeker
 
 # intronSeeker install:
-RUN /bin/bash setup.sh
+RUN /bin/bash /intronSeeker/setup.sh
 RUN source activate ISeeker_environment 
 RUN intronSeeker checkInstall
 RUN echo "End install and check installation..." 
