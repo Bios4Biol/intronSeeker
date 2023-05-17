@@ -8,13 +8,14 @@ RUN conda install -n base conda-libmamba-solver
 RUN conda config --set solver libmamba  
 
 # Copy intronSeeker's code in the futur Docker image:
-WORKDIR /
-COPY README.md ./
-RUN ls /
-RUN ls
+COPY . /intronSeeker/
 
 # intronSeeker install:
+WORKDIR /intronSeeker/
 RUN /bin/bash /intronSeeker/setup.sh
-RUN source activate ISeeker_environment 
+
+# source activate not functional, user SHELL tu run command
+# https://pythonspeed.com/articles/activate-conda-dockerfile/
+SHELL ["conda", "run", "-n", "ISeeker_environment", "/bin/bash", "-c"]
 RUN intronSeeker checkInstall
 RUN echo "End install and check installation..." 
