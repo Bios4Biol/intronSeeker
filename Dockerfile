@@ -16,6 +16,7 @@ RUN /bin/bash /intronSeeker/setup.sh
 
 # source activate not functional, user SHELL tu run command
 # https://pythonspeed.com/articles/activate-conda-dockerfile/
-SHELL ["conda", "run", "-n", "ISeeker_environment", "/bin/bash", "-c"]
-RUN intronSeeker checkInstall
-RUN echo "End install and check installation..." 
+RUN ./entrypoint.sh intronSeeker checkInstall
+RUN echo "End install and check installation..."
+
+ENTRYPOINT ["./entrypoint.sh"]

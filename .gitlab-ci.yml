@@ -26,13 +26,16 @@ buildDocker-job:       # This job first runs tests on intronSeeker install.
   after_script:
     - docker push $CI_REGISTRY_IMAGE:intronSeeker
 
-
 hiSATalign-job:   
   stage: align    # It only starts when the job in the test intallation stage completes successfully.
   image: $CI_REGISTRY_IMAGE:intronSeeker
   script:
     - echo "Reads alignment on reference contigs with Hisat"
-    - intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
+    - intronSeeker hisat2Alignment 
+        -r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+        -1 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+        -2 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+        -o tests/Emilien_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
   artifacts:
     paths:
       - tests/
@@ -43,10 +46,11 @@ STARalign-job:
   image: $CI_REGISTRY_IMAGE:intronSeeker
   script:
     - echo "Reads alignment on reference contigs with STAR"
-    - intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
-  artifacts:
-    paths:
-      - tests/
+    - intronSeeker hisat2Alignment
+      -r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+      -1 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+      -2 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+      -o tests/Emilien_Reduced_real_dataset/Cele_library-contigs_STARAlignment
 
 
 splitReadSearch-job:   
@@ -54,7 +58,10 @@ splitReadSearch-job:
   image: $CI_REGISTRY_IMAGE:intronSeeker
   script:
     - echo "Splicing event search"
-    - intronSeeker splitReadSearch -a data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
+    - intronSeeker splitReadSearch
+      -a tests/Emilien_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam
+      -r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+      -o tests/Emilien_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
 
 
 trimFastaFromTXT-job:      
@@ -62,4 +69,7 @@ trimFastaFromTXT-job:
   image: $CI_REGISTRY_IMAGE:intronSeeker
   script:
     - echo "List features by FASTA trimming"
-    - intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_trimFASTA
+    - intronSeeker trimFastaFromTXT
+      -r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+      -c tests/Emilien_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt
+      -o tests/Emilien_Reduced_real_dataset/Test_Cele_trimFASTA
