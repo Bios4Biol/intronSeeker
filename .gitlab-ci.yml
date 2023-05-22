@@ -1,3 +1,6 @@
+default:
+  tags: ["stable"]
+
 # CI/CD configuration file to test install and run alignment, SRS and trim FASTA on tests data.
 stages:  # List of stages for jobs, and their order of execution
   - buildDocker-installIS
