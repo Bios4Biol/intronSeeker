@@ -25,6 +25,15 @@ buildDocker-job:       # This job first runs tests on intronSeeker install.
         .
   after_script:
     - docker push $CI_REGISTRY_IMAGE:intronSeeker
+  rules:
+    - changes: # the stage will start if one of those files has changed.
+        - Dockerfile
+        - bin/*
+        - config/environment.yml
+        - entrypoint.sh
+        - setup.sh
+      when: always
+    - when: manual # We can launch it manually
 
 hiSATalign-job:   
   stage: align    # It only starts when the job in the test intallation stage completes successfully.
