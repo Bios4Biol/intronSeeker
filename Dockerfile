@@ -14,7 +14,7 @@ COPY . /intronSeeker/
 WORKDIR /intronSeeker/
 RUN /bin/bash /intronSeeker/setup.sh
 
-# source activate not functional, user SHELL tu run command
+# source activate not functional, user entrypoint approach to encapsulate command in bash subshell
 # https://pythonspeed.com/articles/activate-conda-dockerfile/
 RUN ./entrypoint.sh intronSeeker checkInstall
 RUN echo "End install and check installation..."
