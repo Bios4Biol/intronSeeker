@@ -9,7 +9,7 @@ stages:  # List of stages for jobs, and their order of execution
   - trimFastaFromTXT
 
 
-buildDocker-job:       # This job first runs tests on intronSeeker install.
+.buildDocker-template:       # This job is a template to test on intronSeeker install. It wont be run but will de used by other buildDocker jobs
   stage: buildDocker-installIS
   image: docker:20.10.20
   services:
@@ -28,6 +28,10 @@ buildDocker-job:       # This job first runs tests on intronSeeker install.
         .
   after_script:
     - docker push $CI_REGISTRY_IMAGE:intronSeeker
+
+
+buildDocker-job:       # This job first runs tests on intronSeeker install. It will be run automatically if needed
+  extends: .buildDocker-template
   rules:
     - changes: # the stage will start if one of those files has changed.
         - Dockerfile
@@ -36,7 +40,12 @@ buildDocker-job:       # This job first runs tests on intronSeeker install.
         - entrypoint.sh
         - setup.sh
       when: always
-    - when: never # We skip the stage if no modification is done (manual put the job in waiting state)
+
+
+buildDocker-job-manual:   # This job first runs tests on intronSeeker install if manually triggered.
+  extends: .buildDocker-template
+  when: manual # We launch the build job manually
+
 
 hiSATalign-job:   
   stage: align    # It only starts when the job in the test intallation stage completes successfully.
