@@ -36,7 +36,7 @@ To install intronSeeker, download all files and directories found at
 then, open a bash session if you are not already in bash (bash command) and run the setup.sh script :
 
  ```diff
- + /bin/bash setup.sh
+ /bin/bash setup.sh
  ```
 
 This script will  install the Conda environment, configure the newly installed
