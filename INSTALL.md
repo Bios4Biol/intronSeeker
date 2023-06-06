@@ -20,9 +20,10 @@ Follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/inst
 For a faster installation, we advise you to use mamba, available in the latest version of conda:
 
 ```diff
-+ conda update -n base conda
-+ conda install -n base conda-libmamba-solver
-+ conda config --set solver libmamba 
+git  clone git@forgemia.inra.fr:emilien.lasguignes/intronSeeker.git
+conda update -n base conda
+conda install -n base conda-libmamba-solver
+conda config --set solver libmamba 
 ```
 
 Installation procedure
