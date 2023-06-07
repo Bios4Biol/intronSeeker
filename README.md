@@ -130,6 +130,24 @@ Configuration file
     output:/path/to/HTML/
     force: -F
 ```
+## Wrappers description
+
+|  Program / wrapper    |     Description      |      
+| :---    |         :--- |
+|  checkInstall |          check intronSeeker installation               |       
+|     simulateReads    |      produces a single or paired short  reads files from a contig file  |             
+|  starAlignement    |     aligns with STAR single or paired fastq files to a contig file     |  
+|  hisat2Alignment  |          aligns with hisat2 single or paired fastq files to a contig file |                                                          
+|      fullRandomSimulation |      produces a random reference contig fasta file with an without inserted introns                             parameters                          |    
+ |     GTFbasedSimulation     |    randomly selects transcripts and retained introns in a transcriptome                                       genome fasta and GTF files    |              
+|      splitReadSearch    |        produces a split event table from an alignment file   |              
+ |     trimFasta            |      removes introns from a contig file using split events       |                         
+ |     analyzeORF       |          calculates longest ORF for each contig of a fasta fil     |                
+|      analyseProtein   |          Produces longest protein alignment for each contig of a fasta file given a reference protein fasta file              |      
+ |     searchIntrons  |            runs alignment, split read search and trim fasta               |     
+|      checkIntrons        |       runs ORF and protein analysis on both contigs before and after intron removal      |     
+
+Table: intronSeeker programs and wrappers.
 
 # Files formats
 
@@ -275,3 +293,4 @@ Too complex introns are also filtered. An intron is too complex whether because 
 |  PASS  |        After filtering, candidates are flagged PASS.|
 
 Table: IntronSeeker introns filters.
+
