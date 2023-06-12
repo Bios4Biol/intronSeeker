@@ -95,7 +95,7 @@ $ ssh -XY user@genobioinfo.toulouse.inrae.fr
 Run the setup.sh script :
 
  ```diff
- /bin/bash setup.sh
+ $ /bin/bash setup.sh
  ```
 
 This script will  install the Conda environment, configure the newly installed
@@ -147,19 +147,19 @@ NB. Installation can be quite long (15 minutes) due to the numerous grinder perl
 Before each use of intronSeeker, activate the conda environment with :
 
 ```diff
-source activate ISeeker_environment
+$ source activate ISeeker_environment
 ```
 
 Now, your command prompt should be like this :
 
 ```
-(ISeeker_environment) elasguignes@node027 ~ $
+(ISeeker_environment) [smaman@genobioinfo1 intronSeeker]$ 
 ```
 
 Finally, to test the installation, run the command :
 
 ```diff
-intronSeeker checkInstall
+(ISeeker_environment) $ intronSeeker checkInstall
 ```
 
 You should get this message in standard ouput : 
