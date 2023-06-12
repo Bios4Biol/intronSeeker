@@ -233,12 +233,12 @@ Table: SRA samples description.
 To compare tissues, all samples are reduced to 20 million sequences of 75 nt. In the main manuscript we should only have Venn diagrams without the bottom histogram or barplot and with the tissue names and not the dataset names. In the same plot we could have two or three examples.
 
 
-|  Anguilla anguilla (nb contigs)  | Samples          |      \% Retained introns |  
-| :---        |      :----:      |            :--- |
-||                                  |SRR1532756 - Ovaries |  **3.46%**      |       
-||                                  | SRR1532757 - Brain   |  **3.36%**    |         
-||                                  | SRR1532760 - Muscle   | **3.32%**    |         
-||                                  | 3 tissues             | **0.90%**   |          
+| Samples             |      \% Retained introns |  
+| :---                |            :---          |
+|SRR1532756 - Ovaries |  **3.46%**               |       
+|SRR1532757 - Brain   |  **3.36%**               |         
+|SRR1532760 - Muscle  | **3.32%**                |         
+| 3 tissues           | **0.90%**                |          
 
 Table: introns found in different tissues of Anguilla anguilla data.
 
