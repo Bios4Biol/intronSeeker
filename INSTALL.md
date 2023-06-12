@@ -87,7 +87,7 @@ NB. Installation can be quite long (15 minutes) due to the numerous grinder perl
 Before each use of intronSeeker, activate the conda environment with :
 
 ```diff
-+ source activate ISeeker_environment
+source activate ISeeker_environment
 ```
 
 Now, your command prompt should be like this :
@@ -99,7 +99,7 @@ Now, your command prompt should be like this :
 Finally, to test the installation, run the command :
 
 ```diff
-+ intronSeeker checkInstall
+intronSeeker checkInstall
 ```
 
 You should get this message in standard ouput : 
