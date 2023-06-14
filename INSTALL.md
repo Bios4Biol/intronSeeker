@@ -66,7 +66,7 @@ Run the setup.sh script :
 
 ```diff
 $ cd intronSeeker/
-$ ./setup.sh    
+$ /bin/bash/ setup.sh    
 ...
 ### Grinder Installed
 
