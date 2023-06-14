@@ -111,15 +111,9 @@ Installation done.
 
 ```
 
-### Activate ISeeker_environment 
-
-```diff
-$ source activate ISeeker_environment 
-```
-
-### Test installation.
-
 NB. Installation can be quite long (15 minutes) due to the numerous grinder perl dependencies. 
+
+### Activate ISeeker_environment and test installation.
 
 Before each use of intronSeeker, activate the conda environment with :
 
