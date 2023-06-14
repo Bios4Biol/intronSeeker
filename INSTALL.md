@@ -16,6 +16,7 @@ has been created  : Conda environment
 
 For an easy install, conda environments is recommended. 
 Follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to install Miniconda.
+For a faster installation, we advise you to use mamba, already available in the latest version of conda
 
 
 ## intronSeeker installation and environment configuration on genobioinfo
@@ -39,15 +40,29 @@ Resolving deltas: 100% (1556/1556), done.
 Checking out files: 100% (153/153), done.
 ```
 
-### For a faster installation, we advise you to use mamba, available in the latest version of conda
+### Load miniconda environment
+
+#### On genologin
 
 ```diff
-$ module load devel/Miniconda/Miniconda3 
-$ conda update -n base conda
-$ conda install -n base conda-libmamba-solver
+$ module load system/Miniconda3
+```
+or
+
+```diff
+$ module load system/Miniconda3-4.7.10
+```
+
+
+#### On genobioinfo
+
+```diff
+module load devel/Miniconda/Miniconda3
 ```
 
 ### Set up intronSeeker
+
+Run the setup.sh script :
 
 ```diff
 $ cd intronSeeker/
@@ -57,46 +72,6 @@ $ ./setup.sh
 
 ### Installation done.
 ```
-
-### Activate ISeeker_environment 
-
-```diff
-$ conda activate ISeeker_environment 
-```
-
-### If conda activate not found, initialize your shell
-
-Message:
-```diff
-CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
-```
-
-To initialize your shell, run
-
-    $ conda init <SHELL_NAME>
-
-Currently supported shells are:
-  - bash
-  - fish
-  - tcsh
-  - xonsh
-  - zsh
-  - powershell
-
-==> For changes to take effect, close and re-open your current shell. <==
-
-```diff
-$ ssh -XY user@genobioinfo.toulouse.inrae.fr
-(base) [user@genobioinfo1 intronSeeker]$ conda activate ISeeker_environment
-```
-
-### intronSeeker set up
-
-Run the setup.sh script :
-
- ```diff
- $ /bin/bash setup.sh
- ```
 
 This script will  install the Conda environment, configure the newly installed
 environment and install Grinder and its dependencies (Perl modules) wich are not yet
@@ -138,6 +113,12 @@ Conda environment configured.
 
 Installation done.
 
+```
+
+### Activate ISeeker_environment 
+
+```diff
+$ source activate ISeeker_environment 
 ```
 
 ### Test installation.
