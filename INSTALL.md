@@ -47,12 +47,6 @@ Checking out files: 100% (153/153), done.
 ```diff
 $ module load system/Miniconda3
 ```
-or
-
-```diff
-$ module load system/Miniconda3-4.7.10
-```
-
 
 #### On genobioinfo
 
@@ -66,6 +60,7 @@ Run the setup.sh script :
 
 ```diff
 $ cd intronSeeker/
+$ CONDA_SOLVER="libmamba" /bin/bash ./setup.sh
 $ /bin/bash/ setup.sh
 ```
 
@@ -118,7 +113,7 @@ NB. Installation can be quite long (15 minutes) due to the numerous grinder perl
 Before each use of intronSeeker, activate the conda environment with :
 
 ```diff
-$ source activate ISeeker_environment
+$ conda activate ISeeker_environment
 ```
 
 Now, your command prompt should be like this :
