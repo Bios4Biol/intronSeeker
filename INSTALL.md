@@ -51,7 +51,7 @@ $ module load system/Miniconda3
 #### On genobioinfo
 
 ```diff
-module load devel/Miniconda/Miniconda3
+$ module load devel/Miniconda/Miniconda3
 ```
 
 ### Set up intronSeeker
