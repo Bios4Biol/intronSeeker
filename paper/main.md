@@ -18,33 +18,29 @@ Bibliography:
 
 # Introduction
 
-Short read RNA sequencing (RNA-Seq) is now routinely used to study gene expression. When reference genome and transcriptome are available, reads can be splice-aligned to the genome and gene abundances can be measured by counting reads matching each gene location or they can be quantified without alignment using the presence of gene specific kmers. When no reference genome or transcriptome is available, reads are usually assemble to build a reference contig set. In this de novo approach reads are then aligned to the reference contigs without using a splice-aware aligner because they originate from mature transcripts.
+Short read RNA sequencing (RNA-Seq) is now routinely used to study gene expression. When a reference genome and RNA-Seq reads are available, they can be splice-aligned to the genome and gene abundances can be measured by counting alignments found in each gene location. When no reference genome assembly is available, reads are usually assemble to build a reference transcriptome contig set. In this de novo approach reads are then aligned to the contigs without using a splice-aware aligner because they originate from mature transcripts.
 
-In order not to sequence very abundant ribosomal RNAs, commonly used protocols include oligo(dT) transcript enrichment. Transcript
-poly-adhenylation and splicing take place in the nucleus before transfer in the cytoplasm. PolyA tail selection retrieves mainly mature spliced transcripts. Introns spanning reads are still found in most RNA-Seq samples as shown by  [@Ameur2011].
+In order not to sequence very abundant ribosomal RNAs, commonly used protocols include oligo(dT) transcript enrichment. Transcript poly-adhenylation and splicing take place in the nucleus before transfer in the cytoplasm. PolyA tail selection retrieves mainly mature spliced transcripts. Introns spanning reads are still found in most RNA-Seq samples as shown by  [@Ameur2011].
 
-Intron retention is also a known biological gene regulation or alternative splicing mechanism. In plants it has been shown to increase
-the number of transcript splicing forms  [@Jia2020].  [@Braunschweig2014] have shown that even in mammals their is widespread intron retention and its link to gene expression regulation.
+Intron retention is also a known biological gene regulation or alternative splicing mechanism. In plants it has been shown to increase the number of transcript splicing forms  [@Jia2020].  [@Braunschweig2014] have shown that even in mammals their is widespread intron retention linked with gene expression regulation.
 
 Reads located on intron/exon boundaries harbor specific splice motifs. These splice motifs are di-nucleotides located at both intron ends. They can be canonical (GT/AG) or not. Canonical motifs are found in most site of most species.
 
-Intron retention can be seen as an artefact or a biologically relevant mechanism and in both cases it is interesting to monitor it in RNA-Seq data sets. This is easy when having a reference genome because one can quantify reads aligned on introns. This is more complicated in a de novo approach in which the assembler can produce contigs with and without intron for the same transcript.
+Intron retention can be seen as an artefact or a biologically relevant mechanism and in both cases it is interesting to monitor. This is easy with a reference genome assembly because one can quantify reads aligned in introns. This is more complicated in the de novo approach in which the assembler can produce contigs with and without intron for the same transcript.
 
 Contigs with introns are more difficult to annotated because introns are splitting coding sequences (CDS) and possibly generating several shorter protein alignments rather than a unique long match.
 
-Canonical splice motifs presence, number of reads splicing at the same location, the minimum number of splice events and overlaps (XXXXXXX) can be used to reduce faulty detection.
+Canonical splice motifs presence, number of reads splicing at the same location, the minimum number of splice events and overlaps can be used to reduce faulty detection.
 
-Hereafter we present IntronSeeker a software package enabling to search and remove introns from de novo assembled RNA-Seq reads.
+Hereafter we present IntronSeeker a software package enabling to search and remove introns from de novo assembled RNA-Seq contigs.
 
 # Statement of need
 
-RNA-Seq de novo assemblies are widely used to study transcription in species lacking a referencegenome.  The classical extraction protocol collects RNA fragments using their PolyA tails and there-fore should only gather mature RNAs.  Unfortunately part of the extracted RNA molecules still com-prise  retained  introns  which  can  therefore  be  present  in  some  assembled  contigs.   These  intronsgenerate  transcript  frameshits  and  thus  render  annotation  more  difficult.    IntronSeeker  searchesintrons  by  splice-realigning  reads  on  contigs.    Introns  candidates  showing  canonical  intron/exonboundaries supported by several sequences.  IntronSeeker found between 0.02 and 11.96% of pu-tative  introns  in  17  publicly  available  RNA-Seq  de  novo  samples.   IntronSeeker  produces  an  in-tron cleaned contig fasta file as well as a cleaning report.  IntronSeeeker can be downloaded fromhttps://github.com/genotoul-bioinfo/intronseeker.
+RNA-Seq de novo assemblies are widely used to study transcription in species lacking a reference genome. The classical extraction protocol collects RNA fragments using their PolyA tails and there-fore should only gather mature RNAs.  Unfortunately part of the extracted RNA molecules still com-prise  retained  introns  which  can  therefore  be  present  in  some  assembled  contigs.   These  introns generate  transcript  frameshifts  and  thus  render  annotation  more  difficult.    IntronSeeker  searches introns  by  splice-realigning  reads  on  contigs.    Introns  candidates  usually show  canonical  intron/exon boundaries supported by several sequences.  IntronSeeker found between 0.02 and 11.96% of putative  introns  in  twenty  publicly  available  RNA-Seq  de  novo  assembled samples.   IntronSeeker  produces  an  intron cleaned contig fasta file as well as a cleaning report.  IntronSeeeker can be downloaded fromhttps://github.com/genotoul-bioinfo/intronseeker.
 
 ## Searching retained introns in public datasets 
 
-The twenty public TSA contigs sets processed by IntronSeeker are classified in three Fungi, six Plantae, nine Animalia kingdoms and two
-Eukaryote superkingdoms. The number of contig ranged from thirty thousand to three hundred thousand. The number of reads ranged from six
-millions to three hundreed thirty millions. The proportion of retained intron candidates ranged from 0.02 to 11.96%. The figures are presented in Table 1.
+The twenty public TSA contigs sets processed by IntronSeeker are classified in three Fungi, six Plantae, nine Animalia kingdoms and two Eukaryote superkingdoms. The number of contigs ranged from thirty thousand to three hundred thousand. The number of reads ranged from six millions to three hundred thirty millions. The proportion of retained intron candidates ranged from 0.02 to 11.96%. The figures are presented in Table 1.
 
 |  Species          |   (super)kingdom   |  TSA id Nb contigs  | SRA reports                                                                               |         Nb reads.  |     \% cwi|
 | :---        |    :----:   |     :----:   |     :----:   |     :----:   |          :--- |
