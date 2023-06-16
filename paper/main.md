@@ -94,30 +94,26 @@ To ease installation, intronSeeker includes an installation script (setup.sh) wh
 \(1\) IntronSeeker dependencies include seven software packages :
 grinder [@angly2012grinder], gffread [@gffread], hisat2 [@kim2015hisat], STAR [@dobin2013star], samtools [@li2009sequence], TransDecoder [@haas2013novo], diamond [@buchfink2015fast].
 
-
-Python version 3.6 or above is required before installation:
+Versions required before installation:
+* Python version 3.6 or above.
+* Miniconda 23.3.3  or above.
 
 ```
-git clone https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git
-# Genologin cluster:
-module load system/Miniconda3-4.7.10  
+#Clone intronSeeker code from Git:
+$ git clone https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git
 
-# Genobioinfo cluster:
-module load devel/Miniconda/Miniconda3
+#Load our miniconda environment and use libmamba
+$ conda activate
+$ conda update -n base conda
+$ conda install -n base conda-libmamba-solver# Genologin cluster:
 
-#For a faster installation, we advise you to use mamba,  available in the latest version of conda:
-conda update -n base conda
-conda install -n base conda-libmamba-solver
-conda config --set solver libmamba 
+# Set up intronSeeker
+$ cd intronSeeker/ 
+$ ./setup.sh 
 
-# Run intronSeeker
-cd intronSeeker/ 
-./setup.sh 
-
-# Check installation
-source activate ISeeker_environment 
-intronSeeker checkInstall 
-\end{lstlisting}
+#Activate ISeeker_environment and check installation
+$ conda activate ISeeker_environment 
+$ intronSeeker checkInstall 
 
 # Command line help
 $ intronSeeker -h
