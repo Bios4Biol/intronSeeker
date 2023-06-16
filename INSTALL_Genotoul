@@ -118,7 +118,7 @@ $ conda activate ISeeker_environment
 Now, your command prompt should be like this :
 
 ```
-(ISeeker_environment) [smaman@genobioinfo1 intronSeeker]$ 
+(ISeeker_environment) [user@genobioinfo1 intronSeeker]$ 
 ```
 
 Finally, to test the installation, run the command :
