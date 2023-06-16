@@ -5,11 +5,11 @@ import os
 import sys
 
 # Metadata
-__author__    = "Lasguignes E., Oudin F., Cabanettes F., Klopp C."
-__copyright__ = "Copyright (C) 2019 INRA"
+__author__    = "Sarah Maman, Philippe Bardou, Emilien Lasguignes, Faustine Oudin, Floréal Cabanettes, Christophe Klopp."
+__copyright__ = "Copyright (C) 2019 INRAE"
 __license__   = "GNU General Public License"
 __version__   = "1.0"
-__email__     = "support.bioinfo.genotoul(at)inra.fr"
+__email__     = "sigenae(at)inrae.fr"
 __status__    = "dev"
 
 
