@@ -77,10 +77,13 @@ class OldVersion(Exception) :
 def checkVersion(asked_version : str, real_version : str) :
     ref = asked_version.split(".") ;
     real = real_version.split(".") ;
+    if asked_version == real_version:
+        return True;
     for i in range(min(len(ref),len(real))) :
         if int(real[i]) < int(ref[i]) :
             return False ;
-    return True ;
+        if int(real[i]) > int(ref[i]) :     
+            return True;
 
 
 def print_to_stdout(*a):
