@@ -632,7 +632,8 @@ state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
     Script_unigene
-    Copyright (C) 2019  Copyright (C) <2023>  <Sarah Maman, Philippe Bardou, Emilien Lasguignes, Faustine Oudin, Floréal Cabanettes, Christophe Klopp>
+    Copyright (C) 2019
+    <Sarah Maman, Philippe Bardou, Emilien Lasguignes, Faustine Oudin, Floréal Cabanettes, Christophe Klopp>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
