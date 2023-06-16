@@ -40,18 +40,13 @@ Resolving deltas: 100% (1556/1556), done.
 Checking out files: 100% (153/153), done.
 ```
 
-### Load miniconda environment
+### Load our miniconda environment and use libmamba
 
-#### On genologin
-
-```diff
-$ module load system/Miniconda3
-```
-
-#### On genobioinfo
 
 ```diff
-$ module load devel/Miniconda/Miniconda3
+$ conda activate
+$ conda update -n base conda
+$ conda install -n base conda-libmamba-solver
 ```
 
 ### Set up intronSeeker
@@ -60,7 +55,6 @@ Run the setup.sh script :
 
 ```diff
 $ cd intronSeeker/
-$ CONDA_SOLVER="libmamba" /bin/bash ./setup.sh
 ```
 
 This script will  install the Conda environment, configure the newly installed
@@ -118,7 +112,7 @@ $ conda activate ISeeker_environment
 Now, your command prompt should be like this :
 
 ```
-(ISeeker_environment) [smaman@genobioinfo1 intronSeeker]$ 
+(ISeeker_environment) [...]$ 
 ```
 
 Finally, to test the installation, run the command :
