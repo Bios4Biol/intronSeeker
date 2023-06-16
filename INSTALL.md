@@ -61,7 +61,6 @@ Run the setup.sh script :
 ```diff
 $ cd intronSeeker/
 $ CONDA_SOLVER="libmamba" /bin/bash ./setup.sh
-$ /bin/bash/ setup.sh
 ```
 
 This script will  install the Conda environment, configure the newly installed
