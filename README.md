@@ -294,3 +294,8 @@ Too complex introns are also filtered. An intron is too complex whether because 
 
 Table: IntronSeeker introns filters.
 
+# GitLab CI/CD pipeline
+
+"Runner for intronSeeker project" and .gitlab-ci.yml file at the root of this repository are available to run intronSeeker jobs.
+To run an intronSeeker pipeline, please choose "Pipelines" from the right-hand menu, clic "Run pipeline" on the left, run for branch "run_pipelines_tests", then clic "Run pipeline".
+Your pipeline is running and you can follow each stage in progress thanks to "Pipelines" menu.
