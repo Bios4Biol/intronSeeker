@@ -42,28 +42,28 @@ RNA-Seq de novo assemblies are widely used to study transcription in species lac
 
 The twenty public TSA contigs sets processed by IntronSeeker are classified in three Fungi, six Plantae, nine Animalia kingdoms and two Eukaryote superkingdoms. The number of contigs ranged from thirty thousand to three hundred thousand. The number of reads ranged from six millions to three hundred thirty millions. The proportion of retained intron candidates ranged from 0.02 to 11.96%. The figures are presented in Table 1.
 
-|  Species          |   (super)kingdom   |  TSA id Nb contigs  | SRA reports                                                                               |         Nb reads.  |     \% cwi|
-| :---        |    :----:   |     :----:   |     :----:   |     :----:   |          :--- |
-|   Salvia m.    |       Plantae   |         GJJN01 69 705  |     [SRR15718805](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/) |     23 086 599 |  **11.96%**|
-|  Platichthys s.   |   Animalia    |       GAPK01 30 630   |    [SRR1023744](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     | 516 791 904 |  **10,71%**|
-|  Rigidoporus m.   |   Fungi     |         GDMN01 34 441    |   [SRR2187438](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)  |     75 600 628 |   **5,97%**|
-|  Isatis t.      |     Plantae     |       GARR01 33 238   |    [SRR1051997](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |   113 134 348 |   **5,41%**|
-|  Goniomonas a.  |     Eukaryota    |      GGUN01 48 844   |    [SRR7601946](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |    82 416 944 |   **5,27%**|
-|  Vriesea c.  |        Plantae   |         GHCB01 41 228    |   [SRR500874](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     |   85 726 288  |  **3,94%**|
-|  Graminella n.   |    Animalia       |    GAQX01 37 537  |     [SRR857257](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     |   43 693 708   | **2,88%**|
-|  Carassius g.     |   Animalia     |      GJKR01 109 966 |     [SRR12596368](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)  |    21 661 960  |  **2.72%**|
-|  Rhizopus a.  |       Fungi     |         GDUK01 30 601  |     [SRR2104505](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)    |   64 801 576   | **2,51%**|
-|  Diplonema p.    |    Eukaryota     |     GJNJ01 114 037     | [SRR14933372](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     | 63 775 926 |   **2.35%**|
-|  Azolla f.   |        Plantae     |       GBTV01 36 091 |      [SRR1618559](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |   122 059 452 |   **1,97%**|
-|  Tripidium r. |       Plantae    |        GJDA01 106 494   |   [SRR14143372](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)    |  15 357 748  |  **1.50%**|
-|  Cimex l.         |   Animalia    |       GBYH01 39 124   |    [SRR1660436](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)    |  329 875 624 |   **1,24%**|
-|  Trichoplax sp. H2 |  Animalia    |       GFSF01 43 376   |    [SRR5819939](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     | 128 665 904   | **1,24%**|
-|  Phytophthora c.  |   Plantae   |         GBGX01 21 662   |    [SRR1206033](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)  |     14 346 946  |  **1.15%**|
-| Piromyces sp.  |     Fungi     |         GGXH01 124 096    |  [SRR7819335](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |    15 615 535 |   **0.50%**|
-|  Sander l.       |    Animalia       |    GJIW01 56 196     |  [SRR15372351](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |   48 694 199  |  **0.36%**|
-|  Rhodnius n.     |    Animalia        |   GJJI01 67 217 |      [SRR15602387](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     |  6 775 534  |  **0.11%**|
-|  Choromytilus c.   |  Animalia       |    GJJD01 106 298    |  [SRR15058678](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     | 10 490 833 |   **0.10%**|
-|  Bombus t.   |        Animalia  |         GHFS01 48 241   |    [SRR6148374](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)    |   15 547 444  |  **0.02%**|
+|  Species          |   (super)kingdom   |  TSA id |Nb contigs  | SRA reports                                                                               |         Nb reads.  |     \% cwi|
+| :---        |    :----:   |     :----:   |     :----:   |     :----:   |          :--- |:--- |
+|   Salvia m.    |       Plantae   |         GJJN01| 69 705  |     [SRR15718805](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/) |     23 086 599 |  **11.96%**|
+|  Platichthys s.   |   Animalia    |       GAPK01| 30 630   |    [SRR1023744](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     | 516 791 904 |  **10,71%**|
+|  Rigidoporus m.   |   Fungi     |         GDMN01 |34 441    |   [SRR2187438](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)  |     75 600 628 |   **5,97%**|
+|  Isatis t.      |     Plantae     |       GARR01 |33 238   |    [SRR1051997](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |   113 134 348 |   **5,41%**|
+|  Goniomonas a.  |     Eukaryota    |      GGUN01 |48 844   |    [SRR7601946](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |    82 416 944 |   **5,27%**|
+|  Vriesea c.  |        Plantae   |         GHCB01 |41 228    |   [SRR500874](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     |   85 726 288  |  **3,94%**|
+|  Graminella n.   |    Animalia       |    GAQX01 |37 537  |     [SRR857257](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     |   43 693 708   | **2,88%**|
+|  Carassius g.     |   Animalia     |      GJKR01 |109 966 |     [SRR12596368](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)  |    21 661 960  |  **2.72%**|
+|  Rhizopus a.  |       Fungi     |         GDUK01 |30 601  |     [SRR2104505](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)    |   64 801 576   | **2,51%**|
+|  Diplonema p.    |    Eukaryota     |     GJNJ01 |114 037     | [SRR14933372](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     | 63 775 926 |   **2.35%**|
+|  Azolla f.   |        Plantae     |       GBTV01 |36 091 |      [SRR1618559](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |   122 059 452 |   **1,97%**|
+|  Tripidium r. |       Plantae    |        GJDA01 |106 494   |   [SRR14143372](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)    |  15 357 748  |  **1.50%**|
+|  Cimex l.         |   Animalia    |       GBYH01 |39 124   |    [SRR1660436](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)    |  329 875 624 |   **1,24%**|
+|  Trichoplax sp. H2 |  Animalia    |       GFSF01 |43 376   |    [SRR5819939](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     | 128 665 904   | **1,24%**|
+|  Phytophthora c.  |   Plantae   |         GBGX01 |21 662   |    [SRR1206033](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)  |     14 346 946  |  **1.15%**|
+| Piromyces sp.  |     Fungi     |         GGXH01 |124 096    |  [SRR7819335](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |    15 615 535 |   **0.50%**|
+|  Sander l.       |    Animalia       |    GJIW01 |56 196     |  [SRR15372351](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)   |   48 694 199  |  **0.36%**|
+|  Rhodnius n.     |    Animalia        |   GJJI01 |67 217 |      [SRR15602387](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     |  6 775 534  |  **0.11%**|
+|  Choromytilus c.   |  Animalia       |    GJJD01 |106 298    |  [SRR15058678](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)     | 10 490 833 |   **0.10%**|
+|  Bombus t.   |        Animalia  |         GHFS01 |48 241   |    [SRR6148374](http://genoweb.toulouse.inra.fr/~smaman/intronSeeker/DATA-INRAE/REAL-reports/)    |   15 547 444  |  **0.02%**|
 
 Table: Rates of public contigs with introns, data from NCBI Transcript   Shotgun Archive (TSA) and Short Read Archive (SRA).
 
