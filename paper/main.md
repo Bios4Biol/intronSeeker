@@ -103,11 +103,11 @@ $ git clone https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git
 #Load our miniconda environment and use libmamba
 $ conda activate
 $ conda update -n base conda
-$ conda install -n base conda-libmamba-solver# Genologin cluster:
+$ conda install -n base --override-channels -c conda-forge mamba 'python_abi=*=*cp*'
 
 # Set up intronSeeker
-$ cd intronSeeker/ 
-$ ./setup.sh 
+$ cd intronSeeker/
+$ CONDA_SOLVER="libmamba" /bin/bash ./setup.sh
 
 #Activate ISeeker_environment and check installation
 $ conda activate ISeeker_environment 
