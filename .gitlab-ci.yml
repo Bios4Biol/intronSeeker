@@ -88,9 +88,9 @@ splitReadSearch-job:
   script:
     - echo "Splicing event search"
     - intronSeeker splitReadSearch
-      -a tests/REAL_DATA/HISAT2Alignment_Azolla/hisat2_SRR1618559.sort.bam
+      -a tests/hisat2_SRR1618559.sort.bam
       -r data/REAL_DATA/GBTV01.1.fsa_nt
-      -o tests/REAL_DATA/splicing_event_HISAT2_Azolla
+      -o tests/
       #-a tests/Emilien_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam
       #-r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
       #-o tests/Emilien_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
@@ -106,5 +106,5 @@ trimFastaFromTXT-job:
     - echo "List features by FASTA trimming"
     - intronSeeker trimFastaFromTXT
       -r data/REAL_DATA/GBTV01.1.fsa_nt
-      -c tests/REAL_DATA/splicing_event_HISAT2_Azolla/srs_candidates.txt
-      -o tests/REAL_DATA/trimFASTA_Azolla
+      -c tests/srs_candidates.txt
+      -o tests/
