@@ -56,7 +56,7 @@ hiSATalign-job:
         -r data/REAL_DATA/GBTV01.1.fsa_nt
         -1 data/REAL_DATA/SRR1618559_1.fastq
         -2 data/REAL_DATA/SRR1618559_2.fastq
-        -o test/REAL_DATA/HISAT2Alignment_Azolla
+        -o data/REAL_DATA/HISAT2Alignment_Azolla
         #-r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
         #-1 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
         #-2 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
@@ -88,7 +88,7 @@ splitReadSearch-job:
   script:
     - echo "Splicing event search"
     - intronSeeker splitReadSearch
-      -a tests/REAL_DATA/HISAT2Alignment_Azolla/hisat2_SRR1618559.sort.bam
+      -a data/REAL_DATA/HISAT2Alignment_Azolla/hisat2_SRR1618559.sort.bam
       -r data/REAL_DATA/GBTV01.1.fsa_nt
       -o tests/REAL_DATA/splicing_event_HISAT2_Azolla
       #-a tests/Emilien_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam
