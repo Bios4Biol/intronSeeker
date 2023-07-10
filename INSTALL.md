@@ -100,7 +100,7 @@ Installation done.
 
 ```
 
-NB. Installation can be quite long (15 minutes) due to the numerous grinder perl dependencies. 
+NB. Installation can be quite long due to the numerous grinder perl dependencies. 
 
 ### Activate ISeeker_environment and test installation.
 
