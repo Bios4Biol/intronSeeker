@@ -46,7 +46,7 @@ Checking out files: 100% (153/153), done.
 ```diff
 $ conda activate
 $ conda update -n base conda
-$ conda install -n base conda-libmamba-solver
+$ mamba install -n base conda-libmamba-solver
 ```
 
 ### Set up intronSeeker
@@ -55,6 +55,7 @@ Run the setup.sh script :
 
 ```diff
 $ cd intronSeeker/
+$ CONDA_SOLVER="libmamba" /bin/bash ./setup.sh
 ```
 
 This script will  install the Conda environment, configure the newly installed
