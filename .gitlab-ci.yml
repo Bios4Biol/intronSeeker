@@ -66,20 +66,20 @@ hiSATalign-job:
       - tests/
 
 
-STARalign-job:   
-  stage: align    # It only starts when the job in the test intallation stage completes successfully.
-  image: $CI_REGISTRY_IMAGE:intronSeeker
-  script:
-    - echo "Reads alignment on reference contigs with STAR"
-    - intronSeeker hisat2Alignment
-      -r data/REAL_DATA/GBTV01.1.fsa_nt
-      -1 data/REAL_DATA/SRR1618559_1.fastq
-      -2 data/REAL_DATA/SRR1618559_2.fastq
-      -o test/REAL_DATA/STARAlignment_Azolla
-      #-r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
-      #-1 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
-      #-2 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
-      #-o tests/Emilien_Reduced_real_dataset/Cele_library-contigs_STARAlignment
+#STARalign-job:   
+#  stage: align    # It only starts when the job in the test intallation stage completes successfully.
+#  image: $CI_REGISTRY_IMAGE:intronSeeker
+#  script:
+#    - echo "Reads alignment on reference contigs with STAR"
+#    - intronSeeker hisat2Alignment
+#      -r data/REAL_DATA/GBTV01.1.fsa_nt
+#      -1 data/REAL_DATA/SRR1618559_1.fastq
+#      -2 data/REAL_DATA/SRR1618559_2.fastq
+#      -o test/REAL_DATA/STARAlignment_Azolla
+#      #-r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+#      #-1 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+#      #-2 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+#      #-o tests/Emilien_Reduced_real_dataset/Cele_library-contigs_STARAlignment
 
 
 splitReadSearch-job:   
