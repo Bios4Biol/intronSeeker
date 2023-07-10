@@ -42,7 +42,7 @@ RNA-Seq de novo assemblies are widely used to study transcription in species lac
 
 The twenty public TSA contigs sets processed by IntronSeeker are classified in three Fungi, six Plantae, nine Animalia kingdoms and two Eukaryote superkingdoms. The number of contigs ranged from thirty thousand to three hundred thousand. The number of reads ranged from six millions to three hundred thirty millions. The proportion of retained intron candidates ranged from 0.02 to 11.96%. The figures are presented in Table 1.
 
-|  Species          |   (super)kingdom   |  TSA id |Nb contigs  | SRA                                                                                |         Nb reads.  |     \% cwi|
+|  Species          |   (super)kingdom   |  TSA id |Nb contigs  | SRA and link to HTML intronSeeker report                                                                               |         Nb reads.  |     \% cwi|
 | :---              |    :----:     |     :----: |:----:   |       :----:   |           :--- |       :--- |
 |   Salvia m.       |   Plantae     |    GJJN01  | 69 705  |    SRR15718805 |     23 086 599 |  **11.96%**|
 |  Platichthys s.   |   Animalia    |    GAPK01  | 30 630  |    SRR1023744  | 516 791 904    |  **10,71%**|
@@ -61,8 +61,8 @@ The twenty public TSA contigs sets processed by IntronSeeker are classified in t
 |  Phytophthora c.  |   Plantae     | GBGX01     | 21 662  | SRR1206033     |  14 346 946    |  **1.15%**|
 | Piromyces sp.     |     Fungi     |  GGXH01    | 124 096 |  SRR7819335    |    15 615 535  |   **0.50%**|
 |  Sander l.        |   Animalia    |  GJIW01    | 56 196  |  SRR15372351   |   48 694 199   |  **0.36%**|
-|  Rhodnius n.      |    Animalia   |  GJJI01    | 67 217  | SRR15602387    |  6 775 534     |  **0.11%**|
-|  Choromytilus c.  |  Animalia     |  GJJD01    | 106 298 | SRR15058678    | 10 490 833     |   **0.10%**|
+|  Rhodnius n.      |    Animalia   |  GJJI01    | 67 217  | [SRR15602387](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/data/REAL_DATA/Rhodnius_n_SRR15602387/report_Rhod_SRR15602387.html)    |  6 775 534     |  **0.11%**|
+|  Choromytilus c.  |  Animalia     |  GJJD01    | 106 298 | [SRR15058678](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/data/REAL_DATA/Choromytilus_c_SRR15058678/report_Choromytilus_SRR15058678.html)    | 10 490 833     |   **0.10%**|
 |  Bombus t.        |    Animalia   |  GHFS01    | 48 241  | SRR6148374     |   15 547 444   |  **0.02%**|
 
 Table: Rates of public contigs with introns, data from NCBI Transcript   Shotgun Archive (TSA) and Short Read Archive (SRA).
