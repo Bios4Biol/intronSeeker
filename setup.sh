@@ -31,7 +31,7 @@ source $CONDA_PREFIX/etc/profile.d/conda.sh
 echo -e "### Conda environment installing... \n"
 if [ $(conda env list | grep 'ISeeker_environment' | wc -l) = 0 ]
 then
-    conda env create --file $HERE/config/environment.yml
+    mamba env create --file $HERE/config/environment.yml
     
     if [ $? = 0 ] 
     then 
