@@ -53,10 +53,14 @@ hiSATalign-job:
   script:
     - echo "Reads alignment on reference contigs with Hisat"
     - intronSeeker hisat2Alignment 
-        -r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
-        -1 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
-        -2 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
-        -o tests/Emilien_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
+        -r data/REAL_DATA/GBTV01.1.fsa_nt
+        -1 data/REAL_DATA/SRR1618559_1.fastq
+        -2 data/REAL_DATA/SRR1618559_2.fastq
+        -o data/REAL_DATA/HISAT2Alignment_Azolla
+        #-r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+        #-1 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+        #-2 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+        #-o tests/Emilien_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
   artifacts:
     paths:
       - tests/
@@ -68,10 +72,14 @@ STARalign-job:
   script:
     - echo "Reads alignment on reference contigs with STAR"
     - intronSeeker hisat2Alignment
-      -r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
-      -1 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
-      -2 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
-      -o tests/Emilien_Reduced_real_dataset/Cele_library-contigs_STARAlignment
+      -r data/REAL_DATA/GBTV01.1.fsa_nt
+      -1 data/REAL_DATA/SRR1618559_1.fastq
+      -2 data/REAL_DATA/SRR1618559_2.fastq
+      -o data/REAL_DATA/STARAlignment_Azolla
+      #-r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+      #-1 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+      #-2 data/Emilien_Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+      #-o tests/Emilien_Reduced_real_dataset/Cele_library-contigs_STARAlignment
 
 
 splitReadSearch-job:   
@@ -80,9 +88,12 @@ splitReadSearch-job:
   script:
     - echo "Splicing event search"
     - intronSeeker splitReadSearch
-      -a tests/Emilien_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam
-      -r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
-      -o tests/Emilien_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
+      -a tests/REAL_DATA/HISAT2Alignment_Azolla/hisat2_SRR1618559.sort.bam
+      -r data/REAL_DATA/GBTV01.1.fsa_nt
+      -o tests/REAL_DATA/splicing_event_HISAT2_Azolla
+      #-a tests/Emilien_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam
+      #-r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+      #-o tests/Emilien_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
   artifacts:
     paths:
       - tests/
@@ -94,6 +105,6 @@ trimFastaFromTXT-job:
   script:
     - echo "List features by FASTA trimming"
     - intronSeeker trimFastaFromTXT
-      -r data/Emilien_Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
-      -c tests/Emilien_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt
-      -o tests/Emilien_Reduced_real_dataset/Test_Cele_trimFASTA
+      -r data/REAL_DATA/GBTV01.1.fsa_nt
+      -c tests/REAL_DATA/splicing_event_HISAT2_Azolla/srs_candidates.txt
+      -o tests/REAL_DATA/trimFASTA_Azolla
