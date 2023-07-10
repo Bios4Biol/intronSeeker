@@ -46,7 +46,7 @@ Checking out files: 100% (153/153), done.
 ```diff
 $ conda activate
 $ conda update -n base conda
-$ mamba install -n base conda-libmamba-solver
+$ conda install -n base --override-channels -c conda-forge mamba 'python_abi=*=*cp*'
 ```
 
 ### Set up intronSeeker
