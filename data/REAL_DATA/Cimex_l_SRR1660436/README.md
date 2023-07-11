@@ -8,13 +8,10 @@ wget https://sra-download.ncbi.nlm.nih.gov/traces/wgs03/wgs_aux/GB/YH/GBYH01/GBY
 gzip -d GBYH01.1.fsa_nt.gz
 ```
 
-### Paired reads:
-
-Use SRA Toolkit (https://github.com/ncbi/sra-tools/wiki) to download runs locally.
+### Single reads:
 
 ```diff
-fastq-dump -X 5  --split-files  SRR1660436
-https://www.ebi.ac.uk/ena/browser/view/SRR1660436
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR166/006/SRR1660436/SRR1660436.fastq.gz
 
 ```
 
