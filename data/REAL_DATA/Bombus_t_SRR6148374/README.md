@@ -23,7 +23,7 @@ intronSeeker command lines
 ### Step 1 : hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r GHFS01.1.fsa_nt -1 SRR6148374.fastq.gz --prefix GHFS01 -o GHFS01 -t 12
+intronSeeker hisat2Alignment -r GHFS01.1.fsa_nt -1 SRR6148374_1.fastq.gz -2 SRR6148374_2.fastq.gz --prefix GHFS01 -o GHFS01 -t 12
 ```
 
 ### Step2: splitReadSearch
