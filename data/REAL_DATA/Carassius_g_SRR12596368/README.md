@@ -10,10 +10,10 @@ gzip -d GJKR01.1.fsa_nt.gz
 
 ### Paired reads:
 
-Use SRA Toolkit (https://github.com/ncbi/sra-tools/wiki) to download runs locally.
 
 ```diff
-fastq-dump -X 5  --split-files  SRR12596368
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR125/068/SRR12596368/SRR12596368_2.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR125/068/SRR12596368/SRR12596368_1.fastq.gz
 
 ```
 
