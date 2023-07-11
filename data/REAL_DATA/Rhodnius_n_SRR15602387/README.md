@@ -10,11 +10,9 @@ gzip -d GJJI01.1.fsa_nt.gz
 
 ### Paired reads:
 
-Use SRA Toolkit (https://github.com/ncbi/sra-tools/wiki) to download runs locally.
-
 ```diff
-fastq-dump -X 5  --split-files  SRR15602387
-https://www.ebi.ac.uk/ena/browser/view/SRR15602387
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/087/SRR15602387/SRR15602387_2.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR156/087/SRR15602387/SRR15602387_1.fastq.gz
 
 ```
 
