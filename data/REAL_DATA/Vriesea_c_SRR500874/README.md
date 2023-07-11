@@ -8,13 +8,10 @@ wget https://sra-download.ncbi.nlm.nih.gov/traces/wgs03/wgs_aux/GH/CB/GHCB01/GHC
 gzip -d GHCB01.1.fsa_nt.gz
 ```
 
-### Paired reads:
-
-Use SRA Toolkit (https://github.com/ncbi/sra-tools/wiki) to download runs locally.
+### Single reads:
 
 ```diff
-fastq-dump -X 5  --split-files  SRR500874
-https://www.ebi.ac.uk/ena/browser/view/SRR500874
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR500/SRR500874/SRR500874.fastq.gz
 
 ```
 
