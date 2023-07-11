@@ -8,12 +8,11 @@ wget https://sra-download.ncbi.nlm.nih.gov/traces/wgs04/wgs_aux/GJ/JD/GJJD01/GJJ
 gzip -d GJJD01.1.fsa_nt.gz
 ```
 
-### Paired reads:
+### Single reads:
 
-Use SRA Toolkit (https://github.com/ncbi/sra-tools/wiki) to download runs locally.
 
 ```diff
-fastq-dump -X 5  --split-files  SRR15058678
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR150/078/SRR15058678/SRR15058678.fastq.gz
 
 ```
 
