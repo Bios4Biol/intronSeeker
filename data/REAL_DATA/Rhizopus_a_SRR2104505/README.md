@@ -10,11 +10,9 @@ gzip -d GDUK01.1.fsa_nt.gz
 
 ### Paired reads:
 
-Use SRA Toolkit (https://github.com/ncbi/sra-tools/wiki) to download runs locally.
-
 ```diff
-fastq-dump -X 5  --split-files  SRR2104505
-https://www.ebi.ac.uk/ena/browser/view/SRR2104505
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR210/005/SRR2104505/SRR2104505_1.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR210/005/SRR2104505/SRR2104505_2.fastq.gz
 
 ```
 
