@@ -43,7 +43,7 @@ r2:SRR1618559_2.fastq
 flagstat:hisat2_SRR1618559.sort.flagstat.txt
 candidat:srs_SRR1618559_candidates.txt
 split:srs_SRR1618559_split_alignments.txt
-prefix:Azolla_f_SRR1618559
+prefix:GJJN01
 threads: 6                
 output:HTML/
 force: -F
