@@ -10,10 +10,9 @@ gzip -d GJJN01.1.fsa_nt.gz
 
 ### Paired reads:
 
-Use SRA Toolkit (https://github.com/ncbi/sra-tools/wiki) to download runs locally.
-
 ```diff
-fastq-dump -X 5  --split-files  SRR1618559
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR161/009/SRR1618559/SRR1618559_2.fastq.gz
+wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR161/009/SRR1618559/SRR1618559_1.fastq.gz
 ```
 
 intronSeeker command lines
