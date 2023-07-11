@@ -24,7 +24,7 @@ intronSeeker command lines
 ### Step 1 : hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r GBYH01.1.fsa_nt -1 SRR1660436_1.fastq -2 SRR1660436_2.fastq --prefix GBYH01 -o GBYH01 -t 12
+intronSeeker hisat2Alignment -r GBYH01.1.fsa_nt -1 SRR1660436.fastq  --prefix GBYH01 -o GBYH01 -t 12
 ```
 
 ### Step2: splitReadSearch
@@ -40,8 +40,7 @@ Configuration file:
 ```diff
 [Defaults]
 fasta:GBYH01.1.fsa_nt
-r1:SRR1660436_1.fastq
-r2:SRR1660436_2.fastq
+r:SRR1660436.fastq
 flagstat:hisat2_SRR1660436.sort.flagstat.txt
 candidat:srs_SRR1660436_candidates.txt
 split:srs_SRR1660436_split_alignments.txt
