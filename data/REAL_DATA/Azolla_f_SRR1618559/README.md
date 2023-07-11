@@ -38,7 +38,7 @@ Configuration file:
 ```diff
 [Defaults]
 fasta:GBTV01.1.fsa_nt
-r:SRR1618559_1.fastq
+r:SRR1618559.fastq
 flagstat:hisat2_SRR1618559.sort.flagstat.txt
 candidat:srs_SRR1618559_candidates.txt
 split:srs_SRR1618559_split_alignments.txt
