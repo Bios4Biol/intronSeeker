@@ -254,7 +254,7 @@ def get_html_body1(flagstat="", split="", candidat="", mfasta=""):
           <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
 		    Produced by IntronSeeker_v1.0<br>
 		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/scripts/icon/favicon.ico"   ><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
-		    <a style="color:#212529;" href="https://inrae.fr" target="_blank">INRAE</a><br>
+		    <a style="color:#212529;" href="https://www.inrae.fr" target="_blank">INRAE</a><br>
 		    Designed by the <a style="color:#212529;" href="http://sigenae.org" target="_blank">Sigenae</a> team.
           </div>
         </nav>

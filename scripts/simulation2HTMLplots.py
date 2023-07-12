@@ -104,14 +104,16 @@ def plot_hist(values:dict, title:str, xtitle:str, ytitle:str):
     """
     plot_hist function is a reusable function to plot an histogram.
     """
-    myhist = go.Histogram(
-        x=values,
+    hist, bin_edges = np.histogram(values, bins=500)
+    myhist = go.Bar(
+        x=bin_edges[:-1],
+        y=hist,
         name=title,
         opacity=0.85
     )
     data = [myhist]
     layout = go.Layout(
-         xaxis=dict(
+        xaxis=dict(
             title=xtitle
         ),
         yaxis=dict(
@@ -119,8 +121,6 @@ def plot_hist(values:dict, title:str, xtitle:str, ytitle:str):
         )
     )
     fig = go.Figure(data=data, layout=layout)
-    fig.update(layout_yaxis_range = [0,len(values)])
-    fig.update(layout_xaxis_range = [0,values.max()])
     fig.update_layout(
         margin=go.layout.Margin(
             l=50,
