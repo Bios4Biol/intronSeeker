@@ -43,9 +43,6 @@ from simulation2HTMLplots import *
 # python3 simulation2HTML.py -F --config_file ../config/simulation2HTML_example.cfg
 
 
-############
-# SUB MAIN #
-############
 def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str,
                         flagstat:str, candidat:str, split:str,
                         output:str, prefix:str, force:bool, threads:int ) :
@@ -613,48 +610,3 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     #     print('df_split', df_split, '\n\n')
     # if candidat:
     #     print('df_candidat', df_candidat, '\n\n')
-
-
-if __name__ == '__main__' :
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('--config_file')
-    args, left_argv = parser.parse_known_args()
-    if args.config_file:
-        with open(args.config_file, 'r') as f:
-            config = configparser.ConfigParser()
-            config.read([args.config_file])
-    
-    parser = ArgumentParser()
-    parser.add_argument('--config-file', type=argparse.FileType('r'), required=False, help="Provide a config file")
-    parser.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta', help="Path to the reference FASTA file.")
-    parser.add_argument('-m','--modified-fasta', type=argparse.FileType('r'), required=False, dest='mfasta', help="Path to the modified FASTA file.")
-    parser.add_argument('-g','--gtf', type=argparse.FileType('r'), required=False, dest='gtf', help="GTF filename which contains the genome annotation.")
-    parser.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1', help="Name of the  FASTQ  file  which  contains  the  single-end   reads library. If paired-end, filename of #1 reads mates")
-    parser.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2', help="Only for a paired-end library, filename of #2 reads mates.")
-    parser.add_argument('--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat', help="Path to flagstat file.")
-    parser.add_argument('-r','--ranks', type=argparse.FileType('r'), required=False, dest='ranks', help="Path to ranks file.")
-    parser.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat', help="Path to candidat file.")
-    parser.add_argument('-s','--split', type=argparse.FileType('r'), required=False, dest='split', help="Path to split file.")
-    parser.add_argument('-o','--output', type=str, required=True, dest='output', help="Output dir name.")
-    parser.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix', help="Prefix for output files name.")
-    parser.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads', help="Number of threads [1]")
-    parser.add_argument('-F', '--force', action='store_true', default=False, dest='force', help="Force to overwrite output files.")
-
-    try:
-        config
-    except NameError:
-        pass
-    else:
-        for k, v in config.items("Defaults"):
-            config_args={str(k): str(v)}
-            # Use values from configuration file by default
-            parser.set_defaults(**config_args)
-            # Reset `required` attribute when provided from config file
-            for action in parser._actions:
-                if action.dest in config_args:
-                    action.required = False
-
-    # Override with command line arguments when provided
-    args = vars(parser.parse_args(left_argv, args))
-
-    simulationReport(**args)
