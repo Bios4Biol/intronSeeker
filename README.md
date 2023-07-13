@@ -110,8 +110,8 @@ intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-
 ##### Generate a intronSeeker simulation report
 
 ```diff
-    source activate Iseeker_environment
-    python3 simulation2HTML.py -F --config_file /path/to/simulation2HTML_example.cfg 
+    conda activate Iseeker_environment
+    intronSeeker buildReport -F --config_file /path/to/buildReport_example.cfg 
 ```
 
 Configuration file
@@ -214,7 +214,7 @@ Each section of the HTML report corresponds to an  intronSeeker step.
 
 ## Inputs files list and description
 
-First simulation report's tab aims to check input files names listed in simulation2HTML.cfg config file or in parameters.
+First simulation report's tab aims to check input files names listed in buildReport.cfg config file or in parameters.
 
 ![inputs files complete names.](doc/input_files_IS.png)
 
