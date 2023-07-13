@@ -130,6 +130,13 @@ The second simulation is based on an existing genome and corresponding genome\
  containing each sequence of the original Fasta  spliced  of  the  segments \
  corresponding  to  the features of the TXT file.'
     ))
+    # buildReport
+    print('   buildReport\t',end='')
+    print(cw.fill(
+'Build a simulation report in HTML format. intronSeeker steps enabling \
+ to align read on contigs, find and remove retained introns are explained \
+ in this html report produced by buildReport step.'
+    ))
     # findEvidence
     print('   findEvidence\t',end='')
     print(cw.fill(
@@ -193,6 +200,8 @@ def command_help(command: str) :
         split_help()
     elif command == "trimFastaFromTXT" :
         trim_help()
+    elif command == "buildReport":
+        html_help()
     elif command == "findEvidence" :
         findEvidence_help()
     elif command == "fullRandomSimulation" :
@@ -475,6 +484,110 @@ intronSeeker trimFastaFromTXT -r <ref.fa> -c <candidates.txt> -o STR [-m, -F, -p
     print('   -m/--multi',end='')
     print(cw.fill(
 '\tAllow  multiple trimming for contigs with several candidates : only one ouput contig is saved with all trimmed candidates.'
+    ))
+    print('   -h/--help\t',end='')
+    print(cw.fill(
+'Print this help message.'
+    ))
+    print()
+
+########################################
+#### buildReport help printing ####
+########################################
+
+def html_help() :
+    text='\
+\nDescription:\n\
+Build a simulation report in HTML format. intronSeeker steps enabling to align read on contigs, \
+find and remove retained introns are explained in this html report produced by buildReport step.\
+A configuration file could be done and this file contains: Path to the reference FASTA file, FASTQ file(#1 reads mates and #2 reads mates if paired-end),path to flagstat, candidat and split files. If simulted data: path to the modified FASTA, GTF and ranks file. And prefix, number of threads, output directory name, and force if necessary.\n\
+Without configuration file, path to each input should be done and parameters.\n'
+    tw = textwrap.TextWrapper(
+        width=90,
+        initial_indent="",
+        drop_whitespace=True
+    )
+
+    # buildReport Description
+    print("\n".join([tw.fill(line) for line in text.splitlines()]),end='\n\n')
+    
+    # Usage
+    print('Usage:')
+    print(
+    textwrap.fill('\
+intronSeeker buildReport -F --config_file  <config_file.txt>',
+    width=90
+    ))
+    print ('or')
+    print(
+    textwrap.fill('\
+intronSeeker buildReport --fasta <ref.fasta>  -1 <R1.fastq> -2 <R2.fastq> --flagstat  <flagstat.txt>  --candidat <candidates.txt> --split <split_alignments.txt> --output <OUTDIR> -p <prefix> -t 1 -F',
+    width=90
+    ))
+    print()
+    
+    cw = textwrap.TextWrapper(
+        width=72,
+        initial_indent="\t",
+        subsequent_indent="\t\t\t",
+        break_long_words=False
+    )
+    print('Options:')
+    print('   --config_file FILE',end='')
+    print(cw.fill(
+'Path to the configuration TXT file which contains paths and parameters of HTML report fields (detailed above).'
+    ))
+    print('   -f/--fasta FILE',end='')
+    print(cw.fill(
+'Path to the reference FASTA file.'
+    ))
+    print('   -m/--mfasta FILE',end='')
+    print(cw.fill(
+'If simulted data, path to the modified FASTA file.'
+    ))
+    print('   -g/--gtf FILE',end='')
+    print(cw.fill(
+'If simulted data, path to the modified FASTA file.'
+    ))
+    print('   -1/--r1 FILE',end='')
+    print(cw.fill(
+'Path to FASTQ file which contains the single-end reads library. If single-end, file path of #1 reads mates".'
+    ))
+    print('   -2/--r2 FILE',end='')
+    print(cw.fill(
+'Path to FASTQ file which contains the single-end reads library. If single-end, file path of #1 reads mates".'
+    ))
+    print('   -r/--ranks FILE',end='')
+    print(cw.fill(
+'If simulated data, path to ranks file.'
+    ))
+    print('   --flagstat FILE',end='')
+    print(cw.fill(
+'Path to flagstat file, output of samtools flagstat.'
+    ))
+    print('   -c/--candidat FILE',end='')
+    print(cw.fill(
+'Path to candidat file, output of split read search step.'
+    ))
+    print('   -s/--split FILE',end='')
+    print(cw.fill(
+'Path to split file, output of split read search step.'
+    ))
+    print('   -p/--prefix STR',end='')
+    print(cw.fill(
+'Prefix for output files name..'
+    ))
+    print('   -t/--threads INT',end='')
+    print(cw.fill(
+'Number of threads [1].'
+    ))
+    print('   -o/--output STR',end='')
+    print(cw.fill(
+'Path to output directory.'
+    ))
+    print('   -F/--force',end='')
+    print(cw.fill(
+'\tForce to overwrite output files.'
     ))
     print('   -h/--help\t',end='')
     print(cw.fill(
