@@ -66,7 +66,7 @@ input files or output files presented here are available in data directory.
 Before running any intronSeeker command, activate the conda environment with :
 
 ```diff
-source activate ISeeker_environment
+conda activate ISeeker_environment
 ```
 
 ##### Reads alignment on reference contigs : Hisat or Star.
