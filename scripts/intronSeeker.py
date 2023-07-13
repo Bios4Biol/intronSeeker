@@ -124,8 +124,6 @@ def parse_arguments() :
     else:
         for k, v in config_html.items("Defaults"):
             config_html_args={str(k): str(v)}
-            print('k',k,'v',v)
-            print('config_html_args',config_html_args)
             # Use values from configuration file by default
             parser_html.set_defaults(**config_html_args)
             # Reset `required` attribute when provided from config file
