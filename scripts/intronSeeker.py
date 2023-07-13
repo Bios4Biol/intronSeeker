@@ -22,6 +22,9 @@
 import argparse 
 import sys 
 import os 
+import argparse 
+from argparse import ArgumentParser
+import configparser # To parse parameters file
 from intronSearch import findEvidence,trimFastaFromTXT,splitReadSearch
 from readsMapping import star,hisat2
 from dataSimulation import full_random_simulation,gtf_based_simulation,grinder
@@ -87,6 +90,50 @@ def parse_arguments() :
     parser_trim.add_argument('-m', '--multi', action='store_true', default=False, dest='multi')
     parser_trim.add_argument('-h','--help',action='store_const', const = parser_trim.prog.split()[-1],dest='c_help')
     parser_trim.set_defaults(func=trimFastaFromTXT)
+
+    # subparser for HTML simulation report
+    parser_html = subparser.add_parser('buildReport',add_help=False)
+    parser_html.add_argument('--config_file')
+    args_html, left_html_argv = parser_html.parse_known_args()
+    
+    if args_html.config_file:
+        with open(args_html.config_file, 'r') as f:
+            config_html = configparser.ConfigParser()
+            config_html.read([args_html.config_file])
+
+    parser_html.add_argument('--config-file', type=argparse.FileType('r'), required=False, help="Provide a config file")
+    parser_html.add_argument('-f','--fasta', type=argparse.FileType('r'), required=True, dest='fasta', help="Path to the reference FASTA file.")
+    parser_html.add_argument('-m','--modified-fasta', type=argparse.FileType('r'), required=False, dest='mfasta', help="Path to the modified FASTA file.")
+    parser_html.add_argument('-g','--gtf', type=argparse.FileType('r'), required=False, dest='gtf', help="GTF filename which contains the genome annotation.")
+    parser_html.add_argument('-1','--R1', type=argparse.FileType('r'), required=True, dest='r1', help="Name of the  FASTQ  file  which  contains  the  single-end   reads library. If paired-end, filename of #1 reads mates")
+    parser_html.add_argument('-2','--R2', type=argparse.FileType('r'), required=False, dest='r2', help="Only for a paired-end library, filename of #2 reads mates.")
+    parser_html.add_argument('--flagstat', type=argparse.FileType('r'), required=False, dest='flagstat', help="Path to flagstat file.")
+    parser_html.add_argument('-r','--ranks', type=argparse.FileType('r'), required=False, dest='ranks', help="Path to ranks file.")
+    parser_html.add_argument('-c','--candidat', type=argparse.FileType('r'), required=False, dest='candidat', help="Path to candidat file.")
+    parser_html.add_argument('-s','--split', type=argparse.FileType('r'), required=False, dest='split', help="Path to split file.")
+    parser_html.add_argument('-o','--output', type=str, required=True, dest='output', help="Output dir name.")
+    parser_html.add_argument('-p', '--prefix', type=str, required=False, default="", dest='prefix', help="Prefix for output files name.")
+    parser_html.add_argument('-t','--threads', type=int, default=1, required=False, dest='threads', help="Number of threads [1]")
+    parser_html.add_argument('-F', '--force', action='store_true', default=False, dest='force', help="Force to overwrite output files.")
+         
+    
+    try:
+        config_html
+    except NameError:
+        pass
+    else:
+        for k, v in config_html.items("Defaults"):
+            config_html_args={str(k): str(v)}
+            print('k',k,'v',v)
+            print('config_html_args',config_html_args)
+            # Use values from configuration file by default
+            parser_html.set_defaults(**config_html_args)
+            # Reset `required` attribute when provided from config file
+            for action in parser_html._actions:
+                if action.dest in config_html_args:
+                    action.required = False   
+    parser_html.set_defaults(func=simulationReport) 		
+    parser_html.add_argument('-h','--help',action='store_const', const = parser_html.prog.split()[-1],dest='c_help')
 
     # subparser for analyze candidates (findEvidence)
     parser_findEvidence = subparser.add_parser('findEvidence',add_help=False)
