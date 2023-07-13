@@ -49,7 +49,7 @@ force: -F
 
 
 ```diff
-python3 /PATH/TO/intronSeeker/scripts/simulation2HTML.py -F --config_file  SRR1660436.cfg;
+intronSeeker buildReport -F --config_file  SRR1660436.cfg;
 
 ```
 
