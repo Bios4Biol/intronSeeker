@@ -33,14 +33,9 @@ import subprocess as sp # To run subprocess
 import concurrent.futures as prl # For Split read signal analysis
 from itertools import repeat     # For Split read signal analysis
 # Import all functions from internal modules
-from simulation2HTMLparse import *
-from simulation2HTMLtags import *
-from simulation2HTMLplots import *
-
-
-# source activate ISeeker_environment;
-# cd scripts/; 
-# python3 simulation2HTML.py -F --config_file ../config/simulation2HTML_example.cfg
+from buildReportparse import *
+from buildReporttags import *
+from buildReportplots import *
 
 
 def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str, r2:str, ranks:str,
