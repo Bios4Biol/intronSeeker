@@ -22,7 +22,7 @@ intronSeeker command lines
 ### Step 1 : hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r GJJD01.1.fsa_nt -1 SRR15058678.fastq  --prefix GJJD01 -o GJJD01 -t 12
+intronSeeker hisat2Alignment -r GJJD01.1.fsa_nt -1 SRR15058678_1.fastq  --prefix GJJD01 -o GJJD01 -t 12
 ```
 
 ### Step2: splitReadSearch
