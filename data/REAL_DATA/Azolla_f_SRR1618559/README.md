@@ -4,8 +4,8 @@ Data source:
 ### Contigs FASTA: 
 
 ```diff
-wget https://sra-download.ncbi.nlm.nih.gov/traces/wgs04/wgs_aux/GJ/JN/GJJN01/GJJN01.1.fsa_nt.gz
-gzip -d GJJN01.1.fsa_nt.gz
+wget https://sra-download.ncbi.nlm.nih.gov/traces/wgs03/wgs_aux/GB/TV/GBTV01/GBTV01.1.fsa_nt.gz
+gzip -d GBTV01.1.fsa_nt.gz
 ```
 
 ### Paired reads:
@@ -21,28 +21,28 @@ intronSeeker command lines
 ### Step 1 : hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r GJJN01.1.fsa_nt -1 SRR1618559_1.fastq.gz -2 SRR1618559_2.fastq.gz --prefix GJJN01 -o GJJN01 -t 12
+ intronSeeker hisat2Alignment -r GBTV01.1.fsa_nt  -1 SRR1618559_1.fastq.gz -2 SRR1618559_2.fastq.gz --prefix GBTV01  -o GBTV01 -t 12
 ```
 
 ### Step2: splitReadSearch
 
 ```diff
-intronSeeker splitReadSearch -a GJJN01/hisat2_GJJN01.sort.bam -r GJJN01.1.fsa_nt --prefix GJJN01 --output splitReadSearch_GJJN01
+intronSeeker splitReadSearch -a GBTV01/hisat2_GBTV01.sort.bam -r GBTV01.1.fsa_nt --prefix GBTV01 --output splitReadSearch_GBTV01
 ```
 
 ### Step 3: run simulation2HTML
 
-Configuration file:
+Configuration file SRR1618559.cfg:
 
 ```diff
 [Defaults]
-fasta:GJJN01.1.fsa_nt
-r1:SRR1618559_1.fastq
-r2:SRR1618559_2.fastq
+fasta:GBTV01.1.fsa_nt
+r1:SRR1618559_1.fastq.gz
+r2:SRR1618559_2.fastq.gz
 flagstat:hisat2_SRR1618559.sort.flagstat.txt
 candidat:srs_SRR1618559_candidates.txt
 split:srs_SRR1618559_split_alignments.txt
-prefix:GJJN01
+prefix:GBTV01
 threads: 6                
 output:HTML/
 force: -F
