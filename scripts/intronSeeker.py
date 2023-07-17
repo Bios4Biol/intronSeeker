@@ -30,6 +30,7 @@ from readsMapping import star,hisat2
 from dataSimulation import full_random_simulation,gtf_based_simulation,grinder
 from checkInstall import checkInstall
 from helpMessages import program_help,command_help,program_version, print_to_stdout
+from buildReport import simulationReport
 
 
 def parse_arguments() :
