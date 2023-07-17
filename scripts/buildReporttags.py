@@ -19,8 +19,8 @@
 
 
 # Internal modules
-from simulation2HTMLparse import *
-from simulation2HTMLplots import *
+from buildReportparse import *
+from buildReportplots import *
 from collections import defaultdict
 
 
