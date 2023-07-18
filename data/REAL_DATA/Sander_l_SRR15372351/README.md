@@ -22,7 +22,7 @@ intronSeeker command lines
 ### Step 1 : hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r GJIW01.1.fsa_nt -1 SRR15372351_1.fastq -2 SRR15372351_2.fastq --prefix GJIW01 -o GJIW01 -t 12
+intronSeeker hisat2Alignment -r GJIW01.1.fsa_nt -1 SRR15372351_1.fastq.gz -2 SRR15372351_2.fastq.gz --prefix GJIW01 -o GJIW01 -t 12
 ```
 
 ### Step2: splitReadSearch
@@ -36,13 +36,17 @@ intronSeeker splitReadSearch -a GJIW01/hisat2_GJIW01.sort.bam -r GJIW01.1.fsa_nt
 Configuration file:
 
 ```diff
+nano SRR15372351.cfg
+```
+
+```diff
 [Defaults]
 fasta:GJIW01.1.fsa_nt
 r1:SRR15372351_1.fastq
 r2:SRR15372351_2.fastq
-flagstat:hisat2_SRR15372351.sort.flagstat.txt
-candidat:srs_SRR15372351_candidates.txt
-split:srs_SRR15372351_split_alignments.txt
+flagstat:GJIW01/hisat2_SRR15372351.sort.flagstat.txt
+candidat:splitReadSearch_GJIW01/srs_SRR15372351_candidates.txt
+split:splitReadSearch_GJIW01/srs_SRR15372351_split_alignments.txt
 prefix:GJIW01
 threads: 6                
 output:HTML/
