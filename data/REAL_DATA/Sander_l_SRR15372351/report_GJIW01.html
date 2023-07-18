@@ -1,0 +1,361 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="IntronSeeker simulation report">
+    <meta name="author" content="Bardou P., Maman S., Lasguignes E., Oudin F., Cabanettes F., Klopp C.">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css ">
+    <!-- Datatable -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+
+    <!-- Personalised css -->
+    <style type="text/css">
+      body { font-size: .875rem; }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 100; /* Behind the navbar */
+        padding: 0;
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+      }
+      .sidebar-sticky {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 48px; /* Height of navbar */
+        height: calc(100vh - 48px);
+        padding-top: 4rem;
+        overflow-x: hidden;
+        overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+      }
+      .sidebar .nav-link {
+        margin-right: 4px;
+        color: #212529;
+      }
+      .sidebar .nav-link:hover,
+      .sidebar .nav-link.active { color: #999; }
+      .sidebar-heading {
+        font-size: .75rem;
+        text-transform: uppercase;
+      }
+      .navbar-brand {
+        padding-top: .75rem;
+        padding-bottom: .75rem;
+        font-size: 1rem;
+        background-color: rgba(0, 0, 0, .7);
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .7);
+				z-index: 200;
+      }
+      .navbar .form-control {
+        padding: .75rem 1rem;
+        border-width: 0;
+        border-radius: 0;
+				z-index: 200;
+      }
+      .form-control-dark {
+        color: #fff;
+        background-color: rgba(255, 255, 255, .1);
+        border-color: rgba(255, 255, 255, .1);
+      }
+      .form-control-dark:focus {
+        border-color: transparent;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+      }
+      .border-top { border-top: 1px solid #e5e5e5; }
+      .border-bottom { border-bottom: 1px solid #e5e5e5; }
+	  .valn { vertical-align: middle !important; }
+	  .anchor{
+  			display: block;
+  			height: 83px; /*same height as header*/
+  			margin-top: -83px; /*same height as header*/
+  			visibility: hidden;
+	  }
+    </style>
+
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+
+    <title>IntronSeeker simulation report</title>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">IntronSeeker simulation report</a>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="#inputs-parameters">
+                  <span class="oi oi-file" aria-hidden="true"></span>
+                  Input files
+                </a>
+              </li>
+			  <li class="nav-item">
+				<a class="nav-link" href="#ref-descr">
+				  <span class="oi oi-collapse-down" aria-hidden="true"></span>
+					Contigs
+				</a>
+			  </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Contigs statistics
+			    	</a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Nb. of seq. by feature type
+			    	</a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Nb. of seq. with same features
+			    	</a>
+			    </li>      
+              <li class="nav-item">
+				<a class="nav-link" href="#flag-descr">
+				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
+					Mapping
+				</a>
+			   </li>          
+                <li class="nav-item">
+				   <a class="nav-link" href="#features-descr">
+				        <span class="oi oi-folder" aria-hidden="true"></span>
+					    Intron extraction results
+				   </a>
+			    </li>    
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#splitstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Split reads
+			    	</a>
+			    </li>             
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#candidatstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Detected introns
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#filtered_detected_introns">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Filtered detected introns
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#too_complex_detected">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Contigs with too complex introns
+			    	</a>
+			    </li>      
+                <li class="nav-item">
+                    <a class="nav-link" href="#eval">
+                        <span class="oi oi-circle-check" aria-hidden="true"></span>
+                        Evaluation of the detected introns (simulation only)
+                    </a>
+                </li> 
+                <li class="nav-item">
+                    <a class="nav-link" href="#glossary">
+                        <span class="oi oi-info" aria-hidden="true"></span>
+                        Glossary
+                    </a>
+                </li>
+            </ul>
+          </div>
+          <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
+		    Produced by IntronSeeker_v1.0<br>
+		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/scripts/icon/favicon.ico"   ><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
+		    <a style="color:#212529;" href="https://www.inrae.fr" target="_blank">INRAE</a><br>
+		    Designed by the <a style="color:#212529;" href="http://sigenae.org" target="_blank">Sigenae</a> team.
+          </div>
+        </nav>
+		<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 border-bottom">
+			<h1 class="h4">Input files</h1>
+			<span class="anchor" id="inputs-parameters"></span>
+		</div>
+		<div class="d-flex">
+			<div class="mt-4 mr-4 pl-0 col-md-6">
+				<h5>Files</h5>
+				<ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Contig FASTA <span class="badge badge-success badge-pill ml-4">GJIW01.1.fsa_nt</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Read1 FASTQ <span class="badge badge-success badge-pill ml-4">SRR15372351_1.fastq.gz</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Read2 FASTQ <span class="badge badge-success badge-pill ml-4">SRR15372351_2.fastq.gz</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Flagstat <span class="badge badge-success badge-pill ml-4">hisat2_GJIW01.sort.flagstat.txt</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Split <span class="badge badge-success badge-pill ml-4">srs_GJIW01_split_alignments.txt</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Candidat <span class="badge badge-success badge-pill ml-4">srs_GJIW01_candidates.txt</span></li>
+				</ul>
+			</div>
+		</div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Contigs</h1>
+                <span class="anchor" id="ref-descr"></span>
+        </div>
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+                <div class="d-flex">
+                    <div>
+                        <h5>Contigs statistics</h5>
+                        <span class="anchor" id="ref-descr"></span>
+                    </div>
+                    <div class="ml-2">
+                        <span
+                            class="badge badge-pill badge-dark"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            title="<p nowrap><b>Number of features in GTF</b>: total number of features from GTF file</p><p nowrap><b>Number of distinct features in GTF</b>: number of distinct features from all GTF lines</p>">
+                            <span class="oi oi-info" ></span>
+                        </span>
+                    </div>
+                   </div> 
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Contig FASTA - Number of sequences</td><td class='valn text-right'>56 096</td></tr><tr><td class='valn'>Contig FASTA - Mean sequence length</td><td class='valn text-right'>1 524</td></tr></tbody></table>	
+                </div>   
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Reads</h1>
+                <span class="anchor" id="read-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-4 pl-0 col-md-4">
+                 <h5>Reads statistics</h5>
+                <span class="anchor" id="readgstat"></span>
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number of reads</td><td class='valn text-right'>97 388 398</td></tr><tr><td class='valn'>Mean coverage</td><td class='valn text-right'>172.02</td></tr><tr><td class='valn'>Min reads length</td><td class='valn text-right'>151</td></tr><tr><td class='valn'>Max reads length</td><td class='valn text-right'>151</td></tr><tr><td class='valn'>Mean reads length</td><td class='valn text-right'>151.0</td></tr></tbody></table>
+            </div>
+            <div class="mt-4 mr-0 pl-0 col-md-8">
+                    <h5>Reads length distribution</h5>
+                    <span class="anchor" id="readgstat"></span><div>                            <div id="84b5bb23-ed40-45ea-8fb6-315b2a370d1e" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("84b5bb23-ed40-45ea-8fb6-315b2a370d1e")) {                    Plotly.newPlot(                        "84b5bb23-ed40-45ea-8fb6-315b2a370d1e",                        [{"name":"Reads length distribution","opacity":0.85,"x":[150.5,150.502,150.504,150.506,150.508,150.51,150.512,150.514,150.516,150.518,150.52,150.522,150.524,150.526,150.528,150.53,150.532,150.534,150.536,150.538,150.54,150.542,150.544,150.546,150.548,150.55,150.552,150.554,150.556,150.558,150.56,150.562,150.564,150.566,150.568,150.57,150.572,150.574,150.576,150.578,150.58,150.582,150.584,150.586,150.588,150.59,150.592,150.594,150.596,150.598,150.6,150.602,150.604,150.606,150.608,150.61,150.612,150.614,150.616,150.618,150.62,150.622,150.624,150.626,150.628,150.63,150.632,150.634,150.636,150.638,150.64,150.642,150.644,150.646,150.648,150.65,150.652,150.654,150.656,150.658,150.66,150.662,150.664,150.666,150.668,150.67,150.672,150.674,150.676,150.678,150.68,150.682,150.684,150.686,150.688,150.69,150.692,150.694,150.696,150.698,150.7,150.702,150.704,150.706,150.708,150.71,150.712,150.714,150.716,150.718,150.72,150.722,150.724,150.726,150.728,150.73,150.732,150.734,150.736,150.738,150.74,150.742,150.744,150.746,150.748,150.75,150.752,150.754,150.756,150.758,150.76,150.762,150.764,150.766,150.768,150.77,150.772,150.774,150.776,150.778,150.78,150.782,150.784,150.786,150.788,150.79,150.792,150.794,150.796,150.798,150.8,150.802,150.804,150.806,150.808,150.81,150.812,150.814,150.816,150.818,150.82,150.822,150.824,150.826,150.828,150.83,150.832,150.834,150.836,150.838,150.84,150.842,150.844,150.846,150.848,150.85,150.852,150.854,150.856,150.858,150.86,150.862,150.864,150.866,150.868,150.87,150.872,150.874,150.876,150.878,150.88,150.882,150.884,150.886,150.888,150.89,150.892,150.894,150.896,150.898,150.9,150.902,150.904,150.906,150.908,150.91,150.912,150.914,150.916,150.918,150.92,150.922,150.924,150.926,150.928,150.93,150.932,150.934,150.936,150.938,150.94,150.942,150.944,150.946,150.948,150.95,150.952,150.954,150.956,150.958,150.96,150.962,150.964,150.966,150.968,150.97,150.972,150.974,150.976,150.978,150.98,150.982,150.984,150.986,150.988,150.99,150.992,150.994,150.996,150.998,151.0,151.002,151.004,151.006,151.008,151.01,151.012,151.014,151.016,151.018,151.02,151.022,151.024,151.026,151.028,151.03,151.032,151.034,151.036,151.038,151.04,151.042,151.044,151.046,151.048,151.05,151.052,151.054,151.056,151.058,151.06,151.062,151.064,151.066,151.068,151.07,151.072,151.074,151.076,151.078,151.08,151.082,151.084,151.086,151.088,151.09,151.092,151.094,151.096,151.098,151.1,151.102,151.104,151.106,151.108,151.11,151.112,151.114,151.116,151.118,151.12,151.122,151.124,151.126,151.128,151.13,151.132,151.134,151.136,151.138,151.14,151.142,151.144,151.146,151.148,151.15,151.152,151.154,151.156,151.158,151.16,151.162,151.164,151.166,151.168,151.17,151.172,151.174,151.176,151.178,151.18,151.182,151.184,151.186,151.188,151.19,151.192,151.194,151.196,151.198,151.2,151.202,151.204,151.206,151.208,151.21,151.212,151.214,151.216,151.218,151.22,151.222,151.224,151.226,151.228,151.23,151.232,151.234,151.236,151.238,151.24,151.242,151.244,151.246,151.248,151.25,151.252,151.254,151.256,151.258,151.26,151.262,151.264,151.266,151.268,151.27,151.272,151.274,151.276,151.278,151.28,151.282,151.284,151.286,151.288,151.29,151.292,151.294,151.296,151.298,151.3,151.302,151.304,151.306,151.308,151.31,151.312,151.314,151.316,151.318,151.32,151.322,151.324,151.326,151.328,151.33,151.332,151.334,151.336,151.338,151.34,151.342,151.344,151.346,151.348,151.35,151.352,151.354,151.356,151.358,151.36,151.362,151.364,151.366,151.368,151.37,151.372,151.374,151.376,151.378,151.38,151.382,151.384,151.386,151.388,151.39,151.392,151.394,151.396,151.398,151.4,151.402,151.404,151.406,151.408,151.41,151.412,151.414,151.416,151.418,151.42,151.422,151.424,151.426,151.428,151.43,151.432,151.434,151.436,151.438,151.44,151.442,151.444,151.446,151.448,151.45,151.452,151.454,151.456,151.458,151.46,151.462,151.464,151.466,151.468,151.47,151.472,151.474,151.476,151.478,151.48,151.482,151.484,151.486,151.488,151.49,151.492,151.494,151.496,151.498],"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,97388398,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"type":"bar"}],                        {"margin":{"b":20,"l":50,"pad":0,"r":50,"t":30},"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"xaxis":{"title":{"text":"Length (bp)"}},"yaxis":{"title":{"text":"Number of reads"}}},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Mapping (QC-passed reads)</h1>
+                <span class="anchor" id="flag-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number of reads</td><td class='valn text-right'>97 388 398</td></tr><tr><td class='valn'>Number of lines in the BAM</td><td class='valn text-right'>123 922 051</td></tr><tr><td class='valn'>Number of mapped reads</td><td class='valn text-right'>31 855 867</td></tr><tr><td class='valn'>Percentage of mapped reads</td><td class='valn text-right'>32.71</td></tr><tr><td class='valn'>Number of properly paired reads</td><td class='valn text-right'>26 328 582</td></tr><tr><td class='valn'>Percentage of properly paired reads</td><td class='valn text-right'>27.03</td></tr><tr><td class='valn'>Secondary alignments</td><td class='valn text-right'>26 533 653</td></tr><tr><td class='valn'>Singletons alignements</td><td class='valn text-right'>1 774 981</td></tr></tbody></table>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Intron extraction results</h1>
+                <span class="anchor" id="features-descr"></span>
+        </div>
+
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Split reads</h5>
+                <span class="anchor" id="splitstat"></span>
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number of reads overlapping introns</td><td class='valn text-right'>357 067</td></tr><tr><td class='valn'>Mean length of introns</td><td class='valn text-right'>136.43</td></tr><tr><td class='valn text-right'>Junction TT_AA</td><td class='valn text-right'>21 365</td></tr><tr><td class='valn text-right'>Junction TA_TG</td><td class='valn text-right'>14 660</td></tr><tr><td class='valn text-right'>Junction GC_AG</td><td class='valn text-right'>10 583</td></tr><tr><td class='valn text-right'>Junction TT_AC</td><td class='valn text-right'>9 831</td></tr><tr><td class='valn text-right'>Junction AT_AC</td><td class='valn text-right'>7 221</td></tr><tr><td class='valn text-right'>Other junctions</td><td class='valn text-right'>117 907</td></tr><tr><td class='valn text-right'>Canonical junction (GT_AG or CT_AC)</td><td class='valn text-right'>175 500</td></tr></tbody></table>  
+            </div>
+        </div>  
+
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Detected introns</h5>
+                <span class="anchor" id="candidatstat"></span>
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number</td><td class='valn text-right'>20 554</td></tr><tr><td class='valn'>Min length</td><td class='valn text-right'>20</td></tr><tr><td class='valn'>Max length</td><td class='valn text-right'>9 478</td></tr><tr><td class='valn'>Mean length</td><td class='valn text-right'>207.26</td></tr><tr><td class='valn'>Min depth</td><td class='valn text-right'>1</td></tr><tr><td class='valn'>Max depth</td><td class='valn text-right'>21 195</td></tr><tr><td class='valn'>Mean depth</td><td class='valn text-right'>17.37</td></tr></tbody></table>
+            </div>  
+            <div class="mt-4 mr-0 pl-0 col-md-8">
+                <h5>Detected introns depth distribution</h5>
+                <span class="anchor" id="candidatstat"></span>
+<div>                            <div id="edf7f83d-1e9e-4028-aed9-f612da7ea6d3" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("edf7f83d-1e9e-4028-aed9-f612da7ea6d3")) {                    Plotly.newPlot(                        "edf7f83d-1e9e-4028-aed9-f612da7ea6d3",                        [{"name":"Candidats depth","opacity":0.85,"x":[1.0,43.388,85.776,128.164,170.552,212.94,255.32799999999997,297.716,340.104,382.49199999999996,424.88,467.268,509.65599999999995,552.044,594.432,636.8199999999999,679.208,721.596,763.9839999999999,806.372,848.76,891.1479999999999,933.536,975.924,1018.3119999999999,1060.7,1103.088,1145.4759999999999,1187.864,1230.252,1272.6399999999999,1315.028,1357.416,1399.8039999999999,1442.192,1484.58,1526.9679999999998,1569.356,1611.744,1654.1319999999998,1696.52,1738.908,1781.2959999999998,1823.684,1866.072,1908.4599999999998,1950.848,1993.2359999999999,2035.6239999999998,2078.0119999999997,2120.4,2162.788,2205.176,2247.564,2289.9519999999998,2332.3399999999997,2374.728,2417.116,2459.504,2501.892,2544.2799999999997,2586.6679999999997,2629.056,2671.444,2713.832,2756.22,2798.6079999999997,2840.996,2883.384,2925.772,2968.16,3010.548,3052.9359999999997,3095.324,3137.712,3180.1,3222.488,3264.8759999999997,3307.2639999999997,3349.652,3392.04,3434.428,3476.816,3519.2039999999997,3561.5919999999996,3603.98,3646.368,3688.756,3731.144,3773.5319999999997,3815.9199999999996,3858.308,3900.696,3943.084,3985.4719999999998,4027.8599999999997,4070.2479999999996,4112.6359999999995,4155.023999999999,4197.412,4239.8,4282.188,4324.576,4366.964,4409.352,4451.74,4494.128,4536.516,4578.9039999999995,4621.2919999999995,4663.679999999999,4706.068,4748.456,4790.844,4833.232,4875.62,4918.008,4960.396,5002.784,5045.172,5087.5599999999995,5129.947999999999,5172.335999999999,5214.724,5257.112,5299.5,5341.888,5384.276,5426.664,5469.052,5511.44,5553.8279999999995,5596.215999999999,5638.603999999999,5680.992,5723.38,5765.768,5808.156,5850.544,5892.932,5935.32,5977.708,6020.096,6062.4839999999995,6104.871999999999,6147.259999999999,6189.648,6232.036,6274.424,6316.812,6359.2,6401.588,6443.976,6486.364,6528.7519999999995,6571.139999999999,6613.527999999999,6655.915999999999,6698.304,6740.692,6783.08,6825.468,6867.856,6910.244,6952.632,6995.0199999999995,7037.407999999999,7079.795999999999,7122.183999999999,7164.572,7206.96,7249.348,7291.736,7334.124,7376.512,7418.9,7461.288,7503.6759999999995,7546.063999999999,7588.451999999999,7630.839999999999,7673.228,7715.616,7758.004,7800.392,7842.78,7885.168,7927.556,7969.9439999999995,8012.331999999999,8054.719999999999,8097.107999999999,8139.495999999999,8181.884,8224.271999999999,8266.66,8309.047999999999,8351.436,8393.824,8436.212,8478.6,8520.988,8563.376,8605.764,8648.152,8690.539999999999,8732.928,8775.315999999999,8817.704,8860.091999999999,8902.48,8944.868,8987.256,9029.644,9072.032,9114.42,9156.807999999999,9199.196,9241.583999999999,9283.972,9326.359999999999,9368.748,9411.136,9453.524,9495.912,9538.3,9580.688,9623.076,9665.464,9707.851999999999,9750.24,9792.627999999999,9835.016,9877.404,9919.792,9962.18,10004.568,10046.956,10089.344,10131.732,10174.119999999999,10216.508,10258.895999999999,10301.284,10343.671999999999,10386.06,10428.448,10470.836,10513.224,10555.612,10598.0,10640.387999999999,10682.776,10725.163999999999,10767.552,10809.939999999999,10852.328,10894.716,10937.104,10979.492,11021.88,11064.268,11106.655999999999,11149.044,11191.431999999999,11233.82,11276.207999999999,11318.596,11360.984,11403.372,11445.76,11488.148,11530.536,11572.923999999999,11615.312,11657.699999999999,11700.088,11742.475999999999,11784.864,11827.251999999999,11869.64,11912.028,11954.416,11996.804,12039.192,12081.58,12123.967999999999,12166.356,12208.743999999999,12251.132,12293.519999999999,12335.908,12378.296,12420.684,12463.072,12505.46,12547.848,12590.235999999999,12632.624,12675.011999999999,12717.4,12759.787999999999,12802.176,12844.564,12886.952,12929.34,12971.728,13014.116,13056.503999999999,13098.892,13141.279999999999,13183.668,13226.055999999999,13268.444,13310.831999999999,13353.22,13395.608,13437.996,13480.384,13522.771999999999,13565.16,13607.547999999999,13649.936,13692.323999999999,13734.712,13777.099999999999,13819.488,13861.876,13904.264,13946.652,13989.039999999999,14031.428,14073.815999999999,14116.204,14158.591999999999,14200.98,14243.367999999999,14285.756,14328.144,14370.532,14412.92,14455.307999999999,14497.696,14540.083999999999,14582.472,14624.859999999999,14667.248,14709.635999999999,14752.024,14794.411999999998,14836.8,14879.188,14921.576,14963.964,15006.351999999999,15048.74,15091.127999999999,15133.516,15175.903999999999,15218.292,15260.679999999998,15303.068,15345.456,15387.844,15430.232,15472.619999999999,15515.008,15557.395999999999,15599.784,15642.171999999999,15684.56,15726.947999999999,15769.336,15811.724,15854.112,15896.5,15938.887999999999,15981.276,16023.663999999999,16066.052,16108.439999999999,16150.828,16193.215999999999,16235.604,16277.991999999998,16320.38,16362.768,16405.156,16447.543999999998,16489.932,16532.32,16574.708,16617.095999999998,16659.484,16701.872,16744.26,16786.648,16829.036,16871.424,16913.811999999998,16956.2,16998.588,17040.976,17083.363999999998,17125.752,17168.14,17210.528,17252.915999999997,17295.304,17337.692,17380.079999999998,17422.468,17464.856,17507.244,17549.631999999998,17592.02,17634.408,17676.796,17719.183999999997,17761.572,17803.96,17846.347999999998,17888.736,17931.124,17973.512,18015.899999999998,18058.288,18100.676,18143.064,18185.451999999997,18227.84,18270.228,18312.615999999998,18355.004,18397.392,18439.78,18482.167999999998,18524.556,18566.944,18609.332,18651.719999999998,18694.108,18736.496,18778.884,18821.272,18863.66,18906.048,18948.435999999998,18990.824,19033.212,19075.6,19117.987999999998,19160.376,19202.764,19245.152,19287.54,19329.928,19372.316,19414.703999999998,19457.092,19499.48,19541.868,19584.255999999998,19626.644,19669.032,19711.42,19753.808,19796.196,19838.584,19880.971999999998,19923.36,19965.748,20008.136,20050.523999999998,20092.912,20135.3,20177.688,20220.075999999997,20262.464,20304.852,20347.239999999998,20389.628,20432.016,20474.404,20516.791999999998,20559.18,20601.568,20643.956,20686.343999999997,20728.732,20771.12,20813.507999999998,20855.896,20898.284,20940.672,20983.059999999998,21025.448,21067.836,21110.224,21152.611999999997],"y":[19521,482,184,101,67,40,24,19,22,11,12,10,6,5,5,7,2,3,4,1,1,0,0,1,0,2,0,0,0,1,0,0,1,0,1,0,1,0,0,0,0,0,1,0,0,0,1,1,0,0,1,1,0,0,0,1,0,0,1,0,0,0,0,0,2,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],"type":"bar"}],                        {"margin":{"b":20,"l":50,"pad":0,"r":50,"t":30},"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"xaxis":{"title":{"text":"Detected introns depth"}},"yaxis":{"title":{"text":"Number of detected introns"}}},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+        </div>  
+
+
+        <div class="d-flex"> 
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Filtered detected introns</h5>
+                <span class="anchor" id="filtered_detected_introns"></span>
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number</td><td class='valn text-right'>204</td></tr><tr><td class='valn'>Filtered because of depth (<= 1)</td><td class='valn text-right'>19 988</td></tr><tr><td class='valn'>Filtered because of length (>= 80%)</td><td class='valn text-right'>82</td></tr><tr><td class='valn'>Filtered because of non canonical junction</td><td class='valn text-right'>12 525</td></tr><tr><td class='valn'>Filtered because of overlapping introns</td><td class='valn text-right'>14</td></tr><tr><td class='valn'>Min length</td><td class='valn text-right'>20</td></tr><tr><td class='valn'>Max length</td><td class='valn text-right'>7 080</td></tr><tr><td class='valn'>Mean length</td><td class='valn text-right'>164.55</td></tr><tr><td class='valn'>Min depth</td><td class='valn text-right'>2</td></tr><tr><td class='valn'>Max depth</td><td class='valn text-right'>255</td></tr><tr><td class='valn'>Mean depth</td><td class='valn text-right'>11.79</td></tr></tbody></table>
+            </div>
+        </div>
+    
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Top 10 of contigs with the highest number of detected introns</h5>
+                <span class="anchor" id="too_complex_detected"></span>
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>GJIW01023306.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJIW01000001.1</td><td class='valn text-right'>1 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJIW01000065.1</td><td class='valn text-right'>1 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJIW01000097.1</td><td class='valn text-right'>1 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJIW01000235.1</td><td class='valn text-right'>1 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJIW01000266.1</td><td class='valn text-right'>1 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJIW01000477.1</td><td class='valn text-right'>1 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJIW01000622.1</td><td class='valn text-right'>1 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJIW01000667.1</td><td class='valn text-right'>1 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJIW01000745.1</td><td class='valn text-right'>1 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr></tbody></table>  
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Glossary</h1>
+                <span class="anchor" id="glossary"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <span class="anchor" id="glossary"></span>
+                This glossary reflects terms used in this report:<br>
+                <strong>Candidat</strong>        : Detected/predicted introns filtrered by canonical junction, length and depth.</br>
+                <strong>Canonic junction</strong>: GT_AG or CT_AC for donor and acceptor sites.</br>
+                <strong>Contig</strong>          : A set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
+                <strong>Exon</strong>            : Coding part of DNA that is translated into protein.</br>
+                <strong>Features</strong>        : A sequenced chain of nucleic acids which provide protein(s). (source:https://biologydictionary.net/gene/)</br>
+                <strong>Fragment</strong>        : During sequencing, the fragment is a link between fowarded and reverse reads.</br>                
+                <strong>Intron</strong>          : Any nucleotide sequence removed by RNA splicing during maturation of RNA. (source : Wikipedia)</br>
+                <strong>Reads</strong>           : An inferred sequence of base pairs corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
+                <strong>Sequence</strong>        : Base pair probabilities of a DNA fragment.</br>
+                <strong>Splice events</strong>   : a process where exons may be included within or excluded from the final mRNA.</br>
+                <strong>Trimmed contig</strong>  : Contig without retained intron(s).</br>
+                <br>
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:825;height:245;">
+            </div>
+        </div>  
+<br/>
+        </main>
+      </div>
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script type="text/javascript" language="javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js " integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Datatable -->
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" language="javascript">
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+  </body>
+</html>
