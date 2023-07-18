@@ -42,11 +42,11 @@ nano SRR15372351.cfg
 ```diff
 [Defaults]
 fasta:GJIW01.1.fsa_nt
-r1:SRR15372351_1.fastq
-r2:SRR15372351_2.fastq
-flagstat:GJIW01/hisat2_SRR15372351.sort.flagstat.txt
-candidat:splitReadSearch_GJIW01/srs_SRR15372351_candidates.txt
-split:splitReadSearch_GJIW01/srs_SRR15372351_split_alignments.txt
+r1:SRR15372351_1.fastq.gz
+r2:SRR15372351_2.fastq.gz
+flagstat:GJIW01/hisat2_GJIW01.sort.flagstat.txt
+candidat:splitReadSearch_GJIW01/srs_GJIW01_candidates.txt
+split:splitReadSearch_GJIW01/srs_GJIW01_split_alignments.txt
 prefix:GJIW01
 threads: 6                
 output:HTML/
