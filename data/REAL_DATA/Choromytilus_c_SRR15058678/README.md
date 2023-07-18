@@ -35,13 +35,15 @@ intronSeeker splitReadSearch -a GJJD01/hisat2_GJJD01.sort.bam -r GJJD01.1.fsa_nt
 
 Configuration file:
 
+nano SRR15058678.cfg
+
 ```diff
 [Defaults]
 fasta:GJJD01.1.fsa_nt
-r:SRR15058678.fastq
-flagstat:hisat2_SRR15058678.sort.flagstat.txt
-candidat:srs_SRR15058678_candidates.txt
-split:srs_SRR15058678_split_alignments.txt
+r1:SRR15058678_1.fastq
+flagstat:GJJD01/hisat2_GJJD01.sort.flagstat.txt
+candidat:splitReadSearch_GJJD01/srs_GJJD01_candidates.txt
+split:splitReadSearch_GJJD01/srs_GJJD01_split_alignments.txt
 prefix:GJJD01
 threads: 6                
 output:HTML/
