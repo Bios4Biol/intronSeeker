@@ -290,11 +290,12 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
             repeat(maxlen,ex._max_workers),
             repeat(minfootsize,ex._max_workers)
             ))))
+        print_to_stdout('##  Processing ##','\n', 'Preview of candidates list before filter: ', out[0], '\n\n', 'Preview of splits list before filter: ', out[1])
         candidates= pd.concat(out[0])
         split_alignments = pd.concat(out[1])
         
         # ~ print(time.time()-s_t)
-
+    print_to_stdout('###  Filter   ###') 
     # After filtering, focus on flagged PASS candidates and modify
     # filter field (from PASS to OI) if two "retained introns"
     # are overlapping
@@ -323,11 +324,13 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     # ~ candidates = find_split(ref_id_list,bamfile.name,fastafile.name)
     # ~ candidates['selected'] = 1
     # ~ print(candidates)
+    print_to_stdout('###  Focus on flagged PASS candidates and modify filter field (from PASS to OI) if two "retained introns" are overlapping  ###')  
     
     split_alignments=split_alignments[['reference','read','start_split','end_split','split_length','split_borders','strand']] #re-arrange the columns order of split_alignments output
     header_sa= list(split_alignments.columns.values)
     header_sa[0] = '#'+header_sa[0]
     split_alignments.to_csv(output_path+'_split_alignments.txt',header=header_sa,sep='\t',index=False)
+    print_to_stdout('###  Write split alignment file   ###')
     
     f = open(output_path+'_candidates.txt', 'w')
     f.write('##mindepth:' + str(mindepth) + '\n')
@@ -335,6 +338,7 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     header_cand = ["#ID"] + list(candidates.columns.values)
     candidates.reset_index().to_csv(f, header=header_cand, sep='\t', index=False)
     f.close()
+    print_to_stdout('###  Write candidates file   ###') 
     print_to_stdout('###  End of searching split read   ###')      
 
 #########################
