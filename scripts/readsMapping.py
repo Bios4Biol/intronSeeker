@@ -49,7 +49,8 @@ def bam_indexing(bamfile, cmdlog) :
                     bamfile,
                     bamfile.rstrip('.bam') + '.bai'
                     ]
-    cmdlog.write("\n# BAM indexing:\n") 
+    cmdlog.write("\n# BAM indexing:\n")
+    print_to_stdout('##  BAM indexing   ##')
     cmdlog.write(' '.join(bam_index_cmd) + "\n")
     sp.run(bam_index_cmd)
 
@@ -58,7 +59,8 @@ def flagstat(bamfile, cmdlog, threads = 1) :
                         '--threads',str(threads),
                         bamfile
                         ]
-    cmdlog.write("\n# BAM flagstat computation:\n") 
+    cmdlog.write("\n# BAM flagstat computation:\n")
+    print_to_stdout('##  BAM flagstat computation   ##') 
     cmdlog.write(' '.join(bam_flagstat_cmd) + "\n")
     stdout = sp.run(bam_flagstat_cmd,stdout=sp.PIPE).stdout
     with open(bamfile.rstrip('.bam')+'.flagstat.txt','w') as out_flag :
@@ -104,6 +106,7 @@ def star(reference, r1, r2, output, prefix, force, rm, threads):
                     '--outFileNamePrefix', output_path+'.star.'
                     ]
     cmdlog.write('\n# Fasta indexing:\n')
+    print_to_stdout('##  Fasta indexing   ##')
     cmdlog.write(" ".join(index_command) + "\n")
     sp.run(index_command, stdout=sp.DEVNULL, stderr=sp.DEVNULL) 
     
@@ -123,6 +126,7 @@ def star(reference, r1, r2, output, prefix, force, rm, threads):
     if r1.name.endswith('.gz') :
         star_command.extend(['--readFilesCommand', 'zcat'])
     cmdlog.write('\n# STAR alignement:\n')
+    print_to_stdout('##  STAR alignement   ##')
     cmdlog.write(' '.join(star_command) + "\n")
     sp.run(star_command, stdout=sp.DEVNULL, stderr=sp.DEVNULL)
     star_bam_fix(output_path+'.star.Aligned.sortedByCoord.out.bam', output_path+'.sort.bam')
@@ -177,6 +181,7 @@ def hisat2(reference, r1, r2, output, prefix, force, threads):
             if not os.path.exists(ref_path + ".1.ht2") or force:
                 index_command = ['hisat2-build', reference.name, ref_path]
                 cmdlog.write('\n# Fasta indexing:\n')
+                print_to_stdout('##  Fasta indexing   ##')
                 cmdlog.write(" ".join(index_command) + "\n")
                 log = sp.check_output(index_command, stderr=sp.STDOUT)
                 with open(output_path + '_build.log','w') as log_file :
@@ -216,6 +221,7 @@ def hisat2(reference, r1, r2, output, prefix, force, threads):
     samtools_view_cmd = ['samtools', 'view', '-bS']
     samtools_sort_cmd = ['samtools','sort', '-o',output_path+'.sort.bam'] 
     cmdlog.write('\n# HiSat2 Alignement:\n')
+    print_to_stdout('##  HiSat2 Alignement   ##')
     cmdlog.write(' | '.join([' '.join(hisat_command),' '.join(samtools_view_cmd), ' '.join(samtools_sort_cmd)]) + "\n")
     with open(output_path+'_aln.log','w') as log : 
         align = sp.Popen(hisat_command,stdout=sp.PIPE,stderr=log)
