@@ -42,8 +42,8 @@ nano SRR5819939.cfg
 ```diff
 [Defaults]
 fasta:GFSF01.1.fsa_nt
-r1:SRR5819939_1.fastq
-r2:SRR5819939_2.fastq
+r1:SRR5819939_1.fastq.gz
+r2:SRR5819939_2.fastq.gz
 flagstat:GFSF01/hisat2_GFSF01.sort.flagstat.txt
 candidat:splitReadSearch_GFSF01/srs_GFSF01_candidates.txt
 split:splitReadSearch_GFSF01/srs_GFSF01_split_alignments.txt
