@@ -25,6 +25,7 @@ try :
     from Bio.Blast import NCBIXML as bx ;
     from collections import defaultdict
     from itertools import repeat
+    import datetime
     import concurrent.futures as prl
     import pandas as pd
     import numpy as np
@@ -280,6 +281,8 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
 
     with prl.ProcessPoolExecutor(max_workers=threads) as ex :
         # ~ s_t = time.time()
+        current_datetime=datetime.datetime.now()
+        print_to_stdout('Begin candidates and splits search : ',current_datetime)
         ref_id_array = np.array_split(ref_id_list,ex._max_workers)
         out = list(zip(*list(ex.map(
             find_split,
@@ -293,9 +296,13 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
         print_to_stdout('##  Processing ##','\n', 'Preview of candidates list before filter: ', out[0], '\n\n', 'Preview of splits list before filter: ', out[1])
         candidates= pd.concat(out[0])
         split_alignments = pd.concat(out[1])
+        current_datetime2=datetime.datetime.now()
+        print_to_stdout('End of candidates and split search : ',current_datetime2)
         
         # ~ print(time.time()-s_t)
     print_to_stdout('###  Filter   ###') 
+    current_datetime3=datetime.datetime.now()
+    print_to_stdout('Begin candidates and splits filter : ',current_datetime3)  
     # After filtering, focus on flagged PASS candidates and modify
     # filter field (from PASS to OI) if two "retained introns"
     # are overlapping
@@ -325,6 +332,8 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     # ~ candidates['selected'] = 1
     # ~ print(candidates)
     print_to_stdout('###  Focus on flagged PASS candidates and modify filter field (from PASS to OI) if two "retained introns" are overlapping  ###')  
+    current_datetime4=datetime.datetime.now()
+    print_to_stdout('End of candidates and split filter : ',current_datetime4)
     
     split_alignments=split_alignments[['reference','read','start_split','end_split','split_length','split_borders','strand']] #re-arrange the columns order of split_alignments output
     header_sa= list(split_alignments.columns.values)
