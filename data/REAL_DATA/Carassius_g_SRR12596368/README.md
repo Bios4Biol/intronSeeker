@@ -36,8 +36,9 @@ intronSeeker splitReadSearch -a GJKR01/hisat2_GJKR01.sort.bam -r GJKR01.1.fsa_nt
 
 Configuration file:
 
-SRR6148374.cfg
-
+```diff
+nano SRR12596368.cfg
+```
 
 ```diff
 [Defaults]

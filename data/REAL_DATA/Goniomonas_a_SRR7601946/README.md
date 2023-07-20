@@ -42,7 +42,7 @@ nano SRR7601946.cfg
 [Defaults]
 fasta:GGUN01.1.fsa_nt
 r1:SRR7601946_1.fastq.gz
-r2:SRR7601946_2.fastq.ge
+r2:SRR7601946_2.fastq.gz
 flagstat:GGUN01/hisat2_GGUN01.sort.flagstat.txt
 candidat:splitReadSearch_GGUN01/srs_GGUN01_candidates.txt
 split:splitReadSearch_GGUN01/srs_GGUN01_split_alignments.txt
