@@ -37,6 +37,11 @@ intronSeeker splitReadSearch -a GHFS01/hisat2_GHFS01.sort.bam -r GHFS01.1.fsa_nt
 Configuration file:
 
 ```diff
+nano  SRR6148374.cfg
+```
+
+
+```diff
 [Defaults]
 fasta:GHFS01.1.fsa_nt
 r1:SRR6148374_1.fastq

@@ -21,7 +21,7 @@ intronSeeker command lines
 ### Step 1 : hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r GBGX01.1.fsa_nt -1 SRR1206033.fastq  --prefix GBGX01 -o GBGX01 -t 12
+intronSeeker hisat2Alignment -r GBGX01.1.fsa_nt -1 SRR1206033.fastq.gz  --prefix GBGX01 -o GBGX01 -t 12
 ```
 
 ### Step2: splitReadSearch
@@ -35,12 +35,16 @@ intronSeeker splitReadSearch -a GBGX01/hisat2_GBGX01.sort.bam -r GBGX01.1.fsa_nt
 Configuration file:
 
 ```diff
+nano SRR1206033.cfg
+```
+
+```diff
 [Defaults]
 fasta:GBGX01.1.fsa_nt
-r:SRR1206033_1.fastq
-flagstat:hisat2_SRR1206033.sort.flagstat.txt
-candidat:srs_SRR1206033_candidates.txt
-split:srs_SRR1206033_split_alignments.txt
+r1:SRR1206033.fastq.gz
+flagstat:GBGX01/hisat2_GBGX01.sort.flagstat.txt
+candidat:splitReadSearch_GBGX01/srs_GBGX01_candidates.txt
+split:splitReadSearch_GBGX01/srs_GBGX01_split_alignments.txt
 prefix:GBGX01
 threads: 6                
 output:HTML/

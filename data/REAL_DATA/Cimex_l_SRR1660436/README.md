@@ -34,12 +34,17 @@ intronSeeker splitReadSearch -a GBYH01/hisat2_GBYH01.sort.bam -r GBYH01.1.fsa_nt
 Configuration file:
 
 ```diff
+nano  SRR1660436.cfg
+```
+
+
+```diff
 [Defaults]
 fasta:GBYH01.1.fsa_nt
-r:SRR1660436.fastq
-flagstat:hisat2_SRR1660436.sort.flagstat.txt
-candidat:srs_SRR1660436_candidates.txt
-split:srs_SRR1660436_split_alignments.txt
+r:SRR1660436.fastq.gz
+flagstat:GBYH01/hisat2_GBYH01.sort.flagstat.txt
+candidat:splitReadSearch_GBYH01/srs_GBYH01_candidates.txt
+split:splitReadSearch_GBYH01/srs_GBYH01_split_alignments.txt
 prefix:GBYH01
 threads: 6                
 output:HTML/

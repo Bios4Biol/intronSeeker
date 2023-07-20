@@ -35,13 +35,17 @@ intronSeeker splitReadSearch -a GBTV01/hisat2_GBTV01.sort.bam -r GBTV01.1.fsa_nt
 Configuration file SRR1618559.cfg:
 
 ```diff
+nano  SRR1618559.cfg
+```
+
+```diff
 [Defaults]
 fasta:GBTV01.1.fsa_nt
 r1:SRR1618559_1.fastq.gz
 r2:SRR1618559_2.fastq.gz
-flagstat:hisat2_SRR1618559.sort.flagstat.txt
-candidat:srs_SRR1618559_candidates.txt
-split:srs_SRR1618559_split_alignments.txt
+flagstat:GBTV01/hisat2_GBTV01.sort.flagstat.txt
+candidat:splitReadSearch_GBTV01/srs_GBTV01_candidates.txt
+split:splitReadSearch_GBTV01/srs_GBTV01_split_alignments.txt
 prefix:GBTV01
 threads: 6                
 output:HTML/
