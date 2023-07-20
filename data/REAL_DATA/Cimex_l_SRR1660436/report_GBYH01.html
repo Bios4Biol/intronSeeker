@@ -1,0 +1,360 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="IntronSeeker simulation report">
+    <meta name="author" content="Bardou P., Maman S., Lasguignes E., Oudin F., Cabanettes F., Klopp C.">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css ">
+    <!-- Datatable -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+
+    <!-- Personalised css -->
+    <style type="text/css">
+      body { font-size: .875rem; }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 100; /* Behind the navbar */
+        padding: 0;
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+      }
+      .sidebar-sticky {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 48px; /* Height of navbar */
+        height: calc(100vh - 48px);
+        padding-top: 4rem;
+        overflow-x: hidden;
+        overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+      }
+      .sidebar .nav-link {
+        margin-right: 4px;
+        color: #212529;
+      }
+      .sidebar .nav-link:hover,
+      .sidebar .nav-link.active { color: #999; }
+      .sidebar-heading {
+        font-size: .75rem;
+        text-transform: uppercase;
+      }
+      .navbar-brand {
+        padding-top: .75rem;
+        padding-bottom: .75rem;
+        font-size: 1rem;
+        background-color: rgba(0, 0, 0, .7);
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .7);
+				z-index: 200;
+      }
+      .navbar .form-control {
+        padding: .75rem 1rem;
+        border-width: 0;
+        border-radius: 0;
+				z-index: 200;
+      }
+      .form-control-dark {
+        color: #fff;
+        background-color: rgba(255, 255, 255, .1);
+        border-color: rgba(255, 255, 255, .1);
+      }
+      .form-control-dark:focus {
+        border-color: transparent;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+      }
+      .border-top { border-top: 1px solid #e5e5e5; }
+      .border-bottom { border-bottom: 1px solid #e5e5e5; }
+	  .valn { vertical-align: middle !important; }
+	  .anchor{
+  			display: block;
+  			height: 83px; /*same height as header*/
+  			margin-top: -83px; /*same height as header*/
+  			visibility: hidden;
+	  }
+    </style>
+
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+
+    <title>IntronSeeker simulation report</title>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">IntronSeeker simulation report</a>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="#inputs-parameters">
+                  <span class="oi oi-file" aria-hidden="true"></span>
+                  Input files
+                </a>
+              </li>
+			  <li class="nav-item">
+				<a class="nav-link" href="#ref-descr">
+				  <span class="oi oi-collapse-down" aria-hidden="true"></span>
+					Contigs
+				</a>
+			  </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Contigs statistics
+			    	</a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Nb. of seq. by feature type
+			    	</a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Nb. of seq. with same features
+			    	</a>
+			    </li>      
+              <li class="nav-item">
+				<a class="nav-link" href="#flag-descr">
+				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
+					Mapping
+				</a>
+			   </li>          
+                <li class="nav-item">
+				   <a class="nav-link" href="#features-descr">
+				        <span class="oi oi-folder" aria-hidden="true"></span>
+					    Intron extraction results
+				   </a>
+			    </li>    
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#splitstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Split reads
+			    	</a>
+			    </li>             
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#candidatstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Detected introns
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#filtered_detected_introns">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Filtered detected introns
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#too_complex_detected">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Contigs with too complex introns
+			    	</a>
+			    </li>      
+                <li class="nav-item">
+                    <a class="nav-link" href="#eval">
+                        <span class="oi oi-circle-check" aria-hidden="true"></span>
+                        Evaluation of the detected introns (simulation only)
+                    </a>
+                </li> 
+                <li class="nav-item">
+                    <a class="nav-link" href="#glossary">
+                        <span class="oi oi-info" aria-hidden="true"></span>
+                        Glossary
+                    </a>
+                </li>
+            </ul>
+          </div>
+          <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
+		    Produced by IntronSeeker_v1.0<br>
+		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/scripts/icon/favicon.ico"   ><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
+		    <a style="color:#212529;" href="https://www.inrae.fr" target="_blank">INRAE</a><br>
+		    Designed by the <a style="color:#212529;" href="http://sigenae.org" target="_blank">Sigenae</a> team.
+          </div>
+        </nav>
+		<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 border-bottom">
+			<h1 class="h4">Input files</h1>
+			<span class="anchor" id="inputs-parameters"></span>
+		</div>
+		<div class="d-flex">
+			<div class="mt-4 mr-4 pl-0 col-md-6">
+				<h5>Files</h5>
+				<ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Contig FASTA <span class="badge badge-success badge-pill ml-4">GBYH01.1.fsa_nt</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Read1 FASTQ <span class="badge badge-success badge-pill ml-4">SRR1660436.fastq.gz</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Flagstat <span class="badge badge-success badge-pill ml-4">hisat2_GBYH01.sort.flagstat.txt</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Split <span class="badge badge-success badge-pill ml-4">srs_GBYH01_split_alignments.txt</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Candidat <span class="badge badge-success badge-pill ml-4">srs_GBYH01_candidates.txt</span></li>
+				</ul>
+			</div>
+		</div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Contigs</h1>
+                <span class="anchor" id="ref-descr"></span>
+        </div>
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+                <div class="d-flex">
+                    <div>
+                        <h5>Contigs statistics</h5>
+                        <span class="anchor" id="ref-descr"></span>
+                    </div>
+                    <div class="ml-2">
+                        <span
+                            class="badge badge-pill badge-dark"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            title="<p nowrap><b>Number of features in GTF</b>: total number of features from GTF file</p><p nowrap><b>Number of distinct features in GTF</b>: number of distinct features from all GTF lines</p>">
+                            <span class="oi oi-info" ></span>
+                        </span>
+                    </div>
+                   </div> 
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Contig FASTA - Number of sequences</td><td class='valn text-right'>39 124</td></tr><tr><td class='valn'>Contig FASTA - Mean sequence length</td><td class='valn text-right'>948</td></tr></tbody></table>	
+                </div>   
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Reads</h1>
+                <span class="anchor" id="read-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-4 pl-0 col-md-4">
+                 <h5>Reads statistics</h5>
+                <span class="anchor" id="readgstat"></span>
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number of reads</td><td class='valn text-right'>82 468 906</td></tr><tr><td class='valn'>Mean coverage</td><td class='valn text-right'>113.4</td></tr><tr><td class='valn'>Min reads length</td><td class='valn text-right'>51</td></tr><tr><td class='valn'>Max reads length</td><td class='valn text-right'>51</td></tr><tr><td class='valn'>Mean reads length</td><td class='valn text-right'>51.0</td></tr></tbody></table>
+            </div>
+            <div class="mt-4 mr-0 pl-0 col-md-8">
+                    <h5>Reads length distribution</h5>
+                    <span class="anchor" id="readgstat"></span><div>                            <div id="98028335-99b8-42e0-9722-8bab935b4c8d" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("98028335-99b8-42e0-9722-8bab935b4c8d")) {                    Plotly.newPlot(                        "98028335-99b8-42e0-9722-8bab935b4c8d",                        [{"name":"Reads length distribution","opacity":0.85,"x":[50.5,50.502,50.504,50.506,50.508,50.51,50.512,50.514,50.516,50.518,50.52,50.522,50.524,50.526,50.528,50.53,50.532,50.534,50.536,50.538,50.54,50.542,50.544,50.546,50.548,50.55,50.552,50.554,50.556,50.558,50.56,50.562,50.564,50.566,50.568,50.57,50.572,50.574,50.576,50.578,50.58,50.582,50.584,50.586,50.588,50.59,50.592,50.594,50.596,50.598,50.6,50.602,50.604,50.606,50.608,50.61,50.612,50.614,50.616,50.618,50.62,50.622,50.624,50.626,50.628,50.63,50.632,50.634,50.636,50.638,50.64,50.642,50.644,50.646,50.648,50.65,50.652,50.654,50.656,50.658,50.66,50.662,50.664,50.666,50.668,50.67,50.672,50.674,50.676,50.678,50.68,50.682,50.684,50.686,50.688,50.69,50.692,50.694,50.696,50.698,50.7,50.702,50.704,50.706,50.708,50.71,50.712,50.714,50.716,50.718,50.72,50.722,50.724,50.726,50.728,50.73,50.732,50.734,50.736,50.738,50.74,50.742,50.744,50.746,50.748,50.75,50.752,50.754,50.756,50.758,50.76,50.762,50.764,50.766,50.768,50.77,50.772,50.774,50.776,50.778,50.78,50.782,50.784,50.786,50.788,50.79,50.792,50.794,50.796,50.798,50.8,50.802,50.804,50.806,50.808,50.81,50.812,50.814,50.816,50.818,50.82,50.822,50.824,50.826,50.828,50.83,50.832,50.834,50.836,50.838,50.84,50.842,50.844,50.846,50.848,50.85,50.852,50.854,50.856,50.858,50.86,50.862,50.864,50.866,50.868,50.87,50.872,50.874,50.876,50.878,50.88,50.882,50.884,50.886,50.888,50.89,50.892,50.894,50.896,50.898,50.9,50.902,50.904,50.906,50.908,50.91,50.912,50.914,50.916,50.918,50.92,50.922,50.924,50.926,50.928,50.93,50.932,50.934,50.936,50.938,50.94,50.942,50.944,50.946,50.948,50.95,50.952,50.954,50.956,50.958,50.96,50.962,50.964,50.966,50.968,50.97,50.972,50.974,50.976,50.978,50.98,50.982,50.984,50.986,50.988,50.99,50.992,50.994,50.996,50.998,51.0,51.002,51.004,51.006,51.008,51.01,51.012,51.014,51.016,51.018,51.02,51.022,51.024,51.026,51.028,51.03,51.032,51.034,51.036,51.038,51.04,51.042,51.044,51.046,51.048,51.05,51.052,51.054,51.056,51.058,51.06,51.062,51.064,51.066,51.068,51.07,51.072,51.074,51.076,51.078,51.08,51.082,51.084,51.086,51.088,51.09,51.092,51.094,51.096,51.098,51.1,51.102,51.104,51.106,51.108,51.11,51.112,51.114,51.116,51.118,51.12,51.122,51.124,51.126,51.128,51.13,51.132,51.134,51.136,51.138,51.14,51.142,51.144,51.146,51.148,51.15,51.152,51.154,51.156,51.158,51.16,51.162,51.164,51.166,51.168,51.17,51.172,51.174,51.176,51.178,51.18,51.182,51.184,51.186,51.188,51.19,51.192,51.194,51.196,51.198,51.2,51.202,51.204,51.206,51.208,51.21,51.212,51.214,51.216,51.218,51.22,51.222,51.224,51.226,51.228,51.23,51.232,51.234,51.236,51.238,51.24,51.242,51.244,51.246,51.248,51.25,51.252,51.254,51.256,51.258,51.26,51.262,51.264,51.266,51.268,51.27,51.272,51.274,51.276,51.278,51.28,51.282,51.284,51.286,51.288,51.29,51.292,51.294,51.296,51.298,51.3,51.302,51.304,51.306,51.308,51.31,51.312,51.314,51.316,51.318,51.32,51.322,51.324,51.326,51.328,51.33,51.332,51.334,51.336,51.338,51.34,51.342,51.344,51.346,51.348,51.35,51.352,51.354,51.356,51.358,51.36,51.362,51.364,51.366,51.368,51.37,51.372,51.374,51.376,51.378,51.38,51.382,51.384,51.386,51.388,51.39,51.392,51.394,51.396,51.398,51.4,51.402,51.404,51.406,51.408,51.41,51.412,51.414,51.416,51.418,51.42,51.422,51.424,51.426,51.428,51.43,51.432,51.434,51.436,51.438,51.44,51.442,51.444,51.446,51.448,51.45,51.452,51.454,51.456,51.458,51.46,51.462,51.464,51.466,51.468,51.47,51.472,51.474,51.476,51.478,51.48,51.482,51.484,51.486,51.488,51.49,51.492,51.494,51.496,51.498],"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,82468906,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"type":"bar"}],                        {"margin":{"b":20,"l":50,"pad":0,"r":50,"t":30},"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"xaxis":{"title":{"text":"Length (bp)"}},"yaxis":{"title":{"text":"Number of reads"}}},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Mapping (QC-passed reads)</h1>
+                <span class="anchor" id="flag-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number of reads</td><td class='valn text-right'>0</td></tr><tr><td class='valn'>Number of lines in the BAM</td><td class='valn text-right'>89 264 919</td></tr><tr><td class='valn'>Number of mapped reads</td><td class='valn text-right'>22 339 001</td></tr><tr><td class='valn'>Percentage of mapped reads</td><td class='valn text-right'>27.09</td></tr><tr><td class='valn'>Number of properly paired reads</td><td class='valn text-right'>0</td></tr><tr><td class='valn'>Percentage of properly paired reads</td><td class='valn text-right'>0</td></tr><tr><td class='valn'>Secondary alignments</td><td class='valn text-right'>6 796 013</td></tr><tr><td class='valn'>Singletons alignements</td><td class='valn text-right'>0</td></tr></tbody></table>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Intron extraction results</h1>
+                <span class="anchor" id="features-descr"></span>
+        </div>
+
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Split reads</h5>
+                <span class="anchor" id="splitstat"></span>
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number of reads overlapping introns</td><td class='valn text-right'>29 656</td></tr><tr><td class='valn'>Mean length of introns</td><td class='valn text-right'>271.05</td></tr><tr><td class='valn text-right'>Other junctions</td><td class='valn text-right'>0</td></tr><tr><td class='valn text-right'>Canonical junction (GT_AG or CT_AC)</td><td class='valn text-right'>29 656</td></tr></tbody></table>  
+            </div>
+        </div>  
+
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Detected introns</h5>
+                <span class="anchor" id="candidatstat"></span>
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number</td><td class='valn text-right'>2 076</td></tr><tr><td class='valn'>Min length</td><td class='valn text-right'>20</td></tr><tr><td class='valn'>Max length</td><td class='valn text-right'>9 607</td></tr><tr><td class='valn'>Mean length</td><td class='valn text-right'>300.16</td></tr><tr><td class='valn'>Min depth</td><td class='valn text-right'>1</td></tr><tr><td class='valn'>Max depth</td><td class='valn text-right'>4 101</td></tr><tr><td class='valn'>Mean depth</td><td class='valn text-right'>14.29</td></tr></tbody></table>
+            </div>  
+            <div class="mt-4 mr-0 pl-0 col-md-8">
+                <h5>Detected introns depth distribution</h5>
+                <span class="anchor" id="candidatstat"></span>
+<div>                            <div id="3e4547fa-aef5-47b8-9103-7a4f5eca5921" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("3e4547fa-aef5-47b8-9103-7a4f5eca5921")) {                    Plotly.newPlot(                        "3e4547fa-aef5-47b8-9103-7a4f5eca5921",                        [{"name":"Candidats depth","opacity":0.85,"x":[1.0,9.2,17.4,25.599999999999998,33.8,42.0,50.199999999999996,58.39999999999999,66.6,74.8,83.0,91.19999999999999,99.39999999999999,107.6,115.79999999999998,123.99999999999999,132.2,140.39999999999998,148.6,156.79999999999998,165.0,173.2,181.39999999999998,189.6,197.79999999999998,205.99999999999997,214.2,222.39999999999998,230.59999999999997,238.79999999999998,246.99999999999997,255.2,263.4,271.59999999999997,279.79999999999995,288.0,296.2,304.4,312.59999999999997,320.79999999999995,329.0,337.2,345.4,353.59999999999997,361.79999999999995,369.99999999999994,378.2,386.4,394.59999999999997,402.79999999999995,410.99999999999994,419.2,427.4,435.59999999999997,443.79999999999995,451.99999999999994,460.19999999999993,468.4,476.59999999999997,484.79999999999995,492.99999999999994,501.19999999999993,509.4,517.5999999999999,525.8,534.0,542.1999999999999,550.4,558.5999999999999,566.8,575.0,583.1999999999999,591.4,599.5999999999999,607.8,616.0,624.1999999999999,632.4,640.5999999999999,648.8,657.0,665.1999999999999,673.4,681.5999999999999,689.8,697.9999999999999,706.1999999999999,714.4,722.5999999999999,730.8,738.9999999999999,747.1999999999999,755.4,763.5999999999999,771.8,779.9999999999999,788.1999999999999,796.4,804.5999999999999,812.8,820.9999999999999,829.1999999999999,837.4,845.5999999999999,853.8,861.9999999999999,870.1999999999999,878.4,886.5999999999999,894.8,902.9999999999999,911.1999999999999,919.3999999999999,927.5999999999999,935.8,943.9999999999999,952.1999999999999,960.3999999999999,968.5999999999999,976.8,984.9999999999999,993.1999999999999,1001.3999999999999,1009.5999999999999,1017.8,1026.0,1034.1999999999998,1042.3999999999999,1050.6,1058.8,1067.0,1075.1999999999998,1083.3999999999999,1091.6,1099.8,1108.0,1116.1999999999998,1124.3999999999999,1132.6,1140.8,1149.0,1157.1999999999998,1165.3999999999999,1173.6,1181.8,1190.0,1198.1999999999998,1206.3999999999999,1214.6,1222.8,1231.0,1239.1999999999998,1247.3999999999999,1255.6,1263.8,1272.0,1280.1999999999998,1288.3999999999999,1296.6,1304.8,1313.0,1321.1999999999998,1329.3999999999999,1337.6,1345.8,1353.9999999999998,1362.1999999999998,1370.3999999999999,1378.6,1386.8,1394.9999999999998,1403.1999999999998,1411.3999999999999,1419.6,1427.8,1435.9999999999998,1444.1999999999998,1452.3999999999999,1460.6,1468.8,1476.9999999999998,1485.1999999999998,1493.3999999999999,1501.6,1509.8,1517.9999999999998,1526.1999999999998,1534.3999999999999,1542.6,1550.8,1558.9999999999998,1567.1999999999998,1575.3999999999999,1583.6,1591.8,1599.9999999999998,1608.1999999999998,1616.3999999999999,1624.6,1632.8,1640.9999999999998,1649.1999999999998,1657.3999999999999,1665.6,1673.8,1681.9999999999998,1690.1999999999998,1698.3999999999999,1706.6,1714.8,1722.9999999999998,1731.1999999999998,1739.3999999999999,1747.6,1755.8,1763.9999999999998,1772.1999999999998,1780.3999999999999,1788.6,1796.8,1804.9999999999998,1813.1999999999998,1821.3999999999999,1829.6,1837.7999999999997,1845.9999999999998,1854.1999999999998,1862.3999999999999,1870.6,1878.7999999999997,1886.9999999999998,1895.1999999999998,1903.3999999999999,1911.6,1919.7999999999997,1927.9999999999998,1936.1999999999998,1944.3999999999999,1952.6,1960.7999999999997,1968.9999999999998,1977.1999999999998,1985.3999999999999,1993.6,2001.7999999999997,2009.9999999999998,2018.1999999999998,2026.3999999999999,2034.6,2042.7999999999997,2051.0,2059.2,2067.3999999999996,2075.6,2083.7999999999997,2092.0,2100.2,2108.3999999999996,2116.6,2124.7999999999997,2133.0,2141.2,2149.3999999999996,2157.6,2165.7999999999997,2174.0,2182.2,2190.3999999999996,2198.6,2206.7999999999997,2215.0,2223.2,2231.3999999999996,2239.6,2247.7999999999997,2256.0,2264.2,2272.3999999999996,2280.6,2288.7999999999997,2297.0,2305.2,2313.3999999999996,2321.6,2329.7999999999997,2338.0,2346.2,2354.3999999999996,2362.6,2370.7999999999997,2379.0,2387.2,2395.3999999999996,2403.6,2411.7999999999997,2420.0,2428.2,2436.3999999999996,2444.6,2452.7999999999997,2461.0,2469.2,2477.3999999999996,2485.6,2493.7999999999997,2502.0,2510.2,2518.3999999999996,2526.6,2534.7999999999997,2543.0,2551.2,2559.3999999999996,2567.6,2575.7999999999997,2584.0,2592.2,2600.3999999999996,2608.6,2616.7999999999997,2625.0,2633.2,2641.3999999999996,2649.6,2657.7999999999997,2665.9999999999995,2674.2,2682.3999999999996,2690.6,2698.7999999999997,2706.9999999999995,2715.2,2723.3999999999996,2731.6,2739.7999999999997,2747.9999999999995,2756.2,2764.3999999999996,2772.6,2780.7999999999997,2788.9999999999995,2797.2,2805.3999999999996,2813.6,2821.7999999999997,2829.9999999999995,2838.2,2846.3999999999996,2854.6,2862.7999999999997,2870.9999999999995,2879.2,2887.3999999999996,2895.6,2903.7999999999997,2911.9999999999995,2920.2,2928.3999999999996,2936.6,2944.7999999999997,2952.9999999999995,2961.2,2969.3999999999996,2977.6,2985.7999999999997,2993.9999999999995,3002.2,3010.3999999999996,3018.6,3026.7999999999997,3034.9999999999995,3043.2,3051.3999999999996,3059.6,3067.7999999999997,3075.9999999999995,3084.2,3092.3999999999996,3100.6,3108.7999999999997,3116.9999999999995,3125.2,3133.3999999999996,3141.6,3149.7999999999997,3157.9999999999995,3166.2,3174.3999999999996,3182.6,3190.7999999999997,3198.9999999999995,3207.2,3215.3999999999996,3223.6,3231.7999999999997,3239.9999999999995,3248.2,3256.3999999999996,3264.6,3272.7999999999997,3280.9999999999995,3289.2,3297.3999999999996,3305.6,3313.7999999999997,3321.9999999999995,3330.2,3338.3999999999996,3346.6,3354.7999999999997,3362.9999999999995,3371.2,3379.3999999999996,3387.6,3395.7999999999997,3403.9999999999995,3412.2,3420.3999999999996,3428.6,3436.7999999999997,3444.9999999999995,3453.2,3461.3999999999996,3469.6,3477.7999999999997,3485.9999999999995,3494.2,3502.3999999999996,3510.6,3518.7999999999997,3526.9999999999995,3535.2,3543.3999999999996,3551.6,3559.7999999999997,3567.9999999999995,3576.2,3584.3999999999996,3592.6,3600.7999999999997,3608.9999999999995,3617.2,3625.3999999999996,3633.6,3641.7999999999997,3649.9999999999995,3658.2,3666.3999999999996,3674.5999999999995,3682.7999999999997,3690.9999999999995,3699.2,3707.3999999999996,3715.5999999999995,3723.7999999999997,3731.9999999999995,3740.2,3748.3999999999996,3756.5999999999995,3764.7999999999997,3772.9999999999995,3781.2,3789.3999999999996,3797.5999999999995,3805.7999999999997,3813.9999999999995,3822.2,3830.3999999999996,3838.5999999999995,3846.7999999999997,3854.9999999999995,3863.2,3871.3999999999996,3879.5999999999995,3887.7999999999997,3895.9999999999995,3904.2,3912.3999999999996,3920.5999999999995,3928.7999999999997,3936.9999999999995,3945.2,3953.3999999999996,3961.5999999999995,3969.7999999999997,3977.9999999999995,3986.2,3994.3999999999996,4002.5999999999995,4010.7999999999997,4018.9999999999995,4027.2,4035.3999999999996,4043.5999999999995,4051.7999999999997,4059.9999999999995,4068.2,4076.3999999999996,4084.5999999999995,4092.7999999999997],"y":[1549,170,113,65,53,27,30,14,10,5,7,5,3,2,4,3,3,1,1,2,1,2,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],"type":"bar"}],                        {"margin":{"b":20,"l":50,"pad":0,"r":50,"t":30},"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"xaxis":{"title":{"text":"Detected introns depth"}},"yaxis":{"title":{"text":"Number of detected introns"}}},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+        </div>  
+
+
+        <div class="d-flex"> 
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Filtered detected introns</h5>
+                <span class="anchor" id="filtered_detected_introns"></span>
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number</td><td class='valn text-right'>477</td></tr><tr><td class='valn'>Filtered because of depth (<= 1)</td><td class='valn text-right'>1 539</td></tr><tr><td class='valn'>Filtered because of length (>= 80%)</td><td class='valn text-right'>7</td></tr><tr><td class='valn'>Filtered because of non canonical junction</td><td class='valn text-right'>18</td></tr><tr><td class='valn'>Filtered because of overlapping introns</td><td class='valn text-right'>52</td></tr><tr><td class='valn'>Min length</td><td class='valn text-right'>20</td></tr><tr><td class='valn'>Max length</td><td class='valn text-right'>3 059</td></tr><tr><td class='valn'>Mean length</td><td class='valn text-right'>177.74</td></tr><tr><td class='valn'>Min depth</td><td class='valn text-right'>2</td></tr><tr><td class='valn'>Max depth</td><td class='valn text-right'>824</td></tr><tr><td class='valn'>Mean depth</td><td class='valn text-right'>28.18</td></tr></tbody></table>
+            </div>
+        </div>
+    
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Top 10 of contigs with the highest number of detected introns</h5>
+                <span class="anchor" id="too_complex_detected"></span>
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>GBYH01034471.1</td><td class='valn text-right'>5 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GBYH01019872.1</td><td class='valn text-right'>4 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GBYH01006296.1</td><td class='valn text-right'>3 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GBYH01010599.1</td><td class='valn text-right'>3 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GBYH01016746.1</td><td class='valn text-right'>3 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GBYH01000464.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GBYH01003190.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GBYH01007086.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GBYH01007842.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GBYH01011184.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr></tbody></table>  
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Glossary</h1>
+                <span class="anchor" id="glossary"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <span class="anchor" id="glossary"></span>
+                This glossary reflects terms used in this report:<br>
+                <strong>Candidat</strong>        : Detected/predicted introns filtrered by canonical junction, length and depth.</br>
+                <strong>Canonic junction</strong>: GT_AG or CT_AC for donor and acceptor sites.</br>
+                <strong>Contig</strong>          : A set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
+                <strong>Exon</strong>            : Coding part of DNA that is translated into protein.</br>
+                <strong>Features</strong>        : A sequenced chain of nucleic acids which provide protein(s). (source:https://biologydictionary.net/gene/)</br>
+                <strong>Fragment</strong>        : During sequencing, the fragment is a link between fowarded and reverse reads.</br>                
+                <strong>Intron</strong>          : Any nucleotide sequence removed by RNA splicing during maturation of RNA. (source : Wikipedia)</br>
+                <strong>Reads</strong>           : An inferred sequence of base pairs corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
+                <strong>Sequence</strong>        : Base pair probabilities of a DNA fragment.</br>
+                <strong>Splice events</strong>   : a process where exons may be included within or excluded from the final mRNA.</br>
+                <strong>Trimmed contig</strong>  : Contig without retained intron(s).</br>
+                <br>
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:825;height:245;">
+            </div>
+        </div>  
+<br/>
+        </main>
+      </div>
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script type="text/javascript" language="javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js " integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Datatable -->
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" language="javascript">
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+  </body>
+</html>
