@@ -41,7 +41,7 @@ nano  SRR1660436.cfg
 ```diff
 [Defaults]
 fasta:GBYH01.1.fsa_nt
-r:SRR1660436.fastq.gz
+r1:SRR1660436.fastq.gz
 flagstat:GBYH01/hisat2_GBYH01.sort.flagstat.txt
 candidat:splitReadSearch_GBYH01/srs_GBYH01_candidates.txt
 split:splitReadSearch_GBYH01/srs_GBYH01_split_alignments.txt
