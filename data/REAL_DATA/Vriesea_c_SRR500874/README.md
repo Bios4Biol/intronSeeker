@@ -21,7 +21,7 @@ intronSeeker command lines
 ### Step 1 : hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r GHCB01.1.fsa_nt -1 SRR500874_1.fastq --prefix GHCB01 -o GHCB01 -t 12
+intronSeeker hisat2Alignment -r GHCB01.1.fsa_nt -1 SRR500874.fastq.gz --prefix GHCB01 -o GHCB01 -t 12
 ```
 
 ### Step2: splitReadSearch
@@ -33,14 +33,17 @@ intronSeeker splitReadSearch -a GHCB01/hisat2_GHCB01.sort.bam -r GHCB01.1.fsa_nt
 ### Step 3: run simulation2HTML
 
 Configuration file:
+```diff
+nano SRR500874.cfg
+```
 
 ```diff
 [Defaults]
 fasta:GHCB01.1.fsa_nt
-r:SRR500874_1.fastq
-flagstat:hisat2_SRR500874.sort.flagstat.txt
-candidat:srs_SRR500874_candidates.txt
-split:srs_SRR500874_split_alignments.txt
+r1:SRR500874.fastq.gz
+flagstat:GHCB01/hisat2_GHCB01.sort.flagstat.txt
+candidat:splitReadSearch_GHCB01/srs_GHCB01_candidates.txt
+split:splitReadSearch_GHCB01/srs_GHCB01_split_alignments.txt
 prefix:GHCB01
 threads: 6                
 output:HTML/
