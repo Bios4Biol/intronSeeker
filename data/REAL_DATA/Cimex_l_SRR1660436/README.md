@@ -12,7 +12,6 @@ gzip -d GBYH01.1.fsa_nt.gz
 
 ```diff
 wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR166/006/SRR1660436/SRR1660436.fastq.gz
-
 ```
 
 intronSeeker command lines
@@ -21,7 +20,7 @@ intronSeeker command lines
 ### Step 1 : hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r GBYH01.1.fsa_nt -1 SRR1660436.fastq  --prefix GBYH01 -o GBYH01 -t 12
+intronSeeker hisat2Alignment -r GBYH01.1.fsa_nt -1 SRR1660436.fastq.gz  --prefix GBYH01 -o GBYH01 -t 12
 ```
 
 ### Step2: splitReadSearch
