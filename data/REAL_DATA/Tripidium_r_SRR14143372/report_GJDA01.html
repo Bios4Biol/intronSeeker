@@ -1,0 +1,361 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="IntronSeeker simulation report">
+    <meta name="author" content="Bardou P., Maman S., Lasguignes E., Oudin F., Cabanettes F., Klopp C.">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css ">
+    <!-- Datatable -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+
+    <!-- Personalised css -->
+    <style type="text/css">
+      body { font-size: .875rem; }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 100; /* Behind the navbar */
+        padding: 0;
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+      }
+      .sidebar-sticky {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 48px; /* Height of navbar */
+        height: calc(100vh - 48px);
+        padding-top: 4rem;
+        overflow-x: hidden;
+        overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+      }
+      .sidebar .nav-link {
+        margin-right: 4px;
+        color: #212529;
+      }
+      .sidebar .nav-link:hover,
+      .sidebar .nav-link.active { color: #999; }
+      .sidebar-heading {
+        font-size: .75rem;
+        text-transform: uppercase;
+      }
+      .navbar-brand {
+        padding-top: .75rem;
+        padding-bottom: .75rem;
+        font-size: 1rem;
+        background-color: rgba(0, 0, 0, .7);
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .7);
+				z-index: 200;
+      }
+      .navbar .form-control {
+        padding: .75rem 1rem;
+        border-width: 0;
+        border-radius: 0;
+				z-index: 200;
+      }
+      .form-control-dark {
+        color: #fff;
+        background-color: rgba(255, 255, 255, .1);
+        border-color: rgba(255, 255, 255, .1);
+      }
+      .form-control-dark:focus {
+        border-color: transparent;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+      }
+      .border-top { border-top: 1px solid #e5e5e5; }
+      .border-bottom { border-bottom: 1px solid #e5e5e5; }
+	  .valn { vertical-align: middle !important; }
+	  .anchor{
+  			display: block;
+  			height: 83px; /*same height as header*/
+  			margin-top: -83px; /*same height as header*/
+  			visibility: hidden;
+	  }
+    </style>
+
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+
+    <title>IntronSeeker simulation report</title>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">IntronSeeker simulation report</a>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="#inputs-parameters">
+                  <span class="oi oi-file" aria-hidden="true"></span>
+                  Input files
+                </a>
+              </li>
+			  <li class="nav-item">
+				<a class="nav-link" href="#ref-descr">
+				  <span class="oi oi-collapse-down" aria-hidden="true"></span>
+					Contigs
+				</a>
+			  </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Contigs statistics
+			    	</a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Nb. of seq. by feature type
+			    	</a>
+			    </li>
+			    <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#ref-descr">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Nb. of seq. with same features
+			    	</a>
+			    </li>      
+              <li class="nav-item">
+				<a class="nav-link" href="#flag-descr">
+				  <span class="oi oi-collapse-up" aria-hidden="true"></span>
+					Mapping
+				</a>
+			   </li>          
+                <li class="nav-item">
+				   <a class="nav-link" href="#features-descr">
+				        <span class="oi oi-folder" aria-hidden="true"></span>
+					    Intron extraction results
+				   </a>
+			    </li>    
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#splitstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Split reads
+			    	</a>
+			    </li>             
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#candidatstat">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Detected introns
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#filtered_detected_introns">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Filtered detected introns
+			    	</a>
+			    </li>
+                <li class="nav-item" style="padding-left:10px">
+				    <a class="nav-link" href="#too_complex_detected">
+				    	<span class="oi oi-list" aria-hidden="true"></span>
+				    	Contigs with too complex introns
+			    	</a>
+			    </li>      
+                <li class="nav-item">
+                    <a class="nav-link" href="#eval">
+                        <span class="oi oi-circle-check" aria-hidden="true"></span>
+                        Evaluation of the detected introns (simulation only)
+                    </a>
+                </li> 
+                <li class="nav-item">
+                    <a class="nav-link" href="#glossary">
+                        <span class="oi oi-info" aria-hidden="true"></span>
+                        Glossary
+                    </a>
+                </li>
+            </ul>
+          </div>
+          <div style="text-align:center;font-size:smaller;color:darkgrey;margin-top:-25px">
+		    Produced by IntronSeeker_v1.0<br>
+		    Copyright © 2020, <img style="width:18px;padding-bottom:2px" src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/scripts/icon/favicon.ico"   ><!--<img src="http://www.inra.fr/extension/itkinra/design/inra/images/favicon.ico">-->
+		    <a style="color:#212529;" href="https://www.inrae.fr" target="_blank">INRAE</a><br>
+		    Designed by the <a style="color:#212529;" href="http://sigenae.org" target="_blank">Sigenae</a> team.
+          </div>
+        </nav>
+		<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 border-bottom">
+			<h1 class="h4">Input files</h1>
+			<span class="anchor" id="inputs-parameters"></span>
+		</div>
+		<div class="d-flex">
+			<div class="mt-4 mr-4 pl-0 col-md-6">
+				<h5>Files</h5>
+				<ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Contig FASTA <span class="badge badge-success badge-pill ml-4">GJDA01.1.fsa_nt</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Read1 FASTQ <span class="badge badge-success badge-pill ml-4">SRR14143372_1.fastq.gz</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Read2 FASTQ <span class="badge badge-success badge-pill ml-4">SRR14143372_2.fastq.gz</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Flagstat <span class="badge badge-success badge-pill ml-4">hisat2_GJDA01.sort.flagstat.txt</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Split <span class="badge badge-success badge-pill ml-4">srs_GJDA01_split_alignments.txt</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center p-2">Candidat <span class="badge badge-success badge-pill ml-4">srs_GJDA01_candidates.txt</span></li>
+				</ul>
+			</div>
+		</div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Contigs</h1>
+                <span class="anchor" id="ref-descr"></span>
+        </div>
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+                <div class="d-flex">
+                    <div>
+                        <h5>Contigs statistics</h5>
+                        <span class="anchor" id="ref-descr"></span>
+                    </div>
+                    <div class="ml-2">
+                        <span
+                            class="badge badge-pill badge-dark"
+                            data-toggle="tooltip"
+                            data-placement="top"
+                            data-html="true"
+                            title="<p nowrap><b>Number of features in GTF</b>: total number of features from GTF file</p><p nowrap><b>Number of distinct features in GTF</b>: number of distinct features from all GTF lines</p>">
+                            <span class="oi oi-info" ></span>
+                        </span>
+                    </div>
+                   </div> 
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Contig FASTA - Number of sequences</td><td class='valn text-right'>105 306</td></tr><tr><td class='valn'>Contig FASTA - Mean sequence length</td><td class='valn text-right'>1 058</td></tr></tbody></table>	
+                </div>   
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Reads</h1>
+                <span class="anchor" id="read-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-4 pl-0 col-md-4">
+                 <h5>Reads statistics</h5>
+                <span class="anchor" id="readgstat"></span>
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number of reads</td><td class='valn text-right'>30 715 496</td></tr><tr><td class='valn'>Mean coverage</td><td class='valn text-right'>38.13</td></tr><tr><td class='valn'>Min reads length</td><td class='valn text-right'>36</td></tr><tr><td class='valn'>Max reads length</td><td class='valn text-right'>150</td></tr><tr><td class='valn'>Mean reads length</td><td class='valn text-right'>138.32</td></tr></tbody></table>
+            </div>
+            <div class="mt-4 mr-0 pl-0 col-md-8">
+                    <h5>Reads length distribution</h5>
+                    <span class="anchor" id="readgstat"></span><div>                            <div id="10e284ec-d5fc-4b5d-b147-df8a5029c61b" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("10e284ec-d5fc-4b5d-b147-df8a5029c61b")) {                    Plotly.newPlot(                        "10e284ec-d5fc-4b5d-b147-df8a5029c61b",                        [{"name":"Reads length distribution","opacity":0.85,"x":[36.0,36.228,36.456,36.684,36.912,37.14,37.368,37.596000000000004,37.824,38.052,38.28,38.508,38.736,38.964,39.192,39.42,39.648,39.876,40.104,40.332,40.56,40.788,41.016,41.244,41.472,41.7,41.928,42.156,42.384,42.612,42.84,43.068,43.296,43.524,43.752,43.980000000000004,44.208,44.436,44.664,44.891999999999996,45.120000000000005,45.348,45.576,45.804,46.032,46.26,46.488,46.716,46.944,47.172,47.4,47.628,47.856,48.084,48.312,48.54,48.768,48.996,49.224000000000004,49.452,49.68,49.908,50.136,50.364000000000004,50.592,50.82,51.048,51.275999999999996,51.504000000000005,51.732,51.96,52.188,52.416,52.644000000000005,52.872,53.1,53.328,53.556,53.784,54.012,54.24,54.468,54.696,54.924,55.152,55.379999999999995,55.608000000000004,55.836,56.064,56.292,56.519999999999996,56.748000000000005,56.976,57.204,57.432,57.66,57.888000000000005,58.116,58.344,58.572,58.8,59.028000000000006,59.256,59.484,59.712,59.94,60.168,60.396,60.624,60.852000000000004,61.08,61.308,61.536,61.763999999999996,61.992000000000004,62.22,62.448,62.676,62.903999999999996,63.132000000000005,63.36,63.588,63.816,64.044,64.272,64.5,64.72800000000001,64.956,65.184,65.412,65.64,65.868,66.096,66.324,66.55199999999999,66.78,67.00800000000001,67.236,67.464,67.69200000000001,67.92,68.148,68.376,68.604,68.832,69.06,69.28800000000001,69.51599999999999,69.744,69.97200000000001,70.2,70.428,70.656,70.884,71.112,71.34,71.568,71.79599999999999,72.024,72.25200000000001,72.48,72.708,72.936,73.164,73.392,73.62,73.848,74.076,74.304,74.53200000000001,74.75999999999999,74.988,75.21600000000001,75.444,75.672,75.9,76.128,76.356,76.584,76.81200000000001,77.03999999999999,77.268,77.49600000000001,77.724,77.952,78.18,78.408,78.636,78.864,79.092,79.32,79.548,79.77600000000001,80.004,80.232,80.46000000000001,80.688,80.916,81.144,81.372,81.6,81.828,82.05600000000001,82.28399999999999,82.512,82.74000000000001,82.968,83.196,83.424,83.652,83.88,84.108,84.336,84.564,84.792,85.02000000000001,85.248,85.476,85.70400000000001,85.932,86.16,86.388,86.616,86.844,87.072,87.30000000000001,87.52799999999999,87.756,87.98400000000001,88.212,88.44,88.668,88.896,89.124,89.352,89.58000000000001,89.80799999999999,90.036,90.26400000000001,90.492,90.72,90.94800000000001,91.176,91.404,91.632,91.86,92.088,92.316,92.54400000000001,92.772,93.0,93.22800000000001,93.456,93.684,93.912,94.14,94.368,94.596,94.82400000000001,95.05199999999999,95.28,95.50800000000001,95.736,95.964,96.19200000000001,96.42,96.648,96.876,97.104,97.332,97.56,97.78800000000001,98.016,98.244,98.47200000000001,98.7,98.928,99.156,99.384,99.612,99.84,100.068,100.296,100.524,100.752,100.98,101.208,101.436,101.664,101.892,102.12,102.348,102.57600000000001,102.804,103.032,103.26,103.488,103.71600000000001,103.944,104.172,104.4,104.628,104.85600000000001,105.084,105.312,105.54,105.768,105.99600000000001,106.224,106.452,106.68,106.908,107.136,107.364,107.592,107.82000000000001,108.048,108.276,108.504,108.732,108.96000000000001,109.188,109.416,109.644,109.872,110.10000000000001,110.328,110.556,110.784,111.012,111.24000000000001,111.468,111.696,111.924,112.152,112.38000000000001,112.608,112.836,113.06400000000001,113.292,113.52,113.748,113.976,114.20400000000001,114.432,114.66,114.888,115.116,115.34400000000001,115.572,115.8,116.028,116.256,116.48400000000001,116.712,116.94,117.168,117.396,117.62400000000001,117.852,118.08,118.308,118.536,118.76400000000001,118.992,119.22,119.44800000000001,119.676,119.904,120.132,120.36,120.58800000000001,120.816,121.044,121.272,121.5,121.72800000000001,121.956,122.184,122.412,122.64,122.86800000000001,123.096,123.324,123.552,123.78,124.00800000000001,124.236,124.464,124.69200000000001,124.92,125.148,125.376,125.604,125.83200000000001,126.06,126.288,126.516,126.744,126.97200000000001,127.2,127.428,127.656,127.884,128.11200000000002,128.34,128.56799999999998,128.796,129.024,129.252,129.48000000000002,129.708,129.936,130.164,130.392,130.62,130.848,131.07600000000002,131.304,131.53199999999998,131.76,131.988,132.216,132.44400000000002,132.672,132.9,133.128,133.356,133.584,133.812,134.04000000000002,134.268,134.496,134.724,134.952,135.18,135.40800000000002,135.63600000000002,135.864,136.09199999999998,136.32,136.548,136.776,137.00400000000002,137.232,137.46,137.688,137.916,138.144,138.372,138.60000000000002,138.828,139.05599999999998,139.284,139.512,139.74,139.96800000000002,140.196,140.424,140.652,140.88,141.108,141.336,141.56400000000002,141.792,142.02,142.248,142.476,142.704,142.93200000000002,143.16000000000003,143.388,143.61599999999999,143.844,144.072,144.3,144.52800000000002,144.756,144.984,145.212,145.44,145.668,145.89600000000002,146.12400000000002,146.352,146.57999999999998,146.808,147.036,147.264,147.49200000000002,147.72,147.948,148.176,148.404,148.632,148.86,149.08800000000002,149.316,149.544,149.772],"y":[51032,0,0,0,53099,0,0,0,53677,0,0,0,0,54303,0,0,0,55841,0,0,0,55932,0,0,0,0,57717,0,0,0,58968,0,0,0,0,58945,0,0,0,59470,0,0,0,60157,0,0,0,0,60161,0,0,0,60562,0,0,0,0,60163,0,0,0,60344,0,0,0,60422,0,0,0,0,61645,0,0,0,61127,0,0,0,61769,0,0,0,0,62115,0,0,0,61093,0,0,0,0,61423,0,0,0,62450,0,0,0,61644,0,0,0,0,63103,0,0,0,63868,0,0,0,0,63520,0,0,0,62705,0,0,0,62357,0,0,0,0,62146,0,0,0,61553,0,0,0,61981,0,0,0,0,62181,0,0,0,62810,0,0,0,0,61750,0,0,0,61735,0,0,0,62131,0,0,0,0,57394,0,0,0,51486,0,0,0,0,46747,0,0,0,57485,0,0,0,50835,0,0,0,0,50797,0,0,0,50849,0,0,0,50568,0,0,0,0,50415,0,0,0,53325,0,0,0,0,51965,0,0,0,52343,0,0,0,54334,0,0,0,0,53490,0,0,0,53400,0,0,0,0,53336,0,0,0,54065,0,0,0,54376,0,0,0,0,55685,0,0,0,55929,0,0,0,0,55300,0,0,0,55987,0,0,0,55591,0,0,0,0,53930,0,0,0,53579,0,0,0,51997,0,0,0,0,49354,0,0,0,48756,0,0,0,0,46842,0,0,0,45452,0,0,0,45625,0,0,0,0,43900,0,0,0,43382,0,0,0,0,42081,0,0,0,41294,0,0,0,39181,0,0,0,0,39369,0,0,0,38774,0,0,0,38015,0,0,0,0,38677,0,0,0,38604,0,0,0,0,37728,0,0,0,37901,0,0,0,36728,0,0,0,0,38014,0,0,0,37124,0,0,0,0,40007,0,0,0,38857,0,0,0,39021,0,0,0,0,38529,0,0,0,38423,0,0,0,38016,0,0,0,0,37002,0,0,0,38420,0,0,0,0,39035,0,0,0,38837,0,0,0,39001,0,0,0,0,38702,0,0,0,41458,0,0,0,0,40113,0,0,0,43755,0,0,0,46011,0,0,0,0,45150,0,0,0,47779,0,0,0,50447,0,0,0,0,52059,0,0,0,53340,0,0,0,0,54013,0,0,0,53406,0,0,0,55546,0,0,0,0,56613,0,0,0,56025,0,0,0,0,56341,0,0,0,57517,0,0,0,68400,0,0,0,0,198432,0,0,0,878892,0,0,0,23858441],"type":"bar"}],                        {"margin":{"b":20,"l":50,"pad":0,"r":50,"t":30},"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"xaxis":{"title":{"text":"Length (bp)"}},"yaxis":{"title":{"text":"Number of reads"}}},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Mapping (QC-passed reads)</h1>
+                <span class="anchor" id="flag-descr"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number of reads</td><td class='valn text-right'>30 715 496</td></tr><tr><td class='valn'>Number of lines in the BAM</td><td class='valn text-right'>34 901 284</td></tr><tr><td class='valn'>Number of mapped reads</td><td class='valn text-right'>23 839 143</td></tr><tr><td class='valn'>Percentage of mapped reads</td><td class='valn text-right'>77.61</td></tr><tr><td class='valn'>Number of properly paired reads</td><td class='valn text-right'>18 281 524</td></tr><tr><td class='valn'>Percentage of properly paired reads</td><td class='valn text-right'>59.52</td></tr><tr><td class='valn'>Secondary alignments</td><td class='valn text-right'>4 185 788</td></tr><tr><td class='valn'>Singletons alignements</td><td class='valn text-right'>2 248 467</td></tr></tbody></table>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Intron extraction results</h1>
+                <span class="anchor" id="features-descr"></span>
+        </div>
+
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Split reads</h5>
+                <span class="anchor" id="splitstat"></span>
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number of reads overlapping introns</td><td class='valn text-right'>127 717</td></tr><tr><td class='valn'>Mean length of introns</td><td class='valn text-right'>995.25</td></tr><tr><td class='valn text-right'>Junction CT_GC</td><td class='valn text-right'>1 706</td></tr><tr><td class='valn text-right'>Junction GA_AT</td><td class='valn text-right'>981</td></tr><tr><td class='valn text-right'>Junction GC_AG</td><td class='valn text-right'>868</td></tr><tr><td class='valn text-right'>Junction CT_CA</td><td class='valn text-right'>669</td></tr><tr><td class='valn text-right'>Junction NN_NN</td><td class='valn text-right'>536</td></tr><tr><td class='valn text-right'>Other junctions</td><td class='valn text-right'>14 726</td></tr><tr><td class='valn text-right'>Canonical junction (GT_AG or CT_AC)</td><td class='valn text-right'>108 231</td></tr></tbody></table>  
+            </div>
+        </div>  
+
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Detected introns</h5>
+                <span class="anchor" id="candidatstat"></span>
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number</td><td class='valn text-right'>13 419</td></tr><tr><td class='valn'>Min length</td><td class='valn text-right'>20</td></tr><tr><td class='valn'>Max length</td><td class='valn text-right'>10 230</td></tr><tr><td class='valn'>Mean length</td><td class='valn text-right'>520.85</td></tr><tr><td class='valn'>Min depth</td><td class='valn text-right'>1</td></tr><tr><td class='valn'>Max depth</td><td class='valn text-right'>4 385</td></tr><tr><td class='valn'>Mean depth</td><td class='valn text-right'>9.52</td></tr></tbody></table>
+            </div>  
+            <div class="mt-4 mr-0 pl-0 col-md-8">
+                <h5>Detected introns depth distribution</h5>
+                <span class="anchor" id="candidatstat"></span>
+<div>                            <div id="2246c372-b82e-41eb-bfc0-a8640f2d4fc6" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("2246c372-b82e-41eb-bfc0-a8640f2d4fc6")) {                    Plotly.newPlot(                        "2246c372-b82e-41eb-bfc0-a8640f2d4fc6",                        [{"name":"Candidats depth","opacity":0.85,"x":[1.0,9.768,18.536,27.304000000000002,36.072,44.84,53.608000000000004,62.376000000000005,71.144,79.912,88.68,97.44800000000001,106.21600000000001,114.98400000000001,123.75200000000001,132.52,141.288,150.056,158.824,167.592,176.36,185.12800000000001,193.89600000000002,202.66400000000002,211.43200000000002,220.20000000000002,228.96800000000002,237.73600000000002,246.50400000000002,255.27200000000002,264.04,272.808,281.576,290.34400000000005,299.112,307.88,316.648,325.41600000000005,334.184,342.952,351.72,360.48800000000006,369.25600000000003,378.024,386.79200000000003,395.56000000000006,404.32800000000003,413.096,421.86400000000003,430.63200000000006,439.40000000000003,448.168,456.93600000000004,465.70400000000006,474.47200000000004,483.24,492.00800000000004,500.77600000000007,509.54400000000004,518.312,527.08,535.8480000000001,544.616,553.384,562.152,570.9200000000001,579.6880000000001,588.456,597.224,605.9920000000001,614.76,623.528,632.296,641.0640000000001,649.8320000000001,658.6,667.368,676.1360000000001,684.904,693.672,702.44,711.2080000000001,719.9760000000001,728.744,737.5120000000001,746.2800000000001,755.048,763.816,772.5840000000001,781.3520000000001,790.1200000000001,798.888,807.6560000000001,816.4240000000001,825.192,833.96,842.7280000000001,851.4960000000001,860.2640000000001,869.032,877.8000000000001,886.5680000000001,895.336,904.104,912.8720000000001,921.6400000000001,930.4080000000001,939.176,947.9440000000001,956.7120000000001,965.48,974.248,983.0160000000001,991.7840000000001,1000.5520000000001,1009.32,1018.0880000000001,1026.856,1035.624,1044.392,1053.16,1061.928,1070.6960000000001,1079.4640000000002,1088.232,1097.0,1105.768,1114.536,1123.304,1132.0720000000001,1140.8400000000001,1149.6080000000002,1158.3760000000002,1167.144,1175.912,1184.68,1193.448,1202.2160000000001,1210.9840000000002,1219.7520000000002,1228.52,1237.288,1246.056,1254.824,1263.592,1272.3600000000001,1281.1280000000002,1289.8960000000002,1298.6640000000002,1307.432,1316.2,1324.968,1333.736,1342.5040000000001,1351.2720000000002,1360.0400000000002,1368.808,1377.576,1386.344,1395.112,1403.88,1412.6480000000001,1421.4160000000002,1430.1840000000002,1438.9520000000002,1447.72,1456.488,1465.256,1474.0240000000001,1482.7920000000001,1491.5600000000002,1500.3280000000002,1509.096,1517.864,1526.632,1535.4,1544.1680000000001,1552.9360000000001,1561.7040000000002,1570.4720000000002,1579.2400000000002,1588.008,1596.776,1605.544,1614.3120000000001,1623.0800000000002,1631.8480000000002,1640.6160000000002,1649.384,1658.152,1666.92,1675.688,1684.4560000000001,1693.2240000000002,1701.9920000000002,1710.7600000000002,1719.5280000000002,1728.296,1737.064,1745.832,1754.6000000000001,1763.3680000000002,1772.1360000000002,1780.9040000000002,1789.672,1798.44,1807.208,1815.976,1824.7440000000001,1833.5120000000002,1842.2800000000002,1851.0480000000002,1859.8160000000003,1868.584,1877.352,1886.1200000000001,1894.8880000000001,1903.6560000000002,1912.4240000000002,1921.1920000000002,1929.96,1938.728,1947.496,1956.2640000000001,1965.0320000000002,1973.8000000000002,1982.5680000000002,1991.3360000000002,2000.1040000000003,2008.872,2017.64,2026.4080000000001,2035.1760000000002,2043.9440000000002,2052.712,2061.48,2070.248,2079.016,2087.784,2096.552,2105.32,2114.088,2122.856,2131.6240000000003,2140.3920000000003,2149.1600000000003,2157.9280000000003,2166.6960000000004,2175.464,2184.232,2193.0,2201.768,2210.536,2219.304,2228.072,2236.84,2245.608,2254.376,2263.1440000000002,2271.9120000000003,2280.6800000000003,2289.4480000000003,2298.2160000000003,2306.9840000000004,2315.7520000000004,2324.52,2333.288,2342.056,2350.824,2359.592,2368.36,2377.128,2385.896,2394.664,2403.4320000000002,2412.2000000000003,2420.9680000000003,2429.7360000000003,2438.5040000000004,2447.2720000000004,2456.04,2464.808,2473.576,2482.344,2491.112,2499.88,2508.648,2517.416,2526.184,2534.952,2543.7200000000003,2552.4880000000003,2561.2560000000003,2570.0240000000003,2578.7920000000004,2587.5600000000004,2596.3280000000004,2605.096,2613.864,2622.632,2631.4,2640.168,2648.936,2657.704,2666.472,2675.2400000000002,2684.0080000000003,2692.7760000000003,2701.5440000000003,2710.3120000000004,2719.0800000000004,2727.8480000000004,2736.616,2745.384,2754.152,2762.92,2771.688,2780.456,2789.224,2797.992,2806.76,2815.5280000000002,2824.2960000000003,2833.0640000000003,2841.8320000000003,2850.6000000000004,2859.3680000000004,2868.1360000000004,2876.9040000000005,2885.672,2894.44,2903.208,2911.976,2920.744,2929.512,2938.28,2947.0480000000002,2955.8160000000003,2964.5840000000003,2973.3520000000003,2982.1200000000003,2990.8880000000004,2999.6560000000004,3008.4240000000004,3017.192,3025.96,3034.728,3043.496,3052.264,3061.032,3069.8,3078.568,3087.3360000000002,3096.1040000000003,3104.8720000000003,3113.6400000000003,3122.4080000000004,3131.1760000000004,3139.9440000000004,3148.7120000000004,3157.4800000000005,3166.248,3175.016,3183.784,3192.552,3201.32,3210.088,3218.856,3227.6240000000003,3236.3920000000003,3245.1600000000003,3253.9280000000003,3262.6960000000004,3271.4640000000004,3280.2320000000004,3289.0000000000005,3297.768,3306.536,3315.304,3324.072,3332.84,3341.608,3350.376,3359.1440000000002,3367.9120000000003,3376.6800000000003,3385.4480000000003,3394.2160000000003,3402.9840000000004,3411.7520000000004,3420.5200000000004,3429.2880000000005,3438.0560000000005,3446.824,3455.592,3464.36,3473.128,3481.896,3490.664,3499.4320000000002,3508.2000000000003,3516.9680000000003,3525.7360000000003,3534.5040000000004,3543.2720000000004,3552.0400000000004,3560.8080000000004,3569.5760000000005,3578.344,3587.112,3595.88,3604.648,3613.416,3622.184,3630.952,3639.7200000000003,3648.4880000000003,3657.2560000000003,3666.0240000000003,3674.7920000000004,3683.5600000000004,3692.3280000000004,3701.0960000000005,3709.8640000000005,3718.6320000000005,3727.4,3736.168,3744.936,3753.704,3762.472,3771.2400000000002,3780.0080000000003,3788.7760000000003,3797.5440000000003,3806.3120000000004,3815.0800000000004,3823.8480000000004,3832.6160000000004,3841.3840000000005,3850.1520000000005,3858.92,3867.688,3876.456,3885.224,3893.992,3902.76,3911.5280000000002,3920.2960000000003,3929.0640000000003,3937.8320000000003,3946.6000000000004,3955.3680000000004,3964.1360000000004,3972.9040000000005,3981.6720000000005,3990.4400000000005,3999.2080000000005,4007.976,4016.744,4025.512,4034.28,4043.0480000000002,4051.8160000000003,4060.5840000000003,4069.3520000000003,4078.1200000000003,4086.8880000000004,4095.6560000000004,4104.424,4113.192,4121.96,4130.728,4139.496,4148.264,4157.032,4165.8,4174.568,4183.336,4192.104,4200.872,4209.64,4218.408,4227.176,4235.944,4244.712,4253.4800000000005,4262.2480000000005,4271.0160000000005,4279.784000000001,4288.552000000001,4297.320000000001,4306.088000000001,4314.856000000001,4323.624000000001,4332.392000000001,4341.160000000001,4349.928,4358.696,4367.464,4376.232],"y":[11564,820,320,177,111,79,63,42,34,21,21,15,8,14,12,13,2,13,3,5,6,4,1,3,1,5,1,5,1,1,3,1,3,3,2,3,3,2,0,4,1,3,1,0,0,2,0,1,1,0,0,0,0,0,2,0,1,0,0,0,1,1,0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],"type":"bar"}],                        {"margin":{"b":20,"l":50,"pad":0,"r":50,"t":30},"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmapgl":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmapgl"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"xaxis":{"title":{"text":"Detected introns depth"}},"yaxis":{"title":{"text":"Number of detected introns"}}},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+        </div>  
+
+
+        <div class="d-flex"> 
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Filtered detected introns</h5>
+                <span class="anchor" id="filtered_detected_introns"></span>
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>Number</td><td class='valn text-right'>1 598</td></tr><tr><td class='valn'>Filtered because of depth (<= 1)</td><td class='valn text-right'>11 163</td></tr><tr><td class='valn'>Filtered because of length (>= 80%)</td><td class='valn text-right'>1 545</td></tr><tr><td class='valn'>Filtered because of non canonical junction</td><td class='valn text-right'>4 708</td></tr><tr><td class='valn'>Filtered because of overlapping introns</td><td class='valn text-right'>159</td></tr><tr><td class='valn'>Min length</td><td class='valn text-right'>20</td></tr><tr><td class='valn'>Max length</td><td class='valn text-right'>10 230</td></tr><tr><td class='valn'>Mean length</td><td class='valn text-right'>726.9</td></tr><tr><td class='valn'>Min depth</td><td class='valn text-right'>2</td></tr><tr><td class='valn'>Max depth</td><td class='valn text-right'>2 058</td></tr><tr><td class='valn'>Mean depth</td><td class='valn text-right'>23.54</td></tr></tbody></table>
+            </div>
+        </div>
+    
+        <div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-4">
+            <h5>Top 10 of contigs with the highest number of detected introns</h5>
+                <span class="anchor" id="too_complex_detected"></span>
+
+            <table class="table table-striped table-bordered table-sm mb-0 " style="width:100%">
+        	    <tbody>
+<tr><td class='valn'>GJDA01102960.1</td><td class='valn text-right'>4 PASS; 1 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJDA01039682.1</td><td class='valn text-right'>3 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJDA01070112.1</td><td class='valn text-right'>3 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJDA01082141.1</td><td class='valn text-right'>3 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJDA01009720.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJDA01013964.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJDA01019754.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJDA01027644.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJDA01031707.1</td><td class='valn text-right'>2 PASS; 1 DP; 0 IO; 0 SS; 0 LEN</td></tr><tr><td class='valn'>GJDA01040087.1</td><td class='valn text-right'>2 PASS; 0 DP; 0 IO; 0 SS; 0 LEN</td></tr></tbody></table>  
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
+            <h1 class="h4">Glossary</h1>
+                <span class="anchor" id="glossary"></span>
+        </div>
+		<div class="d-flex">
+            <div class="mt-4 mr-0 pl-0 col-md-12">
+                <span class="anchor" id="glossary"></span>
+                This glossary reflects terms used in this report:<br>
+                <strong>Candidat</strong>        : Detected/predicted introns filtrered by canonical junction, length and depth.</br>
+                <strong>Canonic junction</strong>: GT_AG or CT_AC for donor and acceptor sites.</br>
+                <strong>Contig</strong>          : A set of overlapping DNA segments that together represent a consensus region of DNA (source :Wikipedia)</br>
+                <strong>Exon</strong>            : Coding part of DNA that is translated into protein.</br>
+                <strong>Features</strong>        : A sequenced chain of nucleic acids which provide protein(s). (source:https://biologydictionary.net/gene/)</br>
+                <strong>Fragment</strong>        : During sequencing, the fragment is a link between fowarded and reverse reads.</br>                
+                <strong>Intron</strong>          : Any nucleotide sequence removed by RNA splicing during maturation of RNA. (source : Wikipedia)</br>
+                <strong>Reads</strong>           : An inferred sequence of base pairs corresponding to all or part of a single DNA fragment.  (source : Wikipedia)</br>
+                <strong>Sequence</strong>        : Base pair probabilities of a DNA fragment.</br>
+                <strong>Splice events</strong>   : a process where exons may be included within or excluded from the final mRNA.</br>
+                <strong>Trimmed contig</strong>  : Contig without retained intron(s).</br>
+                <br>
+                <img src="https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/raw/master/doc/IntronSeeker-glossary.png" alt="intronSeeker glossary" style="width:825;height:245;">
+            </div>
+        </div>  
+<br/>
+        </main>
+      </div>
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script type="text/javascript" language="javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js " integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Datatable -->
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" language="javascript">
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+  </body>
+</html>
