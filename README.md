@@ -109,27 +109,28 @@ intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-
 
 ##### Generate a intronSeeker simulation report
 
-```diff
-    conda activate Iseeker_environment
-    intronSeeker buildReport -F --config_file /path/to/buildReport_example.cfg 
-```
-
-Configuration file
+Create a configuration file buildReport_example.cfg :
 
 ```diff
-    more sampleFile.cfg
-    [Defaults]
-    fasta:/path/to/ref.fsa_nt
-    r1:/path/to/SRR_1.fastq
-    r2:/path/to/SRR_2.fastq
-    flagstat:/path/to/hisat2_SRR.sort.flagstat.txt
-    candidat:/path/to/srs_SRR_candidates.txt
-    split:/path/to/srs_SRR_split_alignments.txt
-    prefix:prefix
-    threads:6             
-    output:/path/to/HTML/
-    force: -F
+[Defaults]
+ fasta:data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+ r1:data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+ r2:data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+ flagstat:data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.flagstat.txt
+ candidat:data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt
+ split:data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_split_alignments.txt
+ prefix:prefix
+ threads:6             
+ output:HTML/
+ force: -F
 ```
+
+```diff
+    intronSeeker buildReport -F --config_file data/Reduced_real_dataset/buildReport_example.cfg 
+```
+
+Your HTML simulation report is available in HTML directory.
+
 ## Wrappers description
 
 |  Program / wrapper    |     Description      |      
