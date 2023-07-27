@@ -119,7 +119,7 @@ Create a configuration file buildReport_example.cfg :
  flagstat:data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.flagstat.txt
  candidat:data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt
  split:data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_split_alignments.txt
- prefix:prefix
+ prefix:Cele
  threads:6             
  output:HTML/
  force: -F
