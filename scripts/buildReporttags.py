@@ -417,20 +417,6 @@ def get_html_seq_descr_real(global_stat:dict, df_fasta:dict):
 '''
     return r
 
-
-def get_html_abundance(df_fasta:dict, title):
-    r = '''
-        <div class="d-flex">
-            <div class="mt-4 mr-0 pl-0 col-md-12">
-                <h5>'''+title+'''</h5>
-                <span class="anchor" id="abundstat"></span>
-'''+plot_abondance_model(df_fasta)+'''
-            </div>
-        </div>    
-'''
-    return r
-
-
 def get_html_reads_descr(global_stat_fastq : dict, df_library:dict):
     r = '''
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mt-5 pb-2 border-bottom">
@@ -467,19 +453,6 @@ def get_html_flagstat_descr(global_stat_flagstat:dict):
 '''
     return r
    
-def get_html_table_descr(global_stats_table):
-    r = '''
-		<div class="d-flex">
-            <div class="mt-4 mr-4 pl-0 col-md-4">
-            <h5>TO COMPLETE</h5>
-                <span class="anchor" id="assemblystat"></span>
-'''+dict_to_table(global_stats_table,-1,2)+'''
-            </div>
-        </div>
-'''
-    return r
-
-
 # Results
 def get_html_results():
     r = '''

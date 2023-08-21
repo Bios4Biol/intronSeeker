@@ -66,40 +66,6 @@ def plot_hist_contigs_len(fastaContigsLen, mFastaContigsLen):
     )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
-# SARAH 01/2021    
-def plot_hist_contigs_len_real_data(fastaContigsLen):
-    """
-    plot_hist_contigs_len function plot an histogram of contigs length from fasta and modified fasta contigs length data.
-    """
-    contigs = go.Histogram(
-        x=fastaContigsLen,
-        name='Contigs',
-        opacity=0.75
-    )
-    data = [contigs]
-    layout = go.Layout(
-        xaxis=dict(
-            title='Contigs length'
-        ),
-        yaxis=dict(
-            title='Number of contigs'
-        ),
-        bargap=0.2,
-        bargroupgap=0.1
-    )
-    fig = go.Figure(data=data, layout=layout)
-    fig.update_layout(
-        margin=go.layout.Margin(
-            l=50,
-            r=50,
-            b=20,
-            t=30,
-            pad=0
-        )
-    )
-    return py.offline.plot(fig, include_plotlyjs=False, output_type='div')    
-
-
 def plot_hist(values:dict, title:str, xtitle:str, ytitle:str):
     """
     plot_hist function is a reusable function to plot an histogram.
@@ -249,20 +215,3 @@ def plot_abondance_model(df_fasta:dict) :
         )
     )
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
-
-
-def pourcent(str_mapping:str, tot:int):
-    """
-    pourcent function return int from flagstat HISAT2/STAR mapping in string format 
-    (only for the last 3 values : Mapped, Properly paired, Singletons)
-    """
-    mapping=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str_mapping)
-    val=(int(mapping)*100)/tot
-    return val
-
-def nbWithoutPourcent(str_mapping:str):
-    """
-    nbWithoutPourcent function format a string to remove this substring : (nb %)
-    """
-    val=re.sub(r'(\([a-zA-Z0-9_]*.[a-zA-Z0-9_]*%\))', r" ", str_mapping)
-    return val

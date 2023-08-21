@@ -193,15 +193,6 @@ def merge_split(contig_reads) :
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
 
-def class_event(event) :
-    if np.isnan(event.start_cand):
-        return 'FN'
-    elif np.isnan(event.start_ctrl) :
-        return 'FP'
-    elif 
-    
-    
-
 def alignment_analysis(args_dict) :
             # For each contig, we calculate the transcript length (i.e. only the exons total length)
             print("contig computation")

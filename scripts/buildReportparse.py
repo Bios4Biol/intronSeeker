@@ -275,22 +275,6 @@ def compute_pos_on_mfasta(df_features, df_mfasta) :
     flanks = str(c_seq[df_features.start-1:df_features.start+1])+"_"+str(c_seq[df_features.end-2:df_features.end])
     
     return pd.Series([flanks,pos_on_contig],index=["flanks","pos_on_contig"])
-        
-
-def parse_rank_file(rank_file) :
-    """
-    parse_rank_file function parse input rank_file to return ranks dataframe
-    """
-    with open(rank_file,"r") as rf :
-        for line in rf.read().rstrip().split("\n") :
-            if line.startswith('#') :
-                names = line.lstrip("# ").split("\t")
-                names[1] = 'contig'
-                ranks = []
-            else :
-                ranks.append(line.split("\t"))
-    return pd.DataFrame(data=ranks, columns=names).set_index(names[1]).sort_index()
-
 
 def run_assemblathon(fasta : str ) :
     """

@@ -39,19 +39,6 @@ except ImportError as error :
     print(error) ;
     exit(1) ;
 
-def change_key(dictionary: dict, key_to_clean: dict):
-    """
-    Change key dict name
-
-    :param dictionary: dictionary to change keys
-    :param key_to_clean: dictionary of new keys associate to previous keys
-    :return: clean dictionary
-    """
-    for clef, value in key_to_clean.items():
-        if clef in dictionary:
-            dictionary[value] = dictionary.pop(clef)
-    return dictionary
-
 
 #######################
 # Extract split reads #
@@ -715,22 +702,4 @@ def parseDiamondXML(diamXml : str,output : str) :
         ofile.write("\n".join(gff)+"\n") ;
     with open(output+".alignments.gff","w") as o2file :
         o2file.write("\n".join(align_gff)+"\n") ;
-
-def searchProtein(fasta : str, dbprotein : str, output : str, threads : int, rm = False) :
-    """
-    Run all the Protein analysis to search potential introns (i.e. long gaps beetween contigs and proteins
-    :param fasta: Name of the fasta file which contains contigs.
-    :param dbprotein: Name of the Diamond proteic database.
-    :param output: Name of the ouput file.
-    :param threads: Number of threads used for the alignment.
-    :param rm : Boolean which rules the temporary files erasure.
-    """
-    outdir = output + "_protein" ;
-    os.system("makedirs " + outdir) ;
-    path_to_output = outdir + "/" + output ;
-    
-    runDiamond(fasta, dbprotein, path_to_output, threads) ;
-    parseDiamondXML(path_to_output+".tmp.xml", path_to_output) ;
-    if not rm :
-        os.system("rm {outdir}/*.tmp.*".format(outdir=outdir)) ;
 
