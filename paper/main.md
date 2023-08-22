@@ -125,7 +125,7 @@ Different GBS simulations where performed to find the best possible thresholds f
 
 ![GBS parameters impacts](paper/Figures/GBS_params_impacts.png)
 
-IntronSeeker parameters impacts. Graphics have been built on 10 samples of Arabidopsis thaliana data with powerlow abundance (1.2).
+IntronSeeker parameters impacts. Graphics have been built on 10 samples of Arabidopsis thaliana data with powerlow abundance (1.2). Details are available in data/ directory.
 
 **A** Coverage impact on detection: Increasing the coverage allows to quickly lose false candidates with a very limited impact on the number of true candidates (Arabidopsis thaliana data, powerlow abundance).
 
