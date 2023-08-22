@@ -127,12 +127,12 @@ Different GBS simulations where performed to find the best possible thresholds f
 
 IntronSeeker parameters impacts. Graphics have been built on 10 samples of Arabidopsis thaliana data with powerlow abundance (1.2).
 
-**A** Coverage impact on detection: Increasing the coverage allows to quickly lose false candidates with a very limited impact on the number of true candidates (Arabidopsis thaliana data, powerlow abundance).\
+**A** Coverage impact on detection: Increasing the coverage allows to quickly lose false candidates with a very limited impact on the number of true candidates (Arabidopsis thaliana data, powerlow abundance).
 
-**B** Filter candidates on border improve detection. DPratio =DPin/(DPbefore+DPafter)\
+**B** Filter candidates on border improve detection. DPratio =DPin/(DPbefore+DPafter)
 
-**C** Filter candidates on candidat length.\
+**C** Filter candidates on candidat length.
 
-**D** Filter candidates on retained intron ratio (long contig / long candidat).\
+**D** Filter candidates on retained intron ratio (long contig / long candidat).
 
 
