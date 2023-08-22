@@ -1,7 +1,7 @@
 Setting default detection parameters
 ----------------------------------------------------
 
-##### A Coverage impact on detection.
+##### Graph A/ Coverage impact on detection.
 
 Increasing the coverage allows to quickly lose false candidates with a very limited impact on the number of true candidates (Arabidopsis thaliana data, powerlow abundance).
 
@@ -68,7 +68,7 @@ fig.write_image("images/nb_false_by_coverage_PW_10samples.svg")
 fig.write_html("images/nb_false_by_coverage_PW_10samples.html")
 ```
 
-##### B Filter candidates on border improve detection.
+##### Graph B/ Filter candidates on border improve detection.
 
 DPratio = DPin/(DPbefore+DPafter)
 
@@ -105,7 +105,7 @@ if not os.path.exists("images"):
 plt.savefig("images/PW_violin_DP_10samples.svg")
 ```
 
-##### C Filter candidates on candidat length.
+##### Graph C/ Filter candidates on candidat length.
 
 Script to generate this graphic:
 
@@ -136,7 +136,7 @@ if not os.path.exists("images"):
 plt.savefig("images/PW_violin_lCd_10samples.svg")
 ```
 
-##### D Filter candidates on retained intron ratio.
+##### Graph D/ Filter candidates on retained intron ratio.
 
 Retained intron ratio = (len contig / len candidat)
 
