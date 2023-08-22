@@ -133,6 +133,6 @@ IntronSeeker parameters impacts. Graphics have been built on 10 samples of Arabi
 
 **C** Filter candidates on candidat length.
 
-**D** Filter candidates on retained intron ratio (long contig / long candidat).
+**D** Filter candidates on retained intron ratio (len contig / len candidat).
 
 
