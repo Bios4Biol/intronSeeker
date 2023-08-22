@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ./complete_candidat_file_V3.sh   srs_Athal_pw-02_d1_HISAT2_candidates.txt  gbs_Athal_pw-02_d1_transcripts-modified.fa  gbs_Athal_pw-02_d1_transcripts-modified.gtf
+# Example of run:
 #  ./complete_candidat_file.sh  srs_Ggal_d2_sample_1_HISAT2_candidates_HEAD20.txt  gbs_Ggal_d2_sample_1_transcripts-modified_HEAD2000.fa    gbs_Ggal_d2_sample_1_transcripts-modified_HEAD100.gtf
 
 # get fasta length
@@ -26,18 +26,12 @@ grep  -v '^#' candidates.Cglen.ri.Cdlen.txt | sed 's/\t/,/g' - > candidates.Cgle
 # awk -v col14=14 -v col13=13 -v col11=11 '{($col11 ? $col14=($col13/$col11)*100 : 0);}1'  candidates.Cglen.ri.Cdlen.txt > candidates.Cglen.ri.Cdlen_ircg.txt
 # sed -i 's/ /\t/g' candidates.Cglen.ri.Cdlen_ircg.txt;
 
-# supplementary analysis
+## supplementary analysis
 
 # count lines
 wc fasta.length introns.txt candidates.txt  contigs.length  candidates.Cglen.intron.txt  > count_lines.out
 
 # Filter on depth d >=1
-#for i in {1..5}
-#do
-#    awk '$5>="$i"' candidates.Cglen.ri.Cdlen.txt > candidates.Cglen.ri.Cdlen_min"$i".txt;
-#    awk '$5>="$i"' candidates.Cglen.intron.txt > candidates.Cglen.intron_min"$i".txt
-#done
-
 awk '$5>=0' candidates.Cglen.ri.Cdlen.txt | grep -v '^#' - | sed 's/\t/,/g'  - > candidates.Cglen.ri.Cdlen_min0_withoutHeader.csv;
 awk '$5>=1' candidates.Cglen.ri.Cdlen.txt | grep -v '^#' - | sed 's/\t/,/g'  - > candidates.Cglen.ri.Cdlen_min1_withoutHeader.csv;
 awk '$5>=2' candidates.Cglen.ri.Cdlen.txt | grep -v '^#' - | sed 's/\t/,/g'  - > candidates.Cglen.ri.Cdlen_min2_withoutHeader.csv;
