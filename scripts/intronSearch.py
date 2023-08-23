@@ -106,7 +106,6 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
         split_reads=[]
         contig_seq = ref_dict.fetch(ref_id)
         for read in aligned:
-            #sarah
             foot = True
             if read.cigarstring is not None and "N" in read.cigarstring and "I" not in read.cigarstring:
                 #print('cigar string', read.cigarstring)
@@ -123,7 +122,6 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
                 # Remove reads with cigarM1 or cigarM2 < minfootsize       
                 if min(cigarM1,cigarM2) < minfootsize:
                     foot = False
-                    #print('READ TO REMOVE :', min(cigarM1,cigarM2), 'read: ', read.query_name,' and cigar', cigar )
                 else:
                     foot = True    
 
