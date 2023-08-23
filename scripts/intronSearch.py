@@ -101,8 +101,11 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
     split_reads=[]
     split_alignments = []
     candidates=[]
+    j=0
     for ref_id in ref_id_list:
+        j = j + 1
         aligned = bamfile.fetch(ref_id, multiple_iterators=True)
+        print_to_stdout('FS - fetch: ',datetime.datetime.now(), boucle, j)
         split_reads=[]
         contig_seq = ref_dict.fetch(ref_id)
         for read in aligned:
