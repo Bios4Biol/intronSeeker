@@ -204,6 +204,23 @@ Contig without retained intron(s)
 
 Table: Trimmed fasta file description.
 
+## Grinder file
+
+Grinder file is an input to simulate data with FRS (Full Random Simulation) or GBS (GTF based simulation).
+All parameters are described here: https://sourceforge.net/projects/biogrinder/files/
+
+Here are a few examples:
+-cf 100               # Fold coverage (100X)
+#-tr 2000000          # Choose either  "tr" or "cf" parameter. tr is the number of reads to generate for each library.
+-rd 100 normal 7.5    # Read length distribution
+-id 500 normal 250    # Insert distribution
+-mo FR                # Mate orientation
+-md poly4 3e-3 3.3e-8 # Mutation distribution
+-mr 80 20             # Mutation ratio
+-am uniform           # Abundance model : -am uniform for an homogen distribution, or -am powerlaw 0.5 for a powerlaw distribution
+-fq 1                 # Generated reads in FASTQ format
+-ql 32 2              # Quality levels
+
 
 # IntronSeeker report
 
