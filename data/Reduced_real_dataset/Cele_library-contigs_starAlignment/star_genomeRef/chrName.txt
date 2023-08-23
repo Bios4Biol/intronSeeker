@@ -1,0 +1,13 @@
+CL1019Contig1_1
+CL109Contig2_1
+CL104Contig1_1
+CL1095Contig1_2
+CL1292Contig1_1
+CL1056Contig1_1
+CL1119Contig1_1
+CL50Contig1_2
+CL419Contig1_1
+CL1Contig5_1
+k69_Locus_16804_Transcript_1_1
+k25_Locus_11027_Transcript_1_1
+CL615Contig1_1

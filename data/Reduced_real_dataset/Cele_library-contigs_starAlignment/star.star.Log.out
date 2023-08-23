@@ -1,0 +1,160 @@
+STAR version=2.7.3a
+STAR compilation time,server,dir=Tue Oct 8 14:26:19 EDT 2019 vega:/home/dobin/data/STAR/STARcode/STAR.master/source
+##### Command Line:
+STAR --genomeDir data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star_genomeRef --runThreadN 1 --outSAMstrandField intronMotif --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outFileNamePrefix data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star.star. --readFilesIn data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz --readFilesCommand zcat
+##### Initial USER parameters from Command Line:
+outFileNamePrefix                 data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star.star.
+###### All USER parameters from Command Line:
+genomeDir                     data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star_genomeRef     ~RE-DEFINED
+runThreadN                    1     ~RE-DEFINED
+outSAMstrandField             intronMotif     ~RE-DEFINED
+outSAMtype                    BAM   SortedByCoordinate        ~RE-DEFINED
+outSAMunmapped                Within        ~RE-DEFINED
+outFileNamePrefix             data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star.star.     ~RE-DEFINED
+readFilesIn                   data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz   data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz        ~RE-DEFINED
+readFilesCommand              zcat        ~RE-DEFINED
+##### Finished reading parameters from all sources
+
+##### Final user re-defined parameters-----------------:
+runThreadN                        1
+genomeDir                         data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star_genomeRef
+readFilesIn                       data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz   data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz   
+readFilesCommand                  zcat   
+outFileNamePrefix                 data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star.star.
+outSAMtype                        BAM   SortedByCoordinate   
+outSAMstrandField                 intronMotif
+outSAMunmapped                    Within   
+
+-------------------------------
+##### Final effective command line:
+STAR   --runThreadN 1   --genomeDir data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star_genomeRef   --readFilesIn data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz   data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz      --readFilesCommand zcat      --outFileNamePrefix data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star.star.   --outSAMtype BAM   SortedByCoordinate      --outSAMstrandField intronMotif   --outSAMunmapped Within   
+----------------------------------------
+
+
+   Input read files for mate 1, from input string data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+-rw-rw-r--. 1 smaman smaman 7827751  9 mars  15:29 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+
+   readsCommandsFile:
+exec > "data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star.star._STARtmp/tmp.fifo.read1"
+echo FILE 0
+zcat      "data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz"
+
+
+   Input read files for mate 2, from input string data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+-rw-rw-r--. 1 smaman smaman 7782754  9 mars  15:29 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+
+   readsCommandsFile:
+exec > "data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star.star._STARtmp/tmp.fifo.read2"
+echo FILE 0
+zcat      "data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz"
+
+WARNING --outSAMstrandField=intronMotif, therefore STAR will output XS attribute
+WARNING: --limitBAMsortRAM=0, will use genome size as RAM limit for BAM sorting
+Finished loading and checking parameters
+Reading genome generation parameters:
+### STAR   --runMode genomeGenerate   --runThreadN 1   --genomeDir data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star_genomeRef   --genomeFastaFiles data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta      --genomeSAindexNbases 6   --outFileNamePrefix data/Reduced_real_dataset/Cele_library-contigs_starAlignment/star.star.
+### GstrandBit=32
+versionGenome                 2.7.1a     ~RE-DEFINED
+genomeFastaFiles              data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta        ~RE-DEFINED
+genomeSAindexNbases           6     ~RE-DEFINED
+genomeChrBinNbits             18     ~RE-DEFINED
+genomeSAsparseD               1     ~RE-DEFINED
+sjdbOverhang                  0     ~RE-DEFINED
+sjdbFileChrStartEnd           -        ~RE-DEFINED
+sjdbGTFfile                   -     ~RE-DEFINED
+sjdbGTFchrPrefix              -     ~RE-DEFINED
+sjdbGTFfeatureExon            exon     ~RE-DEFINED
+sjdbGTFtagExonParentTranscripttranscript_id     ~RE-DEFINED
+sjdbGTFtagExonParentGene      gene_id     ~RE-DEFINED
+sjdbInsertSave                Basic     ~RE-DEFINED
+genomeFileSizes               3407872   163263        ~RE-DEFINED
+Genome version is compatible with current STAR
+Number of real (reference) chromosomes= 13
+1	CL1019Contig1_1	4614	0
+2	CL109Contig2_1	1009	262144
+3	CL104Contig1_1	3242	524288
+4	CL1095Contig1_2	1956	786432
+5	CL1292Contig1_1	1552	1048576
+6	CL1056Contig1_1	917	1310720
+7	CL1119Contig1_1	214	1572864
+8	CL50Contig1_2	1695	1835008
+9	CL419Contig1_1	1745	2097152
+10	CL1Contig5_1	967	2359296
+11	k69_Locus_16804_Transcript_1_1	206	2621440
+12	k25_Locus_11027_Transcript_1_1	1193	2883584
+13	CL615Contig1_1	479	3145728
+Started loading the genome: Tue May  5 17:17:11 2020
+
+Genome: size given as a parameter = 3407872
+SA: size given as a parameter = 163263
+SAindex: size given as a parameter = 1
+Read from SAindex: pGe.gSAindexNbases=6  nSAi=5460
+nGenome=3407872;  nSAbyte=163263
+GstrandBit=32   SA number of indices=39578
+Shared memory is not used for genomes. Allocated a private copy of the genome.
+Genome file size: 3407872 bytes; state: good=1 eof=0 fail=0 bad=0
+Loading Genome ... done! state: good=1 eof=0 fail=0 bad=0; loaded 3407872 bytes
+SA file size: 163263 bytes; state: good=1 eof=0 fail=0 bad=0
+Loading SA ... done! state: good=1 eof=0 fail=0 bad=0; loaded 163263 bytes
+Loading SAindex ... done: 23955 bytes
+Finished loading the genome: Tue May  5 17:17:11 2020
+
+alignIntronMax=alignMatesGapMax=0, the max intron size will be approximately determined by (2^winBinNbits)*winAnchorDistNbins=589824
+Starting to map file # 0
+mate 1:   data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+mate 2:   data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+Thread #0 end of input stream, nextChar=-1
+BAM sorting: 269138 mapped reads
+BAM sorting bins genomic start loci:
+1	2	8
+2	2	344
+3	2	2432
+4	2	2898
+5	3	382
+6	3	555
+7	3	1641
+8	3	1685
+9	3	1729
+10	3	1783
+11	3	1824
+12	5	555
+13	9	81
+14	9	118
+15	9	159
+16	9	178
+17	9	211
+18	9	240
+19	9	258
+20	9	267
+21	9	285
+22	9	308
+23	9	319
+24	9	333
+25	9	345
+26	9	359
+27	9	372
+28	9	389
+29	9	421
+30	9	437
+31	9	453
+32	9	468
+33	9	492
+34	9	513
+35	9	526
+36	9	542
+37	9	552
+38	9	574
+39	9	601
+40	9	625
+41	9	652
+42	9	684
+43	9	716
+44	9	739
+45	9	752
+46	9	799
+47	9	836
+48	9	879
+Completed: thread #0
+May 05 17:17:17 ..... started sorting BAM
+Max memory needed for sorting = 1668800
+ALL DONE!
