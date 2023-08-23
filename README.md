@@ -208,6 +208,7 @@ Table: Trimmed fasta file description.
 
 Grinder file is an input to simulate data with FRS (Full Random Simulation) or GBS (GTF based simulation).
 All parameters are described here: https://sourceforge.net/projects/biogrinder/files/
+A grinder file is given for example:  config/grinder_frs.cfg 
 
 Here are a few examples:
 -cf 100               # Fold coverage (100X)
