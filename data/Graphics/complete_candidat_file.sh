@@ -1,5 +1,23 @@
 #!/bin/bash
 
+#<IntronSeeker searches introns by splice-realigning reads on contigs.>
+#Copyright (C) <2019> INRAE
+#<Sarah Maman, Philippe Bardou, Emilien Lasguignes, Faustine Oudin, Floréal Cabanettes, Christophe Klopp>
+#
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+#
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
 # Example of run:
 #  ./complete_candidat_file.sh  srs_Ggal_d2_sample_1_HISAT2_candidates.txt  gbs_Ggal_d2_sample_1_transcripts-modified.fa    gbs_Ggal_d2_sample_1_transcripts-modified.gtf path/to/data path/to/outputDir
 
