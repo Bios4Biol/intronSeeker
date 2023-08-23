@@ -83,7 +83,9 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
     :param bamfilename: AlignmentFile object with all reads alignment information
     :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
     """
+    #print_to_stdout('FS - Begin find split : ',datetime.datetime.now())
     bamfile = pysam.AlignmentFile(bamfile, "rb")
+    #print_to_stdout('FS - pysam bam : ',datetime.datetime.now())
     try :
         ref_dict = pysam.FastaFile(fastafile)
     except OSError as e :
@@ -93,18 +95,17 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
         else :
             print(e)
         exit(1)
-    
+    #print_to_stdout('FS - before aligned loop: ',datetime.datetime.now())
     split_alignments = []
     candidates=[]
+    split_reads=[]
     for ref_id in ref_id_list:
         aligned = bamfile.fetch(ref_id, multiple_iterators=True)
-        split_reads=[]
         contig_seq = ref_dict.fetch(ref_id)
-        for read in aligned:
-            #sarah
-            foot = True
-            if read.cigarstring is not None and "N" in read.cigarstring and "I" not in read.cigarstring:
-                #print('cigar string', read.cigarstring)
+    #print_to_stdout('End 1er loop',datetime.datetime.now() )   
+    for read in aligned:
+        if read.cigarstring is not None:
+            if "N" in read.cigarstring and "I" not in read.cigarstring:
                 cigar_pattern = "([0-9]+)M([0-9]+)N([0-9]+)M"  
                 cigar         = re.search(cigar_pattern, read.cigarstring)
                 try:
@@ -115,29 +116,28 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
                     cigarM2 = int(cigar.group(3))
                 except:
                     cigarM2 = 0   
-                # Remove reads with cigarM1 or cigarM2 < minfootsize       
+                # Remove reads with cigarM1 or cigarM2 < minfootsize    
                 if min(cigarM1,cigarM2) < minfootsize:
                     foot = False
-                    #print('READ TO REMOVE :', min(cigarM1,cigarM2), 'read: ', read.query_name,' and cigar', cigar )
                 else:
-                    foot = True    
-
-            if read.cigartuples is not None and read.mapping_quality >= 2 and foot == True :
-                if '(3,' in str(read.cigartuples):
-                    split = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
-                    split['read'] = read.query_name
-                    split['reference'] = read.reference_name
-                    if read.is_reverse :
-                        split['strand'] = '-'
-                    else :
-                        split['strand'] = '+'
-                    split_reads.append(split)
-                    #print('Keep ', foot, ' read : ', read.query_name, ' and cigar ', read.cigarstring)
-        df_split_reads = pd.DataFrame(split_reads)
-        if not df_split_reads.empty :
-            contig_len = len(ref_dict.fetch(ref_id))
-            candidates.append(merge_split(bamfile, df_split_reads, ref_id, contig_seq, contig_len, mindepth, maxlen))
-            split_alignments.append(df_split_reads)
+                    foot = True 
+            if read.mapping_quality >= 2 and '(3,' in str(read.cigartuples) and foot == True: 
+                split              = limit_from_cigar(read.cigartuples, read.reference_start, contig_seq)
+                split['read']      = read.query_name
+                split['reference'] = read.reference_name
+                if read.is_reverse :
+                    split['strand'] = '-'
+                else :
+                    split['strand'] = '+'
+                split_reads.append(split)
+        
+    df_split_reads = pd.DataFrame(split_reads)
+    if not df_split_reads.empty :
+        "print_to_stdout('FS - Generate split file at ', datetime.datetime.now())
+        contig_len = len(ref_dict.fetch(ref_id))
+        candidates.append(merge_split(bamfile, df_split_reads, ref_id, contig_seq, contig_len, mindepth, maxlen))
+        split_alignments.append(df_split_reads)
+    #print_to_stdout('FS - End loop and end find split : ',datetime.datetime.now())
     return pd.concat(candidates), pd.concat(split_alignments)
 
 # Compute mean depth form chr:start-end
