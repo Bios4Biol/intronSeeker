@@ -1,22 +1,22 @@
 Here is a description of the different files and directories available in data/.
 
-Tests files for intronSeeker command lines description
-------------------------------------------------------
+# Tests files for intronSeeker command lines description
+
 Inputs and outputs files used in intronSeeker command lines description (in README file) are available in data/Reduced_real_dataset directory.
 
-Description of the data presented in paper.
--------------------------------------------
+# Description of the data presented in paper
+
 All files are available in data/Graphics.
 
-# Table "Searching retained introns in public datasets"
----------------------------------------------
+## Table "Searching retained introns in public datasets"
+
 intronSeeker command lines, data source and HTML reports are available in data/REAL_DATA/
 
-# Graphics "Setting default detection parameters"
-------------------------------------
+## Graphics "Setting default detection parameters"
+
 These graphics can be used to analyse detection parameters and setting default.
 
-##### Graph A/ Coverage impact on detection.
+##### Graph A/ Coverage impact on detection
 
 Increasing the coverage allows to quickly lose false candidates with a very limited impact on the number of true candidates (Arabidopsis thaliana data, powerlow abundance).
 
@@ -83,7 +83,7 @@ fig.write_image("images/nb_false_by_coverage_PW_10samples.svg")
 fig.write_html("images/nb_false_by_coverage_PW_10samples.html")
 ```
 
-##### Graph B/ Filter candidates on border improve detection.
+##### Graph B/ Filter candidates on border improve detection
 
 DPratio = DPin/(DPbefore+DPafter)
 
@@ -120,7 +120,7 @@ if not os.path.exists("images"):
 plt.savefig("images/PW_violin_DP_10samples.svg")
 ```
 
-##### Graph C/ Filter candidates on candidat length.
+##### Graph C/ Filter candidates on candidat length
 
 Script to generate this graphic:
 
@@ -151,7 +151,7 @@ if not os.path.exists("images"):
 plt.savefig("images/PW_violin_lCd_10samples.svg")
 ```
 
-##### Graph D/ Filter candidates on retained intron ratio.
+##### Graph D/ Filter candidates on retained intron ratio
 
 Retained intron ratio = (len contig / len candidat)
 
