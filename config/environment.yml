@@ -45,4 +45,5 @@ dependencies:
   - perl-list-moreutils>=0.428
   - perl-math-random>=0.72
   - scipy>=1.4.1
+  - EMBOSS>=6.6.0
 
