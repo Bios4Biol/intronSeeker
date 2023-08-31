@@ -23,13 +23,13 @@ intronSeeker command lines
 ### Step 1 : Generate contigs fasta
 
 ```diff
-intronSeeker.py GTFbasedSimulation -a Caenorhabditis_elegans.WBcel235.110.gtf -r Caenorhabditis_elegans.WBcel235.dna.toplevel.fa -p "Cele" -o Cele
+intronSeeker GTFbasedSimulation -a Caenorhabditis_elegans.WBcel235.110.gtf -r Caenorhabditis_elegans.WBcel235.dna.toplevel.fa -p "Cele" -o Cele
 ```
 
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker.py simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
+intronSeeker simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
 ```
 
 ### Step 3: hisat2Alignment
@@ -49,9 +49,7 @@ intronSeeker splitReadSearch -a Cele/hisat2_Cele.sort.bam -r "+mref+" -o Cele -p
 ### Step 5: trimFastaFromTXT
 
 ```diff
-intronSeeker.py trimFastaFromTXT -r "+mref+" -c Cele/srs_Cele_HISAT2_candidates.txt -o Cele/HISAT2_trim/ -p Cele
-
-
+intronSeeker trimFastaFromTXT -r "+mref+" -c Cele/srs_Cele_HISAT2_candidates.txt -o Cele/HISAT2_trim/ -p Cele
 ```
 
 ### Step 6: Simulation report
@@ -83,7 +81,6 @@ force: -F
 
 ```diff
 intronSeeker buildReport  -F --config_file  Cele.cfg;
-
 ```
 
 HTML report is available in this directory.

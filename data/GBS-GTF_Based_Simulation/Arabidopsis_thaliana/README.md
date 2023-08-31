@@ -23,13 +23,13 @@ intronSeeker command lines
 ### Step 1 : Generate contigs fasta
 
 ```diff
-intronSeeker.py GTFbasedSimulation -a Arabidopsis_thaliana.TAIR10.57.gtf -r Arabidopsis_thaliana.TAIR10.dna.toplevel.fa -p "Athal" -o Athal
+intronSeeker GTFbasedSimulation -a Arabidopsis_thaliana.TAIR10.57.gtf -r Arabidopsis_thaliana.TAIR10.dna.toplevel.fa -p "Athal" -o Athal
 ```
 
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker.py simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
+intronSeeker simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
 ```
 
 ### Step 3: hisat2Alignment
@@ -49,9 +49,7 @@ intronSeeker splitReadSearch -a Athal/hisat2_Athal.sort.bam -r "+mref+" -o Athal
 ### Step 5: trimFastaFromTXT
 
 ```diff
-intronSeeker.py trimFastaFromTXT -r "+mref+" -c Athal/srs_Athal_HISAT2_candidates.txt -o Athal/HISAT2_trim/ -p Athal
-
-
+intronSeeker trimFastaFromTXT -r "+mref+" -c Athal/srs_Athal_HISAT2_candidates.txt -o Athal/HISAT2_trim/ -p Athal
 ```
 
 ### Step 6: Simulation report

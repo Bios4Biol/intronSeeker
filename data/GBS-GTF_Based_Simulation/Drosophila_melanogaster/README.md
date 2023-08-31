@@ -23,13 +23,13 @@ intronSeeker command lines
 ### Step 1 : Generate contigs fasta
 
 ```diff
-intronSeeker.py GTFbasedSimulation -a Drosophila_melanogaster.BDGP6.46.110.gtf -r Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa -p "Dmel" -o Dmel
+intronSeeker GTFbasedSimulation -a Drosophila_melanogaster.BDGP6.46.110.gtf -r Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa -p "Dmel" -o Dmel
 ```
 
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker.py simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
+intronSeeker simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
 ```
 
 ### Step 3: hisat2Alignment
@@ -49,9 +49,7 @@ intronSeeker splitReadSearch -a Dmel/hisat2_Dmel.sort.bam -r "+mref+" -o Dmel -p
 ### Step 5: trimFastaFromTXT
 
 ```diff
-intronSeeker.py trimFastaFromTXT -r "+mref+" -c Dmel/srs_Dmel_HISAT2_candidates.txt -o Dmel/HISAT2_trim/ -p Dmel
-
-
+intronSeeker trimFastaFromTXT -r "+mref+" -c Dmel/srs_Dmel_HISAT2_candidates.txt -o Dmel/HISAT2_trim/ -p Dmel
 ```
 
 ### Step 6: Simulation report
@@ -83,7 +81,6 @@ force: -F
 
 ```diff
 intronSeeker buildReport  -F --config_file  Dmel.cfg;
-
 ```
 
 HTML report is available in this directory.

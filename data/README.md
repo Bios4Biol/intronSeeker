@@ -1,8 +1,12 @@
-Here is a description of the different files and directories available in data/.
+Here is a description of the different files and directories available in data/ directory.
+
+# Tests files for FRS Full Random Simulation and for GBS GTF Based Simulation
+
+Inputs and outputs files used and intronSeeker command lines description are available in "FRS-Full_Random_Simulation" and "GBS-GTF_Based_Simulation" directories.
 
 # Tests files for intronSeeker command lines description
 
-Inputs and outputs files used in intronSeeker command lines description (in README file) are available in data/Reduced_real_dataset directory.
+Inputs and outputs files used and intronSeeker command lines description (in README file) are available in data/Reduced_real_dataset directory.
 
 # Description of the data presented in paper
 

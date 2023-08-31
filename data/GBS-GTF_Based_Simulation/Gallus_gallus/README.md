@@ -23,13 +23,13 @@ intronSeeker command lines
 ### Step 1 : Generate contigs fasta
 
 ```diff
-intronSeeker.py GTFbasedSimulation -a Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.110.gtf -r Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa -p "Ggal" -o Ggal
+intronSeeker GTFbasedSimulation -a Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.110.gtf -r Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa -p "Ggal" -o Ggal
 ```
 
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker.py simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
+intronSeeker simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
 ```
 
 ### Step 3: hisat2Alignment
@@ -50,8 +50,6 @@ intronSeeker splitReadSearch -a Ggal/hisat2_Ggal.sort.bam -r "+mref+" -o Ggal -p
 
 ```diff
 intronSeeker.py trimFastaFromTXT -r "+mref+" -c Ggal/srs_Ggal_HISAT2_candidates.txt -o Ggal/HISAT2_trim/ -p Ggal
-
-
 ```
 
 ### Step 6: Simulation report
@@ -83,7 +81,6 @@ force: -F
 
 ```diff
 intronSeeker buildReport  -F --config_file  Ggal.cfg;
-
 ```
 
 HTML report is available in this directory.
