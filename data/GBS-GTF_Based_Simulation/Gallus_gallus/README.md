@@ -23,33 +23,34 @@ intronSeeker command lines
 ### Step 1 : Generate contigs fasta
 
 ```diff
-intronSeeker GTFbasedSimulation -a Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.110.gtf -r Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa -p "Ggal" -o Ggal
+cd data/GBS-GTF_Based_Simulation/
+intronSeeker GTFbasedSimulation -a Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.110.gtf -r Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa -p Ggal -o Ggal
 ```
 
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
+intronSeeker simulateReads -f Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa -c ../../config/grinder_GBS.cfg -p Ggal -o Ggal
 ```
 
 ### Step 3: hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r "+mref+" -1 Ggal/sr_Ggal_R1.fastq.gz -2 Ggal/sr_Ggal_R2.fastq.gz -o Ggal -p Ggal
+intronSeeker hisat2Alignment -r Ggal/gbs_Ggal_transcripts-modified.fa -1 Ggal/sr_Ggal_R1.fastq.gz -2 Ggal/sr_Ggal_R2.fastq.gz -o Ggal -p Ggal
 
 ```
 
 ### Step 4: splitReadSearch
 
 ```diff
-intronSeeker splitReadSearch -a Ggal/hisat2_Ggal.sort.bam -r "+mref+" -o Ggal -p Ggal
+intronSeeker splitReadSearch -a Ggal/hisat2_Ggal.sort.bam -r Ggal/gbs_Ggal_transcripts-modified.fa -o Ggal -p Ggal
 
 ```
 
 ### Step 5: trimFastaFromTXT
 
 ```diff
-intronSeeker.py trimFastaFromTXT -r "+mref+" -c Ggal/srs_Ggal_HISAT2_candidates.txt -o Ggal/HISAT2_trim/ -p Ggal
+intronSeeker.py trimFastaFromTXT -r Ggal/gbs_Ggal_transcripts-modified.fa -c Ggal/srs_Ggal_HISAT2_candidates.txt -o Ggal/HISAT2_trim/ -p Ggal
 ```
 
 ### Step 6: Simulation report
@@ -64,14 +65,15 @@ nano  Ggal.cfg
 
 ```diff
 [Defaults]
-mfasta:gbs_Ggal_transcripts-modified.fa
-fasta:
+mfasta:Ggal/gbs_Ggal_transcripts-modified.fa
+fasta:Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa
 gtf:Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.110.gtf
-r1:Ggal.fastq
-r2:Ggal.fastq
+r1:Ggal/sr_Ggal_R1.fastq.gz
+r2:Ggal/sr_Ggal_R2.fastq.gz
 flagstat:hisat2_Ggal.sort.flagstat.txt
-candidat:srs_Ggal_candidates.txt
-split:srs_Ggal_split_alignments.txt
+candidat:Ggal/srs_Ggal_candidates.txt
+split:Ggal/srs_Ggal_split_alignments.txt
+rank:Ggal/sr_Ggal-ranks.txt
 prefix:Ggal
 threads: 6                
 output:HTML/

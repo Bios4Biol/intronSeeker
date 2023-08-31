@@ -23,19 +23,20 @@ intronSeeker command lines
 ### Step 1 : Generate contigs fasta
 
 ```diff
-intronSeeker GTFbasedSimulation -a Drosophila_melanogaster.BDGP6.46.110.gtf -r Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa -p "Dmel" -o Dmel
+cd data/GBS-GTF_Based_Simulation/
+intronSeeker GTFbasedSimulation -a Drosophila_melanogaster.BDGP6.46.110.gtf -r Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa -p Dmel -o Dmel
 ```
 
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker simulateReads -f "+ref+" -c "+grinder+" -p "+pipelineName+" -o "+pipelineName
+intronSeeker simulateReads -f Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa -c ../../config/grinder_GBS.cfg -p Dmel -o Dmel
 ```
 
 ### Step 3: hisat2Alignment
 
 ```diff
-intronSeeker hisat2Alignment -r "+mref+" -1 Dmel/sr_Dmel_R1.fastq.gz -2 Dmel/sr_Dmel_R2.fastq.gz -o Dmel -p Dmel
+intronSeeker hisat2Alignment -r Dmel/gbs_Dmel_transcripts-modified.fa -1 Dmel/sr_Dmel_R1.fastq.gz -2 Dmel/sr_Dmel_R2.fastq.gz -o Dmel -p Dmel
 
 ```
 
@@ -49,7 +50,7 @@ intronSeeker splitReadSearch -a Dmel/hisat2_Dmel.sort.bam -r "+mref+" -o Dmel -p
 ### Step 5: trimFastaFromTXT
 
 ```diff
-intronSeeker trimFastaFromTXT -r "+mref+" -c Dmel/srs_Dmel_HISAT2_candidates.txt -o Dmel/HISAT2_trim/ -p Dmel
+intronSeeker trimFastaFromTXT -r Dmel/gbs_Dmel_transcripts-modified.fa -c Dmel/srs_Dmel_HISAT2_candidates.txt -o Dmel/HISAT2_trim/ -p Dmel
 ```
 
 ### Step 6: Simulation report
@@ -64,14 +65,15 @@ nano  Dmel.cfg
 
 ```diff
 [Defaults]
-mfasta:gbs_Dmel_transcripts-modified.fa
-fasta:
+mfasta:Dmel/gbs_Dmel_transcripts-modified.fa
+fasta:Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa
 gtf:Drosophila_melanogaster.BDGP6.46.110.gtf
-r1:Dmel.fastq
-r2:Dmel.fastq
+r1:Dmel/sr_Dmel_R1.fastq.gz
+r2:Dmel/sr_Dmel_R2.fastq.gz
 flagstat:hisat2_Dmel.sort.flagstat.txt
-candidat:srs_Dmel_candidates.txt
-split:srs_Dmel_split_alignments.txt
+candidat:Dmel/srs_Dmel_HISAT2_candidates.txt
+split:Dmel/srs_Dmel_split_alignments.txt
+rank:Dmel/sr_Dmel-ranks.txt
 prefix:Dmel
 threads: 6                
 output:HTML/
