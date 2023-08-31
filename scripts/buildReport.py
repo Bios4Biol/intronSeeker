@@ -246,30 +246,7 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     global_stat_fastq["05Mean reads length"]= round(df_library['length'].mean(), 2)
     html += get_html_reads_descr(global_stat_fastq, df_library) 
 
-    # # ABUNDANCE number of reads by contig
-    # # Build a dataframe with:   
-    # #   ctg
-    # #   abund_perc => (number of read on this contig / number of reads) * 100
-    # #   requested  => if grinder ranks output file is given ...
-    # #   norm       => (((number of read on this contig / contig len) * mean len of all contigs) / number of reads) * 100
-    # df_tmp = pd.DataFrame((df_library.groupby('contig').size()/len(df_library))*100, columns = ['abund_perc'])
-    # df_fasta = df_fasta.assign(real=df_tmp.abund_perc.values)
-    # if ranks:
-    #     df_tmp = parse_rank_file(ranks_file)
-    #     df_fasta = df_fasta.assign(rank=df_tmp['rank'].values)
-    #     df_fasta = df_fasta.assign(waiting=df_tmp.rel_abund_perc.values)
-    # df_tmp = pd.DataFrame(
-    #     (((df_library.groupby('contig').size()/df_fasta['length'])*(df_fasta['length'].mean()))/df_library.shape[0])*100,
-    #     columns = ['norm'])
-    # df_fasta = df_fasta.assign(norm=df_tmp['norm'].values)
-    # del df_tmp
-    # if len(df_fasta.index) <= 100:
-    #     html += get_html_abundance(df_fasta.sample, "Pourcentage of reads abundance for each contigs")
-    # elif len(df_fasta.index) * 0.2 > 100:
-    #     html += get_html_abundance(df_fasta.sample(100), "Pourcentage of reads abundance for 100 random contigs")
-    # else:
-    #     html += get_html_abundance(df_fasta.sample(frac=.2), "Pourcentage of reads abundance for 20\% \random contigs")
-    
+
     ## ALIGNMENT STATS
     if flagstat:
         nbreads, mapped, mappercent, paired, proper, properpercent, secondary, singletons=parse_flagstat(flagstat_file)
@@ -594,14 +571,3 @@ def simulationReport(   config_file: str,fasta:str, mfasta:str, gtf:str, r1:str,
     with open(output_file, "w") as f:
         f.write(html)
 
-    # print('DATAFRAMES:\n\n')
-    # print('fasta head :' , df_fasta.head(5), '\n\n')
-    # if mfasta:
-    #     print('mfasta head :' , df_mfasta.head(5), '\n\n')    
-    # # print('mfasta head :' , df_mfasta.head(5), '\n\n')    
-    # print('library head :' , df_library.head(5), '\n\n')
-    # print('features head :', df_features.head(5), '\n\n')
-    # if split:
-    #     print('df_split', df_split, '\n\n')
-    # if candidat:
-    #     print('df_candidat', df_candidat, '\n\n')

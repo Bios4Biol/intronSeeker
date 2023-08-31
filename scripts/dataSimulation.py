@@ -235,12 +235,6 @@ def full_random_simulation(nb:int, maxi:int, mini:int, part:int, lower:int, uppe
 ### Reads library Simulation ###
 ################################
 
-#~ def _grinder(input_file : str, profile_file : str, output_file : str) :
-
-    #~ os.system("grinder -rf {input_file} -pf {profile_file} -bn {output_file}".format(
-        #~ input_file=input_file, profile_file=profile_file, output_file=output_file
-        #~ )) ;
-
 def grinder(rf: str, pf: str, prefix: str, output: str, force: bool):
     """
     Generate reads for a reference file depending on grinder parameters from the profile file.
@@ -859,7 +853,7 @@ def gtf_based_simulation(annotation: str, fasta: str, nb: int, prefix: str, outp
     gtf_content, transcripts = read_gtf(annotation.name)
     #Remove transcript if intron lenght greater than 80% of the total exons length
     transcripts = removeTrWithTooLongIntron(gtf_content, transcripts)
-    # sarah: Remove transcripts that come from the same gene to decrease number of FP
+    # Remove transcripts that come from the same gene to decrease number of FP
     if uniq:
         transcripts = removeTranscriptsComingFromSameGene(gtf_content, transcripts)
     #print("Generate transcripts...")

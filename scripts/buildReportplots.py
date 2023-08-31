@@ -99,29 +99,6 @@ def plot_hist(values:dict, title:str, xtitle:str, ytitle:str):
     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
 
 
-# def plot_box(values:dict, title:str, xtitle:str, ytitle:str):
-#     layout = go.Layout(
-#          xaxis=dict(
-#             title=xtitle
-#         ),
-#         yaxis=dict(
-#             title=ytitle
-#         )
-#     )
-#     fig = go.Figure(layout=layout)
-#     fig.add_trace(go.Box(x=values))
-#     fig.update_layout(
-#         margin=go.layout.Margin(
-#             l=50,
-#             r=50,
-#             b=20,
-#             t=30,
-#             pad=0
-#         )
-#     )   
-#     return py.offline.plot(fig, include_plotlyjs=False, output_type='div')
-
-
 def plot_dist_features_len(len_by_features, feature_names):
     """
     plot_dist_features_len function plot length by features as a distribution.

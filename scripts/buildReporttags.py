@@ -520,28 +520,6 @@ def get_html_candidat(global_stat_f_detected_introns:dict, global_stat_detectabl
     '''
     return r
 
-# # Tab too complex
-# def get_html_too_complex(global_stat_too_complex_detected:dict, global_stat_too_complex_detected_filtered:dict):
-#     r =  '''
-#         <div class="d-flex">
-#             <div class="mt-4 mr-0 pl-0 col-md-4">
-#             <h5>Top 10 of contigs with the highest number of detected introns</h5>
-#                 <span class="anchor" id="too_complex_detected"></span>
-# ''' +  dict_to_table(global_stat_too_complex_detected,-1,2) + '''  
-#             </div>
-
-#         </div>
-#         <div class="d-flex">
-#             <div class="mt-4 mr-0 pl-0 col-md-4">
-#             <h5>Top 10 of contigs with the highest number of detected filtered introns</h5>
-#                 <span class="anchor" id="too_complex_detectable"></span>
-# ''' +  dict_to_table(global_stat_too_complex_detected_filtered,-1,2) + '''  
-#             </div>
-
-#         </div>  
-# '''
-#     return r
-
 # Tab too complex
 def get_html_too_complex(global_stat_too_complex_detected:dict):
     r =  '''
@@ -569,8 +547,7 @@ def get_html_eval(eval_stat:dict, eval_f_stat:dict):
         </div>
     '''
     return r
-
-# SARAH / GLOSSAIRE    
+ 
 # Define all term used in this simulation report
 def get_html_glossary():
     r = '''

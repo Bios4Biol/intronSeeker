@@ -171,16 +171,6 @@ def parse_gtf(gtf) :
     t['features'] = t.apply(lambda df : "|".join([str(df.contig),str(df.start),str(df.end)]),axis=1)
     return t.set_index('features')
 
-# def parse_control_introns(introns_coord_file) :
-#     """
-#     not used ?
-#     """
-#     table = pd.read_table(introns_coord_file, usecols=[0,3,4], names=['contig','start', 'end'], header=None)
-#     table["length"] = table["end"]-table["start"]
-#     table['intron'] = table.apply(lambda df : "|".join([df.contig,str(df.start),str(df.end)]),axis=1)
-#     return table.set_index('intron')    
-    
-
 def parse_candidat(candidat) :
     """
     parse_candidat function parse input candidat file to return 1 dataframe and 2 int values:
