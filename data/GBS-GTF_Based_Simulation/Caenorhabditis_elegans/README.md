@@ -30,7 +30,7 @@ intronSeeker GTFbasedSimulation -a Caenorhabditis_elegans.WBcel235.110.gtf -r Ca
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker simulateReads -f  Caenorhabditis_elegans.WBcel235.dna.toplevel.fa -c ../../config/grinder_GBS.cfg -p Cele -o Cele
+intronSeeker simulateReads -f  Caenorhabditis_elegans.WBcel235.dna.toplevel.fa -c ../../../config/grinder_GBS.cfg -p Cele -o Cele
 ```
 
 ### Step 3: hisat2Alignment

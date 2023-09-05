@@ -30,7 +30,7 @@ intronSeeker GTFbasedSimulation -a Drosophila_melanogaster.BDGP6.46.110.gtf -r D
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker simulateReads -f Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa -c ../../config/grinder_GBS.cfg -p Dmel -o Dmel
+intronSeeker simulateReads -f Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa -c ../../../config/grinder_GBS.cfg -p Dmel -o Dmel
 ```
 
 ### Step 3: hisat2Alignment

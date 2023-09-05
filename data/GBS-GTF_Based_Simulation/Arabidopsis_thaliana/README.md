@@ -30,7 +30,7 @@ intronSeeker GTFbasedSimulation -a Arabidopsis_thaliana.TAIR10.57.gtf -r Arabido
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker simulateReads -f Arabidopsis_thaliana.TAIR10.dna.toplevel.fa -c ../../config/grinder_GBS.cfg -p Athal -o Athal
+intronSeeker simulateReads -f Arabidopsis_thaliana.TAIR10.dna.toplevel.fa -c ../../../config/grinder_GBS.cfg -p Athal -o Athal
 ```
 
 ### Step 3: hisat2Alignment

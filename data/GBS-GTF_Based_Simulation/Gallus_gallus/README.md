@@ -30,7 +30,7 @@ intronSeeker GTFbasedSimulation -a Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.110
 ### Step2: Generate reads with intronSeeker simulateReads from reference fasta
 
 ```diff
-intronSeeker simulateReads -f Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa -c ../../config/grinder_GBS.cfg -p Ggal -o Ggal
+intronSeeker simulateReads -f Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa -c ../../../config/grinder_GBS.cfg -p Ggal -o Ggal
 ```
 
 ### Step 3: hisat2Alignment
