@@ -59,4 +59,5 @@ intronSeeker buildReport -F --config_file  SRR15602387.cfg;
 
 ```
 
-HTML report is available in this directory.
+HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Rhodnius_n__SRR15602387.html
+

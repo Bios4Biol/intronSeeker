@@ -59,4 +59,4 @@ intronSeeker buildReport -F --config_file  SRR1051997.cfg;
 
 ```
 
-HTML report is available in this directory.
+HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Isatis_t_GARR01.html

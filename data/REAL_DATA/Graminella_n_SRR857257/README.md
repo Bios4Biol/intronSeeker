@@ -60,4 +60,4 @@ intronSeeker buildReport -F --config_file  SRR857257.cfg;
 
 ```
 
-HTML report is available in this directory.
+HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Graminella_n_GAQX01.html

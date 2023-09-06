@@ -60,4 +60,5 @@ intronSeeker buildReport -F --config_file  SRR2187438.cfg;
 
 ```
 
-HTML report is available in this directory.
+HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Rigidoporus_m_GDMN01.html
+

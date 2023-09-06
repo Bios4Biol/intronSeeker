@@ -57,4 +57,4 @@ intronSeeker buildReport -F --config_file  SRR1660436.cfg;
 
 ```
 
-HTML report is available in this directory.
+HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Cimex_l_GBYH01.html

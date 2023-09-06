@@ -60,4 +60,4 @@ intronSeeker buildReport -F --config_file  SRR12596368.cfg;
 
 ```
 
-HTML report is available in this directory.
+HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Carassius_g_GJKR01.html

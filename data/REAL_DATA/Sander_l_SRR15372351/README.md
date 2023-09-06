@@ -59,4 +59,4 @@ intronSeeker buildReport -F --config_file  SRR15372351.cfg;
 
 ```
 
-HTML report is available in this directory.
+HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Sander_l_GJIW01.html
