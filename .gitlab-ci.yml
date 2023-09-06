@@ -6,6 +6,6 @@ pages:
   - echo 'Nothing to do...'
   artifacts:
     paths:
-    - public/test_deploy.html
+    - public
   only:
   - master
