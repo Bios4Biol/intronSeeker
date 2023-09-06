@@ -43,7 +43,7 @@ intronSeeker hisat2Alignment -r Dmel/gbs_Dmel_transcripts-modified.fa -1 Dmel/sr
 ### Step 4: splitReadSearch
 
 ```diff
-intronSeeker splitReadSearch -a Dmel/hisat2_Dmel.sort.bam -r "+mref+" -o Dmel -p Dmel
+intronSeeker splitReadSearch -a Dmel/hisat2_Dmel.sort.bam -r Dmel/gbs_Dmel_transcripts-modified.fa -o Dmel -p Dmel
 
 ```
 
