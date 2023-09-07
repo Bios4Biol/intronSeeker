@@ -50,7 +50,7 @@ intronSeeker splitReadSearch -a Cele/hisat2_Cele.sort.bam -r Cele/gbs_Cele_trans
 ### Step 5: trimFastaFromTXT
 
 ```diff
-intronSeeker trimFastaFromTXT -r Cele/gbs_Cele_transcripts-modified.fa -c Cele/srs_Cele_HISAT2_candidates.txt -o Cele/HISAT2_trim/ -p Cele
+intronSeeker trimFastaFromTXT -r Cele/gbs_Cele_transcripts-modified.fa -c Cele/srs_Cele_candidates.txt -o Cele/HISAT2_trim/ -p Cele
 ```
 
 ### Step 6: Simulation report
@@ -70,10 +70,10 @@ fasta:Caenorhabditis_elegans.WBcel235.dna.toplevel.fa
 gtf:Caenorhabditis_elegans.WBcel235.110.gtf
 r1:Cele/sr_Cele_R1.fastq.gz
 r2:Cele/sr_Cele_R2.fastq.gz
-flagstat:hisat2_Cele.sort.flagstat.txt
+flagstat:Cele/hisat2_Cele.sort.flagstat.txt
 candidat:Cele/srs_Cele_candidates.txt
 split:Cele/srs_Cele_split_alignments.txt
-rank:Cele/sr_Cele-ranks.txt
+rank:Cele/sr_Cele_ranks.txt
 prefix:Cele
 threads: 6                
 output:HTML/

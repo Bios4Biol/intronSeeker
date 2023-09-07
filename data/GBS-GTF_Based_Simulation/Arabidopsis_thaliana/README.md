@@ -70,10 +70,10 @@ fasta:Arabidopsis_thaliana.TAIR10.dna.toplevel.fa
 gtf:Arabidopsis_thaliana.TAIR10.57.gtf
 r1:Athal/sr_Athal_R1.fastq.gz
 r2:Athal/sr_Athal_R2.fastq.gz
-flagstat:hisat2_Athal.sort.flagstat.txt
+flagstat:Athal/hisat2_Athal.sort.flagstat.txt
 candidat:Athal/srs_Athal_candidates.txt
 split:Athal/srs_Athal_split_alignments.txt
-rank:Athal/sr_Athal-ranks.txt
+rank:Athal/sr_Athal_ranks.txt
 prefix:Athal
 threads: 6                
 output:HTML/

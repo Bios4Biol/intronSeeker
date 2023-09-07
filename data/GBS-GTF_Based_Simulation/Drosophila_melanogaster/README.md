@@ -70,10 +70,10 @@ fasta:Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa
 gtf:Drosophila_melanogaster.BDGP6.46.110.gtf
 r1:Dmel/sr_Dmel_R1.fastq.gz
 r2:Dmel/sr_Dmel_R2.fastq.gz
-flagstat:hisat2_Dmel.sort.flagstat.txt
+flagstat:Dmel/hisat2_Dmel.sort.flagstat.txt
 candidat:Dmel/srs_Dmel_HISAT2_candidates.txt
 split:Dmel/srs_Dmel_split_alignments.txt
-rank:Dmel/sr_Dmel-ranks.txt
+rank:Dmel/sr_Dmel_ranks.txt
 prefix:Dmel
 threads: 6                
 output:HTML/

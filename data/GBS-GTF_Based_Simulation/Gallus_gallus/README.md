@@ -70,10 +70,10 @@ fasta:Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa
 gtf:Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.110.gtf
 r1:Ggal/sr_Ggal_R1.fastq.gz
 r2:Ggal/sr_Ggal_R2.fastq.gz
-flagstat:hisat2_Ggal.sort.flagstat.txt
+flagstat:Ggal/hisat2_Ggal.sort.flagstat.txt
 candidat:Ggal/srs_Ggal_candidates.txt
 split:Ggal/srs_Ggal_split_alignments.txt
-rank:Ggal/sr_Ggal-ranks.txt
+rank:Ggal/sr_Ggal_ranks.txt
 prefix:Ggal
 threads: 6                
 output:HTML/
