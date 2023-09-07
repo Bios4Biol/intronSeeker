@@ -67,13 +67,13 @@ nano  Cele.cfg
 [Defaults]
 mfasta:Cele/gbs_Cele_transcripts-modified.fa
 fasta:Caenorhabditis_elegans.WBcel235.dna.toplevel.fa
-gtf:Caenorhabditis_elegans.WBcel235.110.gtf
+gtf:Cele/gbs_Cele_transcripts-modified.gtf
 r1:Cele/sr_Cele_R1.fastq.gz
 r2:Cele/sr_Cele_R2.fastq.gz
 flagstat:Cele/hisat2_Cele.sort.flagstat.txt
 candidat:Cele/srs_Cele_candidates.txt
 split:Cele/srs_Cele_split_alignments.txt
-rank:Cele/sr_Cele_ranks.txt
+ranks:Cele/sr_Cele_ranks.txt
 prefix:Cele
 threads: 6                
 output:HTML/
@@ -85,4 +85,4 @@ force: -F
 intronSeeker buildReport  -F --config_file  Cele.cfg;
 ```
 
-HTML report is available in this directory.
+HTML report is available in intronSeeker public directory : https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Cele.html

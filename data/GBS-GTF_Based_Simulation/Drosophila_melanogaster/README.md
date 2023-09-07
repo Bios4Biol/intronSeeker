@@ -67,13 +67,13 @@ nano  Dmel.cfg
 [Defaults]
 mfasta:Dmel/gbs_Dmel_transcripts-modified.fa
 fasta:Drosophila_melanogaster.BDGP6.46.dna.toplevel.fa
-gtf:Drosophila_melanogaster.BDGP6.46.110.gtf
+gtf:Dmel/gbs_Dmel_transcripts-modified.gtf
 r1:Dmel/sr_Dmel_R1.fastq.gz
 r2:Dmel/sr_Dmel_R2.fastq.gz
 flagstat:Dmel/hisat2_Dmel.sort.flagstat.txt
 candidat:Dmel/srs_Dmel_HISAT2_candidates.txt
 split:Dmel/srs_Dmel_split_alignments.txt
-rank:Dmel/sr_Dmel_ranks.txt
+ranks:Dmel/sr_Dmel_ranks.txt
 prefix:Dmel
 threads: 6                
 output:HTML/
@@ -85,4 +85,4 @@ force: -F
 intronSeeker buildReport  -F --config_file  Dmel.cfg;
 ```
 
-HTML report is available in this directory.
+HTML report is available in intronSeeker public directory : https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Dmel.html

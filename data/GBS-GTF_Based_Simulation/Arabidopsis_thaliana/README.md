@@ -67,13 +67,13 @@ nano  Athal.cfg
 [Defaults]
 mfasta:Athal/gbs_Athal_transcripts-modified.fa
 fasta:Arabidopsis_thaliana.TAIR10.dna.toplevel.fa
-gtf:Arabidopsis_thaliana.TAIR10.57.gtf
+gtf:Athal/gbs_Athal_transcripts-modified.gtf
 r1:Athal/sr_Athal_R1.fastq.gz
 r2:Athal/sr_Athal_R2.fastq.gz
 flagstat:Athal/hisat2_Athal.sort.flagstat.txt
 candidat:Athal/srs_Athal_candidates.txt
 split:Athal/srs_Athal_split_alignments.txt
-rank:Athal/sr_Athal_ranks.txt
+ranks:Athal/sr_Athal_ranks.txt
 prefix:Athal
 threads: 6                
 output:HTML/
@@ -85,4 +85,4 @@ force: -F
 intronSeeker buildReport  -F --config_file  Athal.cfg;
 ```
 
-HTML report is available in this directory.
+HTML report is available in intronSeeker public directory : https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Athal.html

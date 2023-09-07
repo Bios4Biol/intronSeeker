@@ -67,13 +67,13 @@ nano  Ggal.cfg
 [Defaults]
 mfasta:Ggal/gbs_Ggal_transcripts-modified.fa
 fasta:Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna.toplevel.fa
-gtf:Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.110.gtf
+gtf:Ggal/gbs_Ggal_transcripts-modified.gtf
 r1:Ggal/sr_Ggal_R1.fastq.gz
 r2:Ggal/sr_Ggal_R2.fastq.gz
 flagstat:Ggal/hisat2_Ggal.sort.flagstat.txt
 candidat:Ggal/srs_Ggal_candidates.txt
 split:Ggal/srs_Ggal_split_alignments.txt
-rank:Ggal/sr_Ggal_ranks.txt
+ranks:Ggal/sr_Ggal_ranks.txt
 prefix:Ggal
 threads: 6                
 output:HTML/
@@ -85,4 +85,4 @@ force: -F
 intronSeeker buildReport  -F --config_file  Ggal.cfg;
 ```
 
-HTML report is available in this directory.
+HTML report is available in intronSeeker public directory : https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Ggal.html
