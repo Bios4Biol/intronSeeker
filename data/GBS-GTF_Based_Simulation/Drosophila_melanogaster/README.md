@@ -71,7 +71,7 @@ gtf:Dmel/gbs_Dmel_transcripts-modified.gtf
 r1:Dmel/sr_Dmel_R1.fastq.gz
 r2:Dmel/sr_Dmel_R2.fastq.gz
 flagstat:Dmel/hisat2_Dmel.sort.flagstat.txt
-candidat:Dmel/srs_Dmel_HISAT2_candidates.txt
+candidat:Dmel/srs_Dmel_candidates.txt
 split:Dmel/srs_Dmel_split_alignments.txt
 ranks:Dmel/sr_Dmel_ranks.txt
 prefix:Dmel
