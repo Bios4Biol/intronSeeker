@@ -59,4 +59,5 @@ intronSeeker buildReport -F --config_file  SRR1023744.cfg;
 
 ```
 
-HTML report is available in this directory.
+HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Platichthys_s_GAPK01.html
+
