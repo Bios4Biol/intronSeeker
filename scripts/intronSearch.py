@@ -167,6 +167,7 @@ def merge_split(bamfile, contig_reads,contig_name,contig_seq,contig_len,mindepth
         current = split_alignments.loc[0,['start_split','end_split']] 
         split_alignments['start_split']=pd.to_numeric(split_alignments['start_split'])
         split_alignments['end_split']=pd.to_numeric(split_alignments['end_split'])
+        # Select all reads in first interval
         selected_reads = split_alignments.query(
             '(-5 <= start_split-{current_start} <= 5) and (-5 <= end_split-{current_end} <= 5)'.format(
                 current_start=float(current.start_split),
@@ -178,6 +179,7 @@ def merge_split(bamfile, contig_reads,contig_name,contig_seq,contig_len,mindepth
             current.start_split = round(selected_reads['start_split'].mean())
             current.end_split = round(selected_reads['end_split'].mean())
             old_size = len(selected_reads)
+            # Extand interval of selected reads
             selected_reads = split_alignments.query(
                 '(-5 <= start_split-{current_start} <= 5) and (-5 <= end_split-{current_end} <= 5)'.format(
                     current_start=current.start_split,
@@ -238,6 +240,7 @@ def merge_split(bamfile, contig_reads,contig_name,contig_seq,contig_len,mindepth
                     ],
             index =  ['reference','start','end','depth','split_borders','DP_before','DP_in','DP_after','filter']
         ))
+        # Drop interval
         split_alignments = split_alignments.drop(selected_reads.index).reset_index(drop=True)
     return pd.DataFrame(candidates)
 
