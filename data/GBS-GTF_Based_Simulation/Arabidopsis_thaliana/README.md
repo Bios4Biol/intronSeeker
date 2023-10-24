@@ -85,4 +85,4 @@ force: -F
 intronSeeker buildReport  -F --config_file  Athal.cfg;
 ```
 
-HTML report is available in intronSeeker public directory : https://bios4biol.pages.mia.inra.fr/intronSeeker/report_Athal.html
+HTML report is available in intronSeeker public directory : https://bios4biol.pages.mia.inra.fr/intronseeker/report_Athal.html
