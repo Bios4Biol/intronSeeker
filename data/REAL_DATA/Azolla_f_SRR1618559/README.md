@@ -58,4 +58,4 @@ intronSeeker buildReport  -F --config_file  SRR1618559.cfg;
 
 ```
 
-HTML report is available in this directory.
+

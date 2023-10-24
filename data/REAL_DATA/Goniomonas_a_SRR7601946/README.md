@@ -58,4 +58,4 @@ intronSeeker buildReport -F --config_file  SRR7601946.cfg;
 
 ```
 
-HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Goniomonas_a_GGUN01.html
+HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Goniomonas_a_GGUN01.html

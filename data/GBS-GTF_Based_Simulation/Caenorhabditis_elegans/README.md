@@ -85,4 +85,4 @@ force: -F
 intronSeeker buildReport  -F --config_file  Cele.cfg;
 ```
 
-HTML report is available in intronSeeker public directory : https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Cele.html
+HTML report is available in intronSeeker public directory : https://bios4biol.pages.mia.inra.fr/intronseeker/report_Cele.html

@@ -59,4 +59,4 @@ intronSeeker buildReport -F --config_file  SRR14143372.cfg;
 
 ```
 
-HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Tripidium_r_GJDA01.html
+HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Tripidium_r_GJDA01.html

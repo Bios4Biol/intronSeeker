@@ -57,4 +57,4 @@ intronSeeker buildReport -F --config_file  SRR1206033.cfg;
 
 ```
 
-HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Phytophtora_c_GBGX01.html
+HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Phytophtora_c_GBGX01.html

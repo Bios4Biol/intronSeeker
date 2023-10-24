@@ -56,5 +56,5 @@ intronSeeker buildReport -F --config_file  SRR500874.cfg;
 
 ```
 
-HTML report is available in public directory and here https://emilien.lasguignes.pages.mia.inra.fr/intronSeeker/report_Vriesea_c_GHCB01.html
+HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Vriesea_c_GHCB01.html
 
