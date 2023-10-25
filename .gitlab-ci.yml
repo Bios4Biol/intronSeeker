@@ -7,7 +7,5 @@ pages:
   artifacts:
     paths:
     - public
-    - public2
-    - public/test/
   only:
   - master
