@@ -107,6 +107,14 @@ When trimFastaFromTXT produces a new FASTA reference file where features, listed
 intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_trimFASTA
 ```
 
+##### Find evidence
+ 
+Perform a proteic alignment against "reference" and "trimref" FASTA files to find evidences.
+
+```diff
+ intronSeeker findEvidence  -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -t data/Reduced_real_dataset/Test_Cele_trimFASTA/tf_trimmed.fa  -d data/Reduced_real_dataset/Test_protein-diamond-database.fasta  -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_FindEvidence
+```
+
 ##### Generate a intronSeeker simulation report
 
 Create a configuration file buildReport_example.cfg :
