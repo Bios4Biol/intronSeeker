@@ -135,4 +135,7 @@ IntronSeeker parameters impacts. Graphics have been built on 10 samples of Arabi
 
 **D** Filter candidates on retained intron ratio (len contig / len candidat).
 
+# Acknowledgement of financial support
+
+The non permanent positions of Floréal Cabanette and Emilien Lasguignes were financed by projet France Génomique n° 31000523 and projet France Génomique n° 15000079.
 
