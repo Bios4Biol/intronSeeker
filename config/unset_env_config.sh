@@ -1,7 +1,7 @@
 #/bin/bash
 
 #<IntronSeeker searches introns by splice-realigning reads on contigs.>
-#Copyright (C) <2019> INRAE
+#Copyright (C) <2019-2024> INRAE
 #<Sarah Maman, Philippe Bardou, Emilien Lasguignes, Faustine Oudin, Floréal Cabanettes, Christophe Klopp>
 #
 #This program is free software: you can redistribute it and/or modify
