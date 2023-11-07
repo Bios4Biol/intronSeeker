@@ -156,3 +156,9 @@ Program: intronSeeker
 Version: 1.0
 
 ```
+
+For other intronSeeker steps, to avoid running front-end jobs on the compute cluster, we recommend that you connect to a compute node as follows:
+
+```diff
+bash-4.4$ srun --mem=20G --pty bash
+```
