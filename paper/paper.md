@@ -9,27 +9,27 @@ authors:
   - name: Sarah Maman
     corresponding: true
     orcid: 0000-0001-6453-902X
-    affiliation: '1'
+    affiliation: 1
     email: sarah.maman@inrae.fr
   - name: Philippe Bardou
     orcid: 0000-0002-0004-0251 
-    affiliation: '1'
+    affiliation: 1
   - name: Emilien Lasguignes
-    affiliation: '1'
+    affiliation: 1
   - name: Faustine Oudin
-    affiliation: '1'
+    affiliation: 1
   - name: Floréal Cabanettes
-    affiliation: '1'
+    affiliation: 1
   - name: Christophe Klopp
     orcid: 0000-0001-7126-5477
-    affiliation: '2'
+    affiliation: 2
 affiliations:
   - name: Sigenae, GenPhySE, Université de Toulouse, INRAE, ENVT, Castanet Tolosan, France
-    index: '1'
+    index: 1
   - name: SIGENAE, Bioinfo Genotoul, UMIAT, INRAE, Castanet-Tolosan, France
-    index: '2'
-date: '2023'
-bibliography: ./IntronSeeker.bib
+    index: 2
+date: 2023
+bibliography: paper.bib
 ---
 
 # Summary 
@@ -69,25 +69,25 @@ The twenty public TSA contigs sets processed by IntronSeeker are classified in t
 
 | Species     |  (super)kingdom  | TSA id |Nb contigs | SRA and link to HTML intronSeeker report                                        |     Nb reads. |   \% cwi|
 | :---       |  :----:   |   :----: |:----:  |    :----:  |      :--- |    :--- |
-|  Salvia m.    |  Plantae   |  GJJN01 | 69 705 |  SRR15718805 |   23 086 599 | **11.96%**|
-| Platichthys s.  |  Animalia  |  GAPK01 | 30 630 |  SRR1023744 | 516 791 904  | **10,71%**|
-| Rigidoporus m.  |  Fungi    |  GDMN01 | 34 441 |  SRR2187438  |   75 600 628 |  **5,97%**|
-| Isatis t.    |  Plantae   |  GARR01 | 33 238 | SRR1051997  |  113 134 348 |  **5,41%**|
-| Goniomonas a.  |  Eukaryota  |  GGUN01 | 48 844 | SRR7601946   |  82 416 944 |  **5,27%**|
-| Vriesea c.    |  Plantae   |  GHCB01 | 41 228 | SRR500874   |  85 726 288  | **3,94%**|
-| Graminella n.  |  Animalia  |  GAQX01 | 37 537 | SRR857257   |  43 693 708  | **2,88%**|
-| Carassius g.   |  Animalia  |  GJKR01 | 109 966 | SRR12596368  |  21 661 960 | **2.72%**|
-| Rhizopus a.   |  Fungi    |  GDUK01 | 30 601 | SRR2104505   |  64 801 576  | **2,51%**|
+| Salvia m.    |  Plantae   |  GJJN01 | 69 705 |  [SRR15718805](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Salvia_m_GJJN01.html) |   23 086 599 | **11.96%**|
+| Platichthys s.  |  Animalia  |  GAPK01 | 30 630 |  [SRR1023744](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Platichthys_s_GAPK01.html) | 516 791 904  | **10,71%**|
+| Rigidoporus m.  |  Fungi    |  GDMN01 | 34 441 |  [SRR2187438](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Rigidoporus_m_GDMN01.html)  |   75 600 628 |  **5,97%**|
+| Isatis t.    |  Plantae   |  GARR01 | 33 238 | [SRR1051997](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Isatis_t_GARR01.html)  |  113 134 348 |  **5,41%**|
+| Goniomonas a.  |  Eukaryota  |  GGUN01 | 48 844 | [SRR7601946](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Goniomonas_a_GGUN01.html)   |  82 416 944 |  **5,27%**|
+| Vriesea c.    |  Plantae   |  GHCB01 | 41 228 | [SRR500874](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Vriesea_c_GHCB01.html)   |  85 726 288  | **3,94%**|
+| Graminella n.  |  Animalia  |  GAQX01 | 37 537 | [SRR857257](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Graminella_n_GAQX01.html)   |  43 693 708  | **2,88%**|
+| Carassius g.   |  Animalia  |  GJKR01 | 109 966 | [SRR12596368](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Carassius_g_GJKR01.html)  |  21 661 960 | **2.72%**|
+| Rhizopus a.   |  Fungi    |  GDUK01 | 30 601 | [SRR2104505](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Rhizopus_a_GDUK01.html)   |  64 801 576  | **2,51%**|
 | Diplonema p.   | Eukaryota  | GJNJ01  | 114 037 | SRR14933372  | 63 775 926   |  **2.35%**|
 | Azolla f.    | Plantae   | GBTV01  | 36 091 | SRR1618559  |  122 059 452 |  **1,97%**|
-| Tripidium r.   | Plantae   | GJDA01  | 106 494 | SRR14143372  | 15 357 748  | **1.50%**|
-| Cimex l.     |  Animalia  | GBYH01  | 39 124 | SRR1660436   | 329 875 624  |  **1,24%**|
-| Trichoplax sp. H2|  Animalia  | GFSF01   | 43 376 | SRR5819939   | 128 665 904  | **1,24%**|
-| Phytophthora c. |  Plantae   | GBGX01   | 21 662 | SRR1206033   | 14 346 946  | **1.15%**|
-| Piromyces sp.   |   Fungi   | GGXH01  | 124 096 | SRR7819335  |  15 615 535 |  **0.50%**|
-| Sander l.    |  Animalia  | GJIW01  | 56 196 | SRR15372351  |  48 694 199  | **0.36%**|
-| Rhodnius n.   |  Animalia  | GJJI01  | 67 217 | [SRR15602387](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/data/REAL_DATA/Rhodnius_n_SRR15602387/report_Rhod_SRR15602387.html)  | 6 775 534   | **0.11%**|
-| Choromytilus c. | Animalia   | GJJD01  | 106 298 | [SRR15058678](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/data/REAL_DATA/Choromytilus_c_SRR15058678/report_Choromytilus_SRR15058678.html)  | 10 490 833   |  **0.10%**|
+| Tripidium r.   | Plantae   | GJDA01  | 106 494 | [SRR14143372]( https://bios4biol.pages.mia.inra.fr/intronseeker/report_Tripidium_r_GJDA01.html)  | 15 357 748  | **1.50%**|
+| Cimex l.     |  Animalia  | GBYH01  | 39 124 | [SRR1660436](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Cimex_l_GBYH01.html)   | 329 875 624  |  **1,24%**|
+| Trichoplax sp. H2|  Animalia  | GFSF01   | 43 376 | [SRR5819939](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Trichoplax_sp_H2_GFSF01.html)   | 128 665 904  | **1,24%**|
+| Phytophthora c. |  Plantae   | GBGX01   | 21 662 | [SRR1206033](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Phytophtora_c_GBGX01.html)   | 14 346 946  | **1.15%**|
+| Piromyces sp.   |   Fungi   | GGXH01  | 124 096 | [SRR7819335](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Piromyces_sp_GGXH01.html)  |  15 615 535 |  **0.50%**|
+| Sander l.    |  Animalia  | GJIW01  | 56 196 | [SRR15372351](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Sander_l_GJIW01.html)  |  48 694 199  | **0.36%**|
+| Rhodnius n.   |  Animalia  | GJJI01  | 67 217 | [SRR15602387](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Rhodnius_n__SRR15602387.html)  | 6 775 534   | **0.11%**|
+| Choromytilus c. | Animalia   | GJJD01  | 106 298 | [SRR15058678](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Choromytilus_c_GJJD01.html)  | 10 490 833   |  **0.10%**|
 | Bombus t.    |  Animalia  | GHFS01  | 48 241 | SRR6148374   |  15 547 444  | **0.02%**|
 
 Table: Rates of public contigs with introns, data from NCBI Transcript  Shotgun Archive (TSA) and Short Read Archive (SRA).
@@ -118,8 +118,8 @@ To ease installation, intronSeeker includes an installation script (setup.sh) wh
 grinder [@angly2012grinder], gffread [@gffread], hisat2 [@kim2015hisat], STAR [@dobin2013star], samtools [@li2009sequence], TransDecoder [@haas2013novo], diamond [@buchfink2015fast].
 
 Versions required before installation:
-* Python version 3.6 or above.
-* Miniconda 23.3.3 or above.
+- Python version 3.6 or above.
+- Miniconda 23.3.3 or above.
 
 ```
 #Clone intronSeeker code from Git:
