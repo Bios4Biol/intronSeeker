@@ -18,6 +18,13 @@ Bibliography:
 
 # Summary 
 
+intronSeeker identify potentially retained introns in de novo RNA-seq assembly in order to quantify and remove them.
+This tool includes two types of RNA-seq data simulations to validate the detection process and measure the false positive detection rate.
+The first simulation module uses random sequence simulation in order to check if splice aligners are able to find inserted introns when only contigs with introns and reads whithout intron are used as well as when contigs with and without introns and reads without introns are used.
+The second simulation is based on an existing genome and corresponding genome annotation.
+In this case the simulator produces reads with an without intron as well as transcripts with and whithout introns. This modules enables to verify the fraction of retained introns which can be detected in real condition and and set the appropriate detection thresholds.  
+intronSeeker provides a list of potential candidates, it filters them, list contigs with retained introns, and clean reference to provide a trimmed fasta.
+
 # Introduction
 
 Short read RNA sequencing (RNA-Seq) is now routinely used to study gene expression. When a reference genome is available, RNA-Seq reads can be splice-aligned to the assembly and gene abundances can be measured by counting alignments found in each gene location. When no reference genome assembly is available, reads are usually assemble to build a reference transcriptome contig set. In this de novo approach reads are then aligned to the contigs without using a splice-aware aligner because they originate from mature transcripts.
