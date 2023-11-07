@@ -83,9 +83,7 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
     :param bamfilename: AlignmentFile object with all reads alignment information
     :return: list of split. For each split, save its reference, name, start, stop, length and flanking sequences.
     """
-    #print_to_stdout('FS - Begin find split : ',datetime.datetime.now())
     bamfile = pysam.AlignmentFile(bamfile, "rb")
-    #print_to_stdout('FS - pysam bam : ',datetime.datetime.now())
     try :
         ref_dict = pysam.FastaFile(fastafile)
     except OSError as e :
@@ -95,7 +93,6 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
         else :
             print(e)
         exit(1)
-    #print_to_stdout('FS - before aligned loop: ',datetime.datetime.now())
     split_alignments = []
     candidates=[]
     split_reads=[]
@@ -103,13 +100,11 @@ def find_split(ref_id_list, bamfile, fastafile, mindepth, maxlen, minfootsize):
     candidates=[]
     for ref_id in ref_id_list:
         aligned = bamfile.fetch(ref_id, multiple_iterators=True)
-        print_to_stdout('FS - fetch: ',datetime.datetime.now())
         split_reads=[]
         contig_seq = ref_dict.fetch(ref_id)
         for read in aligned:
             foot = True
             if read.cigarstring is not None and "N" in read.cigarstring and "I" not in read.cigarstring:
-                #print('cigar string', read.cigarstring)
                 cigar_pattern = "([0-9]+)M([0-9]+)N([0-9]+)M"  
                 cigar         = re.search(cigar_pattern, read.cigarstring)
                 try:
@@ -275,8 +270,6 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
 
     with prl.ProcessPoolExecutor(max_workers=threads) as ex :
         # ~ s_t = time.time()
-        current_datetime=datetime.datetime.now()
-        print_to_stdout('Begin candidates and splits search : ',current_datetime)
         ref_id_array = np.array_split(ref_id_list,ex._max_workers)
         out = list(zip(*list(ex.map(
             find_split,
@@ -290,13 +283,9 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
         print_to_stdout('##  Processing ##','\n', 'Preview of candidates list before filter: ', out[0], '\n\n', 'Preview of splits list before filter: ', out[1])
         candidates= pd.concat(out[0])
         split_alignments = pd.concat(out[1])
-        current_datetime2=datetime.datetime.now()
-        print_to_stdout('End of candidates and split search : ',current_datetime2)
         
         # ~ print(time.time()-s_t)
     print_to_stdout('###  Filter   ###') 
-    current_datetime3=datetime.datetime.now()
-    print_to_stdout('Begin candidates and splits filter : ',current_datetime3)  
     # After filtering, focus on flagged PASS candidates and modify
     # filter field (from PASS to OI) if two "retained introns"
     # are overlapping
@@ -325,9 +314,7 @@ def splitReadSearch(bamfile, fastafile, mindepth, maxlen, output, prefix, force,
     # ~ candidates = find_split(ref_id_list,bamfile.name,fastafile.name)
     # ~ candidates['selected'] = 1
     # ~ print(candidates)
-    print_to_stdout('###  Focus on flagged PASS candidates and modify filter field (from PASS to OI) if two "retained introns" are overlapping  ###')  
-    current_datetime4=datetime.datetime.now()
-    print_to_stdout('End of candidates and split filter : ',current_datetime4)
+    print_to_stdout('###  Focus on flagged PASS candidates and modify filter field (from PASS to OI) if two "retained introns" are overlapping  ###') 
     
     split_alignments=split_alignments[['reference','read','start_split','end_split','split_length','split_borders','strand']] #re-arrange the columns order of split_alignments output
     header_sa= list(split_alignments.columns.values)
