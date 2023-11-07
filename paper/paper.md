@@ -1,19 +1,35 @@
 ---
-Title: Finding and removing introns from RNA-Seq de novo assemblies with IntronSeeker
-Tags:
-- RNA-Seq 
-- de novo 
-- assembly
-- retained introns
-Authors:
-- Sarah Maman
-- Philippe Bardou
-- Emilien Lasguignes
-- Faustine Oudin
-- Floréal Cabanettes
-- Christophe Klopp
-Bibliography:
-- IntronSeeker.bib
+title: 'Finding and removing introns from RNA-Seq de novo assemblies with IntronSeeker'
+tags:
+  - RNA-Seq 
+  - de novo 
+  - assembly
+  - retained introns
+authors:
+  - name: Sarah Maman
+    corresponding: true
+    orcid: 0000-0001-6453-902X
+    affiliation: 1
+    email: sarah.maman@inrae.fr
+  - name: Philippe Bardou
+    orcid: 0000-0002-0004-0251 
+    affiliation: 1
+  - name: Emilien Lasguignes
+    affiliation: 1
+  - name: Faustine Oudin
+    affiliation: 1
+  - name: Floréal Cabanettes
+    affiliation: 1
+  - name: Christophe Klopp
+    orcid: 0000-0001-7126-5477
+    affiliation: 2
+affiliations:
+  - name: Sigenae, GenPhySE, Université de Toulouse, INRAE, ENVT, Castanet Tolosan, France
+    index: 1
+  - name: SIGENAE, Bioinfo Genotoul, UMIAT, INRAE, Castanet-Tolosan, France
+    index: 2
+date: 2023
+bibliography: ./IntronSeeker.bib
 ---
 
 # Summary 
