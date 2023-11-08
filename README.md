@@ -1,18 +1,17 @@
 intronSeeker
 ============
 
-While sequencing mRNA non-spliced introns are often retained and therefore 
-present in the produced reads. These introns coming from to non mature mRNAs 
-create rupture in the proteins found in the transcripts. In order to get the 
-correct protein sequence they have to be removed,
-These retained introns will be present in only some sequences nevertheless they 
-can therefore be present in the assembled contigs built from those reads.  
+RNA-Seq reads quite often contain non-spliced introns. These introns originating from non mature mRNAs 
+can break the translated protein open reading frame. In order to get the 
+correct protein sequence introns have to be removed,
+Retained introns will be present in only some sequences nevertheless they 
+can therefore be present in the corresponding assembled contigs.  
 
 ![](doc/IntronSeeker-glossary.png)
 
-The read splicing signal of these introns can be used to find and remove them. 
-The intron splice site boundaries (canonical or not), the Open Reading Frame size
-and the protein alignment can be used as different hints to measure the probabiliy
+Splice site signal of these introns can be used to find and remove them. 
+Intron splice site boundaries (canonical or not), the Open Reading Frame size
+and related protein alignments can be used as different hints to measure the probabiliy
 of having a retained intron.
 
 We developped a tool to identify potentially retained introns in 
@@ -25,10 +24,10 @@ The first simulation module uses random sequence simulation in order to check if
 splice aligners are able to find inserted introns when only contigs with introns and reads
 whithout intron are used as well as when contigs with and without introns and reads without introns are used.
 
-The second simulation is based on an existing genome and corresponding genome annotation. 
+The second simulation module uses an existing genome and corresponding annotation. 
 In this case the simulator produces reads with an without intron as well as 
-transcripts with and whithout introns. This modules enables to verify the fraction 
-of retained introns which can be detected in real condition and and set the 
+transcripts with and whithout introns. This modules enables to measure the fraction 
+of retained introns which can be detected in real conditions and to set the 
 appropriate detection thresholds.
 
 Simulator and simulation data descriptions can be found in the SIMULATION.md file located in doc directory 
@@ -60,7 +59,7 @@ How to use ?
 Here, we'll present a non-exhaustive documentation on how to use the intronSeeker 
 program. For an exhaustive documentation about the different functions 
 (description, options...), read the HOW TO USE file in doc directory. 
-We'll just present a fast and basic usage with examples of the program. All the 
+We'll just present a fast and basic usage with examples. All the 
 input files or output files presented here are available in data directory. 
 
 Before running any intronSeeker command, activate the conda environment with :
@@ -93,7 +92,7 @@ intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-a
 
 ##### Splicing event search 
 
-When the alignment is ended, you can search for splicing events with :
+When the alignment is finished, you can search for splicing events with :
 
 ```diff
 intronSeeker splitReadSearch -a data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
@@ -109,7 +108,7 @@ intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-
 
 ##### Find evidence
  
-Perform a proteic alignment against "reference" and "trimref" FASTA files to find evidences.
+If you have a reference protein set, you can perform a proteic alignment against the "reference" and "trimref" FASTA files to find evidences.
 
 ```diff
  intronSeeker findEvidence  -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -t data/Reduced_real_dataset/Test_Cele_trimFASTA/tf_trimmed.fa  -d data/Reduced_real_dataset/Test_protein-diamond-database.fasta  -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_FindEvidence
