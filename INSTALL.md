@@ -14,7 +14,7 @@ requirements.txt). So, to make install easier, a conda enviromnent (grinder excl
 has been created  : Conda environment 
 (it is the [environment.yml](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/config/environment.yml) file)
 
-For an easy install, conda environments is recommended. 
+For an easy install, creating a conda environment is recommended. 
 Follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to install Miniconda.
 For a faster installation, we advise you to use mamba, already available in the latest version of conda
 
@@ -58,7 +58,7 @@ $ cd intronSeeker/
 $ CONDA_SOLVER="libmamba" /bin/bash ./setup.sh
 ```
 
-This script will  install the Conda environment, configure the newly installed
+This script will install the conda environment, configure the newly installed
 environment and install Grinder and its dependencies (Perl modules) wich are not yet
 available in conda. Grinder installation is performed in the Conda environment, so, despite
 the missing conda package, its installation will only affect your
