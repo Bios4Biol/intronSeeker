@@ -24,7 +24,7 @@ authors:
     orcid: 0000-0001-7126-5477
     affiliation: 2
 affiliations:
-  - name: Sigenae, GenPhySE, Université de Toulouse, INRAE, ENVT, Castanet Tolosan, France
+  - name: SIGENAE, GenPhySE, Université de Toulouse, INRAE, ENVT, Castanet Tolosan, France
     index: 1
   - name: SIGENAE, Bioinfo Genotoul, UMIAT, INRAE, Castanet-Tolosan, France
     index: 2
