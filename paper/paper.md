@@ -34,12 +34,10 @@ bibliography: paper.bib
 
 # Summary 
 
-intronSeeker identify potentially retained introns in de novo RNA-seq assembly in order to quantify and remove them.
-This tool includes two types of RNA-seq data simulations to validate the detection process and measure the false positive detection rate.
-The first simulation module uses random sequence simulation in order to check if splice aligners are able to find inserted introns when only contigs with introns and reads whithout intron are used as well as when contigs with and without introns and reads without introns are used.
-The second simulation is based on an existing genome and corresponding genome annotation.
-In this case the simulator produces reads with an without intron as well as transcripts with and whithout introns. This modules enables to verify the fraction of retained introns which can be detected in real condition and and set the appropriate detection thresholds.  
-intronSeeker provides a list of potential candidates, it filters them, list contigs with retained introns, and clean reference to provide a trimmed fasta.
+intronSeeker identifies potentially retained introns in *de novo* RNA-seq assembly in order to quantify and remove them.
+To use it you have to provide a set of contigs resulting of a *de novo* transcriptome assembly and a set of RNA-Seq reads. The reads will be aligned on the contigs, splices sites will be searched and tested to check if they correspond to valid intron retention events.
+It includes two types of RNA-seq data simulation strategies to validate the detection process and measure the false positive detection rate.
+intronSeeker provides a list of potential intron candidates, it filters them and outputs a clean reference without introns in Fasta format.
 
 # Introduction
 
