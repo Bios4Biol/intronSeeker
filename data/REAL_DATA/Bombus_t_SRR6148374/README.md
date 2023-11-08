@@ -44,11 +44,11 @@ nano  SRR6148374.cfg
 ```diff
 [Defaults]
 fasta:GHFS01.1.fsa_nt
-r1:SRR6148374_1.fastq
-r2:SRR6148374_2.fastq
-flagstat:hisat2_SRR6148374.sort.flagstat.txt
-candidat:srs_SRR6148374_candidates.txt
-split:srs_SRR6148374_split_alignments.txt
+r1:SRR6148374_1.fastq.gz
+r2:SRR6148374_2.fastq.gz
+flagstat:GHFS01/hisat2_GHFS01.sort.flagstat.txt
+candidat:splitReadSearch_GJJD01/srs_GHFS01_candidates.txt
+split:splitReadSearch_GJJD01/srs_GHFS01_split_alignments.txt
 prefix:GHFS01
 threads: 6                
 output:HTML/
@@ -61,3 +61,4 @@ intronSeeker buildReport  -F --config_file  SRR6148374.cfg;
 
 ```
 
+HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Bombus_t_GHFS01.html
