@@ -59,3 +59,5 @@ force: -F
 intronSeeker buildReport -F --config_file  SRR14933372.cfg;
 
 ```
+
+HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Diplonema_p_GJNJ01.html

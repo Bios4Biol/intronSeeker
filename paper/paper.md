@@ -76,8 +76,8 @@ The twenty public TSA contigs sets processed by IntronSeeker are classified in t
 | Graminella n.  |  Animalia  |  GAQX01 | 37 537 | [SRR857257](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Graminella_n_GAQX01.html)   |  43 693 708  | **2,88%**|
 | Carassius g.   |  Animalia  |  GJKR01 | 109 966 | [SRR12596368](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Carassius_g_GJKR01.html)  |  21 661 960 | **2.72%**|
 | Rhizopus a.   |  Fungi    |  GDUK01 | 30 601 | [SRR2104505](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Rhizopus_a_GDUK01.html)   |  64 801 576  | **2,51%**|
-| Diplonema p.   | Eukaryota  | GJNJ01  | 114 037 | SRR14933372  | 63 775 926   |  **2.35%**|
-| Azolla f.    | Plantae   | GBTV01  | 36 091 | SRR1618559  |  122 059 452 |  **1,97%**|
+| Diplonema p.   | Eukaryota  | GJNJ01  | 114 037 | [SRR14933372](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Diplonema_p_GJNJ01.html)  | 63 775 926   |  **2.35%**|
+| Azolla f.    | Plantae   | GBTV01  | 36 091 | [SRR1618559]( https://bios4biol.pages.mia.inra.fr/intronseeker/report_Azolla_f_GBTV01.html)  |  122 059 452 |  **1,97%**|
 | Tripidium r.   | Plantae   | GJDA01  | 106 494 | [SRR14143372]( https://bios4biol.pages.mia.inra.fr/intronseeker/report_Tripidium_r_GJDA01.html)  | 15 357 748  | **1.50%**|
 | Cimex l.     |  Animalia  | GBYH01  | 39 124 | [SRR1660436](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Cimex_l_GBYH01.html)   | 329 875 624  |  **1,24%**|
 | Trichoplax sp. H2|  Animalia  | GFSF01   | 43 376 | [SRR5819939](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Trichoplax_sp_H2_GFSF01.html)   | 128 665 904  | **1,24%**|
@@ -86,7 +86,7 @@ The twenty public TSA contigs sets processed by IntronSeeker are classified in t
 | Sander l.    |  Animalia  | GJIW01  | 56 196 | [SRR15372351](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Sander_l_GJIW01.html)  |  48 694 199  | **0.36%**|
 | Rhodnius n.   |  Animalia  | GJJI01  | 67 217 | [SRR15602387](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Rhodnius_n__SRR15602387.html)  | 6 775 534   | **0.11%**|
 | Choromytilus c. | Animalia   | GJJD01  | 106 298 | [SRR15058678](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Choromytilus_c_GJJD01.html)  | 10 490 833   |  **0.10%**|
-| Bombus t.    |  Animalia  | GHFS01  | 48 241 | SRR6148374   |  15 547 444  | **0.02%**|
+| Bombus t.    |  Animalia  | GHFS01  | 48 241 | [SRR6148374](https://bios4biol.pages.mia.inra.fr/intronseeker/report_Bombus_t_GHFS01.html)   |  15 547 444  | **0.02%**|
 
 Table: Rates of public contigs with introns, data from NCBI Transcript  Shotgun Archive (TSA) and Short Read Archive (SRA).
 
@@ -159,7 +159,7 @@ DPratio =DPin/(DPbefore+DPafter)
 Filtering candidates on the border enhances detection. 
 DPratio is calculated as follows :
 $$\frac{DP_{in}}{(DP_{before} + DP_{after})}$$
-$$With DP_{before} corresponding to the mean DP for 10bp before the candidate, DP_{in} to the mean DP of candidate and DP_{after} to the mean DP for 10bp after the candidate.$$
+With DPbefore corresponding to the mean DP for 10bp before the candidate, DPin to the mean DP of candidate and DPafter to the mean DP for 10bp after the candidate.
 
 **C** Filter candidates on candidat length.
 
