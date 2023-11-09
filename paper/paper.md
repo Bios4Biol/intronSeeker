@@ -163,7 +163,7 @@ With DPbefore corresponding to the mean DP for 10bp before the candidate, DPin t
 
 **C** Filter candidates on candidat length.
 
-**D** Filter candidates on retained intron ratio (len contig / len candidat).
+**D** Filter candidates on retained intron ratio (length contig / length candidat).
 
 # Acknowledgement of financial support
 
