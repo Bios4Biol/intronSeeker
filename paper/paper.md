@@ -153,10 +153,7 @@ IntronSeeker parameters impacts. Graphics have been built on 10 samples of Arabi
 **A** Impact of coverage on detection.
 Increased coverage means that false candidates are quickly lost, with very limited impact on the number of true candidates (tested with Arabidopsis thaliana data and powerlow abundance).
 
-**B** Filter candidates on border improves detection.
-DPratio =DPin/(DPbefore+DPafter)
-
-Filtering candidates on the border enhances detection. 
+**B** Filtering candidates on the border enhances detection. 
 DPratio is calculated as follows :
 $$\frac{DP_{in}}{(DP_{before} + DP_{after})}$$
 With DPbefore corresponding to the mean DP for 10bp before the candidate, DPin to the mean DP of candidate and DPafter to the mean DP for 10bp after the candidate.
