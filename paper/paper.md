@@ -156,6 +156,11 @@ Increased coverage means that false candidates are quickly lost, with very limit
 **B** Filter candidates on border improves detection.
 DPratio =DPin/(DPbefore+DPafter)
 
+Filtering candidates on the border enhances detection. 
+DPratio is calculated as follows :
+$$\frac{DPin}{(DPbefore + DPafter)}$$
+With DPbefore corresponding to the mean DP for 10bp before the candidate, DPin to the mean DP of candidate and DPafter to the mean DP for 10bp after the candidate.
+
 **C** Filter candidates on candidat length.
 
 **D** Filter candidates on retained intron ratio (len contig / len candidat).
