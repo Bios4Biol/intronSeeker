@@ -159,7 +159,7 @@ DPratio =DPin/(DPbefore+DPafter)
 Filtering candidates on the border enhances detection. 
 DPratio is calculated as follows :
 $$\frac{DP_{in}}{(DP_{before} + DP_{after})}$$
-With $$DP_{before}$$ corresponding to the mean DP for 10bp before the candidate, $$DP_{in}$$ to the mean DP of candidate and $$DP_{after}$$ to the mean DP for 10bp after the candidate.
+$$With DP_{before} corresponding to the mean DP for 10bp before the candidate, DP_{in} to the mean DP of candidate and DP_{after} to the mean DP for 10bp after the candidate.$$
 
 **C** Filter candidates on candidat length.
 
