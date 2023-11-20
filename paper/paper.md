@@ -15,18 +15,18 @@ authors:
     orcid: 0000-0002-0004-0251 
     affiliation: 1
   - name: Emilien Lasguignes
-    affiliation: 1
+    affiliation: 2
   - name: Faustine Oudin
-    affiliation: 1
+    affiliation: 2
   - name: Floréal Cabanettes
-    affiliation: 1
+    affiliation: 2
   - name: Christophe Klopp
     orcid: 0000-0001-7126-5477
     affiliation: 2
 affiliations:
-  - name: SIGENAE, GenPhySE, Université de Toulouse, INRAE, ENVT, Castanet Tolosan, France
+  - name: Sigenae, GenPhySE, Université de Toulouse, INRAE, ENVT, F-31326, Castanet Tolosan, France.
     index: 1
-  - name: SIGENAE, Bioinfo Genotoul, UMIAT, INRAE, Castanet-Tolosan, France
+  - name: Université Fédérale de Toulouse, INRAE, BioinfOmics, GenoToul Bioinformatics facility, Sigenae, 31326, Castanet-Tolosan, France
     index: 2
 date: 2023
 bibliography: paper.bib
