@@ -105,7 +105,7 @@ IntronSeeker is a python script which includes three steps enabling to align rea
 
 IntronSeeker is open source (GNU General Public License) and can be download from <http://github.com/>
 
-![IntronSeeker steps diagram](paper/Figures/IS_pipeline.png)
+![IntronSeeker steps diagram](Figures/IS_pipeline.png)
 
 
 ## Conda based installation procedure
@@ -146,7 +146,7 @@ Detected introns are filtered according to thresholds (number of reads overlappi
 
 Different GBS simulations where performed to find the best possible thresholds for minimum number of splice events, maximum intron spanning size, presence of canonical splice sites and minimum overlap size to call a splice event an intron retention candidate.
 
-![GBS parameters impacts](paper/Figures/GBS_params_impacts.png)
+![GBS parameters impacts](Figures/GBS_params_impacts.png)
 
 IntronSeeker parameters impacts. Graphics have been built on 10 samples of Arabidopsis thaliana data with powerlow abundance (1.2). Details are available in data/ directory.
 
