@@ -201,6 +201,16 @@ else
     exit $code
 fi
 
+# Instal EMBOSS for findEvidence 
+if [ $? = 0 ]
+then
+    conda install -c bioconda emboss
+else
+    code=$?
+    echo "FAIL : EMBOSS installation FAILED." 
+    exit $code
+fi
+
 cd ..
 cd $HERE
 
