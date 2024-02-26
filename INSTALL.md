@@ -100,6 +100,12 @@ Installation done.
 
 ```
 
+If Anaconda Client is not found, please run this command line:
+
+```
+conda install anaconda-client -n base
+```
+
 NB. Installation can be quite long due to the numerous grinder perl dependencies. 
 
 ### Activate ISeeker_environment and test installation.
