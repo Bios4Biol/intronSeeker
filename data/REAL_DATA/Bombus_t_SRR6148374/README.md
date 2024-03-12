@@ -61,4 +61,4 @@ intronSeeker buildReport  -F --config_file  SRR6148374.cfg;
 
 ```
 
-HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Bombus_t_GHFS01.html
+HTML report is available in public directory and here  http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Bombus_t_GHFS01.html
