@@ -58,5 +58,4 @@ force: -F
 intronSeeker buildReport -F --config_file  SRR15372351.cfg;
 
 ```
-
-HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Sander_l_GJIW01.html
+As this HTML report file is too large, it is not available in this repository.
