@@ -59,5 +59,5 @@ intronSeeker buildReport -F --config_file  SRR15602387.cfg;
 
 ```
 
-HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Rhodnius_n__SRR15602387.html
+HTML report is available in public directory and here http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Rhodnius_n__SRR15602387.html
 
