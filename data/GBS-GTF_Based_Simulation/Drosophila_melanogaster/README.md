@@ -85,4 +85,4 @@ force: -F
 intronSeeker buildReport  -F --config_file  Dmel.cfg;
 ```
 
-HTML report is available in intronSeeker public directory : https://bios4biol.pages.mia.inra.fr/intronseeker/report_Dmel.html
+HTML report is available in intronSeeker public directory : http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Dmel.html
