@@ -58,4 +58,4 @@ intronSeeker buildReport -F --config_file  SRR15718805.cfg;
 
 ```
 
-HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Salvia_m_GJJN01.html
+HTML report is available in public directory and here http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Salvia_m_GJJN01.html
