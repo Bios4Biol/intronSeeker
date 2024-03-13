@@ -59,4 +59,4 @@ intronSeeker buildReport -F --config_file  SRR5819939.cfg;
 
 ```
 
-HTML report is available in public directory and here https://bios4biol.pages.mia.inra.fr/intronseeker/report_Trichoplax_sp_H2_GFSF01.html
+HTML report is available in public directory and here http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Trichoplax_sp_H2_GFSF01.html
