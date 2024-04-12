@@ -58,7 +58,7 @@ How to use ?
 
 Here, we'll present a non-exhaustive documentation on how to use the intronSeeker 
 program. For an exhaustive documentation about the different functions 
-(description, options...), read the HOW TO USE file in doc directory. 
+(description, options...), please see the README file in data directory. 
 We'll just present a fast and basic usage with examples. All the 
 input files or output files presented here are available in data directory. 
 
