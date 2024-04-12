@@ -218,8 +218,8 @@ All parameters are described here: https://sourceforge.net/projects/biogrinder/f
 A grinder file is given for example:  config/grinder_frs.cfg 
 
 Here are a few examples:
--cf 100               # Fold coverage (100X)
-#-tr 2000000          # Choose either  "tr" or "cf" parameter. tr is the number of reads to generate for each library.
+```diff
+-cf 100               # Fold coverage (100X). Choose either  "tr" or "cf" parameter. tr is the number of reads to generate for each library. Example: -tr 2000000
 -rd 100 normal 7.5    # Read length distribution
 -id 500 normal 250    # Insert distribution
 -mo FR                # Mate orientation
@@ -228,7 +228,7 @@ Here are a few examples:
 -am uniform           # Abundance model : -am uniform for an homogen distribution, or -am powerlaw 0.5 for a powerlaw distribution
 -fq 1                 # Generated reads in FASTQ format
 -ql 32 2              # Quality levels
-
+```
 
 # IntronSeeker report
 
