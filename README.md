@@ -3,7 +3,7 @@ intronSeeker
 
 RNA-Seq reads quite often contain non-spliced introns. These introns originating from non mature mRNAs 
 can break the translated protein Open Reading Frame. In order to get the 
-correct protein sequence introns have to be removed,
+correct protein sequence introns have to be removed.
 Retained introns will be present in only some sequences nevertheless they 
 can therefore be present in the corresponding assembled contigs.  
 
