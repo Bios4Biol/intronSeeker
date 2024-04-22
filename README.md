@@ -88,6 +88,8 @@ in the data directory (this data comes from *Ceanhorhabditis elegans*).
 intronSeeker can use two aligners : STAR and Hisat2. Hisat2 gives better alignment
 results but takes longer to run and works only with paired-end library.
 
+The aligners we tested were the only two capable of handling alignments on contigs with and without the intron. We wrapped them to simplify their launch.
+
 Running alignment, use the commands :
 
 ```diff
