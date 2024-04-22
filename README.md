@@ -40,6 +40,16 @@ How it works ?
 
 ![](doc/IntronSeeker-workflow.png)
 
+Dashed lines connectors are used to represent optional inputs files. 
+Solid lines connectors are used to represent inputs and outputs files.
+
+Inputs data for intronSeeker are raw RNASeq paired reads (R1.fastq and R2.fastq). These reads are aligned on the contigs with STAR or HiSAT2, according to user preferences. Splices sites are searched and intronSeeker generate a list of candidates and a list of splits alignements. This candidat file is then tested to check if they correspond to valid intron retention events.  A clean reference without introns is generated in Fasta format with TrimFasta step. From the reference  and trimmed Fasta files, intronSeeker predicts the Open  Reading  Frames and  find  proteic  hits to find evidences.
+
+
+Simulated data are used for validating the method and measure the false positive detection rate. Intron detection never involve a simulation step.
+
+
+The main pipeline step are:
 1. Use [Star](https://github.com/alexdobin/STAR) or 
 [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml) to map reads on 
 assembled contigs.
