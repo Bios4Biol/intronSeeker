@@ -6,6 +6,7 @@ can break the translated protein Open Reading Frame. In order to get the
 correct protein sequence introns have to be removed.
 Retained introns will be present in only some sequences nevertheless they 
 can therefore be present in the corresponding assembled contigs.  
+Introns are retained by "accident" meaning due to non mature transcripts present in the cell. These transcripts have not undergone complete splicing and therefore still harbor introns. The upstream step is not data processing but a biological process called splicing.
 
 ![](doc/IntronSeeker-glossary.png)
 
