@@ -162,6 +162,17 @@ With DPbefore corresponding to the mean DP for 10bp before the candidate, DPin t
 
 **D** Filter candidates on retained intron ratio (candidat length / contig length).
 
+# Acknowledgements
+
+We are grateful to the Genotoul bioinformatics platform Toulouse Occitanie (1) for providing help, computing and storage resources.
+We are grateful to Philippe BORDRON (2) and Patrice DEHAIS (3) for testing and validating the intronSeeker installation procedure.
+
+(1) Bioinfo Genotoul, doi: 10.15454/1.5572369328961167E12
+(2)
+- Université de Toulouse, INRAE, BioinfOmics, GenoToul Bioinformatics Facility, Castanet-Tolosan, France, 
+- Université de Toulouse, INRAE, UR 875 MIAT, Castanet-Tolosan, France
+(3) Sigenae, GenPhySE, Université de Toulouse, INRAE, ENVT, F-31326, Castanet Tolosan, France
+  
 # Acknowledgement of financial support
 
 The non permanent positions of Floréal Cabanette and Emilien Lasguignes were financed by projet France Génomique n° 31000523 and projet France Génomique n° 15000079.
