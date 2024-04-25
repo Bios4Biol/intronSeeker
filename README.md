@@ -93,22 +93,22 @@ The aligners we tested were the only two capable of handling alignments on conti
 Running alignment, use the commands :
 
 ```diff
-intronSeeker starAlignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/Reduced_real_dataset/Cele_library-contigs_starAlignment
+intronSeeker starAlignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o test_Reduced_real_dataset/Cele_library-contigs_starAlignment
 ```
 
 or 
 
 ```diff
-intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
+intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
 ```
-
+N.B.: If you wish to re-run this step, it is necessary to change the name of your output directory.
 
 ##### Splicing event search 
 
 When the alignment is finished, you can search for splicing events with :
 
 ```diff
-intronSeeker splitReadSearch -a data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
+intronSeeker splitReadSearch -a test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
 ```
 
 ##### List features by FASTA trimming
@@ -136,7 +136,7 @@ Create a configuration file buildReport_example.cfg :
  fasta:data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
  r1:data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
  r2:data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
- flagstat:data/Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.flagstat.txt
+ flagstat:test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.flagstat.txt
  candidat:data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt
  split:data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_split_alignments.txt
  prefix:Cele
