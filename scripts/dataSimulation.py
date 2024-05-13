@@ -37,7 +37,7 @@ try :
     from Bio import SeqIO
     from Bio.SeqRecord import SeqRecord
     from collections import defaultdict
-    from math import *  #sarah
+    from math import *
     from helpMessages import print_to_stdout
 except ImportError as error :
     print(error)
