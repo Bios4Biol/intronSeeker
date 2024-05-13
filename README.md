@@ -62,7 +62,7 @@ assembled contigs.
 How to install ?
 ----------------
 
-To install intronSeeker, see the INSTALL.md file [here](./INSTALL.md)
+To install intronSeeker, see the [INSTALL.md file](./INSTALL.md)
 
 How to use ? 
 ------------
@@ -90,16 +90,16 @@ results but takes longer to run and works only with paired-end library.
 
 The aligners we tested were the only two capable of handling alignments on contigs with and without the intron. We wrapped them to simplify their launch.
 
-Running alignment, use the commands :
+In introSeeker directory, in order to run alignment, use the commands :
 
 ```diff
-intronSeeker starAlignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o test_Reduced_real_dataset/Cele_library-contigs_starAlignment
+./intronSeeker starAlignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o test_Reduced_real_dataset/Cele_library-contigs_starAlignment
 ```
 
 or 
 
 ```diff
-intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
+./intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
 ```
 N.B.: If you wish to re-run this step, it is necessary to change the name of your output directory.
 
@@ -108,7 +108,7 @@ N.B.: If you wish to re-run this step, it is necessary to change the name of you
 When the alignment is finished, you can search for splicing events with :
 
 ```diff
-intronSeeker splitReadSearch -a test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
+./intronSeeker splitReadSearch -a test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
 ```
 
 ##### List features by FASTA trimming
@@ -116,7 +116,7 @@ intronSeeker splitReadSearch -a test_Reduced_real_dataset/Cele_library-contigs_H
 When trimFastaFromTXT produces a new FASTA reference file where features, listed in candidats file, are trimmed from the reference FASTA.
 
 ```diff
-intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_trimFASTA
+./intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_trimFASTA
 ```
 
 ##### Find evidence
@@ -124,7 +124,7 @@ intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-
 If you have a reference protein set, you can perform a proteic alignment against the "reference" and "trimref" FASTA files to find evidences.
 
 ```diff
- intronSeeker findEvidence  -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -t data/Reduced_real_dataset/Test_Cele_trimFASTA/tf_trimmed.fa  -d data/Reduced_real_dataset/Test_protein-diamond-database.fasta  -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_FindEvidence
+./intronSeeker findEvidence  -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -t data/Reduced_real_dataset/Test_Cele_trimFASTA/tf_trimmed.fa  -d data/Reduced_real_dataset/Test_protein-diamond-database.fasta  -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_FindEvidence
 ```
 
 ##### Generate a intronSeeker simulation report
@@ -146,7 +146,7 @@ Create a configuration file buildReport_example.cfg :
 ```
 
 ```diff
-    intronSeeker buildReport -F --config_file data/Reduced_real_dataset/buildReport_example.cfg 
+./intronSeeker buildReport -F --config_file data/Reduced_real_dataset/buildReport_example.cfg 
 ```
 
 Your HTML simulation report is available in HTML directory.
