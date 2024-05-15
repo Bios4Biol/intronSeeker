@@ -108,7 +108,7 @@ N.B.: If you wish to re-run this step, it is necessary to change the name of you
 When the alignment is finished, you can search for splicing events with :
 
 ```diff
-./intronSeeker splitReadSearch -a test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
+./intronSeeker splitReadSearch -a test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
 ```
 
 ##### List features by FASTA trimming
@@ -116,7 +116,7 @@ When the alignment is finished, you can search for splicing events with :
 When trimFastaFromTXT produces a new FASTA reference file where features, listed in candidats file, are trimmed from the reference FASTA.
 
 ```diff
-./intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_trimFASTA
+./intronSeeker trimFastaFromTXT -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -c data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/test_Reduced_real_dataset/Test_Cele_trimFASTA
 ```
 
 ##### Find evidence
@@ -124,32 +124,32 @@ When trimFastaFromTXT produces a new FASTA reference file where features, listed
 If you have a reference protein set, you can perform a proteic alignment against the "reference" and "trimref" FASTA files to find evidences.
 
 ```diff
-./intronSeeker findEvidence  -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -t data/Reduced_real_dataset/Test_Cele_trimFASTA/tf_trimmed.fa  -d data/Reduced_real_dataset/Test_protein-diamond-database.fasta  -c data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_FindEvidence
+./intronSeeker findEvidence  -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -t data/Reduced_real_dataset/Test_Cele_trimFASTA/tf_trimmed.fa  -d data/Reduced_real_dataset/Test_protein-diamond-database.fasta  -c data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt -o data/Reduced_real_dataset/Test_Cele_FindEvidence
 ```
 
 ##### Generate a intronSeeker simulation report
 
-Create a configuration file buildReport_example.cfg :
+Create a configuration file data/test_Reduced_real_dataset/buildReport_example.cfg :
 
 ```diff
 [Defaults]
- fasta:data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
- r1:data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
- r2:data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
- flagstat:test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.flagstat.txt
- candidat:data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt
- split:data/Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_split_alignments.txt
- prefix:Cele
- threads:6             
- output:HTML/
- force: -F
+fasta:data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
+r1:data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
+r2:data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
+flagstat:test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.flagstat.txt
+candidat:data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt
+split:data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_split_alignments.txt
+prefix:Cele
+threads:6             
+output:test_HTML/
+force: -F
 ```
 
 ```diff
-./intronSeeker buildReport -F --config_file data/Reduced_real_dataset/buildReport_example.cfg 
+./intronSeeker buildReport -F --config_file data/test_Reduced_real_dataset/buildReport_example.cfg 
 ```
 
-Your HTML simulation report is available in HTML directory.
+Your HTML simulation report is available in test_HTML directory.
 
 ## Wrappers description
 
