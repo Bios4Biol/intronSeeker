@@ -20,30 +20,30 @@ name: ISeeker_environment
 channels:
   - conda-forge
   - bioconda
+  - intronseeker
   - defaults
 dependencies:
+  - intronseeker::assemblathon_stats
   - bcftools>=1.9
   - biopython>=1.74
-  - diamond>=0.9.24
-  - gffread>=0.11.4
+  - diamond==0.9.24
+  - emboss>=6.6.0
+  - gffread==0.11.4
   - gtfparse>=1.2.0
-  - hisat2>=2.1.0
+  - intronseeker::grinder==0.5.4
+  - hisat2==2.1.0
   - numpy>=1.16.4
   - pandas>=0.25.0
-  - plotly>=4.0.0
-  - pysam>=0.15.3
-  - python>=3.6.9
-  - samtools>=1.9
-  - star>=2.7.1a
-  - transdecoder>=5.5.0
-  - gcc_linux-64==9.3.0
-  - libgcc-ng==9.3.0
   - perl-test-more>=1.001002
   - perl-test-warn>=0.36
   - perl-bioperl-core>=1.007002
-  - perl-getopt-long>=2.50
   - perl-list-moreutils>=0.428
   - perl-math-random>=0.72
+  - plotly>=4.0.0
+  - pysam>=0.15.3
+  - python>=3.6.9
+  - samtools==1.9
+  - star==2.7.1a
   - scipy>=1.4.1
-  - EMBOSS>=6.6.0
+  - transdecoder==5.5.0
 
