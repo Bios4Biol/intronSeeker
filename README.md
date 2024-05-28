@@ -93,13 +93,13 @@ The aligners we tested were the only two capable of handling alignments on conti
 In introSeeker directory, in order to run alignment, use the commands :
 
 ```diff
-./intronSeeker starAlignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o test_Reduced_real_dataset/Cele_library-contigs_starAlignment
+./intronSeeker starAlignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/test_Reduced_real_dataset/Cele_library-contigs_starAlignment
 ```
 
 or 
 
 ```diff
-./intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
+./intronSeeker hisat2Alignment -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -1 data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz -2 data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz -o data/test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment
 ```
 N.B.: If you wish to re-run this step, it is necessary to change the name of your output directory.
 
@@ -108,7 +108,7 @@ N.B.: If you wish to re-run this step, it is necessary to change the name of you
 When the alignment is finished, you can search for splicing events with :
 
 ```diff
-./intronSeeker splitReadSearch -a test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
+./intronSeeker splitReadSearch -a data/test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
 ```
 
 ##### List features by FASTA trimming
@@ -136,7 +136,7 @@ Create a configuration file data/test_Reduced_real_dataset/buildReport_example.c
 fasta:data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta
 r1:data/Reduced_real_dataset/Test_set_Cele_reads-1.fastq.gz
 r2:data/Reduced_real_dataset/Test_set_Cele_reads-2.fastq.gz
-flagstat:test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.flagstat.txt
+flagstat:data/test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.flagstat.txt
 candidat:data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_candidates.txt
 split:data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2/srs_split_alignments.txt
 prefix:Cele
