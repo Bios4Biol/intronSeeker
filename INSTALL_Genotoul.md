@@ -12,7 +12,7 @@ It also needs Python packages and external softwares to work
 correctly (all these dependancies and their versions are detailed in the file 
 requirements.txt). So, to make install easier, a conda enviromnent (grinder excluded)
 has been created  : Conda environment 
-(it is the [environment.yml](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/config/environment.yml) file)
+(it is the [environment.yml](https://github.com/Bios4Biol/intronSeeker/blob/master/config/environment.yml) file)
 
 For an easy install, conda environments is recommended. 
 Follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to install Miniconda.
@@ -26,10 +26,10 @@ First, open a bash session if you are not already in bash (bash command).
 
 ### Clone intronSeeker code from Git.
 
-Download all files and directories found at [URL](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker) 
+Download all files and directories found at [URL](https://github.com/Bios4Biol/intronSeeker.git) 
 
 ```diff
-$ git clone https://forgemia.inra.fr/emilien.lasguignes/intronSeeker.git
+$ git clone https://github.com/Bios4Biol/intronSeeker.git
 Cloning into 'intronSeeker'...
 remote: Enumerating objects: 2364, done.
 remote: Counting objects: 100% (2334/2334), done.
