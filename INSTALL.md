@@ -9,7 +9,7 @@ Requirements
 IntronSeeker requires Python version 3.6 or above. You don't need to change your Python version because this is managed by your Conda environment.
 
 It also needs Python packages and external softwares to work 
-correctly (all these dependancies and their versions are detailed in the file 
+correctly (all these dependencies and their versions are detailed in the file 
 requirements.txt). So, to make install easier, a conda enviromnent (grinder excluded)
 has been created  : Conda environment 
 (it is the [environment.yml](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/config/environment.yml) file)
@@ -43,9 +43,24 @@ Checking out files: 100% (153/153), done.
 ### Install intronSeeker environment.
 
 
-```diff
+```txt
+# We go into the software directory
 $ cd intronSeeker
+
+# We check how conda channel search for dependencies
+$ conda config --get channel_priority
+
+# It may return the following line
+#--set channel_priority strict
+
+# We relax constrains on dependency checking if it is set to 'strict'
+$ conda config --set channel_priority flexible
+
+# We install the env
 $ conda env create -f config/environment.yml
+
+# If needed, we restore channel_priority as before (here strict)
+$ conda config --set channel_priority strict
 ```
 
 You can speedup intronSeeker installation by using [`mamba`](https://mamba.readthedocs.io/en/latest/) or [`libmamba`](https://conda.github.io/conda-libmamba-solver/)

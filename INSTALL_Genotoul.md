@@ -9,12 +9,12 @@ Requirements
 IntronSeeker requires Python version 3.6 or above. You don't need to change your Python version because this is managed by your Conda environment.
 
 It also needs Python packages and external softwares to work 
-correctly (all these dependancies and their versions are detailed in the file 
+correctly (all these dependencies and their versions are detailed in the file 
 requirements.txt). So, to make install easier, a conda enviromnent (grinder excluded)
 has been created  : Conda environment 
-(it is the [environment.yml](https://github.com/Bios4Biol/intronSeeker/blob/master/config/environment.yml) file)
+(it is the [environment.yml](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/config/environment.yml) file)
 
-For an easy install, conda environments is recommended. 
+For an easy install, creating a conda environment is recommended. 
 Follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to install Miniconda.
 For a faster installation, we advise you to use mamba, already available in the latest version of conda
 
@@ -26,7 +26,7 @@ First, open a bash session if you are not already in bash (bash command).
 
 ### Clone intronSeeker code from Git.
 
-Download all files and directories found at [URL](https://github.com/Bios4Biol/intronSeeker.git) 
+Download all files and directories found at [URL](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker) 
 
 ```diff
 $ git clone https://github.com/Bios4Biol/intronSeeker.git
@@ -54,58 +54,31 @@ $ module load system/Miniconda3
 $ module load devel/Miniconda/Miniconda3
 ```
 
-### Set up intronSeeker
+### Install intronSeeker environment.
 
-Run the setup.sh script :
 
-```diff
-$ cd intronSeeker/
-$ CONDA_SOLVER="libmamba" /bin/bash ./setup.sh
+```txt
+# We go into the software directory
+$ cd intronSeeker
+
+# We check how conda channel search for dependencies
+$ conda config --get channel_priority
+
+# It may return the following line
+#--set channel_priority strict
+
+# We relax constrains on dependency checking if it is set to 'strict'
+$ conda config --set channel_priority flexible
+
+# We install the env
+$ conda env create --solver libmamba -f config/environment.yml
+
+# If needed, we restore channel_priority as before (here strict)
+$ conda config --set channel_priority strict
 ```
 
-This script will  install the Conda environment, configure the newly installed
-environment and install Grinder and its dependencies (Perl modules) wich are not yet
-available in conda. Grinder installation is performed in the Conda environment, so, despite
-the missing conda package, its installation will only affect your
-conda environment (i.e. you will be able to run Grinder only when the environment is activated).
-You should get these messages in the standard output :
+You can speedup intronSeeker installation by using [`mamba`](https://mamba.readthedocs.io/en/latest/) or [`libmamba`](https://conda.github.io/conda-libmamba-solver/)
 
-```
-Begin installing intronSeeker...
-
-Directory added to the PATH
-
-Conda environment installing...
-
-Solving environment: done
-
-Downloading and Extracting Packages
-libcurl-7.63.0       | 550 KB    | ###################################################### | 100% 
-[...]
-perl-uri-1.74        | 54 KB     | ###################################################### | 100%
-Preparing transaction: done
-Verifying transaction: done
-Executing transaction: done
-#
-# To activate this environment, use
-#
-#     $ conda activate ISeeker_environment
-#
-# To deactivate an active environment, use
-#
-#     $ conda deactivate
-
-Conda environment installed.
-
-Conda environment configuration...
-
-Conda environment configured.
-
-Installation done.
-
-```
-
-NB. Installation can be quite long (15 minutes) due to the numerous grinder perl dependencies. 
 
 ### Activate ISeeker_environment and test installation.
 
@@ -118,13 +91,13 @@ $ conda activate ISeeker_environment
 Now, your command prompt should be like this :
 
 ```
-(ISeeker_environment) [user@genobioinfo1 intronSeeker]$ 
+(ISeeker_environment) [...]$ 
 ```
 
 Finally, to test the installation, run the command :
 
 ```diff
-(ISeeker_environment) $ intronSeeker checkInstall
+(ISeeker_environment) $ ./intronSeeker checkInstall
 ```
 
 You should get this message in standard ouput : 
@@ -148,6 +121,27 @@ All the dependencies are correctly installed
 ```
 
 To see intronSeeker help:
+
+```diff
+(ISeeker_environment) $ ./intronSeeker -h
+
+Program: intronSeeker
+Version: 1.0
+
+```
+
+## Add intronSeeker into you conda env PATH (once)
+
+intronSeeker can be run from anywhere. 
+In order to avoid to type the full PATH to intronSeeker program, you can create a symbolic link into the `ISeeker_environment` environment.
+You can use the following command when `ISeeker_environment` environment is loaded to do this:
+
+```diff
+ln -s "${PWD}"/intronSeeker "${CONDA_PREFIX}/bin/"
+```
+
+Then you can run it from anywhere:
+
 
 ```diff
 (ISeeker_environment) $ intronSeeker -h
