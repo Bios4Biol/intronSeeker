@@ -456,7 +456,10 @@ def df_lg_trim_ORF(getorf_file, candidates) :
     orfs={}
     for line in lines :
         vals = line.lstrip('>').split()
-        id    = vals[-1].split('=')[1]
+        if '=' in vals[-1]:
+            id = vals[-1].split('=')[1]
+        else:
+            id = vals[-1]
         start = int(vals[1].lstrip('['))
         end   = int(vals[3].rstrip(']'))
         if id not in orfs:
