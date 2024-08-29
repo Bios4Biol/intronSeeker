@@ -12,7 +12,7 @@ It also needs Python packages and external softwares to work
 correctly (all these dependencies and their versions are detailed in the file 
 requirements.txt). So, to make install easier, a conda enviromnent (grinder excluded)
 has been created  : Conda environment 
-(it is the [environment.yml](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker/-/blob/master/config/environment.yml) file)
+(it is the [environment.yml](https://github.com/Bios4Biol/intronSeeker/blob/master/config/environment.yml) file)
 
 For an easy install, creating a conda environment is recommended. 
 Follow [this tutorial](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) to install Miniconda.
@@ -26,9 +26,9 @@ First, open a bash session if you are not already in bash (bash command).
 
 ### Clone intronSeeker code from Git.
 
-Download all files and directories found at [URL](https://forgemia.inra.fr/emilien.lasguignes/intronSeeker) 
+Download all files and directories found at [URL](https://github.com/Bios4Biol/intronSeeker)
 
-```diff
+```shell
 $ git clone https://github.com/Bios4Biol/intronSeeker.git
 Cloning into 'intronSeeker'...
 remote: Enumerating objects: 2364, done.
@@ -44,20 +44,20 @@ Checking out files: 100% (153/153), done.
 
 #### On genologin
 
-```diff
+```shell
 $ module load system/Miniconda3
 ```
 
 #### On genobioinfo
 
-```diff
+```shell
 $ module load devel/Miniconda/Miniconda3
 ```
 
 ### Install intronSeeker environment.
 
 
-```txt
+```shell
 # We go into the software directory
 $ cd intronSeeker
 
@@ -84,7 +84,7 @@ You can speedup intronSeeker installation by using [`mamba`](https://mamba.readt
 
 Before each use of intronSeeker, activate the conda environment with :
 
-```diff
+```shell
 $ conda activate ISeeker_environment
 ```
 
@@ -96,7 +96,7 @@ Now, your command prompt should be like this :
 
 Finally, to test the installation, run the command :
 
-```diff
+```shell
 (ISeeker_environment) $ ./intronSeeker checkInstall
 ```
 
@@ -122,7 +122,7 @@ All the dependencies are correctly installed
 
 To see intronSeeker help:
 
-```diff
+```shell
 (ISeeker_environment) $ ./intronSeeker -h
 
 Program: intronSeeker
@@ -136,14 +136,14 @@ intronSeeker can be run from anywhere.
 In order to avoid to type the full PATH to intronSeeker program, you can create a symbolic link into the `ISeeker_environment` environment.
 You can use the following command when `ISeeker_environment` environment is loaded to do this:
 
-```diff
+```shell
 ln -s "${PWD}"/intronSeeker "${CONDA_PREFIX}/bin/"
 ```
 
 Then you can run it from anywhere:
 
 
-```diff
+```shell
 (ISeeker_environment) $ intronSeeker -h
 
 Program: intronSeeker
@@ -153,6 +153,6 @@ Version: 1.0
 
 For other intronSeeker steps, to avoid running front-end jobs on the compute cluster, we recommend that you connect to a compute node as follows:
 
-```diff
+```shell
 bash-4.4$ srun --mem=20G --pty bash
 ```
