@@ -41,7 +41,7 @@ intronSeeker provides a list of potential intron candidates, it filters them and
 
 # Introduction
 
-Short read RNA sequencing (RNA-Seq) is now routinely used to study gene expression. When a reference genome is available, RNA-Seq reads can be splice-aligned to the assembly and gene abundances can be measured by counting alignments found in each gene location. When no reference genome assembly is available, reads are usually assemble to build a reference transcriptome contig set. In this de novo approach reads are then aligned to the contigs without using a splice-aware aligner because they originate from mature transcripts.
+Short read RNA sequencing (RNA-Seq) is now routinely used to study gene expression. When a reference genome is available, RNA-Seq reads can be splice-aligned to the assembly and gene abundances can be measured by counting alignments found in each gene location. When no reference genome assembly is available, reads are usually assembled to build a reference transcriptome contig set. In this de novo approach reads are then aligned on the contigs without using a splice-aware aligner because they originate from mature transcripts.
 
 In order not to sequence very abundant ribosomal RNAs, commonly used protocols include oligo(dT) transcript enrichment. Transcript poly-adhenylation and splicing take place in the nucleus before transfer in the cytoplasm. PolyA tail selection retrieves mainly mature spliced transcripts. Introns spanning reads are still found in most RNA-Seq sets as shown by  [@Ameur2011].
 
@@ -51,7 +51,7 @@ Reads located on intron/exon boundaries harbor specific splice motifs. These spl
 
 Intron retention can be seen as an artefact or a biologically relevant mechanism and in both cases it is interesting to monitor. This is easy with a reference genome assembly because one can quantify reads aligned in introns. This is more complicated in the de novo approach in which the assembler can produce contigs with and without intron for the same transcript.
 
-Contigs with introns are more difficult to annotated because introns are splitting coding sequences (CDS) and possibly generating several shorter protein alignments rather than a unique long match.
+Contigs with introns are more difficult to be annotated because introns are splitting coding sequences (CDS) and possibly generating several shorter protein alignments rather than a unique long match.
 
 Canonical splice motifs presence, number of reads splicing at the same location, the minimum number of splice events and overlaps can be used to reduce faulty detection.
 
@@ -59,7 +59,7 @@ Hereafter we present IntronSeeker a software package enabling to search and remo
 
 # Statement of need
 
-RNA-Seq de novo assemblies are widely used to study transcription in species lacking a reference genome. The classical extraction protocol collects RNA fragments using their PolyA tails and there-fore should only gather mature RNAs. Unfortunately part of the extracted RNA molecules still com-prise retained introns which can therefore be present in some assembled contigs. These introns generate transcript frameshifts and thus render annotation more difficult. IntronSeeker searches introns by splice-realigning reads on contigs.  Introns candidates usually show canonical intron/exon boundaries supported by several sequences. IntronSeeker found between 0.02 and 11.96% of putative introns in twenty publicly available RNA-Seq de novo assembled samples. IntronSeeker produces an intron cleaned contig fasta file as well as a cleaning report. IntronSeeeker can be downloaded fromhttps://github.com/genotoul-bioinfo/intronseeker.
+RNA-Seq de novo assemblies are widely used to study transcription in species lacking a reference genome. The classical extraction protocol collects RNA fragments using their PolyA tails and therefore should only gather mature RNAs. Unfortunately part of the extracted RNA molecules still comprise retained introns which can therefore be present in some assembled contigs. These introns generate transcript frameshifts and thus render annotation more difficult. IntronSeeker searches introns by splice-realigning reads on contigs.  Introns candidates usually show canonical intron/exon boundaries supported by several sequences. IntronSeeker found between 0.02 and 11.96% of putative introns in twenty publicly available RNA-Seq de novo assembled samples. IntronSeeker produces an intron cleaned contig fasta file as well as a cleaning report. IntronSeeeker can be downloaded from [GitHub intronSeeker](https://github.com/Bios4Biol/intronSeeker/tree/master).
 
 ## Searching retained introns in public datasets 
 
@@ -68,7 +68,7 @@ The twenty public TSA contigs sets processed by IntronSeeker are classified in t
 | Species     |  (super)kingdom  | TSA id |Nb contigs | SRA and link to HTML intronSeeker report                                        |     Nb reads. |   \% cwi|
 | :---       |  :----:   |   :----: |:----:  |    :----:  |      :--- |    :--- |
 | Salvia m.    |  Plantae   |  GJJN01 | 69 705 |  [SRR15718805](http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Salvia_m_GJJN01.html) |   23 086 599 | **11.96%**|
-| Platichthys s.  |  Animalia  |  GAPK01 | 30 630 |  [SRR1023744](http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/)/report_Platichthys_s_GAPK01.html) | 516 791 904  | **10,71%**|
+| Platichthys s.  |  Animalia  |  GAPK01 | 30 630 |  [SRR1023744](http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Platichthys_s_GAPK01.html) | 516 791 904  | **10,71%**|
 | Rigidoporus m.  |  Fungi    |  GDMN01 | 34 441 |  [SRR2187438](http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Rigidoporus_m_GDMN01.html)  |   75 600 628 |  **5,97%**|
 | Isatis t.    |  Plantae   |  GARR01 | 33 238 | [SRR1051997](http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Isatis_t_GARR01.html)  |  113 134 348 |  **5,41%**|
 | Goniomonas a.  |  Eukaryota  |  GGUN01 | 48 844 | [SRR7601946](http://htmlpreview.github.io/?https://github.com/Bios4Biol/intronSeeker/blob/master/public/report_Goniomonas_a_GGUN01.html)   |  82 416 944 |  **5,27%**|
@@ -103,7 +103,7 @@ Fraction of contigs with introns (cwi) = Nb of contigs PASS / Nb total of contig
 
 IntronSeeker is a python script which includes three steps enabling to align read on contigs, find and remove retained introns and produce an html report. Figure 1. presents theses steps with input and output file formats.
 
-IntronSeeker is open source (GNU General Public License) and can be download from <http://github.com/>
+IntronSeeker is open source (GNU General Public License) and can be download [here](https://github.com/Bios4Biol/intronSeeker/blob/master/LICENSE).
 
 ![IntronSeeker steps diagram](Figures/IS_pipeline.png)
 
