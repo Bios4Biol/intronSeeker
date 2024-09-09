@@ -105,10 +105,16 @@ N.B.: If you wish to re-run this step, it is necessary to change the name of you
 
 ##### Splicing event search 
 
-When the alignment is finished, you can search for splicing events with :
+When the alignment is finished, you can search for splicing events with HiSAT2:
 
 ```diff
 ./intronSeeker splitReadSearch -a data/test_Reduced_real_dataset/Cele_library-contigs_HISAT2Alignment/hisat2.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/test_Reduced_real_dataset/Test_Cele_splicing_event_HISAT2
+```
+
+or with STAR:
+
+```diff
+./intronSeeker splitReadSearch -a data/test_Reduced_real_dataset/Cele_library-contigs_starAlignment/star.sort.bam -r data/Reduced_real_dataset/Test_set_Cele_contig-assembly.fasta -o data/test_Reduced_real_dataset/Test_Cele_splicing_event_STAR
 ```
 
 ##### List features by FASTA trimming
