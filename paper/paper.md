@@ -49,7 +49,7 @@ Intron retention is also a known biological gene regulation or alternative splic
 
 Reads located on intron/exon boundaries harbor specific splice motifs. These splice motifs are di-nucleotides located at both intron ends. They can be canonical (GT/AG) or not. Canonical motifs are found in most site of most species.
 
-Intron retention can be seen as an artifact or a biologically relevant mechanism and in both cases it is interesting to monitor. This is easy with a reference genome assembly because one can quantify reads aligned in introns. This is more complicated in the de novo approach in which the assembler can produce contigs with and without intron for the same transcript.
+Intron retention can be seen as an artefact or a biologically relevant mechanism and in both cases it is interesting to monitor. This is easy with a reference genome assembly because one can quantify reads aligned in introns. This is more complicated in the de novo approach in which the assembler can produce contigs with and without intron for the same transcript.
 
 Contigs with introns are more difficult to be annotated because introns are splitting coding sequences (CDS) and possibly generating several shorter protein alignments rather than a unique long match.
 
