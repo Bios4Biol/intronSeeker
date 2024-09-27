@@ -35,8 +35,8 @@ bibliography: paper.bib
 # Summary 
 
 intronSeeker identifies potentially retained introns in *de novo* RNA-seq assembly in order to quantify and remove them.
-To use it you have to provide a set of contigs resulting of a *de novo* transcriptome assembly and a set of RNA-Seq reads. The reads will be aligned on the contigs, splices sites will be searched and tested to check if they correspond to valid intron retention events.
-It includes two types of RNA-seq data simulation strategies to validate the detection process and measure the false positive detection rate.
+To use it you have to provide a set of contigs resulting of a de novo transcriptome assembly and a set of RNA-Seq reads. The reads will be aligned on the contigs, splices sites will be searched and tested to check if they correspond to valid intron retention events.
+The tool works by aligning user-provided reads to contigs from a de novo transcriptome assembly. Splice sites are then searched and tested to check if they correspond to valid intron retention events.
 intronSeeker provides a list of potential intron candidates, it filters them and outputs a clean reference without introns in Fasta format.
 
 # Introduction
@@ -45,21 +45,21 @@ Short read RNA sequencing (RNA-Seq) is now routinely used to study gene expressi
 
 In order not to sequence very abundant ribosomal RNAs, commonly used protocols include oligo(dT) transcript enrichment. Transcript poly-adhenylation and splicing take place in the nucleus before transfer in the cytoplasm. PolyA tail selection retrieves mainly mature spliced transcripts. Introns spanning reads are still found in most RNA-Seq sets as shown by  [@Ameur2011].
 
-Intron retention is also a known biological gene regulation or alternative splicing mechanism. In plants it has been shown to increase the number of transcript splicing forms  [@Jia2020].  [@Braunschweig2014] have shown that, even in mammals, their is widespread intron retention linked with gene expression regulation.
+Intron retention is also a known biological gene regulation or alternative splicing mechanism. In plants it has been shown to increase the number of transcript splicing forms  [@Jia2020].  [@Braunschweig2014] have shown that, even in mammals, there is widespread intron retention linked with gene expression regulation.
 
 Reads located on intron/exon boundaries harbor specific splice motifs. These splice motifs are di-nucleotides located at both intron ends. They can be canonical (GT/AG) or not. Canonical motifs are found in most site of most species.
 
-Intron retention can be seen as an artefact or a biologically relevant mechanism and in both cases it is interesting to monitor. This is easy with a reference genome assembly because one can quantify reads aligned in introns. This is more complicated in the de novo approach in which the assembler can produce contigs with and without intron for the same transcript.
+Intron retention can be seen as an artefact or a biologically relevant mechanism; in both cases it is interesting to monitor. This is easy with a reference genome assembly because one can quantify reads aligned in introns. This is more complicated in the de novo approach in which the assembler can produce contigs with and without intron for the same transcript.
 
-Contigs with introns are more difficult to be annotated because introns are splitting coding sequences (CDS) and possibly generating several shorter protein alignments rather than a unique long match.
+Contigs with introns are more difficult to annotated because introns split coding sequences (CDS) and can generate several shorter protein alignments rather than a unique long match.
 
 Canonical splice motifs presence, number of reads splicing at the same location, the minimum number of splice events and overlaps can be used to reduce faulty detection.
 
-Hereafter we present IntronSeeker a software package enabling to search and remove introns from de novo assembled RNA-Seq contigs.
+We present IntronSeeker; a software package that enables the user to search and remove introns from de novo assembled RNA-Seq contigs.
 
 # Statement of need
 
-RNA-Seq de novo assemblies are widely used to study transcription in species lacking a reference genome. The classical extraction protocol collects RNA fragments using their PolyA tails and therefore should only gather mature RNAs. Unfortunately part of the extracted RNA molecules still comprise retained introns which can therefore be present in some assembled contigs. These introns generate transcript frameshifts and thus render annotation more difficult. IntronSeeker searches introns by splice-realigning reads on contigs.  Introns candidates usually show canonical intron/exon boundaries supported by several sequences. IntronSeeker found between 0.02 and 11.96% of putative introns in twenty publicly available RNA-Seq de novo assembled samples. IntronSeeker produces an intron cleaned contig fasta file as well as a cleaning report. IntronSeeeker can be downloaded from [GitHub intronSeeker](https://github.com/Bios4Biol/intronSeeker/tree/master).
+RNA-Seq de novo assemblies are widely used to study transcription in species lacking a reference genome. The classical extraction protocol collects RNA fragments using their PolyA tails and therefore should only gather mature RNAs. Unfortunately part of the extracted RNA molecules still comprise retained introns which can therefore be present in some assembled contigs. These introns can generate transcript frameshifts and thus render annotation more difficult. IntronSeeker searches introns by splice-realigning reads on contigs.  Introns candidates usually show canonical intron/exon boundaries supported by several sequences. IntronSeeker found between 0.02 and 11.96% of putative introns in twenty publicly available RNA-Seq de novo assembled samples. IntronSeeker produces an intron cleaned contig fasta file as well as a cleaning report. IntronSeeeker can be downloaded from [GitHub intronSeeker](https://github.com/Bios4Biol/intronSeeker/tree/master).
 
 ## Searching retained introns in public datasets 
 
@@ -110,7 +110,7 @@ IntronSeeker is open source (GNU General Public License) and can be download [he
 
 ## Conda based installation procedure
 
-To ease installation, intronSeeker includes an installation script (setup.sh) which run the installation of all the dependencies (1) but one (grinder) using conda and then installs grinder in the conda environment. Conda has to be installed beforehand. Installation can be checked using intronSeeker checkInstall program which will verify the presence and version of all dependencies. To run intronSeeker one has first to load the ISeeker_environment using conda 'source activate ISeeker_environment' command. An example data set named reduced_real_dataset is also provided in the data directory. It includes the result files which will enable manual comparison of the reference and produced intron files after complying the test. The installation procedure and the test command line can be found on the main page of the intronSeeker GITHUB WEB-page.
+To ease installation, intronSeeker includes an installation script (setup.sh) which run the installation of all the dependencies (1) but one (grinder) using conda and then installs grinder in the conda environment. Conda must be installed beforehand. Installation can be checked using intronSeeker checkInstall program which will verify the presence and version of all dependencies. To run intronSeeker one has first to load the ISeeker_environment using conda 'source activate ISeeker_environment' command. An example data set named reduced_real_dataset is also provided in the data directory. It includes the result files which will enable manual comparison of the reference and produced intron files after complying the test. The installation procedure and the test command line can be found on the main page of the intronSeeker GITHUB WEB-page.
 
 \(1\) IntronSeeker dependencies include seven software packages :
 grinder [@angly2012grinder], gffread [@gffread], hisat2 [@kim2015hisat], STAR [@dobin2013star], samtools [@li2009sequence], TransDecoder [@haas2013novo], diamond [@buchfink2015fast].
