@@ -169,8 +169,8 @@ We are grateful to Philippe BORDRON (2) and Patrice DEHAIS (3) for testing and v
 
 (1) Bioinfo Genotoul, doi: 10.15454/1.5572369328961167E12
 (2)
-- Université de Toulouse, INRAE, BioinfOmics, GenoToul Bioinformatics Facility, Castanet-Tolosan, France, 
-- Université de Toulouse, INRAE, UR 875 MIAT, Castanet-Tolosan, France
+    - Université de Toulouse, INRAE, BioinfOmics, GenoToul Bioinformatics Facility, Castanet-Tolosan, France, 
+    - Université de Toulouse, INRAE, UR 875 MIAT, Castanet-Tolosan, France
 (3) Sigenae, GenPhySE, Université de Toulouse, INRAE, ENVT, F-31326, Castanet Tolosan, France
   
 # Acknowledgement of financial support
