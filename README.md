@@ -34,6 +34,10 @@ appropriate detection thresholds.
 Simulator and simulation data descriptions can be found in the SIMULATION.md file located in doc directory 
 [here](./doc/SIMULATION.md)
 
+How to cite ?
+--------------
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.06272/status.svg)](https://doi.org/10.21105/joss.06272)
+
 How it works ?
 --------------
 
